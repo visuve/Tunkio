@@ -54,11 +54,25 @@ namespace
 
     std::wstring Win32ErrorToString(const DWORD error)
     {
-        wchar_t buffer[KiloByte] = { 0 };
         constexpr DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         constexpr DWORD langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
+        wchar_t buffer[KiloByte] = { 0 };
         const DWORD size = FormatMessage(flags, nullptr, error, langId, buffer, KiloByte, nullptr);
         return std::wstring(buffer, size);
+    }
+
+    void PrintUsage()
+    {
+        std::wcerr << L"Please provide path to the drive to wipe." << std::endl;
+        std::wcout << L"Example: \\\\.\\PHYSICALDRIVE1" << std::endl;
+        std::wcout << std::endl << "Here are your drives:" << std::endl << std::endl;
+
+        DWORD error = static_cast<DWORD>(_wsystem(L"wmic diskdrive list brief"));
+
+        if (error != 0)
+        {
+            std::wcerr << L"Listing your drives failed with wmic: " << error << std::endl;
+        }
     }
 }
 
@@ -66,8 +80,7 @@ int wmain(int argc, wchar_t* argv[])
 {
     if (argc <= 1)
     {
-        std::wcerr << L"Please provide path to the drive to nuke." << std::endl;
-        std::wcout << L"Example: \\\\.\\PHYSICALDRIVE1" << std::endl;
+        PrintUsage();
         return ERROR_BAD_ARGUMENTS;
     }
 
@@ -80,7 +93,7 @@ int wmain(int argc, wchar_t* argv[])
     if (!hdd.IsValid())
     {
         const DWORD error = GetLastError();
-        std::wcerr << L"Could not open HDD: " << error << L" / " << Win32ErrorToString(error) << std::endl;
+        std::wcerr << L"Could not open drive: " << error << L" / " << Win32ErrorToString(error) << std::endl;
         return error;
     }
 
@@ -93,7 +106,7 @@ int wmain(int argc, wchar_t* argv[])
         return error;
     }
 
-    std::wcout << L"Bytes to nuke: " << bytesLeft << std::endl;
+    std::wcout << L"Bytes to wipe: " << bytesLeft << std::endl;
 
     const std::string buffer(MegaByte, '\0');
     UINT64 writtenBytesTotal = 0;
@@ -113,7 +126,7 @@ int wmain(int argc, wchar_t* argv[])
             const DWORD error = GetLastError();
             std::wcerr << L"Write operation failed: " << error << L" / " << Win32ErrorToString(error) << std::endl;
             std::wcout << L"Wrote only " << writtenBytes << L" of intended " << MegaByte << L" bytes" << std::endl;
-            std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unnuked" << std::endl;
+            std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unwiped" << std::endl;
             std::wcout << L"Took :" << stopWatch << std::endl;
             return error;
         }
@@ -124,7 +137,7 @@ int wmain(int argc, wchar_t* argv[])
         }
     }
 
-    std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unnuked" << std::endl;
+    std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unwiped" << std::endl;
     std::wcout << L"Took :" << stopWatch << std::endl;
 
     return 0;
