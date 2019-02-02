@@ -9,14 +9,18 @@ namespace
     class AutoHandle
     {
     public:
-        AutoHandle(HANDLE handle) :
+        AutoHandle(const HANDLE handle) :
             m_handle(handle)
         {
         }
 
         ~AutoHandle()
         {
-            Close();
+            if (m_handle)
+            {
+                CloseHandle(m_handle);
+                m_handle = nullptr;
+            }
         }
 
         bool IsValid() const
@@ -30,15 +34,6 @@ namespace
         }
 
     private:
-        void Close()
-        {
-            if (m_handle)
-            {
-                CloseHandle(m_handle);
-                m_handle = nullptr;
-            }
-        }
-
         HANDLE m_handle = INVALID_HANDLE_VALUE;
     };
 
@@ -57,12 +52,12 @@ namespace
         return diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
     }
 
-    std::wstring Win32ErrorToString(DWORD error)
+    std::wstring Win32ErrorToString(const DWORD error)
     {
         wchar_t buffer[KiloByte] = { 0 };
         constexpr DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         constexpr DWORD langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-        DWORD size = FormatMessage(flags, nullptr, error, langId, buffer, KiloByte, nullptr);
+        const DWORD size = FormatMessage(flags, nullptr, error, langId, buffer, KiloByte, nullptr);
         return std::wstring(buffer, size);
     }
 }
@@ -80,11 +75,11 @@ int wmain(int argc, wchar_t* argv[])
 
     constexpr DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE;
     constexpr DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-    AutoHandle hdd = CreateFile(argv[1], desiredAccess, shareMode, nullptr, OPEN_EXISTING, 0, nullptr);
+    const AutoHandle hdd = CreateFile(argv[1], desiredAccess, shareMode, nullptr, OPEN_EXISTING, 0, nullptr);
 
     if (!hdd.IsValid())
     {
-        DWORD error = GetLastError();
+        const DWORD error = GetLastError();
         std::wcerr << L"Could not open HDD: " << error << L" / " << Win32ErrorToString(error) << std::endl;
         return error;
     }
@@ -93,8 +88,8 @@ int wmain(int argc, wchar_t* argv[])
 
     if (!bytesLeft)
     {
-        DWORD error = GetLastError();
-        std::wcerr << L"Failed to get disk geometry: " << Win32ErrorToString(error) << std::endl;
+        const DWORD error = GetLastError();
+        std::wcerr << L"Failed to get disk geometry: " << error << L" / " << Win32ErrorToString(error) << std::endl;
         return error;
     }
 
@@ -102,23 +97,26 @@ int wmain(int argc, wchar_t* argv[])
 
     const std::string buffer(MegaByte, '\0');
     UINT64 writtenBytesTotal = 0;
-    StopWatch<std::chrono::seconds> stopWatch;
+    const StopWatch<std::chrono::seconds> stopWatch;
 
     while (bytesLeft)
     {
-        DWORD writtenBytes = 0;
         const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
+        DWORD writtenBytes = 0;
 
-        if (!WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr))
-        {
-            DWORD error = GetLastError();
-            std::wcerr << L"Write failed: " << error << L" / " << Win32ErrorToString(error) << std::endl;
-            std::wcout << L"Could write only " << writtenBytes << L" of " << MegaByte << L" bytes" << std::endl;
-            break;
-        }
-
+        const bool result = WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr);
         writtenBytesTotal += writtenBytes;
         bytesLeft -= writtenBytes;
+
+        if (!result)
+        {
+            const DWORD error = GetLastError();
+            std::wcerr << L"Write operation failed: " << error << L" / " << Win32ErrorToString(error) << std::endl;
+            std::wcout << L"Wrote only " << writtenBytes << L" of intended " << MegaByte << L" bytes" << std::endl;
+            std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unnuked" << std::endl;
+            std::wcout << L"Took :" << stopWatch << std::endl;
+            return error;
+        }
 
         if (writtenBytesTotal % (MegaByte * 10) == 0)
         {
@@ -126,7 +124,7 @@ int wmain(int argc, wchar_t* argv[])
         }
     }
 
-    std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L"left unnuked" << std::endl;
+    std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unnuked" << std::endl;
     std::wcout << L"Took :" << stopWatch << std::endl;
 
     return 0;

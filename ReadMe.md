@@ -6,7 +6,7 @@
 
 ## TODO
 
-- Limit the file file flags
+- Try to limit the CreateFile flags as low as possible
 - Attempt to try recovering files after the wipe
 
 ## Prerequisites
