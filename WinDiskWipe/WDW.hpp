@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Timer.hpp"
+#include "Units.hpp"
 
 #include <functional>
 
 namespace WDW
 {
-    constexpr uint32_t KiloByte = 1024u;
-    constexpr uint32_t MegaByte = KiloByte * 1024u;
-    using ProgressCallback = std::function<void(uint64_t, std::chrono::seconds)>;
+    using ProgressCallback = std::function<void(uint64_t bytesWritten, uint64_t secondsElapsed)>;
 
     class AutoHandle
     {

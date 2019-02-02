@@ -105,6 +105,7 @@
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
     <ClInclude Include="Timer.hpp" />
+    <ClInclude Include="Units.hpp" />
     <ClInclude Include="WDW.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -8,8 +8,8 @@ namespace Help
     {
         constexpr uint32_t flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         constexpr uint32_t langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-        wchar_t buffer[WDW::KiloByte] = { 0 };
-        const uint32_t size = FormatMessage(flags, nullptr, error, langId, buffer, WDW::KiloByte, nullptr);
+        wchar_t buffer[Units::KiloByte] = { 0 };
+        const uint32_t size = FormatMessage(flags, nullptr, error, langId, buffer, Units::KiloByte, nullptr);
         return std::wstring(buffer, size);
     }
 
@@ -62,12 +62,12 @@ int wmain(int argc, wchar_t* argv[])
 
     uint64_t writtenBytesTotal = 0;
     uint32_t error = ERROR_SUCCESS;
-    const Timer<std::chrono::seconds> stopWatch;
+    const Timer<Units::Seconds> stopWatch;
 
-    const auto progress = [](uint64_t bytes, std::chrono::seconds time) -> void
+    const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
     {
-        const uint64_t megabytes = bytes / WDW::MegaByte;
-        std::wcout << megabytes << L" megabytes written. Speed " << megabytes / time.count() << " MB/s" << std::endl;
+        const uint64_t megabytesWritten = bytesWritten / Units::MegaByte;
+        std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
     };
 
     if (!WipeDrive(hdd, bytesLeft, writtenBytesTotal, progress))

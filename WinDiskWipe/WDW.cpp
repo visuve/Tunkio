@@ -1,5 +1,6 @@
 #include "PCH.hpp"
 #include "WDW.hpp"
+#include "Timer.hpp"
 
 namespace WDW
 {
@@ -44,27 +45,27 @@ namespace WDW
 
     bool WipeDrive(const AutoHandle& hdd, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress)
     {
-        const std::string buffer(MegaByte, '\0');
-        Timer<std::chrono::seconds> timer;
+        const std::string buffer(Units::MegaByte, '\0');
+        Timer<Units::Seconds> timer;
 
         while (bytesLeft)
         {
-            const uint32_t bytesToWrite = bytesLeft < MegaByte ? static_cast<uint32_t>(bytesLeft) : MegaByte;
+            const uint64_t bytesToWrite = bytesLeft < Units::MegaByte ? bytesLeft : Units::MegaByte;
             unsigned long writtenBytes = 0u;
 
-            const bool result = WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr);
+            const bool result = WriteFile(hdd, &buffer.front(), static_cast<uint32_t>(bytesToWrite), &writtenBytes, nullptr);
             writtenBytesTotal += writtenBytes;
             bytesLeft -= writtenBytes;
 
             if (!result)
             {
-                std::wcout << L"Wrote only " << writtenBytes << L" of intended " << MegaByte << L" bytes" << std::endl;
+                std::wcout << L"Wrote only " << writtenBytes << L" of intended " << Units::MegaByte << L" bytes" << std::endl;
                 return false;
             }
 
-            if (timer > std::chrono::seconds(1))
+            if (timer > Units::Seconds(1))
             {
-                progress(writtenBytesTotal, timer.Duration());
+                progress(writtenBytesTotal, timer.Count());
             }
         }
 
