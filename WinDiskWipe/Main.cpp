@@ -64,7 +64,12 @@ int wmain(int argc, wchar_t* argv[])
     DWORD error = ERROR_SUCCESS;
     const StopWatch<std::chrono::seconds> stopWatch;
 
-    if (!WipeDrive(hdd, bytesLeft, writtenBytesTotal))
+    const auto progress = [](UINT64 megabytes) -> void
+    {
+        std::wcout << megabytes << L" megabytes written" << std::endl;
+    };
+
+    if (!WipeDrive(hdd, bytesLeft, writtenBytesTotal, progress))
     {
         error = GetLastError();
         std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;

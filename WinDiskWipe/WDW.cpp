@@ -26,7 +26,7 @@ namespace WDW
         return m_handle;
     }
 
-    UINT64 DiskSize(const AutoHandle & hdd)
+    UINT64 DiskSize(const AutoHandle& hdd)
     {
         DWORD bytesReturned = 0; // Not needed
         DISK_GEOMETRY diskGeo = { 0 };
@@ -41,7 +41,7 @@ namespace WDW
         return diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
     }
 
-    bool WipeDrive(const AutoHandle & hdd, UINT64 & bytesLeft, UINT64 & writtenBytesTotal)
+    bool WipeDrive(const AutoHandle& hdd, UINT64& bytesLeft, UINT64& writtenBytesTotal, const ProgressCallback& progress)
     {
         const std::string buffer(MegaByte, '\0');
 
@@ -62,7 +62,7 @@ namespace WDW
 
             if (writtenBytesTotal % (MegaByte * 10) == 0)
             {
-                std::wcout << writtenBytesTotal / MegaByte << L" megabytes written" << std::endl;
+                progress(writtenBytesTotal / MegaByte);
             }
         }
 
