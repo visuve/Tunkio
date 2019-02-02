@@ -52,6 +52,37 @@ namespace
         return diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
     }
 
+    bool WipeDrive(const AutoHandle& hdd, UINT64& bytesLeft, UINT64& writtenBytesTotal)
+    {
+        const std::string buffer(MegaByte, '\0');
+
+        while (bytesLeft)
+        {
+            const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
+            DWORD writtenBytes = 0;
+
+            const bool result = WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr);
+            writtenBytesTotal += writtenBytes;
+            bytesLeft -= writtenBytes;
+
+            if (!result)
+            {
+                std::wcout << L"Wrote only " << writtenBytes << L" of intended " << MegaByte << L" bytes" << std::endl;
+                return false;
+            }
+
+            if (writtenBytesTotal % (MegaByte * 10) == 0)
+            {
+                std::wcout << writtenBytesTotal / MegaByte << L" megabytes written" << std::endl;
+            }
+        }
+
+        return true;
+    }
+}
+
+namespace Help
+{
     std::wstring Win32ErrorToString(const DWORD error)
     {
         constexpr DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
@@ -76,11 +107,12 @@ namespace
     }
 }
 
+
 int wmain(int argc, wchar_t* argv[])
 {
     if (argc <= 1)
     {
-        PrintUsage();
+        Help::PrintUsage();
         return ERROR_BAD_ARGUMENTS;
     }
 
@@ -93,7 +125,7 @@ int wmain(int argc, wchar_t* argv[])
     if (!hdd.IsValid())
     {
         const DWORD error = GetLastError();
-        std::wcerr << L"Could not open drive: " << error << L" / " << Win32ErrorToString(error) << std::endl;
+        std::wcerr << L"Could not open drive: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
         return error;
     }
 
@@ -102,43 +134,24 @@ int wmain(int argc, wchar_t* argv[])
     if (!bytesLeft)
     {
         const DWORD error = GetLastError();
-        std::wcerr << L"Failed to get disk geometry: " << error << L" / " << Win32ErrorToString(error) << std::endl;
+        std::wcerr << L"Failed to get disk geometry: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
         return error;
     }
 
     std::wcout << L"Bytes to wipe: " << bytesLeft << std::endl;
 
-    const std::string buffer(MegaByte, '\0');
     UINT64 writtenBytesTotal = 0;
+    DWORD error = ERROR_SUCCESS;
     const StopWatch<std::chrono::seconds> stopWatch;
 
-    while (bytesLeft)
+    if (!WipeDrive(hdd, bytesLeft, writtenBytesTotal))
     {
-        const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
-        DWORD writtenBytes = 0;
-
-        const bool result = WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr);
-        writtenBytesTotal += writtenBytes;
-        bytesLeft -= writtenBytes;
-
-        if (!result)
-        {
-            const DWORD error = GetLastError();
-            std::wcerr << L"Write operation failed: " << error << L" / " << Win32ErrorToString(error) << std::endl;
-            std::wcout << L"Wrote only " << writtenBytes << L" of intended " << MegaByte << L" bytes" << std::endl;
-            std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unwiped" << std::endl;
-            std::wcout << L"Took :" << stopWatch << std::endl;
-            return error;
-        }
-
-        if (writtenBytesTotal % (MegaByte * 10) == 0)
-        {
-            std::wcout << writtenBytesTotal / MegaByte << L" megabytes written" << std::endl;
-        }
+        error = GetLastError();
+        std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
     }
 
     std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes " << bytesLeft << L" left unwiped" << std::endl;
     std::wcout << L"Took :" << stopWatch << std::endl;
 
-    return 0;
+    return error;
 }
