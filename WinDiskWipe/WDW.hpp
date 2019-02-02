@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StopWatch.hpp"
+#include "Timer.hpp"
 
 #include <Windows.h>
 #include <functional>

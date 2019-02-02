@@ -1,6 +1,6 @@
 #include "PCH.hpp"
-#include "StopWatch.hpp"
 #include "WDW.hpp"
+#include "Timer.hpp"
 
 namespace Help
 {
@@ -62,7 +62,7 @@ int wmain(int argc, wchar_t* argv[])
 
     UINT64 writtenBytesTotal = 0;
     DWORD error = ERROR_SUCCESS;
-    const StopWatch<std::chrono::seconds> stopWatch;
+    const Timer<std::chrono::seconds> stopWatch;
 
     const auto progress = [](UINT64 bytes, std::chrono::seconds time) -> void
     {

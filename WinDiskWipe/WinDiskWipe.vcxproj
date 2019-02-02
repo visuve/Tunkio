@@ -104,7 +104,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="StopWatch.hpp" />
+    <ClInclude Include="Timer.hpp" />
     <ClInclude Include="WDW.hpp" />
   </ItemGroup>
   <ItemGroup>
