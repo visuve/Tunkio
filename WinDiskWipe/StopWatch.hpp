@@ -13,7 +13,6 @@ namespace
 
         virtual ~StopWatch()
         {
-            std::cout << *this << std::endl;
         }
 
         T Duration() const
@@ -29,23 +28,23 @@ namespace
         const std::chrono::high_resolution_clock::time_point m_start = std::chrono::high_resolution_clock::now();
     };
 
-    std::ostream &operator << (std::ostream& os, const StopWatch<std::chrono::nanoseconds>& s)
+    std::wostream &operator << (std::wostream& os, const StopWatch<std::chrono::nanoseconds>& s)
     {
-        return os << s.Duration().count() << "ns";
+        return os << s.Duration().count() << L"ns";
     }
 
-    std::ostream &operator << (std::ostream& os, const StopWatch<std::chrono::microseconds>& s)
+    std::wostream &operator << (std::wostream& os, const StopWatch<std::chrono::microseconds>& s)
     {
-        return os << s.Duration().count() << "us";
+        return os << s.Duration().count() << L"us";
     }
 
-    std::ostream &operator << (std::ostream& os, const StopWatch<std::chrono::milliseconds>& s)
+    std::wostream &operator << (std::wostream& os, const StopWatch<std::chrono::milliseconds>& s)
     {
-        return os << s.Duration().count() << "ms";
+        return os << s.Duration().count() << L"ms";
     }
 
-    std::ostream &operator << (std::ostream& os, const StopWatch<std::chrono::seconds>& s)
+    std::wostream &operator << (std::wostream& os, const StopWatch<std::chrono::seconds>& s)
     {
-        return os << s.Duration().count() << "s";
+        return os << s.Duration().count() << L"s";
     }
 }

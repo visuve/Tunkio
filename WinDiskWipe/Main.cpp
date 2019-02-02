@@ -100,35 +100,34 @@ int wmain(int argc, wchar_t* argv[])
 
     std::wcout << L"Bytes to nuke: " << bytesLeft << std::endl;
 
+    const std::string buffer(MegaByte, '\0');
+    UINT64 writtenBytesTotal = 0;
+    StopWatch<std::chrono::seconds> stopWatch;
+
+    while (bytesLeft)
     {
-        const std::string buffer(MegaByte, '\0');
-        UINT64 writtenBytesTotal = 0;
-        StopWatch<std::chrono::seconds> stopWatch;
+        DWORD writtenBytes = 0;
+        const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
 
-        while (bytesLeft)
+        if (!WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr))
         {
-            DWORD writtenBytes = 0;
-            const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
-
-            if (!WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr))
-            {
-                DWORD error = GetLastError();
-                std::wcerr << L"Write failed: " << error << L" / " << Win32ErrorToString(error) << std::endl;
-                std::wcout << L"Could write only " << writtenBytes << L" of " << MegaByte << L" bytes" << std::endl;
-                break;
-            }
-
-            writtenBytesTotal += writtenBytes;
-            bytesLeft -= writtenBytes;
-
-            if (writtenBytesTotal % (MegaByte * 10) == 0)
-            {
-                std::wcout << writtenBytesTotal / MegaByte << L" megabytes written" << std::endl;
-            }
+            DWORD error = GetLastError();
+            std::wcerr << L"Write failed: " << error << L" / " << Win32ErrorToString(error) << std::endl;
+            std::wcout << L"Could write only " << writtenBytes << L" of " << MegaByte << L" bytes" << std::endl;
+            break;
         }
 
-        std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L"left unnuked" << std::endl;
+        writtenBytesTotal += writtenBytes;
+        bytesLeft -= writtenBytes;
+
+        if (writtenBytesTotal % (MegaByte * 10) == 0)
+        {
+            std::wcout << writtenBytesTotal / MegaByte << L" megabytes written" << std::endl;
+        }
     }
+
+    std::wcout << L"Nuked: " << writtenBytesTotal << L" bytes " << bytesLeft << L"left unnuked" << std::endl;
+    std::wcout << L"Took :" << stopWatch << std::endl;
 
     return 0;
 }
