@@ -10,10 +10,11 @@ namespace
     {
     public:
         StopWatch() = default;
-
-        virtual ~StopWatch()
-        {
-        }
+        StopWatch(const StopWatch&) = delete;
+        StopWatch(StopWatch&&) = delete;
+        StopWatch& operator = (const StopWatch&) = delete;
+        StopWatch& operator = (StopWatch&&) = delete;
+        ~StopWatch() = default;
 
         T Duration() const
         {
@@ -21,8 +22,15 @@ namespace
             return std::chrono::duration_cast<T>(diff);
         }
 
-        StopWatch(const StopWatch&) = delete;
-        StopWatch& operator = (const StopWatch&) = delete;
+        bool operator < (T time) const
+        {
+            return Duration() < time;
+        }
+
+        bool operator > (T time) const
+        {
+            return Duration() > time;
+        }
 
     private:
         const std::chrono::high_resolution_clock::time_point m_start = std::chrono::high_resolution_clock::now();

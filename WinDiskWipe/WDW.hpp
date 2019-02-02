@@ -1,5 +1,7 @@
 #pragma once
 
+#include "StopWatch.hpp"
+
 #include <Windows.h>
 #include <functional>
 
@@ -7,7 +9,7 @@ namespace WDW
 {
     constexpr DWORD KiloByte = 1024;
     constexpr DWORD MegaByte = KiloByte * 1024;
-    using ProgressCallback = std::function<void(UINT64)>;
+    using ProgressCallback = std::function<void(UINT64, std::chrono::seconds)>;
 
     class AutoHandle
     {

@@ -44,6 +44,7 @@ namespace WDW
     bool WipeDrive(const AutoHandle& hdd, UINT64& bytesLeft, UINT64& writtenBytesTotal, const ProgressCallback& progress)
     {
         const std::string buffer(MegaByte, '\0');
+        StopWatch<std::chrono::seconds> timer;
 
         while (bytesLeft)
         {
@@ -60,9 +61,9 @@ namespace WDW
                 return false;
             }
 
-            if (writtenBytesTotal % (MegaByte * 10) == 0)
+            if (timer > std::chrono::seconds(1))
             {
-                progress(writtenBytesTotal / MegaByte);
+                progress(writtenBytesTotal, timer.Duration());
             }
         }
 

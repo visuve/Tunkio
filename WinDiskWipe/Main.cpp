@@ -64,9 +64,10 @@ int wmain(int argc, wchar_t* argv[])
     DWORD error = ERROR_SUCCESS;
     const StopWatch<std::chrono::seconds> stopWatch;
 
-    const auto progress = [](UINT64 megabytes) -> void
+    const auto progress = [](UINT64 bytes, std::chrono::seconds time) -> void
     {
-        std::wcout << megabytes << L" megabytes written" << std::endl;
+        const UINT64 megabytes = bytes / WDW::MegaByte;
+        std::wcout << megabytes << L" megabytes written. Speed " << megabytes / time.count() << " MB/s" << std::endl;
     };
 
     if (!WipeDrive(hdd, bytesLeft, writtenBytesTotal, progress))
