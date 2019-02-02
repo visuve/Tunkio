@@ -2,19 +2,19 @@
 
 #include "Timer.hpp"
 
-#include <Windows.h>
 #include <functional>
 
 namespace WDW
 {
-    constexpr DWORD KiloByte = 1024;
-    constexpr DWORD MegaByte = KiloByte * 1024;
-    using ProgressCallback = std::function<void(UINT64, std::chrono::seconds)>;
+    constexpr uint32_t KiloByte = 1024u;
+    constexpr uint32_t MegaByte = KiloByte * 1024u;
+    using ProgressCallback = std::function<void(uint64_t, std::chrono::seconds)>;
 
     class AutoHandle
     {
+        using RawHandle = void*;
     public:
-        AutoHandle(const HANDLE handle);
+        AutoHandle(const RawHandle handle);
         AutoHandle(const AutoHandle&) = delete;
         AutoHandle(AutoHandle&&) = delete;
         AutoHandle& operator = (const AutoHandle&) = delete;
@@ -22,11 +22,11 @@ namespace WDW
         ~AutoHandle();
 
         bool IsValid() const;
-        operator const HANDLE() const;
+        operator const RawHandle() const;
     private:
-        HANDLE m_handle = INVALID_HANDLE_VALUE;
+        RawHandle m_handle = INVALID_HANDLE_VALUE;
     };
 
-    UINT64 DiskSize(const AutoHandle& hdd);
-    bool WipeDrive(const AutoHandle& hdd, UINT64& bytesLeft, UINT64& writtenBytesTotal, const ProgressCallback& progress);
+    uint64_t DiskSize(const AutoHandle& hdd);
+    bool WipeDrive(const AutoHandle& hdd, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress);
 }

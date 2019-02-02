@@ -3,10 +3,11 @@
 
 namespace WDW
 {
-    AutoHandle::AutoHandle(const HANDLE handle) :
+    AutoHandle::AutoHandle(const RawHandle handle) :
         m_handle(handle)
     {
     }
+
     AutoHandle::~AutoHandle()
     {
         if (m_handle)
@@ -21,35 +22,35 @@ namespace WDW
         return m_handle != INVALID_HANDLE_VALUE;
     }
 
-    AutoHandle::operator const HANDLE() const
+    AutoHandle::operator const RawHandle() const
     {
         return m_handle;
     }
 
-    UINT64 DiskSize(const AutoHandle& hdd)
+    uint64_t DiskSize(const AutoHandle& hdd)
     {
-        DWORD bytesReturned = 0; // Not needed
+        unsigned long bytesReturned = 0; // Not needed
         DISK_GEOMETRY diskGeo = { 0 };
-        constexpr DWORD diskGeoSize = sizeof(DISK_GEOMETRY);
+        constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
 
         if (!DeviceIoControl(hdd, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
         {
-            return 0;
+            return 0u;
         }
 
         _ASSERT(bytesReturned == sizeof(DISK_GEOMETRY));
         return diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
     }
 
-    bool WipeDrive(const AutoHandle& hdd, UINT64& bytesLeft, UINT64& writtenBytesTotal, const ProgressCallback& progress)
+    bool WipeDrive(const AutoHandle& hdd, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress)
     {
         const std::string buffer(MegaByte, '\0');
         Timer<std::chrono::seconds> timer;
 
         while (bytesLeft)
         {
-            const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
-            DWORD writtenBytes = 0;
+            const uint32_t bytesToWrite = bytesLeft < MegaByte ? static_cast<uint32_t>(bytesLeft) : MegaByte;
+            unsigned long writtenBytes = 0u;
 
             const bool result = WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr);
             writtenBytesTotal += writtenBytes;
