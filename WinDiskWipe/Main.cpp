@@ -1,85 +1,6 @@
 #include "PCH.hpp"
 #include "StopWatch.hpp"
-
-namespace
-{
-    constexpr DWORD KiloByte = 1024;
-    constexpr DWORD MegaByte = KiloByte * 1024;
-
-    class AutoHandle
-    {
-    public:
-        AutoHandle(const HANDLE handle) :
-            m_handle(handle)
-        {
-        }
-
-        ~AutoHandle()
-        {
-            if (m_handle)
-            {
-                CloseHandle(m_handle);
-                m_handle = nullptr;
-            }
-        }
-
-        bool IsValid() const
-        {
-            return m_handle != INVALID_HANDLE_VALUE;
-        }
-
-        operator const HANDLE() const
-        {
-            return m_handle;
-        }
-
-    private:
-        HANDLE m_handle = INVALID_HANDLE_VALUE;
-    };
-
-    UINT64 DiskSize(const AutoHandle& hdd)
-    {
-        DWORD bytesReturned = 0; // Not needed
-        DISK_GEOMETRY diskGeo = { 0 };
-        constexpr DWORD diskGeoSize = sizeof(DISK_GEOMETRY);
-
-        if (!DeviceIoControl(hdd, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
-        {
-            return 0;
-        }
-
-        _ASSERT(bytesReturned == sizeof(DISK_GEOMETRY));
-        return diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
-    }
-
-    bool WipeDrive(const AutoHandle& hdd, UINT64& bytesLeft, UINT64& writtenBytesTotal)
-    {
-        const std::string buffer(MegaByte, '\0');
-
-        while (bytesLeft)
-        {
-            const DWORD bytesToWrite = bytesLeft < MegaByte ? static_cast<DWORD>(bytesLeft) : MegaByte;
-            DWORD writtenBytes = 0;
-
-            const bool result = WriteFile(hdd, &buffer.front(), bytesToWrite, &writtenBytes, nullptr);
-            writtenBytesTotal += writtenBytes;
-            bytesLeft -= writtenBytes;
-
-            if (!result)
-            {
-                std::wcout << L"Wrote only " << writtenBytes << L" of intended " << MegaByte << L" bytes" << std::endl;
-                return false;
-            }
-
-            if (writtenBytesTotal % (MegaByte * 10) == 0)
-            {
-                std::wcout << writtenBytesTotal / MegaByte << L" megabytes written" << std::endl;
-            }
-        }
-
-        return true;
-    }
-}
+#include "WDW.hpp"
 
 namespace Help
 {
@@ -87,8 +8,8 @@ namespace Help
     {
         constexpr DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         constexpr DWORD langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-        wchar_t buffer[KiloByte] = { 0 };
-        const DWORD size = FormatMessage(flags, nullptr, error, langId, buffer, KiloByte, nullptr);
+        wchar_t buffer[WDW::KiloByte] = { 0 };
+        const DWORD size = FormatMessage(flags, nullptr, error, langId, buffer, WDW::KiloByte, nullptr);
         return std::wstring(buffer, size);
     }
 
@@ -107,7 +28,6 @@ namespace Help
     }
 }
 
-
 int wmain(int argc, wchar_t* argv[])
 {
     if (argc <= 1)
@@ -120,7 +40,7 @@ int wmain(int argc, wchar_t* argv[])
 
     constexpr DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE;
     constexpr DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-    const AutoHandle hdd = CreateFile(argv[1], desiredAccess, shareMode, nullptr, OPEN_EXISTING, 0, nullptr);
+    const WDW::AutoHandle hdd = CreateFile(argv[1], desiredAccess, shareMode, nullptr, OPEN_EXISTING, 0, nullptr);
 
     if (!hdd.IsValid())
     {
