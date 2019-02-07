@@ -1,4 +1,5 @@
 out/
+packages/
 .vs/
 *.opendb
 *.db

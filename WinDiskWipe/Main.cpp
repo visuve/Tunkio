@@ -70,7 +70,7 @@ int wmain(int argc, wchar_t* argv[])
         std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
     };
 
-    if (!WipeDrive(hdd, bytesLeft, writtenBytesTotal, progress))
+    if (!Wipe(hdd, bytesLeft, writtenBytesTotal, progress))
     {
         error = GetLastError();
         std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
