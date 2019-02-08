@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="TunkioHandleTest.cpp" />
+    <ClCompile Include="PCH.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioHandle.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioIOMock.cpp" />
+    <ClCompile Include="TunkioIOTest.cpp" />
+    <ClCompile Include="TestMain.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioIO.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioCLUI\TunkioArgs.cpp">
+      <Filter>../TunkioCLUI</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioArgsTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="TunkioIOMock.hpp" />
+    <ClInclude Include="..\TunkioDLL\TunkioHandle.hpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TunkioDLL\TunkioIO.hpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TunkioDLL\TunkioTimer.hpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TunkioDLL\TunkioUnits.hpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TunkioCLUI\TunkioArgs.hpp">
+      <Filter>../TunkioCLUI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="../TunkioDLL">
+      <UniqueIdentifier>{4404c51f-4ca3-4506-aa17-a76c9d90e312}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="../TunkioCLUI">
+      <UniqueIdentifier>{f6db035c-a92c-4bcc-9245-5fa71335c720}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

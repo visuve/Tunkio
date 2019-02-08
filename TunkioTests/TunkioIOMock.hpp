@@ -2,7 +2,7 @@
 
 #include <functional>
 
-namespace WDW::Mock
+namespace Tunkio::IO::Mock
 {
     void SetFakeWrite(std::function<bool(unsigned long*)> fakeWrite);
 }

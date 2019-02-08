@@ -1,7 +1,7 @@
 #include "PCH.hpp"
-#include "AutoHandle.hpp"
+#include "TunkioHandle.hpp"
 
-namespace WDW
+namespace Tunkio::IO
 {
     AutoHandle::AutoHandle(const RawHandle handle) :
         m_handle(handle)

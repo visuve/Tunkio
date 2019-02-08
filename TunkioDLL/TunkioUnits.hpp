@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace Units
+namespace Tunkio::Units
 {
     using MicroSeconds = std::chrono::duration<uint64_t, std::micro>;
     using MilliSeconds = std::chrono::duration<uint64_t, std::milli>;

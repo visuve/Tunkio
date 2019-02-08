@@ -9,12 +9,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		ReadMe.md = ReadMe.md
-		WinDiskWipe.props = WinDiskWipe.props
+		Tunkio.props = Tunkio.props
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinDiskWipe", "WinDiskWipe\WinDiskWipe.vcxproj", "{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioDLL", "TunkioDLL\TunkioDLL.vcxproj", "{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{9E670774-172A-4523-A048-1DE13B8AD55D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioCLUI", "TunkioCLUI\TunkioCLUI.vcxproj", "{DB0A41E5-ED54-4842-9745-FFB5EF14F294}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioTests", "TunkioTests\TunkioTests.vcxproj", "{9E670774-172A-4523-A048-1DE13B8AD55D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,14 @@ Global
 		{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}.Release|x64.Build.0 = Release|x64
 		{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}.Release|x86.ActiveCfg = Release|Win32
 		{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}.Release|x86.Build.0 = Release|Win32
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Debug|x64.ActiveCfg = Debug|x64
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Debug|x64.Build.0 = Debug|x64
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Debug|x86.ActiveCfg = Debug|Win32
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Debug|x86.Build.0 = Debug|Win32
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Release|x64.ActiveCfg = Release|x64
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Release|x64.Build.0 = Release|x64
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Release|x86.ActiveCfg = Release|Win32
+		{DB0A41E5-ED54-4842-9745-FFB5EF14F294}.Release|x86.Build.0 = Release|Win32
 		{9E670774-172A-4523-A048-1DE13B8AD55D}.Debug|x64.ActiveCfg = Debug|x64
 		{9E670774-172A-4523-A048-1DE13B8AD55D}.Debug|x64.Build.0 = Debug|x64
 		{9E670774-172A-4523-A048-1DE13B8AD55D}.Debug|x86.ActiveCfg = Debug|Win32

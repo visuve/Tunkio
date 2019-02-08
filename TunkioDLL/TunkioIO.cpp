@@ -1,16 +1,32 @@
 #include "PCH.hpp"
-#include "WDW.hpp"
-#include "Timer.hpp"
+#include "TunkioIO.hpp"
+#include "TunkioTimer.hpp"
 
-namespace WDW
+namespace Tunkio::IO
 {
 #ifdef TESTING
+    extern decltype(CreateFileW) Win32OpenW;
+    extern decltype(CreateFileA) Win32OpenA;
     extern decltype(DeviceIoControl) Win32DeviceIoControl;
     extern decltype(WriteFile) Win32Write;
 #else
+    constexpr auto Win32OpenW = CreateFileW;
+    constexpr auto Win32OpenA = CreateFileA;
     constexpr auto Win32DeviceIoControl = DeviceIoControl;
     constexpr auto Win32Write = WriteFile;
 #endif
+    constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
+    constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+
+    void* OpenW(const std::wstring& path)
+    {
+        return Win32OpenW(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, 0, nullptr);
+    }
+
+    void* OpenA(const std::string& path)
+    {
+        return Win32OpenA(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, 0, nullptr);
+    }
 
     uint64_t DiskSize(const AutoHandle& hdd)
     {

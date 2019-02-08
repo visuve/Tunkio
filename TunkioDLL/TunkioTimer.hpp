@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Units.hpp"
+#include "TunkioUnits.hpp"
 
 #include <chrono>
 #include <iostream>
 
-namespace
+namespace Tunkio
 {
     template <typename T>
     class Timer
@@ -43,27 +43,27 @@ namespace
         const std::chrono::high_resolution_clock::time_point m_start = std::chrono::high_resolution_clock::now();
     };
 
-    std::wostream& operator << (std::wostream& os, const Timer<Units::MicroSeconds>& us)
+    inline std::wostream& operator << (std::wostream& os, const Timer<Units::MicroSeconds>& us)
     {
         return os << us.Count() << L"us";
     }
 
-    std::wostream& operator << (std::wostream& os, const Timer<Units::MilliSeconds>& ms)
+    inline std::wostream& operator << (std::wostream& os, const Timer<Units::MilliSeconds>& ms)
     {
         return os << ms.Count() << L"ms";
     }
 
-    std::wostream& operator << (std::wostream& os, const Timer<Units::Seconds>& s)
+    inline std::wostream& operator << (std::wostream& os, const Timer<Units::Seconds>& s)
     {
         return os << s.Count() << L"s";
     }
 
-    std::wostream& operator << (std::wostream& os, const Timer<Units::Minutes>& m)
+    inline std::wostream& operator << (std::wostream& os, const Timer<Units::Minutes>& m)
     {
         return os << m.Count() << L"m";
     }
 
-    std::wostream& operator << (std::wostream& os, const Timer<Units::Hours>& h)
+    inline std::wostream& operator << (std::wostream& os, const Timer<Units::Hours>& h)
     {
         return os << h.Count() << L"h";
     }

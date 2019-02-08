@@ -1,4 +1,4 @@
-# WinDiskWipe
+# Tunkio
 
 - Wipes an unallocated hard disk drive
 - Originally written during the small hours of a boring night, since improved a little

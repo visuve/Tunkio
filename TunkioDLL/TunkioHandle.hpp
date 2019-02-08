@@ -1,10 +1,11 @@
 #pragma once
 
-namespace WDW
+namespace Tunkio::IO
 {
+    using RawHandle = void*;
+
     class AutoHandle
     {
-        using RawHandle = void*;
     public:
         AutoHandle(const RawHandle handle);
         AutoHandle(const AutoHandle&) = delete;

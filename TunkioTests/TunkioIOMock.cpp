@@ -1,9 +1,9 @@
 #include "PCH.hpp"
-#include "FileSystemMock.hpp"
-#include "../WinDiskWipe/WDW.hpp"
-#include "../WinDiskWipe/Units.hpp"
+#include "TunkioIOMock.hpp"
+#include "TunkioIO.hpp"
+#include "TunkioUnits.hpp"
 
-namespace WDW
+namespace Tunkio::IO
 {
     namespace Mock
     {
@@ -13,6 +13,16 @@ namespace WDW
         {
             FakeWrite = fn;
         }
+    }
+
+    HANDLE Win32OpenW(LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE)
+    {
+        return nullptr;
+    }
+
+    HANDLE Win32OpenA(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE)
+    {
+        return nullptr;
     }
 
     BOOL Win32DeviceIoControl(HANDLE, DWORD, LPVOID, DWORD, LPVOID diskGeometry, DWORD, LPDWORD bytesReturned, LPOVERLAPPED)
@@ -30,6 +40,6 @@ namespace WDW
 
     BOOL Win32Write(HANDLE, LPCVOID, DWORD, LPDWORD writtenBytes, LPOVERLAPPED)
     {
-        return WDW::Mock::FakeWrite(writtenBytes);
+        return Mock::FakeWrite(writtenBytes);
     }
 }

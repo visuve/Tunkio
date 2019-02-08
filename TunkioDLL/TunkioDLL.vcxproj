@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}</ProjectGuid>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <TargetNameBase>Tunkio</TargetNameBase>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Tunkio.props" />
+  <ItemDefinitionGroup>
+    <Link>
+      <ModuleDefinitionFile>TunkioAPI.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="TunkioAPI.h" />
+    <ClInclude Include="TunkioHandle.hpp" />
+    <ClInclude Include="TunkioIO.hpp" />
+    <ClInclude Include="TunkioTimer.hpp" />
+    <ClInclude Include="TunkioUnits.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="PCH.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TunkioAPI.cpp" />
+    <ClCompile Include="TunkioHandle.cpp" />
+    <ClCompile Include="TunkioIO.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TunkioAPI.def" />
+  </ItemGroup>
+</Project>
