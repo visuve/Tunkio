@@ -48,19 +48,20 @@ namespace Tunkio::Args
     Argument::Argument(bool required, const std::wstring& key, std::any value) :
         Required(required),
         Key(key),
+        Type(value.type()),
         Value(value)
     {
     }
 
     bool Argument::Parse(const std::wstring& from)
     {
-        if (Value.type() == typeid(std::wstring))
+        if (Type == typeid(std::wstring))
         {
             Value = from;
             return true;
         }
 
-        if (Value.type() == typeid(Target))
+        if (Type == typeid(Target))
         {
             if (from.size() != 1)
             {
@@ -71,7 +72,7 @@ namespace Tunkio::Args
             return TargetFromChar(from.front(), Value);
         }
 
-        if (Value.type() == typeid(Mode))
+        if (Type == typeid(Mode))
         {
             if (from.size() != 1)
             {
@@ -95,7 +96,7 @@ namespace Tunkio::Args
     {
         return Key != key;
     }
-    
+
     bool Parse(const std::vector<std::wstring>& rawArgs)
     {
         for (Argument& arg : Arguments)
@@ -105,7 +106,6 @@ namespace Tunkio::Args
             for (auto& rawArg : rawArgs)
             {
                 const auto mm = std::mismatch(rawArg.cbegin(), rawArg.cend(), arg.Key.cbegin(), arg.Key.cend());
-
                 const std::wstring key = { rawArg.cbegin(), mm.first };
                 const std::wstring value = { mm.first, rawArg.cend() };
 

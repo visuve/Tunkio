@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include <any>
+#include <typeindex>
 #include <array>
 #include <vector>
 
@@ -33,6 +35,7 @@ namespace Tunkio::Args
 
         const bool Required;
         const std::wstring Key;
+        const std::type_index Type;
         std::any Value;
     };
 
