@@ -4,12 +4,17 @@
 
 namespace Tunkio
 {
-    TEST(TunkioTest, DiskSizeSuccess)
+    TEST(TunkioIOTest, FileSizeSuccess)
     {
-        EXPECT_EQ(IO::DiskSize(nullptr), 210);
+        EXPECT_EQ(IO::FileSize(nullptr), 123);
     }
 
-    TEST(TunkioTest, WipeDiskSuccess)
+    TEST(TunkioIOTest, VolumeSizeSuccess)
+    {
+        EXPECT_EQ(IO::VolumeSize(nullptr), 210);
+    }
+
+    TEST(TunkioIOTest, WipeSuccess)
     {
         IO::Mock::SetFakeWrite([](LPDWORD bytesWritten)
         {
@@ -25,7 +30,7 @@ namespace Tunkio
         EXPECT_EQ(bytesWritten, 0x1000);
     }
 
-    TEST(TunkioTest, WipeDiskImmediateFail)
+    TEST(TunkioIOTest, WipeImmediateFail)
     {
         IO::Mock::SetFakeWrite([](LPDWORD)
         {
@@ -40,7 +45,7 @@ namespace Tunkio
         EXPECT_EQ(bytesWritten, 0);
     }
 
-    TEST(TunkioTest, WipeDiskPartialFail)
+    TEST(TunkioIOTest, WipePartialFail)
     {
         int calls = 0;
         IO::Mock::SetFakeWrite([&](LPDWORD bytesWritten)

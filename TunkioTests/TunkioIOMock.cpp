@@ -7,7 +7,7 @@ namespace Tunkio::IO
 {
     namespace Mock
     {
-        std::function<bool(unsigned long*)> FakeWrite;
+        std::function<bool(unsigned long* writtenBytes)> FakeWrite;
 
         void SetFakeWrite(std::function<bool(unsigned long*)> fn)
         {
@@ -15,14 +15,15 @@ namespace Tunkio::IO
         }
     }
 
-    HANDLE Win32OpenW(LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE)
+    HANDLE Win32Open(LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE)
     {
         return nullptr;
     }
 
-    HANDLE Win32OpenA(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE)
+    BOOL Win32FileSize(HANDLE, PLARGE_INTEGER size)
     {
-        return nullptr;
+        size->QuadPart = 123;
+        return TRUE;
     }
 
     BOOL Win32DeviceIoControl(HANDLE, DWORD, LPVOID, DWORD, LPVOID diskGeometry, DWORD, LPDWORD bytesReturned, LPOVERLAPPED)

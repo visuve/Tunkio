@@ -16,6 +16,10 @@
     <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
+    <ClCompile Include="TunkioAPITest.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />

@@ -4,5 +4,5 @@
 
 namespace Tunkio::IO::Mock
 {
-    void SetFakeWrite(std::function<bool(unsigned long*)> fakeWrite);
+    void SetFakeWrite(std::function<bool(unsigned long* writtenBytes)> fakeWrite);
 }

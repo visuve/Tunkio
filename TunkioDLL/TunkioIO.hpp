@@ -6,11 +6,10 @@
 
 namespace Tunkio::IO
 {
+    RawHandle Open(const std::wstring& path);
+    uint64_t FileSize(const AutoHandle& file);
+    uint64_t VolumeSize(const AutoHandle& volume);
+
     using ProgressCallback = std::function<void(uint64_t bytesWritten, uint64_t secondsElapsed)>;
-
-    RawHandle OpenW(const std::wstring& path);
-    RawHandle OpenA(const std::string& path);
-
-    uint64_t DiskSize(const AutoHandle& hdd);
     bool Wipe(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress);
 }

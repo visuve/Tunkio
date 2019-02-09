@@ -5,36 +5,43 @@
 namespace Tunkio::IO
 {
 #ifdef TESTING
-    extern decltype(CreateFileW) Win32OpenW;
-    extern decltype(CreateFileA) Win32OpenA;
+    extern decltype(CreateFileW) Win32Open;
+    extern decltype(GetFileSizeEx) Win32FileSize;
     extern decltype(DeviceIoControl) Win32DeviceIoControl;
     extern decltype(WriteFile) Win32Write;
 #else
-    constexpr auto Win32OpenW = CreateFileW;
-    constexpr auto Win32OpenA = CreateFileA;
+    constexpr auto Win32Open = CreateFileW;
+    constexpr auto Win32FileSize = GetFileSizeEx;
     constexpr auto Win32DeviceIoControl = DeviceIoControl;
     constexpr auto Win32Write = WriteFile;
 #endif
-    constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
-    constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
-    void* OpenW(const std::wstring& path)
+    RawHandle Open(const std::wstring& path)
     {
-        return Win32OpenW(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, 0, nullptr);
+        constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
+        constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+        return Win32Open(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, 0, nullptr);
     }
 
-    void* OpenA(const std::string& path)
+    uint64_t FileSize(const AutoHandle & file)
     {
-        return Win32OpenA(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, 0, nullptr);
+        LARGE_INTEGER fileSize = { 0 };
+
+        if (!Win32FileSize(file, &fileSize))
+        {
+            return 0u;
+        }
+
+        return fileSize.QuadPart;
     }
 
-    uint64_t DiskSize(const AutoHandle& hdd)
+    uint64_t VolumeSize(const AutoHandle& volume)
     {
         unsigned long bytesReturned = 0; // Not needed
         DISK_GEOMETRY diskGeo = { 0 };
         constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
 
-        if (!Win32DeviceIoControl(hdd, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
+        if (!Win32DeviceIoControl(volume, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
         {
             return 0u;
         }
@@ -53,6 +60,7 @@ namespace Tunkio::IO
             const uint64_t bytesToWrite = bytesLeft < Units::MegaByte ? bytesLeft : Units::MegaByte;
             unsigned long writtenBytes = 0u;
 
+            // TODO: make async with WriteFileEx
             const bool result = Win32Write(handle, &buffer.front(), static_cast<uint32_t>(bytesToWrite), &writtenBytes, nullptr);
             writtenBytesTotal += writtenBytes;
             bytesLeft -= writtenBytes;
