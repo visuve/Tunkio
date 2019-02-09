@@ -1,7 +1,8 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
 #include "TunkioIO.hpp"
-#include "TunkioTimer.hpp"
+#include "TunkioUnits.hpp"
+#include "TunkioTiming.hpp"
 #include "TunkioEncoding.hpp"
 #include "TunkioAPI.h"
 
@@ -25,7 +26,7 @@ namespace Tunkio
 
         uint64_t writtenBytesTotal = 0;
         uint32_t error = ERROR_SUCCESS;
-        const Timer<Units::Seconds> stopWatch;
+        const Timing::Timer stopWatch;
 
         const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
         {
@@ -40,7 +41,7 @@ namespace Tunkio
         }
 
         std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
-        std::wcout << L"Took: " << stopWatch << std::endl;
+        std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
         return error;
     }
 

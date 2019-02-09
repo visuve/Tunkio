@@ -29,7 +29,7 @@
     <ClInclude Include="..\TunkioDLL\TunkioEncoding.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioHandle.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioIO.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioTimer.hpp" />
+    <ClInclude Include="..\TunkioDLL\TunkioTiming.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioUnits.hpp" />
     <ClInclude Include="TunkioIOMock.hpp" />
     <ClInclude Include="PCH.hpp" />
@@ -38,6 +38,7 @@
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioTiming.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

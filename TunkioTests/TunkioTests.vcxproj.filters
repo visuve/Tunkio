@@ -24,6 +24,9 @@
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
     <ClCompile Include="TunkioEncodingTest.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioTiming.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
@@ -34,9 +37,6 @@
     <ClInclude Include="..\TunkioDLL\TunkioIO.hpp">
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
-    <ClInclude Include="..\TunkioDLL\TunkioTimer.hpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClInclude>
     <ClInclude Include="..\TunkioDLL\TunkioUnits.hpp">
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
@@ -44,6 +44,9 @@
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
     <ClInclude Include="..\TunkioDLL\TunkioEncoding.hpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TunkioDLL\TunkioTiming.hpp">
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,7 +7,7 @@
 ## TODO
 
 - Add support to wipe directories
-- Add ANSI support for TunkioAPI
+- Implement the intended wiping modes
 - Try to limit the CreateFile flags as low as possible
 - Attempt to try recovering files after the wipe
 

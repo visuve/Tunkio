@@ -18,7 +18,7 @@
     <ClInclude Include="TunkioEncoding.hpp" />
     <ClInclude Include="TunkioHandle.hpp" />
     <ClInclude Include="TunkioIO.hpp" />
-    <ClInclude Include="TunkioTimer.hpp" />
+    <ClInclude Include="TunkioTiming.hpp" />
     <ClInclude Include="TunkioUnits.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +31,7 @@
     <ClCompile Include="TunkioEncoding.cpp" />
     <ClCompile Include="TunkioHandle.cpp" />
     <ClCompile Include="TunkioIO.cpp" />
+    <ClCompile Include="TunkioTiming.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TunkioAPI.def" />

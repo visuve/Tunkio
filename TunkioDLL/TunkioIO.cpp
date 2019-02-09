@@ -1,6 +1,7 @@
 #include "PCH.hpp"
 #include "TunkioIO.hpp"
-#include "TunkioTimer.hpp"
+#include "TunkioUnits.hpp"
+#include "TunkioTiming.hpp"
 
 namespace Tunkio::IO
 {
@@ -53,7 +54,7 @@ namespace Tunkio::IO
     bool Wipe(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress)
     {
         const std::vector<char> buffer(Units::MegaByte, '\0');
-        Timer<Units::Seconds> timer;
+        Timing::Timer timer;
 
         while (bytesLeft)
         {
@@ -71,9 +72,9 @@ namespace Tunkio::IO
                 return false;
             }
 
-            if (progress && timer > Units::Seconds(1))
+            if (progress && timer.Elapsed<Timing::Seconds>() > Timing::Seconds(1))
             {
-                progress(writtenBytesTotal, timer.Count());
+                progress(writtenBytesTotal, timer.Elapsed<Timing::Seconds>().count());
             }
         }
 
