@@ -15,6 +15,7 @@
     <ClInclude Include="PCH.hpp" />
     <ClInclude Include="TunkioAPI.h" />
     <ClInclude Include="TunkioArgs.hpp" />
+    <ClInclude Include="TunkioEncoding.hpp" />
     <ClInclude Include="TunkioHandle.hpp" />
     <ClInclude Include="TunkioIO.hpp" />
     <ClInclude Include="TunkioTimer.hpp" />
@@ -27,6 +28,7 @@
     </ClCompile>
     <ClCompile Include="TunkioAPI.cpp" />
     <ClCompile Include="TunkioArgs.cpp" />
+    <ClCompile Include="TunkioEncoding.cpp" />
     <ClCompile Include="TunkioHandle.cpp" />
     <ClCompile Include="TunkioIO.cpp" />
   </ItemGroup>

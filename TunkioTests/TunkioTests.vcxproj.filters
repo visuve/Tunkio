@@ -20,6 +20,10 @@
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
+    <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioEncodingTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
@@ -37,6 +41,9 @@
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
     <ClInclude Include="..\TunkioDLL\TunkioArgs.hpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TunkioDLL\TunkioEncoding.hpp">
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
   </ItemGroup>

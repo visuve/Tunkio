@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\TunkioDLL\TunkioArgs.hpp" />
+    <ClInclude Include="..\TunkioDLL\TunkioEncoding.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioHandle.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioIO.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioTimer.hpp" />
@@ -36,11 +37,13 @@
   <ItemGroup>
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TunkioAPITest.cpp" />
     <ClCompile Include="TunkioArgsTest.cpp" />
+    <ClCompile Include="TunkioEncodingTest.cpp" />
     <ClCompile Include="TunkioHandleTest.cpp" />
     <ClCompile Include="TunkioIOMock.cpp" />
     <ClCompile Include="TunkioIOTest.cpp" />

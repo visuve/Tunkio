@@ -2,6 +2,7 @@
 #include "TunkioArgs.hpp"
 #include "TunkioIO.hpp"
 #include "TunkioTimer.hpp"
+#include "TunkioEncoding.hpp"
 #include "TunkioAPI.h"
 
 namespace Tunkio
@@ -93,9 +94,17 @@ namespace Tunkio
         return WipeData(volume, bytesLeft);
     }
 
-    uint32_t Exec(const std::wstring& path, Args::Target target)
+    uint32_t Exec(const std::vector<std::wstring>& args)
     {
-        switch (target)
+        if (!Args::Parse(args))
+        {
+            return ERROR_BAD_ARGUMENTS;
+        }
+
+        // TODO: this ain't the prettiest
+        const std::wstring path = Args::Arguments[0].Value<std::wstring>();
+
+        switch (Args::Arguments[1].Value<Args::Target>())
         {
         case Tunkio::Args::Target::AutoDetect:
             std::wcerr << L"Target auto detecion not yet supported";
@@ -118,24 +127,11 @@ namespace Tunkio
 
 unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[])
 {
-    using namespace Tunkio;
-
-    if (!Args::Parse({ argv + 1, argv + argc }))
-    {
-        return ERROR_BAD_ARGUMENTS;
-    }
-
-    // TODO: this ain't the prettiest...
-    return Exec(
-        Args::Arguments[0].Value<std::wstring>(), 
-        Args::Arguments[1].Value<Args::Target>());
+    return Tunkio::Exec({ argv + 1, argv + argc });
 }
 
-unsigned long __stdcall TunkioExecuteA(int /*argc*/, char* argv[])
+unsigned long __stdcall TunkioExecuteA(int argc, char* argv[])
 {
-    // TODO: convert args to wstring 
-
-    std::cout << argv[0];
-
-    return ERROR_NOT_SUPPORTED;
+    using namespace Tunkio;
+    return Exec(Encoding::AnsiToUnicode(std::vector<std::string>(argv + 1, argv + argc)));
 }
