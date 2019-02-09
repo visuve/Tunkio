@@ -25,25 +25,26 @@ namespace Tunkio
             std::wcerr << L"Listing your drives failed with wmic: " << error << std::endl;
         }
     }
-
-    std::array<Args::Argument, 3> Args::Arguments =
-    {
-        Args::Argument(true, L"--path=", std::wstring()),
-        Args::Argument(false, L"--target=", Args::Target::AutoDetect),
-        Args::Argument(false, L"--mode=", Args::Mode::Zeroes)
-    };
 }
 
 int wmain(int argc, wchar_t* argv[])
 {
     std::wcout << L"Tunkio 0.1" << std::endl << std::endl;
 
-    if (argc <= 1 || !Tunkio::Args::Parse({ argv + 1, argv + argc }))
+    if (argc <= 1)
     {
         std::wcerr << L"Invalid arguments!" << std::endl << std::endl;
         Tunkio::PrintUsage(argv[0]);
         return ERROR_BAD_ARGUMENTS;
     }
 
-    return TunkioExecuteW(argv[1], L'v', L'r');
+    DWORD result = TunkioExecuteW(argc, argv);
+
+    if (result == ERROR_BAD_ARGUMENTS)
+    {
+        std::wcerr << L"Invalid arguments!" << std::endl << std::endl;
+        Tunkio::PrintUsage(argv[0]);
+    }
+
+    return result;
 }

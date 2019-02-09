@@ -12,10 +12,10 @@
     <ClCompile Include="..\TunkioDLL\TunkioIO.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\TunkioCLUI\TunkioArgs.cpp">
-      <Filter>../TunkioCLUI</Filter>
-    </ClCompile>
     <ClCompile Include="TunkioArgsTest.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
@@ -32,8 +32,8 @@
     <ClInclude Include="..\TunkioDLL\TunkioUnits.hpp">
       <Filter>../TunkioDLL</Filter>
     </ClInclude>
-    <ClInclude Include="..\TunkioCLUI\TunkioArgs.hpp">
-      <Filter>../TunkioCLUI</Filter>
+    <ClInclude Include="..\TunkioDLL\TunkioArgs.hpp">
+      <Filter>../TunkioDLL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -42,9 +42,6 @@
   <ItemGroup>
     <Filter Include="../TunkioDLL">
       <UniqueIdentifier>{4404c51f-4ca3-4506-aa17-a76c9d90e312}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="../TunkioCLUI">
-      <UniqueIdentifier>{f6db035c-a92c-4bcc-9245-5fa71335c720}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

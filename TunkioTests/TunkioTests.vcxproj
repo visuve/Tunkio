@@ -25,7 +25,7 @@
     <None Include="Packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\TunkioCLUI\TunkioArgs.hpp" />
+    <ClInclude Include="..\TunkioDLL\TunkioArgs.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioHandle.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioIO.hpp" />
     <ClInclude Include="..\TunkioDLL\TunkioTimer.hpp" />
@@ -34,7 +34,7 @@
     <ClInclude Include="PCH.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\TunkioCLUI\TunkioArgs.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

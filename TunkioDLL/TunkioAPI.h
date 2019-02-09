@@ -4,8 +4,8 @@
 extern "C"
 {
 #endif
-    unsigned long  __stdcall TunkioExecuteW(const wchar_t* path, wchar_t target, wchar_t mode);
-    unsigned long  __stdcall TunkioExecuteA(const char* path, char target, char mode);
+    unsigned long  __stdcall TunkioExecuteW(int argc, wchar_t** argv);
+    unsigned long  __stdcall TunkioExecuteA(int argc, char** argv);
 #if defined(__cplusplus)
 };
 #endif

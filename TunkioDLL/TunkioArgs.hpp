@@ -33,13 +33,21 @@ namespace Tunkio::Args
         bool operator == (const std::wstring& key) const;
         bool operator != (const std::wstring& key) const;
 
+        template <typename T>
+        const T Value() const
+        {
+            return std::any_cast<T>(m_value);
+        }
+
         const bool Required;
         const std::wstring Key;
         const std::type_index Type;
-        std::any Value;
+
+    private:
+        std::any m_value;
     };
 
-    extern std::array<Argument, 3> Arguments;
+    extern std::array<Args::Argument, 3> Arguments;
 
     bool Parse(const std::vector<std::wstring>& rawArgs);
 }

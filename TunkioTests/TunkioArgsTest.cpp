@@ -3,13 +3,6 @@
 
 namespace Tunkio
 {
-    std::array<Args::Argument, 3> Args::Arguments
-    {
-        Args::Argument(true, L"--path=", std::wstring()),
-        Args::Argument(false, L"--target=", Args::Target::AutoDetect),
-        Args::Argument(false, L"--mode=", Args::Mode::Zeroes)
-    };
-
     TEST(TunkioArgsTest, ParseRequiredSuccess)
     {
         EXPECT_TRUE(Args::Parse({ L"--path=xyz" }));

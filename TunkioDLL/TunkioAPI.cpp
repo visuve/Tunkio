@@ -1,4 +1,5 @@
 #include "PCH.hpp"
+#include "TunkioArgs.hpp"
 #include "TunkioIO.hpp"
 #include "TunkioTimer.hpp"
 #include "TunkioAPI.h"
@@ -17,7 +18,7 @@ namespace Tunkio
         }
     }
 
-    uint32_t Exec(const wchar_t* path)
+    uint32_t Exec(const std::wstring& path)
     {
         std::wcout << L"Hello. Going to wipe your drive: " << path << std::endl;
 
@@ -64,14 +65,19 @@ namespace Tunkio
     }
 }
 
-unsigned long __stdcall TunkioExecuteW(const wchar_t* path, wchar_t target, wchar_t mode)
+unsigned long __stdcall TunkioExecuteW(int argc, wchar_t** argv)
 {
-    std::wcout << path << L' ' << target << L' ' << mode << std::endl;
-    return Tunkio::Exec(path);
+    using namespace Tunkio;
+
+    if (!Args::Parse({ argv + 1, argv + argc }))
+    {
+        return ERROR_BAD_ARGUMENTS;
+    }
+
+    return Exec(Args::Arguments[0].Value<std::wstring>());
 }
 
-unsigned long __stdcall TunkioExecuteA(const char * path, char target, char mode)
+unsigned long __stdcall TunkioExecuteA(int /*argc*/, char** /*argv*/)
 {
-    std::wcout << path << L' ' << target << L' ' << mode << std::endl;
-    return static_cast<unsigned long>(-1);
+    return ERROR_NOT_SUPPORTED;
 }
