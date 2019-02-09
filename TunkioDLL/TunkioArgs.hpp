@@ -47,7 +47,7 @@ namespace Tunkio::Args
         std::any m_value;
     };
 
-    extern std::array<Args::Argument, 3> Arguments;
+    extern std::array<Args::Argument, 4> Arguments;
 
     bool Parse(const std::vector<std::wstring>& rawArgs);
 }

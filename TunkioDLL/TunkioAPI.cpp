@@ -45,29 +45,51 @@ namespace Tunkio
         return error;
     }
 
-    uint32_t WipeFile(const std::wstring& path)
+    uint32_t WipeFile(const std::wstring& path, bool remove)
     {
-        std::wcout << L"Wiping file: " << path << std::endl;
+        {
+            std::wcout << L"Wiping file: " << path << std::endl;
 
-        const IO::AutoHandle file(IO::Open(path));
+            const IO::AutoHandle file(IO::Open(path));
 
-        if (!file.IsValid())
+            if (!file.IsValid())
+            {
+                const uint32_t error = GetLastError();
+                std::wcerr << L"Could not open file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+                return error;
+            }
+
+            const uint64_t bytesLeft = IO::FileSize(file);
+
+            if (!bytesLeft)
+            {
+                const uint32_t error = GetLastError();
+                std::wcerr << L"Failed to file size: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+                return error;
+            }
+
+            const uint32_t result = WipeData(file, bytesLeft);
+
+            if (!remove)
+            {
+                return result;
+            }
+        }
+
+        if (!IO::RemoveFile(path.c_str()))
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Could not open file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+            std::wcerr << L"Failed to remove file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
             return error;
         }
 
-        uint64_t bytesLeft = IO::FileSize(file);
+        return ERROR_SUCCESS;
+    }
 
-        if (!bytesLeft)
-        {
-            const uint32_t error = GetLastError();
-            std::wcerr << L"Failed to file size: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
-            return error;
-        }
-
-        return WipeData(file, bytesLeft);
+    uint32_t WipeDirectory(const std::wstring&, bool)
+    {
+        std::wcerr << L"Wiping directories not yet supported";
+        return ERROR_NOT_SUPPORTED;
     }
 
     uint32_t WipeVolume(const std::wstring& path)
@@ -104,6 +126,7 @@ namespace Tunkio
 
         // TODO: this ain't the prettiest
         const std::wstring path = Args::Arguments[0].Value<std::wstring>();
+        const bool remove = Args::Arguments[3].Value<bool>();
 
         switch (Args::Arguments[1].Value<Args::Target>())
         {
@@ -112,11 +135,10 @@ namespace Tunkio
             return ERROR_NOT_SUPPORTED;
 
         case Tunkio::Args::Target::File:
-            return WipeFile(path);
+            return WipeFile(path, remove);
 
         case Tunkio::Args::Target::Directory:
-            std::wcerr << L"Wiping directories not yet supported";
-            return ERROR_NOT_SUPPORTED;
+            return WipeDirectory(path, remove);
 
         case Tunkio::Args::Target::Volume:
             return WipeVolume(path);

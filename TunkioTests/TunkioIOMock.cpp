@@ -43,4 +43,9 @@ namespace Tunkio::IO
     {
         return Mock::FakeWrite(writtenBytes);
     }
+
+    BOOL Win32DeleteFile(LPCTSTR)
+    {
+        return TRUE;
+    }
 }

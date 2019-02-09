@@ -10,11 +10,13 @@ namespace Tunkio::IO
     extern decltype(GetFileSizeEx) Win32FileSize;
     extern decltype(DeviceIoControl) Win32DeviceIoControl;
     extern decltype(WriteFile) Win32Write;
+    extern decltype(DeleteFileW) Win32DeleteFile;
 #else
     constexpr auto Win32Open = CreateFileW;
     constexpr auto Win32FileSize = GetFileSizeEx;
     constexpr auto Win32DeviceIoControl = DeviceIoControl;
     constexpr auto Win32Write = WriteFile;
+    constexpr auto Win32DeleteFile = DeleteFileW;
 #endif
 
     RawHandle Open(const std::wstring& path)
@@ -68,7 +70,6 @@ namespace Tunkio::IO
 
             if (!result)
             {
-                std::wcout << L"Wrote only " << writtenBytes << L" of intended " << Units::MegaByte << L" bytes" << std::endl;
                 return false;
             }
 
@@ -79,5 +80,10 @@ namespace Tunkio::IO
         }
 
         return true;
+    }
+
+    bool RemoveFile(const std::wstring& path)
+    {
+        return Win32DeleteFile(path.c_str());
     }
 }

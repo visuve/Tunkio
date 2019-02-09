@@ -12,4 +12,5 @@ namespace Tunkio::IO
 
     using ProgressCallback = std::function<void(uint64_t bytesWritten, uint64_t secondsElapsed)>;
     bool Wipe(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress);
+    bool RemoveFile(const std::wstring& path);
 }

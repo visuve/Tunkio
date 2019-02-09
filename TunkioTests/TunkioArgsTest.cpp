@@ -7,6 +7,8 @@ namespace Tunkio
     {
         EXPECT_TRUE(Args::Parse({ L"--path=xyz" }));
         EXPECT_TRUE(Args::Parse({ L"--path=x" }));
+
+        EXPECT_STREQ(Args::Arguments[0].Value<std::wstring>().c_str(), L"x");
     }
 
     TEST(TunkioArgsTest, ParseRequiredFailure)
@@ -19,6 +21,12 @@ namespace Tunkio
     {
         EXPECT_TRUE(Args::Parse({ L"--path=xyz", L"--target=a", L"--mode=0" }));
         EXPECT_TRUE(Args::Parse({ L"--path=x", L"--target=v", L"--mode=1" }));
+        EXPECT_TRUE(Args::Parse({ L"--path=x", L"--target=v", L"--mode=1", L"--remove=y" }));
+
+        EXPECT_STREQ(Args::Arguments[0].Value<std::wstring>().c_str(), L"x");
+        EXPECT_EQ(Args::Arguments[1].Value<Args::Target>(), Args::Target::Volume);
+        EXPECT_EQ(Args::Arguments[2].Value<Args::Mode>(), Args::Mode::Ones);
+        EXPECT_EQ(Args::Arguments[3].Value<bool>(), true);
     }
 
     TEST(TunkioArgsTest, ParseOptionalFailure)
@@ -32,6 +40,11 @@ namespace Tunkio
     {
         EXPECT_TRUE(Args::Parse({ L"--mode=0",  L"--target=a", L"--path=xyz" }));
         EXPECT_TRUE(Args::Parse({ L"--mode=1", L"--path=x", L"--target=v",  }));
+
+        EXPECT_STREQ(Args::Arguments[0].Value<std::wstring>().c_str(), L"x");
+        EXPECT_EQ(Args::Arguments[1].Value<Args::Target>(), Args::Target::Volume);
+        EXPECT_EQ(Args::Arguments[2].Value<Args::Mode>(), Args::Mode::Ones);
+        EXPECT_EQ(Args::Arguments[3].Value<bool>(), true);
     }
 
     TEST(TunkioArgsTest, ParseAbnormalOrderFailure)

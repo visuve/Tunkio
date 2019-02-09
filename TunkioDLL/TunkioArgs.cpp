@@ -3,11 +3,12 @@
 
 namespace Tunkio::Args
 {
-    std::array<Args::Argument, 3> Arguments =
+    std::array<Args::Argument, 4> Arguments =
     {
         Args::Argument(true, L"--path=", std::wstring()),
         Args::Argument(false, L"--target=", Args::Target::AutoDetect),
-        Args::Argument(false, L"--mode=", Args::Mode::Zeroes)
+        Args::Argument(false, L"--mode=", Args::Mode::Zeroes),
+        Args::Argument(false, L"--remove=", false),
     };
 
     constexpr bool TargetFromChar(wchar_t c, std::any& m)
@@ -52,6 +53,21 @@ namespace Tunkio::Args
         return false;
     }
 
+    constexpr bool BoolFromChar(wchar_t c, std::any& m)
+    {
+        switch (c)
+        {
+            case L'y' :
+                m = true;
+                return true;
+            case L'n':
+                m = false;
+                return true;
+        }
+
+        return false;
+    }
+
     Argument::Argument(bool required, const std::wstring& key, std::any value) :
         Required(required),
         Key(key),
@@ -88,6 +104,17 @@ namespace Tunkio::Args
             }
 
             return ModeFromChar(value.front(), m_value);
+        }
+
+        if (Type == typeid(bool))
+        {
+            if (value.size() != 1)
+            {
+                // Argument has incorrect length
+                return false;
+            }
+
+            return BoolFromChar(value.front(), m_value);
         }
 
         // Uknown type
