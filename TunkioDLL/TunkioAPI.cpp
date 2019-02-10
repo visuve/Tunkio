@@ -20,46 +20,27 @@ namespace Tunkio
         }
     }
 
-    uint32_t WipeData(const Tunkio::IO::AutoHandle &handle, uint64_t bytesLeft)
-    {
-        std::wcout << L"Bytes to wipe: " << bytesLeft << std::endl;
-
-        uint64_t writtenBytesTotal = 0;
-        uint32_t error = ERROR_SUCCESS;
-        const Timing::Timer stopWatch;
-
-        const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
-        {
-            const uint64_t megabytesWritten = bytesWritten / Units::MegaByte;
-            std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
-        };
-
-        if (!IO::Wipe(handle, bytesLeft, writtenBytesTotal, progress))
-        {
-            error = GetLastError();
-            std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
-        }
-
-        std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
-        std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
-        return error;
-    }
-
-    uint32_t WipeFile(const std::wstring& path, bool remove)
+    uint32_t WipeFile(const IO::Path& path, bool remove)
     {
         {
+            if (!IO::FileSystem::exists(path))
+            {
+                std::wcerr << L"File: " << path << L" not found" << std::endl;
+                return ERROR_FILE_NOT_FOUND;
+            }
+
             std::wcout << L"Wiping file: " << path << std::endl;
 
-            const IO::AutoHandle file(IO::Open(path));
+            IO::FileStream file = IO::File::Open(path);
 
-            if (!file.IsValid())
+            if (!file)
             {
                 const uint32_t error = GetLastError();
                 std::wcerr << L"Could not open file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
                 return error;
             }
 
-            const uint64_t bytesLeft = IO::FileSize(file);
+            uint64_t bytesLeft = IO::File::Size(path);
 
             if (!bytesLeft)
             {
@@ -68,15 +49,32 @@ namespace Tunkio
                 return error;
             }
 
-            const uint32_t result = WipeData(file, bytesLeft);
+            uint64_t writtenBytesTotal = 0;
+            uint32_t error = ERROR_SUCCESS;
+            const Timing::Timer stopWatch;
 
-            if (!remove)
+            const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
             {
-                return result;
+                const uint64_t megabytesWritten = bytesWritten / Units::MegaByte;
+                std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
+            };
+
+            if (!IO::File::Fill(file, bytesLeft, writtenBytesTotal, progress))
+            {
+                error = GetLastError();
+                std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+            }
+
+            std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
+            std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
+            
+            if (error != ERROR_SUCCESS)
+            {
+                return error;
             }
         }
 
-        if (!IO::RemoveFile(path.c_str()))
+        if (remove && !IO::File::Remove(path))
         {
             const uint32_t error = GetLastError();
             std::wcerr << L"Failed to remove file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
@@ -96,7 +94,7 @@ namespace Tunkio
     {
         std::wcout << L"Wiping volume: " << path << std::endl;
 
-        const IO::AutoHandle volume(IO::Open(path));
+        const IO::AutoHandle volume(IO::Volume::Open(path));
 
         if (!volume.IsValid())
         {
@@ -105,7 +103,7 @@ namespace Tunkio
             return error;
         }
 
-        uint64_t bytesLeft = IO::VolumeSize(volume);
+        uint64_t bytesLeft = IO::Volume::Size(volume);
 
         if (!bytesLeft)
         {
@@ -114,7 +112,27 @@ namespace Tunkio
             return error;
         }
 
-        return WipeData(volume, bytesLeft);
+        std::wcout << L"Bytes to wipe: " << bytesLeft << std::endl;
+
+        uint64_t writtenBytesTotal = 0;
+        uint32_t error = ERROR_SUCCESS;
+        const Timing::Timer stopWatch;
+
+        const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
+        {
+            const uint64_t megabytesWritten = bytesWritten / Units::MegaByte;
+            std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
+        };
+
+        if (!IO::Volume::Fill(volume, bytesLeft, writtenBytesTotal, progress))
+        {
+            error = GetLastError();
+            std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+        }
+
+        std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
+        std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
+        return error;
     }
 
     uint32_t Exec(const std::vector<std::wstring>& args)

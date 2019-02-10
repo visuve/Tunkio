@@ -6,10 +6,13 @@
 
 ## TODO
 
-- Add support to wipe directories
-- Implement the intended wiping modes
-- Try to limit the CreateFile flags as low as possible
-- Attempt to try recovering files after the wipe
+- Implementation
+  - Add support to wipe directories
+  - Implement the intended wiping modes
+
+- Testing
+  - Add also non other than "happy path" unit tests
+  - Attempt to try recovering data after a wipe
 
 ## Prerequisites
 

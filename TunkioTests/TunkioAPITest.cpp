@@ -6,21 +6,17 @@ namespace Tunkio
 {
     TEST(TunkioAPITest, WipeFileSuccess)
     {
-        IO::Mock::SetFakeWrite([](LPDWORD bytesWritten)
-        {
-            *bytesWritten = 1;
-            return true;
-        });
-
-        wchar_t* argv[4] = 
+        const int argc = 5;
+        char* argv[argc] =
         { 
-            L"Path\\To\\This\\Exe",
-            L"--path=xyz", 
-            L"--target=f", 
-            L"--mode=0" 
+            "Path\\To\\This\\Exe",
+            "--path=xyz", 
+            "--target=f", 
+            "--mode=0",
+            "--remove=y"
         };
 
-        const unsigned long actual = TunkioExecuteW(3, argv);
+        const unsigned long actual = TunkioExecuteA(argc, argv);
         const unsigned long expected = ERROR_SUCCESS;
         EXPECT_EQ(actual, expected);
     }

@@ -47,5 +47,7 @@ int wmain(int argc, wchar_t* argv[])
         Tunkio::PrintUsage(argv[0]);
     }
 
+    system("PAUSE");
+
     return result;
 }
