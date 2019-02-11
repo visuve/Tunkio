@@ -1,5 +1,6 @@
 #pragma once
 
+#include "TunkioAPI.h"
 #include "TunkioHandle.hpp"
 
 #include <functional>
@@ -33,14 +34,11 @@ namespace Tunkio::IO
     constexpr auto Win32Write = WriteFile;
 #endif
 
-    using ProgressCallback =
-        std::function<void(uint64_t bytesWritten, uint64_t secondsElapsed)>;
-
     namespace File
     {
         FileStream Open(const Path& file);
         uint64_t Size(const Path& file);
-        bool Fill(FileStream& file, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress);
+        bool Fill(FileStream& file, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, TunkioProgressCallback progress);
         bool Remove(const Path& path);
     }
 
@@ -53,6 +51,6 @@ namespace Tunkio::IO
     {
         RawHandle Open(const std::wstring& path);
         uint64_t Size(const AutoHandle& volume);
-        bool Fill(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress);
+        bool Fill(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, TunkioProgressCallback progress);
     }
 }

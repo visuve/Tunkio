@@ -15,12 +15,12 @@ namespace Tunkio
             constexpr uint32_t flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
             constexpr uint32_t langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
             wchar_t buffer[Units::KiloByte] = { 0 };
-            const uint32_t size = FormatMessage(flags, nullptr, error, langId, buffer, Units::KiloByte, nullptr);
+            const size_t size = FormatMessage(flags, nullptr, error, langId, buffer, Units::KiloByte, nullptr);
             return std::wstring(buffer, size);
         }
     }
 
-    uint32_t WipeFile(const IO::Path& path, bool remove)
+    uint32_t WipeFile(const IO::Path& path, bool remove, TunkioProgressCallback progress)
     {
         {
             if (!IO::FileSystem::exists(path))
@@ -53,12 +53,6 @@ namespace Tunkio
             uint32_t error = ERROR_SUCCESS;
             const Timing::Timer stopWatch;
 
-            const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
-            {
-                const uint64_t megabytesWritten = bytesWritten / Units::MegaByte;
-                std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
-            };
-
             if (!IO::File::Fill(file, bytesLeft, writtenBytesTotal, progress))
             {
                 error = GetLastError();
@@ -84,13 +78,13 @@ namespace Tunkio
         return ERROR_SUCCESS;
     }
 
-    uint32_t WipeDirectory(const std::wstring&, bool)
+    uint32_t WipeDirectory(const std::wstring&, bool, TunkioProgressCallback)
     {
         std::wcerr << L"Wiping directories not yet supported";
         return ERROR_NOT_SUPPORTED;
     }
 
-    uint32_t WipeVolume(const std::wstring& path)
+    uint32_t WipeVolume(const std::wstring& path, TunkioProgressCallback progress)
     {
         std::wcout << L"Wiping volume: " << path << std::endl;
 
@@ -118,12 +112,6 @@ namespace Tunkio
         uint32_t error = ERROR_SUCCESS;
         const Timing::Timer stopWatch;
 
-        const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
-        {
-            const uint64_t megabytesWritten = bytesWritten / Units::MegaByte;
-            std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
-        };
-
         if (!IO::Volume::Fill(volume, bytesLeft, writtenBytesTotal, progress))
         {
             error = GetLastError();
@@ -135,7 +123,7 @@ namespace Tunkio
         return error;
     }
 
-    uint32_t Exec(const std::vector<std::wstring>& args)
+    uint32_t Exec(const std::vector<std::wstring>& args, TunkioProgressCallback progress)
     {
         if (!Args::Parse(args))
         {
@@ -153,26 +141,26 @@ namespace Tunkio
             return ERROR_NOT_SUPPORTED;
 
         case Tunkio::Args::Target::File:
-            return WipeFile(path, remove);
+            return WipeFile(path, remove, progress);
 
         case Tunkio::Args::Target::Directory:
-            return WipeDirectory(path, remove);
+            return WipeDirectory(path, remove, progress);
 
         case Tunkio::Args::Target::Volume:
-            return WipeVolume(path);
+            return WipeVolume(path, progress);
         }
 
         return ERROR_BAD_ARGUMENTS;
     }
 }
 
-unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[])
+unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgressCallback progress)
 {
-    return Tunkio::Exec({ argv + 1, argv + argc });
+    return Tunkio::Exec({ argv + 1, argv + argc }, progress);
 }
 
-unsigned long __stdcall TunkioExecuteA(int argc, char* argv[])
+unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCallback progress)
 {
     using namespace Tunkio;
-    return Exec(Encoding::AnsiToUnicode(std::vector<std::string>(argv + 1, argv + argc)));
+    return Exec(Encoding::AnsiToUnicode(std::vector<std::string>(argv + 1, argv + argc)), progress);
 }

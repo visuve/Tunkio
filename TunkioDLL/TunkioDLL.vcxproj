@@ -26,6 +26,9 @@
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TunkioAPICheck.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="TunkioAPI.cpp" />
     <ClCompile Include="TunkioArgs.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />

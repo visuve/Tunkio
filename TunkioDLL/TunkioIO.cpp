@@ -17,7 +17,7 @@ namespace Tunkio::IO
             return FileSystem::file_size(file);
         }
 
-        bool Fill(FileStream& file, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress)
+        bool Fill(FileStream& file, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, TunkioProgressCallback progress)
         {
             const std::vector<uint8_t> buffer(Units::MegaByte, 0);
             Timing::Timer timer;
@@ -79,7 +79,7 @@ namespace Tunkio::IO
             return diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
         }
 
-        bool Fill(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, const ProgressCallback& progress)
+        bool Fill(const AutoHandle& handle, uint64_t& bytesLeft, uint64_t& writtenBytesTotal, TunkioProgressCallback progress)
         {
             const std::vector<uint8_t> fakeData(Units::MegaByte, '\0');
             Timing::Timer timer;

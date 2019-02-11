@@ -39,7 +39,14 @@ int wmain(int argc, wchar_t* argv[])
         return ERROR_BAD_ARGUMENTS;
     }
 
-    DWORD result = TunkioExecuteW(argc, argv);
+    const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
+    {
+        const uint64_t megabytesWritten = bytesWritten / 1024;
+        std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
+    };
+
+
+    const uint32_t result = TunkioExecuteW(argc, argv, progress);
 
     if (result == ERROR_BAD_ARGUMENTS)
     {
@@ -47,7 +54,7 @@ int wmain(int argc, wchar_t* argv[])
         Tunkio::PrintUsage(argv[0]);
     }
 
-    system("PAUSE");
+    system("PAUSE"); // TODO: replace with std::cin?
 
     return result;
 }

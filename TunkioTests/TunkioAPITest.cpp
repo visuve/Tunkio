@@ -16,7 +16,13 @@ namespace Tunkio
             "--remove=y"
         };
 
-        const unsigned long actual = TunkioExecuteA(argc, argv);
+        const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
+        {
+            const uint64_t megabytesWritten = bytesWritten / 1024;
+            std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
+        };
+
+        const unsigned long actual = TunkioExecuteA(argc, argv, progress);
         const unsigned long expected = ERROR_SUCCESS;
         EXPECT_EQ(actual, expected);
     }
