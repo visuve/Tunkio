@@ -9,6 +9,7 @@
   <ItemDefinitionGroup>
     <Link>
       <ModuleDefinitionFile>TunkioAPI.def</ModuleDefinitionFile>
+      <AdditionalDependencies />
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
