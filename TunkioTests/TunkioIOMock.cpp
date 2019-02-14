@@ -14,6 +14,11 @@ namespace Tunkio::IO
     {
     }
 
+    const wchar_t * PathMock::c_str() const
+    {
+        return m_str.c_str();
+    }
+
     std::wostream& operator << (std::wostream & os, const PathMock& path)
     {
         return os << path.m_str;
@@ -35,7 +40,7 @@ namespace Tunkio::IO
     }
 
 
-    FileStreamMock::FileStreamMock(const PathMock& path, std::ios_base::openmode modes) :
+    FileStreamMock::FileStreamMock(const PathMock& path, int modes) :
         m_path(path),
         m_modes(modes)
     {

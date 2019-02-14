@@ -137,7 +137,7 @@ namespace Tunkio
         switch (Args::Arguments[1].Value<Args::Target>())
         {
         case Tunkio::Args::Target::AutoDetect:
-            std::wcerr << L"Target auto detecion not yet supported";
+            std::wcerr << L"Target auto detecion not yet supported" << std::endl;
             return ERROR_NOT_SUPPORTED;
 
         case Tunkio::Args::Target::File:

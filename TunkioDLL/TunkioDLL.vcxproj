@@ -13,6 +13,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="TunkioIOAlias.hpp" />
     <ClInclude Include="TunkioAPI.h" />
     <ClInclude Include="TunkioArgs.hpp" />
     <ClInclude Include="TunkioEncoding.hpp" />

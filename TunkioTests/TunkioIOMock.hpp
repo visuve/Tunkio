@@ -12,6 +12,8 @@ namespace Tunkio::IO
         PathMock(const std::wstring& str);
 
         friend std::wostream& operator << (std::wostream& os, const PathMock& p);
+
+        const wchar_t* c_str() const;
     private:
         std::wstring m_str;
     };

@@ -57,7 +57,7 @@ namespace Tunkio::IO
 
     namespace Volume
     {
-        RawHandle Open(const std::wstring& path)
+        RawHandle Open(const Path& path)
         {
             constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
             constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
