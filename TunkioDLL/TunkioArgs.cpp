@@ -57,7 +57,7 @@ namespace Tunkio::Args
     {
         switch (c)
         {
-            case L'y' :
+            case L'y':
                 m = true;
                 return true;
             case L'n':

@@ -1,51 +1,39 @@
 #include "PCH.hpp"
-#include "TunkioArgs.hpp"
-#include "TunkioIO.hpp"
-#include "TunkioUnits.hpp"
-#include "TunkioTiming.hpp"
-#include "TunkioEncoding.hpp"
 #include "TunkioAPI.h"
+#include "TunkioArgs.hpp"
+#include "TunkioEncoding.hpp"
+#include "TunkioTiming.hpp"
+
+#include "TunkioOutput.hpp"
+#include "TunkioFileSystem.hpp"
+#include "TunkioNative.hpp"
 
 namespace Tunkio
 {
-    namespace Help
-    {
-        std::wstring Win32ErrorToString(const uint32_t error)
-        {
-            constexpr uint32_t flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-            constexpr uint32_t langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-            wchar_t buffer[Units::KiloByte] = { 0 };
-            const size_t size = FormatMessage(flags, nullptr, error, langId, buffer, Units::KiloByte, nullptr);
-            return std::wstring(buffer, size);
-        }
-    }
-
-    uint32_t WipeFile(const IO::Path& path, bool remove, TunkioProgressCallback progress)
+    uint32_t WipeFile(const Path& path, bool remove, TunkioProgressCallback progress)
     {
         {
-            if (!IO::FileSystem::exists(path))
+            if (!FileSystem::exists(path))
             {
                 std::wcerr << L"File: " << path << L" not found" << std::endl;
                 return ERROR_FILE_NOT_FOUND;
             }
 
-            std::wcout << L"Wiping file: " << path << std::endl;
-
-            IO::FileStream file = IO::File::Open(path);
+            FileStream file(path, std::ios::in | std::ios::out | std::ios::binary);
 
             if (!file)
             {
                 const uint32_t error = GetLastError();
-                std::wcerr << L"Could not open file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+                std::wcerr << L"Could not open file: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
                 return error;
             }
 
-            uint64_t bytesLeft = IO::File::Size(path);
+            uint64_t bytesLeft = FileSystem::file_size(path);
 
             if (!bytesLeft)
             {
                 const uint32_t error = GetLastError();
-                std::wcerr << L"Failed to file size: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+                std::wcerr << L"Failed to file size: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
                 return error;
             }
 
@@ -53,25 +41,25 @@ namespace Tunkio
             uint32_t error = ERROR_SUCCESS;
             const Timing::Timer stopWatch;
 
-            if (!IO::File::Fill(file, bytesLeft, writtenBytesTotal, progress))
+            if (!Output::Fill(file, bytesLeft, writtenBytesTotal, progress))
             {
                 error = GetLastError();
-                std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+                std::wcerr << L"Write operation failed: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
             }
 
             std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
             std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
-            
+
             if (error != ERROR_SUCCESS)
             {
                 return error;
             }
         }
 
-        if (remove && !IO::File::Remove(path))
+        if (remove && !FileSystem::remove(path))
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Failed to remove file: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+            std::wcerr << L"Failed to remove file: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
             return error;
         }
 
@@ -86,23 +74,25 @@ namespace Tunkio
 
     uint32_t WipeVolume(const std::wstring& path, TunkioProgressCallback progress)
     {
-        std::wcout << L"Wiping volume: " << path << std::endl;
-
-        const IO::AutoHandle volume(IO::Volume::Open(path));
+        const Native::Win32::AutoHandle volume(Native::Win32::Open(path));
 
         if (!volume.IsValid())
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Could not open volume: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+            std::wcerr << L"Could not open volume: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
             return error;
         }
 
-        uint64_t bytesLeft = IO::Volume::Size(volume);
+        // NOTE: it's simply impossible to get the volume size otherwise.
+        // std::filesystem::space() fails
+        // std::file_system::file_size() fails
+        // std::fstream.tellp() returns too little
+        uint64_t bytesLeft = Native::Win32::VolumeSize(volume);
 
         if (!bytesLeft)
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Failed to get disk geometry: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+            std::wcerr << L"Failed to get disk geometry: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
             return error;
         }
 
@@ -112,10 +102,10 @@ namespace Tunkio
         uint32_t error = ERROR_SUCCESS;
         const Timing::Timer stopWatch;
 
-        if (!IO::Volume::Fill(volume, bytesLeft, writtenBytesTotal, progress))
+        if (!Native::Win32::Fill(volume, bytesLeft, writtenBytesTotal, progress))
         {
             error = GetLastError();
-            std::wcerr << L"Write operation failed: " << error << L" / " << Help::Win32ErrorToString(error) << std::endl;
+            std::wcerr << L"Write operation failed: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
         }
 
         std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;

@@ -13,7 +13,7 @@ namespace Tunkio
         std::wcout << L"  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::wcout << std::endl;
         std::wcout << L" Usage examples:" << std::endl << std::endl;
-        std::wcout << L"  " << exe << L" --path=\"C:\\SecretFile.txt\" --target=f --mode=r"  << std::endl;
+        std::wcout << L"  " << exe << L" --path=\"C:\\SecretFile.txt\" --target=f --mode=r" << std::endl;
         std::wcout << L"  " << exe << L" --path=\"C:\\SecretDirectory\" --target=d --mode=r" << std::endl;
         std::wcout << L"  " << exe << L" --path=\\\\.\\PHYSICALDRIVE1 --target=v --mode=r" << std::endl;
         std::wcout << std::endl;
@@ -44,7 +44,6 @@ int wmain(int argc, wchar_t* argv[])
         const uint64_t megabytesWritten = bytesWritten / 1024;
         std::wcout << megabytesWritten << L" megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
     };
-
 
     const uint32_t result = TunkioExecuteW(argc, argv, progress);
 

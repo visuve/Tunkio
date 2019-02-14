@@ -14,14 +14,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="TunkioIOAlias.hpp" />
     <ClInclude Include="TunkioAPI.h" />
     <ClInclude Include="TunkioArgs.hpp" />
     <ClInclude Include="TunkioEncoding.hpp" />
-    <ClInclude Include="TunkioHandle.hpp" />
-    <ClInclude Include="TunkioIO.hpp" />
+    <ClInclude Include="TunkioFileSystem.hpp" />
+    <ClInclude Include="TunkioOutput.hpp" />
+    <ClInclude Include="TunkioNative.hpp" />
     <ClInclude Include="TunkioTiming.hpp" />
-    <ClInclude Include="TunkioUnits.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
@@ -34,8 +33,8 @@
     <ClCompile Include="TunkioAPI.cpp" />
     <ClCompile Include="TunkioArgs.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />
-    <ClCompile Include="TunkioHandle.cpp" />
-    <ClCompile Include="TunkioIO.cpp" />
+    <ClCompile Include="TunkioOutput.cpp" />
+    <ClCompile Include="TunkioNative.cpp" />
     <ClCompile Include="TunkioTiming.cpp" />
   </ItemGroup>
   <ItemGroup>

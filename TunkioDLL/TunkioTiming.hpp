@@ -1,7 +1,7 @@
 #pragma once
 
 #include <chrono>
-#include <iostream>
+// #include <iostream>
 
 namespace Tunkio::Timing
 {

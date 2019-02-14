@@ -3,51 +3,48 @@
   <ItemGroup>
     <ClCompile Include="TunkioHandleTest.cpp" />
     <ClCompile Include="PCH.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioHandle.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
-    <ClCompile Include="TunkioIOMock.cpp" />
-    <ClCompile Include="TunkioIOTest.cpp" />
     <ClCompile Include="TestMain.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioIO.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
     <ClCompile Include="TunkioArgsTest.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp">
+    <ClCompile Include="TunkioAPITest.cpp" />
+    <ClCompile Include="TunkioEncodingTest.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
-    <ClCompile Include="TunkioAPITest.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp">
+    <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
-    <ClCompile Include="TunkioEncodingTest.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioOutput.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
     <ClCompile Include="..\TunkioDLL\TunkioTiming.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioOutputMock.cpp">
+      <Filter>Mocks</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioOperatingSystemMock.cpp">
+      <Filter>Mocks</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioFileSystemMock.cpp">
+      <Filter>Mocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioDLL\TunkioNative.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="TunkioIOMock.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioHandle.hpp">
-      <Filter>../TunkioDLL</Filter>
+    <ClInclude Include="TunkioOutputMock.hpp">
+      <Filter>Mocks</Filter>
     </ClInclude>
-    <ClInclude Include="..\TunkioDLL\TunkioIO.hpp">
-      <Filter>../TunkioDLL</Filter>
+    <ClInclude Include="TunkioOperatingSystemMock.hpp">
+      <Filter>Mocks</Filter>
     </ClInclude>
-    <ClInclude Include="..\TunkioDLL\TunkioUnits.hpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TunkioDLL\TunkioArgs.hpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TunkioDLL\TunkioEncoding.hpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TunkioDLL\TunkioTiming.hpp">
-      <Filter>../TunkioDLL</Filter>
+    <ClInclude Include="TunkioFileSystemMock.hpp">
+      <Filter>Mocks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +53,9 @@
   <ItemGroup>
     <Filter Include="../TunkioDLL">
       <UniqueIdentifier>{4404c51f-4ca3-4506-aa17-a76c9d90e312}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mocks">
+      <UniqueIdentifier>{32fbaaf0-9e68-410c-90b6-56ca26c1d16e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

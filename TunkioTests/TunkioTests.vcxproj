@@ -14,7 +14,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;$(SolutionDir)\TunkioCLUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -25,19 +25,17 @@
     <None Include="Packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\TunkioDLL\TunkioArgs.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioEncoding.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioHandle.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioIO.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioTiming.hpp" />
-    <ClInclude Include="..\TunkioDLL\TunkioUnits.hpp" />
-    <ClInclude Include="TunkioIOMock.hpp" />
+    <ClInclude Include="TunkioFileSystemMock.hpp" />
+    <ClInclude Include="TunkioOperatingSystemMock.hpp" />
+    <ClInclude Include="TunkioOutputMock.hpp" />
     <ClInclude Include="PCH.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioNative.cpp" />
+    <ClCompile Include="..\TunkioDLL\TunkioOutput.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioTiming.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -45,12 +43,11 @@
     <ClCompile Include="TunkioAPITest.cpp" />
     <ClCompile Include="TunkioArgsTest.cpp" />
     <ClCompile Include="TunkioEncodingTest.cpp" />
+    <ClCompile Include="TunkioFileSystemMock.cpp" />
     <ClCompile Include="TunkioHandleTest.cpp" />
-    <ClCompile Include="TunkioIOMock.cpp" />
-    <ClCompile Include="TunkioIOTest.cpp" />
+    <ClCompile Include="TunkioOutputMock.cpp" />
     <ClCompile Include="TestMain.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioHandle.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioIO.cpp" />
+    <ClCompile Include="TunkioOperatingSystemMock.cpp" />
   </ItemGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
