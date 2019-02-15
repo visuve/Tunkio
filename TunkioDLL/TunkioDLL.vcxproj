@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <TargetNameBase>Tunkio</TargetNameBase>
+    <TargetName>Tunkio</TargetName>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\Tunkio.props" />
   <ItemDefinitionGroup>

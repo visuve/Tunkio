@@ -3,7 +3,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9e670774-172a-4523-a048-1de13b8ad55d}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
-    <TargetNameBase>TunkioTests</TargetNameBase>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\Tunkio.props" />
   <ImportGroup Label="ExtensionTargets">

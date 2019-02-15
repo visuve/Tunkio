@@ -33,32 +33,29 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(TargetNameBase)32d</TargetName>
-    <IntDir>$(SolutionDir)out\obj\$(ProjectName)32d\</IntDir>
+    <IntDir>$(SolutionDir)out\x86d\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x86d\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(TargetNameBase)32</TargetName>
-    <IntDir>$(SolutionDir)out\obj\$(ProjectName)32\</IntDir>
+    <IntDir>$(SolutionDir)out\x86\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x86\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(TargetNameBase)64d</TargetName>
-    <IntDir>$(SolutionDir)out\obj\$(ProjectName)64d\</IntDir>
+    <IntDir>$(SolutionDir)out\x64d\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x64d\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>$(TargetNameBase)64</TargetName>
-    <IntDir>$(SolutionDir)out\obj\$(ProjectName)64\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup>
-    <OutDir>$(SolutionDir)out\bin\</OutDir>
+    <IntDir>$(SolutionDir)out\x64\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x64\bin\</OutDir>
   </PropertyGroup>
   <ImportGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
