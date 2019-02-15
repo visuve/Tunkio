@@ -28,11 +28,11 @@ namespace Tunkio::Args
      TEST(TunkioArgsTest, ParseOptionalSuccess)
     {
         EXPECT_TRUE(Parse(Arguments, { L"--path=xyz", L"--target=a", L"--mode=0" }));
-        EXPECT_TRUE(Parse(Arguments, { L"--path=x", L"--target=v", L"--mode=1" }));
-        EXPECT_TRUE(Parse(Arguments, { L"--path=x", L"--target=v", L"--mode=1", L"--remove=y" }));
+        EXPECT_TRUE(Parse(Arguments, { L"--path=x", L"--target=m", L"--mode=1" }));
+        EXPECT_TRUE(Parse(Arguments, { L"--path=x", L"--target=m", L"--mode=1", L"--remove=y" }));
 
         EXPECT_STREQ(Arguments[0].Value<std::wstring>().c_str(), L"x");
-        EXPECT_EQ(Arguments[1].Value<Target>(), Target::Volume);
+        EXPECT_EQ(Arguments[1].Value<Target>(), Target::MassMedia);
         EXPECT_EQ(Arguments[2].Value<Mode>(), Mode::Ones);
         EXPECT_EQ(Arguments[3].Value<bool>(), true);
     }
@@ -40,17 +40,17 @@ namespace Tunkio::Args
     TEST(TunkioArgsTest, ParseOptionalFailure)
     {
         EXPECT_FALSE(Parse(Arguments, { L"--path=xyz", L"--target=x", L"--mode=0" }));
-        EXPECT_FALSE(Parse(Arguments, { L"--path=x", L"--target=v", L"--mode=z" }));
-        EXPECT_FALSE(Parse(Arguments, { L"--path=xyz", L"--target=v", L"--mode=rofl" }));
+        EXPECT_FALSE(Parse(Arguments, { L"--path=x", L"--target=m", L"--mode=z" }));
+        EXPECT_FALSE(Parse(Arguments, { L"--path=xyz", L"--target=m", L"--mode=rofl" }));
     }
 
     TEST(TunkioArgsTest, ParseAbnormalOrderSuccess)
     {
         EXPECT_TRUE(Parse(Arguments, { L"--mode=0",  L"--target=a", L"--path=xyz" }));
-        EXPECT_TRUE(Parse(Arguments, { L"--mode=1", L"--path=x", L"--target=v",  }));
+        EXPECT_TRUE(Parse(Arguments, { L"--mode=1", L"--path=x", L"--target=m",  }));
 
         EXPECT_STREQ(Arguments[0].Value<std::wstring>().c_str(), L"x");
-        EXPECT_EQ(Arguments[1].Value<Target>(), Target::Volume);
+        EXPECT_EQ(Arguments[1].Value<Target>(), Target::MassMedia);
         EXPECT_EQ(Arguments[2].Value<Mode>(), Mode::Ones);
         EXPECT_EQ(Arguments[3].Value<bool>(), true);
     }

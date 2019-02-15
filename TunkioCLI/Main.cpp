@@ -8,7 +8,7 @@ namespace Tunkio
     {
         std::wcout << L" Usage:" << std::endl << std::endl;
         std::wcout << L"  --path=\"P:\\Path\\To\\File|Disk|Volume\" (Required) " << std::endl;
-        std::wcout << L"  --target=[a|f|d|v] where a=automatic, f=file, d=directory, v=volume (Optional) " << std::endl;
+        std::wcout << L"  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
         std::wcout << L"  --mode=[0|1|r|R] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random, R=less random (Optional)" << std::endl;
         std::wcout << L"  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::wcout << std::endl;

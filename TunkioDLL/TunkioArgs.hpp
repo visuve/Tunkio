@@ -13,7 +13,7 @@ namespace Tunkio::Args
         AutoDetect = 'a',
         File = 'f',
         Directory = 'd',
-        Volume = 'v'
+        MassMedia = 'm'
     };
 
     enum class Mode : char
@@ -38,8 +38,8 @@ namespace Tunkio::Args
             case static_cast<C>(Target::Directory) :
                 m = Target::Directory;
                 return true;
-            case  static_cast<C>(Target::Volume) :
-                m = Target::Volume;
+            case  static_cast<C>(Target::MassMedia) :
+                m = Target::MassMedia;
                 return true;
         }
 

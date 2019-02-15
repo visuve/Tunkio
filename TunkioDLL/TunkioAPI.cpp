@@ -133,7 +133,7 @@ namespace Tunkio
         case Tunkio::Args::Target::Directory:
             return WipeDirectory(path, remove, progress);
 
-        case Tunkio::Args::Target::Volume:
+        case Tunkio::Args::Target::MassMedia:
             return WipeVolume(path, progress);
         }
 
