@@ -144,38 +144,64 @@ unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgress
 {
     using namespace Tunkio;
 
-    std::array<Args::Argument<wchar_t>, 4> args =
+    try
     {
-        Args::Argument<wchar_t>(true, L"--path=", Path()),
-        Args::Argument<wchar_t>(false, L"--target=", Args::Target::AutoDetect),
-        Args::Argument<wchar_t>(false, L"--mode=", Args::Mode::Zeroes),
-        Args::Argument<wchar_t>(false, L"--remove=", false),
-    };
+        std::array<Args::Argument<wchar_t>, 4> args =
+        {
+            Args::Argument<wchar_t>(true, L"--path=", std::wstring()),
+            Args::Argument<wchar_t>(false, L"--target=", Args::Target::AutoDetect),
+            Args::Argument<wchar_t>(false, L"--mode=", Args::Mode::Zeroes),
+            Args::Argument<wchar_t>(false, L"--remove=", false),
+        };
 
-    if (!Args::Parse(args, std::vector<std::wstring>({ argv + 1, argv + argc })))
+        if (!Args::Parse(args, std::vector<std::wstring>({ argv + 1, argv + argc })))
+        {
+            return ERROR_BAD_ARGUMENTS;
+        }
+
+        return Tunkio::Exec(args, progress);
+    }
+    catch (const std::exception& e)
     {
-        return ERROR_BAD_ARGUMENTS;
+        std::wcout << L"An exception occurred: " << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::wcout << L"An unknown exception occurred." << std::endl;
     }
 
-    return Tunkio::Exec(args, progress);
+    return ERROR_UNHANDLED_EXCEPTION;
 }
 
 unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCallback progress)
 {
     using namespace Tunkio;
 
-    std::array<Args::Argument<char>, 4> args =
+    try
     {
-        Args::Argument<char>(true, "--path=", Path()),
-        Args::Argument<char>(false, "--target=", Args::Target::AutoDetect),
-        Args::Argument<char>(false, "--mode=", Args::Mode::Zeroes),
-        Args::Argument<char>(false, "--remove=", false),
-    };
+        std::array<Args::Argument<char>, 4> args =
+        {
+            Args::Argument<char>(true, "--path=", std::string()),
+            Args::Argument<char>(false, "--target=", Args::Target::AutoDetect),
+            Args::Argument<char>(false, "--mode=", Args::Mode::Zeroes),
+            Args::Argument<char>(false, "--remove=", false),
+        };
 
-    if (!Args::Parse(args, std::vector<std::string>({ argv + 1, argv + argc })))
+        if (!Args::Parse(args, std::vector<std::string>({ argv + 1, argv + argc })))
+        {
+            return ERROR_BAD_ARGUMENTS;
+        }
+
+        return Tunkio::Exec(args, progress);
+    }
+    catch (std::exception& e)
     {
-        return ERROR_BAD_ARGUMENTS;
+        std::wcout << L"An exception occurred: " << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::wcout << L"An unknown exception occurred." << std::endl;
     }
 
-    return Tunkio::Exec(args, progress);
+    return ERROR_UNHANDLED_EXCEPTION;
 }
