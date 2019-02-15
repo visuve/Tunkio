@@ -5,7 +5,7 @@ namespace Tunkio::Args
 {
     std::array<Argument<wchar_t>, 4> Arguments =
     {
-        Argument<wchar_t>(true, L"--path=", Path()),
+        Argument<wchar_t>(true, L"--path=", std::wstring()),
         Argument<wchar_t>(false, L"--target=", Target::AutoDetect),
         Argument<wchar_t>(false, L"--mode=", Mode::Zeroes),
         Argument<wchar_t>(false, L"--remove=", false),

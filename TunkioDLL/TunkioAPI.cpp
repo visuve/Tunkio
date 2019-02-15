@@ -113,11 +113,12 @@ namespace Tunkio
         return error;
     }
 
-    template <typename T>
-    uint32_t Exec(const std::array<Args::Argument<T>, 4>& args, TunkioProgressCallback progress)
+    template <typename C>
+    uint32_t Exec(const std::array<Args::Argument<C>, 4>& args, TunkioProgressCallback progress)
     {
         // TODO: this ain't the prettiest
-        const Path path = args[0].Value<Path>();
+        const auto path = args[0].Value<std::basic_string<C>>();
+
         const bool remove = args[3].Value<bool>();
 
         switch (args[1].Value<Args::Target>())
@@ -146,12 +147,12 @@ unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgress
 
     try
     {
-        std::array<Args::Argument<wchar_t>, 4> args =
+        std::array<Args::WideArgument, 4> args =
         {
-            Args::Argument<wchar_t>(true, L"--path=", std::wstring()),
-            Args::Argument<wchar_t>(false, L"--target=", Args::Target::AutoDetect),
-            Args::Argument<wchar_t>(false, L"--mode=", Args::Mode::Zeroes),
-            Args::Argument<wchar_t>(false, L"--remove=", false),
+            Args::WideArgument(true, L"--path=", std::wstring()),
+            Args::WideArgument(false, L"--target=", Args::Target::AutoDetect),
+            Args::WideArgument(false, L"--mode=", Args::Mode::Zeroes),
+            Args::WideArgument(false, L"--remove=", false),
         };
 
         if (!Args::Parse(args, std::vector<std::wstring>({ argv + 1, argv + argc })))
@@ -179,12 +180,12 @@ unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCal
 
     try
     {
-        std::array<Args::Argument<char>, 4> args =
+        std::array<Args::NarrowArgument, 4> args =
         {
-            Args::Argument<char>(true, "--path=", std::string()),
-            Args::Argument<char>(false, "--target=", Args::Target::AutoDetect),
-            Args::Argument<char>(false, "--mode=", Args::Mode::Zeroes),
-            Args::Argument<char>(false, "--remove=", false),
+            Args::NarrowArgument(true, "--path=", std::string()),
+            Args::NarrowArgument(false, "--target=", Args::Target::AutoDetect),
+            Args::NarrowArgument(false, "--mode=", Args::Mode::Zeroes),
+            Args::NarrowArgument(false, "--remove=", false),
         };
 
         if (!Args::Parse(args, std::vector<std::string>({ argv + 1, argv + argc })))

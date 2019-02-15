@@ -6,8 +6,6 @@
 #include <array>
 #include <vector>
 
-#include "TunkioFileSystem.hpp"
-
 namespace Tunkio::Args
 {
     enum class Target : char
@@ -26,21 +24,21 @@ namespace Tunkio::Args
         MoreRandom = 'r'
     };
 
-    template <typename T>
-    constexpr bool TargetFromChar(T c, std::any& m)
+    template <typename C>
+    constexpr bool TargetFromChar(C c, std::any& m)
     {
         switch (c)
         {
-            case static_cast<wchar_t>(Target::AutoDetect) :
+            case static_cast<C>(Target::AutoDetect) :
                 m = Target::AutoDetect;
                 return true;
-            case static_cast<wchar_t>(Target::File) :
+            case static_cast<C>(Target::File) :
                 m = Target::File;
                 return true;
-            case static_cast<wchar_t>(Target::Directory) :
+            case static_cast<C>(Target::Directory) :
                 m = Target::Directory;
                 return true;
-            case  static_cast<wchar_t>(Target::Volume) :
+            case  static_cast<C>(Target::Volume) :
                 m = Target::Volume;
                 return true;
         }
@@ -48,21 +46,21 @@ namespace Tunkio::Args
         return false;
     }
 
-    template <typename T>
-    constexpr bool ModeFromChar(T c, std::any& m)
+    template <typename C>
+    constexpr bool ModeFromChar(C c, std::any& m)
     {
         switch (c)
         {
-            case static_cast<T>(Mode::Zeroes) :
+            case static_cast<C>(Mode::Zeroes) :
                 m = Mode::Zeroes;
                 return true;
-            case static_cast<T>(Mode::Ones) :
+            case static_cast<C>(Mode::Ones) :
                 m = Mode::Ones;
                 return true;
-            case static_cast<T>(Mode::LessRandom) :
+            case static_cast<C>(Mode::LessRandom) :
                 m = Mode::LessRandom;
                 return true;
-            case static_cast<T>(Mode::MoreRandom) :
+            case static_cast<C>(Mode::MoreRandom) :
                 m = Mode::MoreRandom;
                 return true;
         }
@@ -70,8 +68,8 @@ namespace Tunkio::Args
         return false;
     }
 
-    template <typename T>
-    constexpr bool BoolFromChar(T c, std::any& m)
+    template <typename C>
+    constexpr bool BoolFromChar(C c, std::any& m)
     {
         switch (c)
         {
@@ -86,11 +84,11 @@ namespace Tunkio::Args
         return false;
     }
 
-    template <typename T>
+    template <typename C>
     class Argument
     {
     public:
-        Argument(bool required, const std::basic_string<T>& key, std::any value) :
+        Argument(bool required, const std::basic_string<C>& key, std::any value) :
             Required(required),
             Key(key),
             Type(value.type()),
@@ -98,19 +96,19 @@ namespace Tunkio::Args
         {
         }
 
-        bool Argument::operator == (const std::basic_string<T>& key) const
+        bool Argument::operator == (const std::basic_string<C>& key) const
         {
             return Key == key;
         }
 
-        bool Argument::operator != (const std::basic_string<T>& key) const
+        bool Argument::operator != (const std::basic_string<C>& key) const
         {
             return Key != key;
         }
 
-        bool Parse(const std::basic_string<T>& value)
+        bool Parse(const std::basic_string<C>& value)
         {
-            if (Type == typeid(std::basic_string<T>) || Type == typeid(Path))
+            if (Type == typeid(std::basic_string<C>))
             {
                 m_value = value;
                 return true;
@@ -153,22 +151,25 @@ namespace Tunkio::Args
             return false;
         }
 
-        template <typename X>
-        const X Value() const
+        template <class T>
+        const T Value() const
         {
-            return std::any_cast<X>(m_value);
+            return std::any_cast<T>(m_value);
         }
 
         const bool Required;
-        const std::basic_string<T> Key;
+        const std::basic_string<C> Key;
         const std::type_index Type;
 
     private:
         std::any m_value;
     };
+
+    using NarrowArgument = Argument<char>;
+    using WideArgument = Argument<wchar_t>;
     
-    template <typename T>
-    bool Parse(std::array<Args::Argument<T>, 4>& arguments, const std::vector<std::basic_string<T>>& rawArgs)
+    template <typename C>
+    bool Parse(std::array<Args::Argument<C>, 4>& arguments, const std::vector<std::basic_string<C>>& rawArgs)
     {
         for (auto& arg : arguments)
         {
@@ -177,8 +178,8 @@ namespace Tunkio::Args
             for (auto& rawArg : rawArgs)
             {
                 const auto mm = std::mismatch(rawArg.cbegin(), rawArg.cend(), arg.Key.cbegin(), arg.Key.cend());
-                const std::basic_string<T> key = { rawArg.cbegin(), mm.first };
-                const std::basic_string<T> value = { mm.first, rawArg.cend() };
+                const std::basic_string<C> key = { rawArg.cbegin(), mm.first };
+                const std::basic_string<C> value = { mm.first, rawArg.cend() };
 
                 if (arg != key)
                 {
