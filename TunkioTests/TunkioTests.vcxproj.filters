@@ -10,9 +10,6 @@
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>

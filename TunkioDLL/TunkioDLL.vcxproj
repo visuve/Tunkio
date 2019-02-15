@@ -31,7 +31,6 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TunkioAPI.cpp" />
-    <ClCompile Include="TunkioArgs.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />
     <ClCompile Include="TunkioOutput.cpp" />
     <ClCompile Include="TunkioNative.cpp" />

@@ -5,6 +5,7 @@ namespace Tunkio::FileSystemMock
     class PathMock
     {
     public:
+        PathMock() = default;
         PathMock(const wchar_t* str);
         PathMock(const std::wstring& str);
 

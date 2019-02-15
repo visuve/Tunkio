@@ -32,7 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioArgs.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioNative.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioOutput.cpp" />

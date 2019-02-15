@@ -66,13 +66,13 @@ namespace Tunkio
         return ERROR_SUCCESS;
     }
 
-    uint32_t WipeDirectory(const std::wstring&, bool, TunkioProgressCallback)
+    uint32_t WipeDirectory(const Path&, bool, TunkioProgressCallback)
     {
         std::wcerr << L"Wiping directories not yet supported";
         return ERROR_NOT_SUPPORTED;
     }
 
-    uint32_t WipeVolume(const std::wstring& path, TunkioProgressCallback progress)
+    uint32_t WipeVolume(const Path& path, TunkioProgressCallback progress)
     {
         const Native::Win32::AutoHandle volume(Native::Win32::Open(path));
 
@@ -113,18 +113,14 @@ namespace Tunkio
         return error;
     }
 
-    uint32_t Exec(const std::vector<std::wstring>& args, TunkioProgressCallback progress)
+    template <typename T>
+    uint32_t Exec(const std::array<Args::Argument<T>, 4>& args, TunkioProgressCallback progress)
     {
-        if (!Args::Parse(args))
-        {
-            return ERROR_BAD_ARGUMENTS;
-        }
-
         // TODO: this ain't the prettiest
-        const std::wstring path = Args::Arguments[0].Value<std::wstring>();
-        const bool remove = Args::Arguments[3].Value<bool>();
+        const Path path = args[0].Value<Path>();
+        const bool remove = args[3].Value<bool>();
 
-        switch (Args::Arguments[1].Value<Args::Target>())
+        switch (args[1].Value<Args::Target>())
         {
         case Tunkio::Args::Target::AutoDetect:
             std::wcerr << L"Target auto detecion not yet supported" << std::endl;
@@ -146,11 +142,40 @@ namespace Tunkio
 
 unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgressCallback progress)
 {
-    return Tunkio::Exec({ argv + 1, argv + argc }, progress);
+    using namespace Tunkio;
+
+    std::array<Args::Argument<wchar_t>, 4> args =
+    {
+        Args::Argument<wchar_t>(true, L"--path=", Path()),
+        Args::Argument<wchar_t>(false, L"--target=", Args::Target::AutoDetect),
+        Args::Argument<wchar_t>(false, L"--mode=", Args::Mode::Zeroes),
+        Args::Argument<wchar_t>(false, L"--remove=", false),
+    };
+
+    if (!Args::Parse(args, std::vector<std::wstring>({ argv + 1, argv + argc })))
+    {
+        return ERROR_BAD_ARGUMENTS;
+    }
+
+    return Tunkio::Exec(args, progress);
 }
 
 unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCallback progress)
 {
     using namespace Tunkio;
-    return Exec(Encoding::AnsiToUnicode(std::vector<std::string>(argv + 1, argv + argc)), progress);
+
+    std::array<Args::Argument<char>, 4> args =
+    {
+        Args::Argument<char>(true, "--path=", Path()),
+        Args::Argument<char>(false, "--target=", Args::Target::AutoDetect),
+        Args::Argument<char>(false, "--mode=", Args::Mode::Zeroes),
+        Args::Argument<char>(false, "--remove=", false),
+    };
+
+    if (!Args::Parse(args, std::vector<std::string>({ argv + 1, argv + argc })))
+    {
+        return ERROR_BAD_ARGUMENTS;
+    }
+
+    return Tunkio::Exec(args, progress);
 }

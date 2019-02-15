@@ -5,7 +5,6 @@
     <ClCompile Include="PCH.cpp" />
     <ClCompile Include="TunkioAPICheck.c" />
     <ClCompile Include="TunkioAPI.cpp" />
-    <ClCompile Include="TunkioArgs.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />
     <ClCompile Include="TunkioTiming.cpp" />
     <ClCompile Include="TunkioOutput.cpp" />
