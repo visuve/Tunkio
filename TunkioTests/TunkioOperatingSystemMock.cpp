@@ -3,7 +3,7 @@
 
 namespace Tunkio
 {
-    DWORD FormatMessageMock(DWORD, LPCVOID, DWORD, DWORD, LPTSTR, DWORD, va_list *)
+    DWORD FormatMessageMock(DWORD, LPCVOID, DWORD, DWORD, LPSTR, DWORD, va_list *)
     {
         return 0;
     }

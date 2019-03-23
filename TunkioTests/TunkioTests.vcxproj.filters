@@ -31,6 +31,9 @@
     <ClCompile Include="..\TunkioDLL\TunkioNative.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
+    <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp">
+      <Filter>../TunkioCLI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
@@ -53,6 +56,9 @@
     </Filter>
     <Filter Include="Mocks">
       <UniqueIdentifier>{32fbaaf0-9e68-410c-90b6-56ca26c1d16e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="../TunkioCLI">
+      <UniqueIdentifier>{a91f6553-a60c-4621-aed6-739abf5c8126}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

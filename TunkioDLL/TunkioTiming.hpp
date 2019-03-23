@@ -23,6 +23,14 @@ namespace Tunkio::Timing
         const MicroSeconds Us;
     };
 
+    std::ostream& operator << (std::ostream& os, Days s);
+    std::ostream& operator << (std::ostream& os, Hours s);
+    std::ostream& operator << (std::ostream& os, Minutes s);
+    std::ostream& operator << (std::ostream& os, Seconds s);
+    std::ostream& operator << (std::ostream& os, MilliSeconds ms);
+    std::ostream& operator << (std::ostream& os, MicroSeconds us);
+    std::ostream& operator << (std::ostream& os, const Duration& x);
+
     std::wostream& operator << (std::wostream& os, Days s);
     std::wostream& operator << (std::wostream& os, Hours s);
     std::wostream& operator << (std::wostream& os, Minutes s);

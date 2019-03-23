@@ -13,7 +13,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;$(SolutionDir)\TunkioCLI;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -30,6 +30,7 @@
     <ClInclude Include="PCH.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioNative.cpp" />

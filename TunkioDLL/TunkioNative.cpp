@@ -29,13 +29,13 @@ namespace Tunkio::Native
             return m_handle;
         }
 
-        std::wstring ErrorToString(const uint32_t error)
+        std::string ErrorToString(const uint32_t error)
         {
             constexpr uint32_t flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
             constexpr uint32_t langId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-            wchar_t buffer[1024] = { 0 };
+            char buffer[1024] = { 0 };
             const size_t size = Win32FormatMessage(flags, nullptr, error, langId, buffer, 1024, nullptr);
-            return std::wstring(buffer, size);
+            return std::string(buffer, size);
         }
 
         RawHandle Open(const Path& path)

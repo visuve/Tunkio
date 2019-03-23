@@ -1,44 +1,40 @@
 #include "PCH.hpp"
 #include "TunkioFileSystemMock.hpp"
+#include "TunkioEncoding.hpp"
 
 namespace Tunkio::FileSystemMock
 {
+    PathMock::PathMock(const char* str) :
+        m_str(Encoding::ToWide(str))
+    {
+    }
+
     PathMock::PathMock(const wchar_t* str) :
         m_str(str)
     {
     }
 
-    PathMock::PathMock(const char* str)
-    {
-        // NOTE: this is a mock so an ugly solution will do
-        size_t required = 0;
-        m_str.resize(1024);
-        if (mbstowcs_s(&required, &m_str.front(), 1024, str, 1024) == ERROR_SUCCESS && required > 0)
-        {
-            m_str.resize(required - 1);
-        }
-        else
-        {
-            m_str.clear();
-        }
-    }
-
-    PathMock::PathMock(const std::wstring& str) :
-        m_str(str)
-    {
-    }
-
     PathMock::PathMock(const std::string& str) :
-        PathMock(str.c_str())
+        m_str(Encoding::ToWide(str))
     {
     }
 
-    const wchar_t * PathMock::c_str() const
+     PathMock::PathMock(const std::wstring& str) :
+        m_str(str)
+     {
+     }
+
+    const wchar_t* PathMock::c_str() const
     {
         return m_str.c_str();
     }
 
-    std::wostream& operator << (std::wostream & os, const PathMock& path)
+    std::ostream& operator << (std::ostream& os, const PathMock& path)
+    {
+        return os << Encoding::ToNarrow(path.m_str);
+    }
+
+    std::wostream& operator << (std::wostream& os, const PathMock& path)
     {
         return os << path.m_str;
     }

@@ -1,15 +1,47 @@
 #pragma once
 
 #include <stdint.h>
-#include <wchar.h>
+#include <stdbool.h>
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
+    typedef enum
+    {
+        AutoDetect = 'a',
+        File = 'f',
+        Directory = 'd',
+        MassMedia = 'm'
+    } TunkioTarget;
+
+    typedef enum
+    {
+        Zeroes = '0',
+        Ones = '1',
+        LessRandom = 'R',
+        MoreRandom = 'r'
+    } TunkioMode;
+
     typedef void(*TunkioProgressCallback)(uint64_t bytesWritten, uint64_t secondsElapsed);
-    unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgressCallback progress);
-    unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCallback progress);
+
+    struct TunkioString
+    {
+        size_t Length;
+        char* Data;
+    };
+
+    struct TunkioOptions
+    {
+        TunkioTarget Target;
+        TunkioMode Mode;
+        bool Remove;
+        TunkioProgressCallback ProgressCallback;
+        struct TunkioString Path;
+    };
+
+    uint32_t __cdecl TunkioExecute(const struct TunkioOptions* options);
+
 #if defined(__cplusplus)
 };
 #endif

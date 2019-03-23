@@ -1,6 +1,5 @@
 #include "PCH.hpp"
 #include "TunkioAPI.h"
-#include "TunkioArgs.hpp"
 #include "TunkioEncoding.hpp"
 #include "TunkioTiming.hpp"
 
@@ -15,7 +14,7 @@ namespace Tunkio
         {
             if (!FileSystem::exists(path))
             {
-                std::wcerr << L"File: " << path << L" not found" << std::endl;
+                std::cerr << "File: " << path << " not found" << std::endl;
                 return ERROR_FILE_NOT_FOUND;
             }
 
@@ -24,7 +23,7 @@ namespace Tunkio
             if (!file)
             {
                 const uint32_t error = GetLastError();
-                std::wcerr << L"Could not open file: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+                std::cerr << "Could not open file: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
                 return error;
             }
 
@@ -33,7 +32,7 @@ namespace Tunkio
             if (!bytesLeft)
             {
                 const uint32_t error = GetLastError();
-                std::wcerr << L"Failed to file size: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+                std::cerr << "Failed to file size: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
                 return error;
             }
 
@@ -44,11 +43,11 @@ namespace Tunkio
             if (!Output::Fill(file, bytesLeft, writtenBytesTotal, progress))
             {
                 error = GetLastError();
-                std::wcerr << L"Write operation failed: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+                std::cerr << "Write operation failed: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
             }
 
-            std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
-            std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
+            std::cout << "Wiped: " << writtenBytesTotal << " bytes. " << bytesLeft << " Left unwiped" << std::endl;
+            std::cout << "Took: " << stopWatch.Elapsed() << std::endl;
 
             if (error != ERROR_SUCCESS)
             {
@@ -59,7 +58,7 @@ namespace Tunkio
         if (remove && !FileSystem::remove(path))
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Failed to remove file: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+            std::cerr << "Failed to remove file: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
             return error;
         }
 
@@ -68,7 +67,7 @@ namespace Tunkio
 
     uint32_t WipeDirectory(const Path&, bool, TunkioProgressCallback)
     {
-        std::wcerr << L"Wiping directories not yet supported";
+        std::cerr << "Wiping directories not yet supported";
         return ERROR_NOT_SUPPORTED;
     }
 
@@ -79,7 +78,7 @@ namespace Tunkio
         if (!volume.IsValid())
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Could not open volume: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+            std::cerr << "Could not open volume: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
             return error;
         }
 
@@ -92,11 +91,11 @@ namespace Tunkio
         if (!bytesLeft)
         {
             const uint32_t error = GetLastError();
-            std::wcerr << L"Failed to get disk geometry: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+            std::cerr << "Failed to get disk geometry: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
             return error;
         }
 
-        std::wcout << L"Bytes to wipe: " << bytesLeft << std::endl;
+        std::cout << "Bytes to wipe: " << bytesLeft << std::endl;
 
         uint64_t writtenBytesTotal = 0;
         uint32_t error = ERROR_SUCCESS;
@@ -105,15 +104,15 @@ namespace Tunkio
         if (!Native::Win32::Fill(volume, bytesLeft, writtenBytesTotal, progress))
         {
             error = GetLastError();
-            std::wcerr << L"Write operation failed: " << error << L" / " << Native::Win32::ErrorToString(error) << std::endl;
+            std::cerr << "Write operation failed: " << error << " / " << Native::Win32::ErrorToString(error) << std::endl;
         }
 
-        std::wcout << L"Wiped: " << writtenBytesTotal << L" bytes. " << bytesLeft << L" Left unwiped" << std::endl;
-        std::wcout << L"Took: " << stopWatch.Elapsed() << std::endl;
+        std::cout << "Wiped: " << writtenBytesTotal << " bytes. " << bytesLeft << " Left unwiped" << std::endl;
+        std::cout << "Took: " << stopWatch.Elapsed() << std::endl;
         return error;
     }
 
-    template <typename C>
+    /*template <typename C>
     uint32_t Exec(const std::array<Args::Argument<C>, 4>& args, TunkioProgressCallback progress)
     {
         // TODO: this ain't the prettiest
@@ -124,7 +123,7 @@ namespace Tunkio
         switch (args[1].Value<Args::Target>())
         {
         case Tunkio::Args::Target::AutoDetect:
-            std::wcerr << L"Target auto detecion not yet supported" << std::endl;
+            std::cerr << "Target auto detecion not yet supported" << std::endl;
             return ERROR_NOT_SUPPORTED;
 
         case Tunkio::Args::Target::File:
@@ -138,10 +137,10 @@ namespace Tunkio
         }
 
         return ERROR_BAD_ARGUMENTS;
-    }
+    }*/
 }
 
-unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgressCallback progress)
+/*unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgressCallback progress)
 {
     using namespace Tunkio;
 
@@ -149,13 +148,13 @@ unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgress
     {
         std::array<Args::WideArgument, 4> args =
         {
-            Args::WideArgument(true, L"--path=", std::wstring()),
+            Args::WideArgument(true, L"--path=", std::u16string()),
             Args::WideArgument(false, L"--target=", Args::Target::AutoDetect),
             Args::WideArgument(false, L"--mode=", Args::Mode::Zeroes),
             Args::WideArgument(false, L"--remove=", false),
         };
 
-        if (!Args::Parse(args, std::vector<std::wstring>({ argv + 1, argv + argc })))
+        if (!Args::Parse(args, std::vector<std::u16string>({ argv + 1, argv + argc })))
         {
             return ERROR_BAD_ARGUMENTS;
         }
@@ -164,11 +163,11 @@ unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgress
     }
     catch (const std::exception& e)
     {
-        std::wcout << L"An exception occurred: " << e.what() << std::endl;
+        std::cout << "An exception occurred: " << e.what() << std::endl;
     }
     catch (...)
     {
-        std::wcout << L"An unknown exception occurred." << std::endl;
+        std::cout << "An unknown exception occurred." << std::endl;
     }
 
     return ERROR_UNHANDLED_EXCEPTION;
@@ -197,12 +196,42 @@ unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCal
     }
     catch (std::exception& e)
     {
-        std::wcout << L"An exception occurred: " << e.what() << std::endl;
+        std::cout << "An exception occurred: " << e.what() << std::endl;
     }
     catch (...)
     {
-        std::wcout << L"An unknown exception occurred." << std::endl;
+        std::cout << "An unknown exception occurred." << std::endl;
     }
 
     return ERROR_UNHANDLED_EXCEPTION;
+}*/
+
+uint32_t __cdecl TunkioExecute(const TunkioOptions* options)
+{
+    if (!options)
+    {
+        return ERROR_BAD_ARGUMENTS;
+    }
+
+    const Path path(std::string(options->Path.Data, options->Path.Length));
+
+    options->ProgressCallback(0, 0);
+
+    switch (options->Target)
+    {
+        case TunkioTarget::AutoDetect:
+            std::cerr << "Target auto detecion not yet supported" << std::endl;
+            return ERROR_NOT_SUPPORTED;
+
+        case TunkioTarget::File:
+            return Tunkio::WipeFile(path, options->Remove, options->ProgressCallback);
+
+        case TunkioTarget::Directory:
+            return Tunkio::WipeDirectory(path, options->Remove, options->ProgressCallback);
+
+        case TunkioTarget::MassMedia:
+            return Tunkio::WipeVolume(path, options->ProgressCallback);
+    }
+
+    return 0;
 }

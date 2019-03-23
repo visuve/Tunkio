@@ -6,11 +6,12 @@ namespace Tunkio::FileSystemMock
     {
     public:
         PathMock() = default;
-        PathMock(const wchar_t* str);
         PathMock(const char* str);
-        PathMock(const std::wstring& str);
+        PathMock(const wchar_t* str);
         PathMock(const std::string& str);
+        PathMock(const std::wstring& str);
 
+        friend std::ostream& operator << (std::ostream& os, const PathMock& p);
         friend std::wostream& operator << (std::wostream& os, const PathMock& p);
 
         const wchar_t* c_str() const;

@@ -5,7 +5,7 @@
 
 #ifndef TESTING
 #include <Windows.h>
-constexpr auto Win32FormatMessage = FormatMessageW;
+constexpr auto Win32FormatMessage = FormatMessageA;
 constexpr auto Win32CreateFile = CreateFileW;
 constexpr auto Win32DeviceIoControl = DeviceIoControl;
 constexpr auto Win32WriteFile = WriteFile;
@@ -40,7 +40,7 @@ namespace Tunkio::Native
             const RawHandle m_handle = reinterpret_cast<RawHandle*>(-1);
         };
         
-        std::wstring ErrorToString(const uint32_t error);
+        std::string ErrorToString(const uint32_t error);
 
         RawHandle Open(const Path& path);
         uint64_t VolumeSize(const AutoHandle& volume);
