@@ -16,5 +16,5 @@
 
 ## Prerequisites
 
-- Visual Studio 2017 with latest updates
+- Visual Studio 2019 with latest updates
   - https://www.visualstudio.com/
