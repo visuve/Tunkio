@@ -35,12 +35,12 @@ namespace Tunkio
         { "path", Args::Argument(true, std::filesystem::path()) }
     };
 
-    template <typename T, typename C>
-    T* Clone(const std::basic_string<C>& str)
+    template <typename T>
+    T* Clone(const std::basic_string<T>& str)
     {
-        const size_t bytes = str.length() * sizeof(C) + sizeof(C);
+        const size_t bytes = str.length() * sizeof(T) + sizeof(T);
         auto buffer = new T[bytes];
-        std::memcpy(buffer, str.c_str(), bytes);
+        str.copy(buffer, bytes);
         return buffer;
     }
 
@@ -101,7 +101,6 @@ int main(int argc, char* argv[])
     }
 
     const std::unique_ptr<TunkioOptions, TunkioOptionsDeleter> options(CreateOptions());
-
     const uint32_t result = TunkioExecute(options.get());
 
     system("PAUSE"); // TODO: replace with std::cin?
