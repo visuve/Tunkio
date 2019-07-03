@@ -1,5 +1,6 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
+#include "TunkioExitCodes.hpp"
 #include "TunkioAPI.h"
 
 namespace Tunkio
@@ -61,7 +62,7 @@ namespace Tunkio
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
             progress,
-            TunkioString{ path.size(), Clone<char>(path) }
+            TunkioString{ path.size(), Clone(path) }
         };
     }
 
@@ -92,12 +93,12 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Invalid arguments!" << std::endl << std::endl;
         PrintUsage(argv[0]);
-        return ERROR_BAD_ARGUMENTS;
+        return ExitCode::InvalidArgument;
     }
 
     if (!Args::Parse(Arguments, std::vector<std::string>({ argv + 1, argv + argc })))
     {
-        return ERROR_BAD_ARGUMENTS;
+        return ExitCode::InvalidArgument;
     }
 
     const std::unique_ptr<TunkioOptions, TunkioOptionsDeleter> options(CreateOptions());

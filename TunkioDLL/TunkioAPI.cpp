@@ -6,6 +6,7 @@
 #include "TunkioOutput.hpp"
 #include "TunkioFileSystem.hpp"
 #include "TunkioNative.hpp"
+#include "TunkioExitCodes.hpp"
 
 namespace Tunkio
 {
@@ -15,7 +16,7 @@ namespace Tunkio
             if (!FileSystem::exists(path))
             {
                 std::cerr << "File: " << path << " not found" << std::endl;
-                return ERROR_FILE_NOT_FOUND;
+                return Tunkio::ExitCode::FileNotFound;
             }
 
             FileStream file(path, std::ios::in | std::ios::out | std::ios::binary);
@@ -37,7 +38,7 @@ namespace Tunkio
             }
 
             uint64_t writtenBytesTotal = 0;
-            uint32_t error = ERROR_SUCCESS;
+            uint32_t error = ExitCode::Success;
             const Timing::Timer stopWatch;
 
             if (!Output::Fill(file, bytesLeft, writtenBytesTotal, progress))
@@ -49,7 +50,7 @@ namespace Tunkio
             std::cout << "Wiped: " << writtenBytesTotal << " bytes. " << bytesLeft << " Left unwiped" << std::endl;
             std::cout << "Took: " << stopWatch.Elapsed() << std::endl;
 
-            if (error != ERROR_SUCCESS)
+            if (error != ExitCode::Success)
             {
                 return error;
             }
@@ -62,13 +63,13 @@ namespace Tunkio
             return error;
         }
 
-        return ERROR_SUCCESS;
+        return ExitCode::Success;
     }
 
     uint32_t WipeDirectory(const Path&, bool, TunkioProgressCallback)
     {
-        std::cerr << "Wiping directories not yet supported";
-        return ERROR_NOT_SUPPORTED;
+        std::cerr << "Wiping directories not yet implemented";
+        return Tunkio::ExitCode::NotImplemented;
     }
 
     uint32_t WipeVolume(const Path& path, TunkioProgressCallback progress)
@@ -98,7 +99,7 @@ namespace Tunkio
         std::cout << "Bytes to wipe: " << bytesLeft << std::endl;
 
         uint64_t writtenBytesTotal = 0;
-        uint32_t error = ERROR_SUCCESS;
+        uint32_t error = ExitCode::Success;
         const Timing::Timer stopWatch;
 
         if (!Native::Win32::Fill(volume, bytesLeft, writtenBytesTotal, progress))
@@ -124,7 +125,7 @@ namespace Tunkio
         {
         case Tunkio::Args::Target::AutoDetect:
             std::cerr << "Target auto detecion not yet supported" << std::endl;
-            return ERROR_NOT_SUPPORTED;
+            return ExitCode::NotImplemented;
 
         case Tunkio::Args::Target::File:
             return WipeFile(path, remove, progress);
@@ -136,7 +137,7 @@ namespace Tunkio
             return WipeVolume(path, progress);
         }
 
-        return ERROR_BAD_ARGUMENTS;
+        return ExitCode::InvalidArgument;
     }*/
 }
 
@@ -156,7 +157,7 @@ namespace Tunkio
 
         if (!Args::Parse(args, std::vector<std::u16string>({ argv + 1, argv + argc })))
         {
-            return ERROR_BAD_ARGUMENTS;
+            return ExitCode::InvalidArgument;
         }
 
         return Tunkio::Exec(args, progress);
@@ -189,7 +190,7 @@ unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCal
 
         if (!Args::Parse(args, std::vector<std::string>({ argv + 1, argv + argc })))
         {
-            return ERROR_BAD_ARGUMENTS;
+            return ExitCode::InvalidArgument;
         }
 
         return Tunkio::Exec(args, progress);
@@ -210,7 +211,7 @@ uint32_t __cdecl TunkioExecute(const TunkioOptions* options)
 {
     if (!options)
     {
-        return ERROR_BAD_ARGUMENTS;
+        return Tunkio::ExitCode::InvalidArgument;
     }
 
     const Path path(std::string(options->Path.Data, options->Path.Length));
@@ -221,7 +222,7 @@ uint32_t __cdecl TunkioExecute(const TunkioOptions* options)
     {
         case TunkioTarget::AutoDetect:
             std::cerr << "Target auto detecion not yet supported" << std::endl;
-            return ERROR_NOT_SUPPORTED;
+            return Tunkio::ExitCode::NotImplemented;
 
         case TunkioTarget::File:
             return Tunkio::WipeFile(path, options->Remove, options->ProgressCallback);

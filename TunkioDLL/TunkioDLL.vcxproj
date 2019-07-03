@@ -16,6 +16,7 @@
     <ClInclude Include="PCH.hpp" />
     <ClInclude Include="TunkioAPI.h" />
     <ClInclude Include="TunkioEncoding.hpp" />
+    <ClInclude Include="TunkioExitCodes.hpp" />
     <ClInclude Include="TunkioFileSystem.hpp" />
     <ClInclude Include="TunkioOutput.hpp" />
     <ClInclude Include="TunkioNative.hpp" />

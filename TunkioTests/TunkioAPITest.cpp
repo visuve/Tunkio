@@ -1,5 +1,6 @@
 #include "PCH.hpp"
 #include "TunkioAPI.h"
+#include "TunkioExitCodes.hpp"
 
 namespace Tunkio
 {
@@ -19,12 +20,12 @@ namespace Tunkio
             progress,
             {
                 4,
-                "xyz"
+                const_cast<char*>("xyz")
             }
         };
 
         const unsigned long actual = TunkioExecute(&options);
-        const unsigned long expected = ERROR_SUCCESS;
+        const unsigned long expected = Tunkio::ExitCode::Success;
         EXPECT_EQ(actual, expected);
     }
 }
