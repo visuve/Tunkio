@@ -67,8 +67,8 @@ namespace Tunkio::Args
             case static_cast<uint8_t>(TunkioTarget::Directory) :
                 m_value = TunkioTarget::Directory;
                 return true;
-            case  static_cast<uint8_t>(TunkioTarget::MassMedia) :
-                m_value = TunkioTarget::MassMedia;
+            case  static_cast<uint8_t>(TunkioTarget::Volume) :
+                m_value = TunkioTarget::Volume;
                 return true;
         }
 

@@ -112,100 +112,7 @@ namespace Tunkio
         std::cout << "Took: " << stopWatch.Elapsed() << std::endl;
         return error;
     }
-
-    /*template <typename C>
-    uint32_t Exec(const std::array<Args::Argument<C>, 4>& args, TunkioProgressCallback progress)
-    {
-        // TODO: this ain't the prettiest
-        const auto path = args[0].Value<std::basic_string<C>>();
-
-        const bool remove = args[3].Value<bool>();
-
-        switch (args[1].Value<Args::Target>())
-        {
-        case Tunkio::Args::Target::AutoDetect:
-            std::cerr << "Target auto detecion not yet supported" << std::endl;
-            return ExitCode::NotImplemented;
-
-        case Tunkio::Args::Target::File:
-            return WipeFile(path, remove, progress);
-
-        case Tunkio::Args::Target::Directory:
-            return WipeDirectory(path, remove, progress);
-
-        case Tunkio::Args::Target::MassMedia:
-            return WipeVolume(path, progress);
-        }
-
-        return ExitCode::InvalidArgument;
-    }*/
 }
-
-/*unsigned long __stdcall TunkioExecuteW(int argc, wchar_t* argv[], TunkioProgressCallback progress)
-{
-    using namespace Tunkio;
-
-    try
-    {
-        std::array<Args::WideArgument, 4> args =
-        {
-            Args::WideArgument(true, L"--path=", std::u16string()),
-            Args::WideArgument(false, L"--target=", Args::Target::AutoDetect),
-            Args::WideArgument(false, L"--mode=", Args::Mode::Zeroes),
-            Args::WideArgument(false, L"--remove=", false),
-        };
-
-        if (!Args::Parse(args, std::vector<std::u16string>({ argv + 1, argv + argc })))
-        {
-            return ExitCode::InvalidArgument;
-        }
-
-        return Tunkio::Exec(args, progress);
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "An exception occurred: " << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "An unknown exception occurred." << std::endl;
-    }
-
-    return ERROR_UNHANDLED_EXCEPTION;
-}
-
-unsigned long __stdcall TunkioExecuteA(int argc, char* argv[], TunkioProgressCallback progress)
-{
-    using namespace Tunkio;
-
-    try
-    {
-        std::array<Args::NarrowArgument, 4> args =
-        {
-            Args::NarrowArgument(true, "--path=", std::string()),
-            Args::NarrowArgument(false, "--target=", Args::Target::AutoDetect),
-            Args::NarrowArgument(false, "--mode=", Args::Mode::Zeroes),
-            Args::NarrowArgument(false, "--remove=", false),
-        };
-
-        if (!Args::Parse(args, std::vector<std::string>({ argv + 1, argv + argc })))
-        {
-            return ExitCode::InvalidArgument;
-        }
-
-        return Tunkio::Exec(args, progress);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "An exception occurred: " << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "An unknown exception occurred." << std::endl;
-    }
-
-    return ERROR_UNHANDLED_EXCEPTION;
-}*/
 
 uint32_t __cdecl TunkioExecute(const TunkioOptions* options)
 {
@@ -215,8 +122,6 @@ uint32_t __cdecl TunkioExecute(const TunkioOptions* options)
     }
 
     const Path path(std::string(options->Path.Data, options->Path.Length));
-
-    options->ProgressCallback(0, 0);
 
     switch (options->Target)
     {
@@ -230,7 +135,7 @@ uint32_t __cdecl TunkioExecute(const TunkioOptions* options)
         case TunkioTarget::Directory:
             return Tunkio::WipeDirectory(path, options->Remove, options->ProgressCallback);
 
-        case TunkioTarget::MassMedia:
+        case TunkioTarget::Volume:
             return Tunkio::WipeVolume(path, options->ProgressCallback);
     }
 

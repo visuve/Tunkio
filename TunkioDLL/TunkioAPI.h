@@ -12,7 +12,7 @@ extern "C"
         AutoDetect = 'a',
         File = 'f',
         Directory = 'd',
-        MassMedia = 'm'
+        Volume = 'v'
     } TunkioTarget;
 
     typedef enum

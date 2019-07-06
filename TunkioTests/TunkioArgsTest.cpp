@@ -25,14 +25,14 @@ namespace Tunkio::Args
         EXPECT_FALSE(Parse(Arguments, { "--path" }));
     }
 
-     TEST(TunkioArgsTest, ParseOptionalSuccess)
+    TEST(TunkioArgsTest, ParseOptionalSuccess)
     {
         EXPECT_TRUE(Parse(Arguments, { "--path=xyz", "--target=a", "--mode=0" }));
-        EXPECT_TRUE(Parse(Arguments, { "--path=x", "--target=m", "--mode=1" }));
-        EXPECT_TRUE(Parse(Arguments, { "--path=x", "--target=m", "--mode=1", "--remove=y" }));
+        EXPECT_TRUE(Parse(Arguments, { "--path=x", "--target=v", "--mode=1" }));
+        EXPECT_TRUE(Parse(Arguments, { "--path=x", "--target=v", "--mode=1", "--remove=y" }));
 
         EXPECT_STREQ(Arguments.at("path").Value<std::filesystem::path>().c_str(), L"x");
-        EXPECT_EQ(Arguments.at("target").Value<TunkioTarget>(), TunkioTarget::MassMedia);
+        EXPECT_EQ(Arguments.at("target").Value<TunkioTarget>(), TunkioTarget::Volume);
         EXPECT_EQ(Arguments.at("mode").Value<TunkioMode>(), TunkioMode::Ones);
         EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
     }
@@ -44,27 +44,27 @@ namespace Tunkio::Args
         EXPECT_FALSE(Parse(Arguments, { "--path=xyz", "--target=m", "--mode=rofl" }));
     }
 
-    /*TEST(TunkioArgsTest, ParseAbnormalOrderSuccess)
+    TEST(TunkioArgsTest, ParseAbnormalOrderSuccess)
     {
-        EXPECT_TRUE(Parse(Arguments, { L"--mode=0",  L"--target=a", L"--path=xyz" }));
-        EXPECT_TRUE(Parse(Arguments, { L"--mode=1", L"--path=x", L"--target=m",  }));
+        EXPECT_TRUE(Parse(Arguments, { "--mode=0",  "--target=a", "--path=xyz" }));
+        EXPECT_TRUE(Parse(Arguments, { "--mode=1", "--path=x", "--target=v", }));
 
-        EXPECT_STREQ(Arguments[0].Value<std::u16string>().c_str(), L"x");
-        EXPECT_EQ(Arguments[1].Value<Target>(), Target::MassMedia);
-        EXPECT_EQ(Arguments[2].Value<Mode>(), Mode::Ones);
-        EXPECT_EQ(Arguments[3].Value<bool>(), true);
+        EXPECT_STREQ(Arguments.at("path").Value<std::filesystem::path>().c_str(), L"x");
+        EXPECT_EQ(Arguments.at("target").Value<TunkioTarget>(), TunkioTarget::Volume);
+        EXPECT_EQ(Arguments.at("mode").Value<TunkioMode>(), TunkioMode::Ones);
+        EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
     }
 
     TEST(TunkioArgsTest, ParseAbnormalOrderFailure)
     {
-        EXPECT_FALSE(Parse(Arguments, { L"--mode=0",  L"--target=a", L"--path=" }));
-        EXPECT_FALSE(Parse(Arguments, { L"--mode=a", L"--path=x", L"--target=0", }));
+        EXPECT_FALSE(Parse(Arguments, { "--mode=0",  "--target=a", "--path=" }));
+        EXPECT_FALSE(Parse(Arguments, { "--mode=a", "--path=x", "--target=0", }));
     }
 
     TEST(TunkioArgsTest, ParseUtterNonsense)
     {
-        EXPECT_FALSE(Parse(Arguments, { L"--path=\0", L" ", L"\0" }));
-        EXPECT_FALSE(Parse(Arguments, { L"a", L"b", L"c" }));
-        EXPECT_FALSE(Parse(Arguments, { L"a b c", L"d e f" }));
-    }*/
+        EXPECT_FALSE(Parse(Arguments, { "--path=\0", " ", "\0" }));
+        EXPECT_FALSE(Parse(Arguments, { "a", "b", "c" }));
+        EXPECT_FALSE(Parse(Arguments, { "a b c", "d e f" }));
+    }
 }
