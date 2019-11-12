@@ -16,11 +16,11 @@
     <ClInclude Include="PCH.hpp" />
     <ClInclude Include="TunkioAPI.h" />
     <ClInclude Include="TunkioEncoding.hpp" />
-    <ClInclude Include="TunkioExitCodes.hpp" />
-    <ClInclude Include="TunkioFileSystem.hpp" />
-    <ClInclude Include="TunkioOutput.hpp" />
-    <ClInclude Include="TunkioNative.hpp" />
-    <ClInclude Include="TunkioTiming.hpp" />
+    <ClInclude Include="TunkioErrorCodes.hpp" />
+    <ClInclude Include="Strategies\ITunkioOperation.hpp" />
+    <ClInclude Include="Strategies\TunkioFileWipe.hpp" />
+    <ClInclude Include="Strategies\TunkioDeviceWipe.hpp" />
+    <ClInclude Include="Strategies\Win32\TunkioWin32AutoHandle.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
@@ -32,9 +32,9 @@
     </ClCompile>
     <ClCompile Include="TunkioAPI.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />
-    <ClCompile Include="TunkioOutput.cpp" />
-    <ClCompile Include="TunkioNative.cpp" />
-    <ClCompile Include="TunkioTiming.cpp" />
+    <ClCompile Include="Strategies\Win32\TunkioWin32AutoHandle.cpp" />
+    <ClCompile Include="Strategies\Win32\TunkioWin32DeviceWipe.cpp" />
+    <ClCompile Include="Strategies\Win32\TunkioWin32FileWipe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TunkioAPI.def" />

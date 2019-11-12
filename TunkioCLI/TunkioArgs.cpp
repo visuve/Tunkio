@@ -58,18 +58,21 @@ namespace Tunkio::Args
     {
         switch (c)
         {
-            case static_cast<uint8_t>(TunkioTarget::AutoDetect) :
-                m_value = TunkioTarget::AutoDetect;
-                return true;
             case static_cast<uint8_t>(TunkioTarget::File) :
+            {
                 m_value = TunkioTarget::File;
                 return true;
+            }
             case static_cast<uint8_t>(TunkioTarget::Directory) :
+            {
                 m_value = TunkioTarget::Directory;
                 return true;
-            case  static_cast<uint8_t>(TunkioTarget::Volume) :
-                m_value = TunkioTarget::Volume;
+            }
+            case  static_cast<uint8_t>(TunkioTarget::Device) :
+            {
+                m_value = TunkioTarget::Device;
                 return true;
+            }
         }
 
         return false;
@@ -80,17 +83,25 @@ namespace Tunkio::Args
         switch (c)
         {
             case static_cast<uint8_t>(TunkioMode::Zeroes) :
+            {
                 m_value = TunkioMode::Zeroes;
                 return true;
+            }
             case static_cast<uint8_t>(TunkioMode::Ones) :
+            {
                 m_value = TunkioMode::Ones;
                 return true;
+            }
             case static_cast<uint8_t>(TunkioMode::LessRandom) :
+            {
                 m_value = TunkioMode::LessRandom;
                 return true;
+            }
             case static_cast<uint8_t>(TunkioMode::MoreRandom) :
+            {
                 m_value = TunkioMode::MoreRandom;
                 return true;
+            }
         }
 
         return false;

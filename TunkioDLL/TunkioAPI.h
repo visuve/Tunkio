@@ -9,21 +9,27 @@ extern "C"
 #endif
     typedef enum
     {
-        AutoDetect = 'a',
         File = 'f',
         Directory = 'd',
-        Volume = 'v'
+        Device = 'D'
     } TunkioTarget;
 
     typedef enum
     {
         Zeroes = '0',
         Ones = '1',
-        LessRandom = 'R',
-        MoreRandom = 'r'
+        LessRandom = 'r',
+        MoreRandom = 'R'
     } TunkioMode;
 
-    typedef void(*TunkioProgressCallback)(uint64_t bytesWritten, uint64_t secondsElapsed);
+    typedef void(*TunkioProgressCallback)(uint64_t bytesWritten);
+    typedef void(*TunkioErrorCallback)(uint32_t error, uint64_t bytesWritten);
+    typedef void(*TunkioCompletedCallback)(uint64_t bytesWritten);
+
+    struct TunkioHandle
+    {
+        int Unused;
+    };
 
     struct TunkioString
     {
@@ -31,16 +37,25 @@ extern "C"
         char* Data;
     };
 
+    struct TunkioCallbacks
+    {
+        TunkioProgressCallback ProgressCallback;
+        TunkioErrorCallback ErrorCallback;
+        TunkioCompletedCallback CompletedCallback;
+    };
+
     struct TunkioOptions
     {
         TunkioTarget Target;
         TunkioMode Mode;
         bool Remove;
-        TunkioProgressCallback ProgressCallback;
+        struct TunkioCallbacks Callbacks;
         struct TunkioString Path;
     };
 
-    uint32_t __cdecl TunkioExecute(const struct TunkioOptions* options);
+    struct TunkioHandle* __cdecl TunkioCreate(const struct TunkioOptions*);
+    uint32_t __cdecl TunkioRun(struct TunkioHandle*);
+    void __cdecl TunkioFree(struct TunkioHandle*);
 
 #if defined(__cplusplus)
 };

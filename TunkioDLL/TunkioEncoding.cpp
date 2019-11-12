@@ -75,14 +75,14 @@ namespace Tunkio::Encoding
         return ansi;
     }
 
-   /* std::vector<std::string> ToAnsi(const std::vector<std::wstring>& unicode)
-    {
-        std::vector<std::string> ansi;
-        std::transform(unicode.cbegin(), unicode.cend(), std::back_inserter(ansi), [](const std::wstring& iter)
-        {
-            return ToAnsi(iter);
-        });
+    /* std::vector<std::string> ToAnsi(const std::vector<std::wstring>& unicode)
+     {
+         std::vector<std::string> ansi;
+         std::transform(unicode.cbegin(), unicode.cend(), std::back_inserter(ansi), [](const std::wstring& iter)
+         {
+             return ToAnsi(iter);
+         });
 
-        return ansi;
-    }*/
+         return ansi;
+     }*/
 }

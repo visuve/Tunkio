@@ -1,10 +1,17 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
-#include "TunkioExitCodes.hpp"
+#include "TunkioErrorCodes.hpp"
+#include "TunkioTiming.hpp"
 #include "TunkioAPI.h"
+
+#include <mutex>
+#include <condition_variable>
 
 namespace Tunkio
 {
+    Timing::Timer g_timer;
+    uint32_t g_error = ErrorCode::Success;
+
     void PrintUsage(const std::filesystem::path& exe)
     {
         std::cout << " Usage:" << std::endl << std::endl;
@@ -14,9 +21,9 @@ namespace Tunkio
         std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::cout << std::endl;
         std::cout << " Usage examples:" << std::endl << std::endl;
-        std::cout << "  " << exe << " --path=\"C:\\SecretFile.txt\" --target=f --mode=r" << std::endl;
-        std::cout << "  " << exe << " --path=\"C:\\SecretDirectory\" --target=d --mode=r" << std::endl;
-        std::cout << "  " << exe << " --path=\\\\.\\PHYSICALDRIVE1 --target=v --mode=r" << std::endl;
+        std::cout << "  " << exe << " --path=\"C:\\SecretFile.txt\" --target=" << TunkioTarget::File << " --mode=r" << std::endl;
+        std::cout << "  " << exe << " --path=\"C:\\SecretDirectory\" --target=" << TunkioTarget::Directory << " --mode=r" << std::endl;
+        std::cout << "  " << exe << " --path=\\\\.\\PHYSICALDRIVE1 --target=" << TunkioTarget::Device << " --mode=r" << std::endl;
         std::cout << std::endl;
 
         std::cout << std::endl << "Here are your volumes:" << std::endl << std::endl;
@@ -30,7 +37,7 @@ namespace Tunkio
 
     std::map<std::string, Args::Argument> Arguments =
     {
-        { "target", Args::Argument(false, TunkioTarget::AutoDetect) },
+        { "target", Args::Argument(false, TunkioTarget::File) },
         { "mode", Args::Argument(false, TunkioMode::Zeroes) },
         { "remove", Args::Argument(false, false) },
         { "path", Args::Argument(true, std::filesystem::path()) }
@@ -40,18 +47,50 @@ namespace Tunkio
     T* Clone(const std::basic_string<T>& str)
     {
         const size_t bytes = str.length() * sizeof(T) + sizeof(T);
-        auto buffer = new T[bytes];
-        str.copy(buffer, bytes);
-        return buffer;
+        return reinterpret_cast<T*>(memcpy(new T[bytes], str.c_str(), bytes));
     }
 
     TunkioOptions* CreateOptions()
     {
-        const auto progress = [](uint64_t bytesWritten, uint64_t secondsElapsed) -> void
+        const auto progress = [](uint64_t bytesWritten) -> void
         {
-            assert(bytesWritten && secondsElapsed && "Progress triggered with zero(s)");
-            const uint64_t megabytesWritten = bytesWritten / 1024;
-            std::cout << megabytesWritten << " megabytes written. Speed " << megabytesWritten / secondsElapsed << " MB/s" << std::endl;
+            if (bytesWritten)
+            {
+                const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
+                const uint64_t elapsedSeconds = g_timer.Elapsed<Timing::Seconds>().count();
+
+                if (megabytesWritten && elapsedSeconds)
+                {
+                    std::cout << megabytesWritten << " megabytes written. Speed " << static_cast<double>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
+                }
+            }
+        };
+
+        const auto errors = [](uint32_t error, uint64_t bytesWritten) -> void
+        {
+            if (bytesWritten)
+            {
+                std::cout << "Error " << error << "  occurred. Bytes written: " << bytesWritten << std::endl;
+            }
+            else
+            {
+                std::cout << "Wipe failed. Error. " << error << std::endl;
+            }
+
+            g_error = error;
+        };
+
+        const auto completed = [](uint64_t bytesWritten) -> void
+        {
+            std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
+
+            const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
+            const uint64_t elapsedSeconds = g_timer.Elapsed<Timing::Seconds>().count();
+
+            if (megabytesWritten && elapsedSeconds)
+            {
+                std::cout << "Average speed " << static_cast<double>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
+            }
         };
 
         const auto path = Arguments.at("path").Value<std::filesystem::path>().string();
@@ -61,7 +100,7 @@ namespace Tunkio
             Arguments.at("target").Value<TunkioTarget>(),
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
-            progress,
+            TunkioCallbacks { progress, errors, completed },
             TunkioString{ path.size(), Clone(path) }
         };
     }
@@ -81,6 +120,17 @@ namespace Tunkio
             }
         }
     };
+
+    struct TunkioDeleter
+    {
+        void operator()(TunkioHandle* tunkio)
+        {
+            if (tunkio)
+            {
+                TunkioFree(tunkio);
+            }
+        }
+    };
 }
 
 int main(int argc, char* argv[])
@@ -93,18 +143,31 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Invalid arguments!" << std::endl << std::endl;
         PrintUsage(argv[0]);
-        return ExitCode::InvalidArgument;
+        return ErrorCode::InvalidArgument;
     }
 
     if (!Args::Parse(Arguments, std::vector<std::string>({ argv + 1, argv + argc })))
     {
-        return ExitCode::InvalidArgument;
+        return ErrorCode::InvalidArgument;
     }
 
     const std::unique_ptr<TunkioOptions, TunkioOptionsDeleter> options(CreateOptions());
-    const uint32_t result = TunkioExecute(options.get());
+    const std::unique_ptr<TunkioHandle, TunkioDeleter> tunkio(TunkioCreate(options.get()));
 
-    system("PAUSE"); // TODO: replace with std::cin?
+    if (!tunkio)
+    {
+        std::cerr << "Failed to create TunkioHandle!" << std::endl;
+        return -666; // TODO: FIX
+    }
 
-    return result;
+    DWORD result = TunkioRun(tunkio.get());
+
+    system("PAUSE");
+
+    if (result != Tunkio::ErrorCode::Success)
+    {
+        return result;
+    }
+
+    return g_error;
 }
