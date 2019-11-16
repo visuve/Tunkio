@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DB0A41E5-ED54-4842-9745-FFB5EF14F294}</ProjectGuid>
+    <ProjectGuid>{89B12F02-D6FC-4B18-9A23-F78A9D1FAB3E}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\Tunkio.props" />
@@ -10,23 +10,27 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Tunkio.lib</AdditionalDependencies>
+      <AdditionalDependencies>Tunkio.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="TunkioTiming.hpp" />
-    <ClInclude Include="TunkioArgs.hpp" />
     <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="TunkioGUI.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TunkioTiming.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TunkioGUI.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TunkioArgs.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TunkioGUI.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="TunkioGUI.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TunkioDLL\TunkioDLL.vcxproj">
