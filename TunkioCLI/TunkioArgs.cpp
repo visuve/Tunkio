@@ -1,10 +1,16 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
+#include "TunkioAPI.h"
 
 namespace Tunkio::Args
 {
     bool Argument::Parse(const std::string& value)
     {
+        if (value.empty())
+        {
+            return false;
+        }
+
         if (Type == typeid(std::string))
         {
             m_value = std::make_any<std::string>(value);
@@ -25,7 +31,7 @@ namespace Tunkio::Args
                 return false;
             }
 
-            return TargetFromChar(value.front());
+            return TargetFromChar(value.front(), m_value);
         }
 
         if (Type == typeid(TunkioMode))
@@ -36,7 +42,7 @@ namespace Tunkio::Args
                 return false;
             }
 
-            return ModeFromChar(value.front());
+            return ModeFromChar(value.front(), m_value);
         }
 
         if (Type == typeid(bool))
@@ -47,30 +53,30 @@ namespace Tunkio::Args
                 return false;
             }
 
-            return BoolFromChar(value.front());
+            return BoolFromChar(value.front(), m_value);
         }
 
         // Uknown type
         return false;
     }
 
-    bool Argument::TargetFromChar(char c)
+    bool TargetFromChar(char c, std::any& result)
     {
         switch (c)
         {
             case static_cast<uint8_t>(TunkioTarget::File) :
             {
-                m_value = TunkioTarget::File;
+                result = TunkioTarget::File;
                 return true;
             }
             case static_cast<uint8_t>(TunkioTarget::Directory) :
             {
-                m_value = TunkioTarget::Directory;
+                result = TunkioTarget::Directory;
                 return true;
             }
             case  static_cast<uint8_t>(TunkioTarget::Device) :
             {
-                m_value = TunkioTarget::Device;
+                result = TunkioTarget::Device;
                 return true;
             }
         }
@@ -78,28 +84,28 @@ namespace Tunkio::Args
         return false;
     }
 
-    bool Argument::ModeFromChar(char c)
+    bool ModeFromChar(char c, std::any& result)
     {
         switch (c)
         {
             case static_cast<uint8_t>(TunkioMode::Zeroes) :
             {
-                m_value = TunkioMode::Zeroes;
+                result = TunkioMode::Zeroes;
                 return true;
             }
             case static_cast<uint8_t>(TunkioMode::Ones) :
             {
-                m_value = TunkioMode::Ones;
+                result = TunkioMode::Ones;
                 return true;
             }
             case static_cast<uint8_t>(TunkioMode::LessRandom) :
             {
-                m_value = TunkioMode::LessRandom;
+                result = TunkioMode::LessRandom;
                 return true;
             }
             case static_cast<uint8_t>(TunkioMode::MoreRandom) :
             {
-                m_value = TunkioMode::MoreRandom;
+                result = TunkioMode::MoreRandom;
                 return true;
             }
         }
@@ -107,45 +113,41 @@ namespace Tunkio::Args
         return false;
     }
 
-    bool Argument::BoolFromChar(char c)
+    bool BoolFromChar(char c, std::any& result)
     {
         switch (c)
         {
             case 'y':
-                m_value = true;
+                result = true;
                 return true;
             case 'n':
-                m_value = false;
+                result = false;
                 return true;
         }
 
         return false;
     }
 
-    bool Parse(std::map<std::string, Argument>& arguments, const std::vector<std::string>& rawArgs)
+    bool Parse(std::map<std::string, Argument>& arguments, const std::vector<std::string>& rawArguments)
     {
         for (auto& kvp : arguments)
         {
-            const std::string paramKey = "--" + kvp.first + '=';
+            const std::string argumentKey = "--" + kvp.first + '=';
+            const std::regex argumentRegex(argumentKey + "(\"[^\"]+\"|[^\\s\"]+)");
             bool found = false;
 
-            for (const std::string& rawArg : rawArgs)
+            for (const std::string& rawArgument : rawArguments)
             {
-                const auto mm = std::mismatch(rawArg.cbegin(), rawArg.cend(), paramKey.cbegin(), paramKey.cend());
-                const std::string argKey = { rawArg.cbegin(), mm.first };
-                const std::string argValue = { mm.first, rawArg.cend() };
+                std::smatch matches;
 
-                if (paramKey != argKey)
+                if (!std::regex_match(rawArgument, matches, argumentRegex))
                 {
                     continue;
                 }
 
-                if (argValue.empty())
-                {
-                    return false;
-                }
+                const std::string rawArgumentValue = matches.str(1);
 
-                if (!kvp.second.Parse(argValue))
+                if (!kvp.second.Parse(rawArgumentValue))
                 {
                     return false;
                 }
@@ -154,6 +156,35 @@ namespace Tunkio::Args
             }
 
             if (kvp.second.Required && !found)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool ParsePotko(std::map<std::string, Argument>& arguments, const std::string& rawArguments)
+    {
+        for (auto& kvp : arguments)
+        {
+            const std::string argumentKey = "--" + kvp.first + '=';
+            const std::regex argumentRegex(argumentKey + "(\"[^\"]+\"|[^\\s\"]+)");
+            std::smatch matches;
+
+            if (!std::regex_search(rawArguments, matches, argumentRegex))
+            {
+                if (kvp.second.Required)
+                {
+                    return false;
+                }
+
+                continue;
+            }
+
+            const std::string rawArgumentValue = matches.str(1);
+
+            if (!kvp.second.Parse(rawArgumentValue))
             {
                 return false;
             }
