@@ -98,14 +98,9 @@ namespace Tunkio::Args
                 result = TunkioMode::Ones;
                 return true;
             }
-            case static_cast<uint8_t>(TunkioMode::LessRandom) :
+            case static_cast<uint8_t>(TunkioMode::Random) :
             {
-                result = TunkioMode::LessRandom;
-                return true;
-            }
-            case static_cast<uint8_t>(TunkioMode::MoreRandom) :
-            {
-                result = TunkioMode::MoreRandom;
+                result = TunkioMode::Random;
                 return true;
             }
         }
@@ -156,35 +151,6 @@ namespace Tunkio::Args
             }
 
             if (kvp.second.Required && !found)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    bool ParsePotko(std::map<std::string, Argument>& arguments, const std::string& rawArguments)
-    {
-        for (auto& kvp : arguments)
-        {
-            const std::string argumentKey = "--" + kvp.first + '=';
-            const std::regex argumentRegex(argumentKey + "(\"[^\"]+\"|[^\\s\"]+)");
-            std::smatch matches;
-
-            if (!std::regex_search(rawArguments, matches, argumentRegex))
-            {
-                if (kvp.second.Required)
-                {
-                    return false;
-                }
-
-                continue;
-            }
-
-            const std::string rawArgumentValue = matches.str(1);
-
-            if (!kvp.second.Parse(rawArgumentValue))
             {
                 return false;
             }

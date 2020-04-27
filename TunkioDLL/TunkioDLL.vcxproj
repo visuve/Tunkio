@@ -17,6 +17,7 @@
     <ClInclude Include="TunkioAPI.h" />
     <ClInclude Include="TunkioEncoding.hpp" />
     <ClInclude Include="TunkioErrorCodes.hpp" />
+    <ClInclude Include="Strategies\TunkioFillStrategy.hpp" />
     <ClInclude Include="Strategies\ITunkioOperation.hpp" />
     <ClInclude Include="Strategies\TunkioFileWipe.hpp" />
     <ClInclude Include="Strategies\TunkioDeviceWipe.hpp" />
@@ -32,6 +33,7 @@
     </ClCompile>
     <ClCompile Include="TunkioAPI.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />
+    <ClCompile Include="Strategies\TunkioFillStrategy.cpp" />
     <ClCompile Include="Strategies\Win32\TunkioWin32AutoHandle.cpp" />
     <ClCompile Include="Strategies\Win32\TunkioWin32DeviceWipe.cpp" />
     <ClCompile Include="Strategies\Win32\TunkioWin32FileWipe.cpp" />

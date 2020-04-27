@@ -18,8 +18,7 @@ extern "C"
     {
         Zeroes = '0',
         Ones = '1',
-        LessRandom = 'r',
-        MoreRandom = 'R'
+        Random = 'r'
     } TunkioMode;
 
     typedef void(*TunkioProgressCallback)(uint64_t bytesWritten);
@@ -34,7 +33,7 @@ extern "C"
     struct TunkioString
     {
         size_t Length;
-        char* Data;
+        const char* Data;
     };
 
     struct TunkioCallbacks

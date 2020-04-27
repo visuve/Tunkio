@@ -23,6 +23,6 @@ namespace Tunkio
 
     bool Win32AutoHandle::IsValid() const
     {
-        return m_handle != INVALID_HANDLE_VALUE;
+        return m_handle && m_handle != INVALID_HANDLE_VALUE;
     }
 }

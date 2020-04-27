@@ -13,39 +13,25 @@
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\TunkioDLL\TunkioOutput.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TunkioDLL\TunkioTiming.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
-    <ClCompile Include="TunkioOutputMock.cpp">
-      <Filter>Mocks</Filter>
-    </ClCompile>
-    <ClCompile Include="TunkioOperatingSystemMock.cpp">
-      <Filter>Mocks</Filter>
-    </ClCompile>
-    <ClCompile Include="TunkioFileSystemMock.cpp">
-      <Filter>Mocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TunkioDLL\TunkioNative.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
     <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp">
       <Filter>../TunkioCLI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp">
+      <Filter>../TunkioDLL</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioFillStategyTest.cpp" />
+    <ClCompile Include="TunkioMockDeviceWipe.cpp">
+      <Filter>Mocks</Filter>
+    </ClCompile>
+    <ClCompile Include="TunkioMockFileWipe.cpp">
+      <Filter>Mocks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="TunkioOutputMock.hpp">
-      <Filter>Mocks</Filter>
-    </ClInclude>
-    <ClInclude Include="TunkioOperatingSystemMock.hpp">
-      <Filter>Mocks</Filter>
-    </ClInclude>
-    <ClInclude Include="TunkioFileSystemMock.hpp">
-      <Filter>Mocks</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="../TunkioDLL">

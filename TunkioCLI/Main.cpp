@@ -17,7 +17,7 @@ namespace Tunkio
         std::cout << " Usage:" << std::endl << std::endl;
         std::cout << "  --path=\"P:\\Path\\To\\File|Disk|Volume\" (Required) " << std::endl;
         std::cout << "  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
-        std::cout << "  --mode=[0|1|r|R] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random, R=less random (Optional)" << std::endl;
+        std::cout << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
         std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::cout << std::endl;
         std::cout << " Usage examples:" << std::endl << std::endl;
@@ -44,10 +44,10 @@ namespace Tunkio
     };
 
     template <typename T>
-    T* Clone(const std::basic_string<T>& str)
+    const T* Clone(const std::basic_string<T>& str)
     {
         const size_t bytes = str.length() * sizeof(T) + sizeof(T);
-        return reinterpret_cast<T*>(memcpy(new T[bytes], str.c_str(), bytes));
+        return reinterpret_cast<const T*>(memcpy(new T[bytes], str.c_str(), bytes));
     }
 
     TunkioOptions* CreateOptions()

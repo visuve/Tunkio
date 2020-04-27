@@ -1,60 +1,35 @@
 #include "PCH.hpp"
-#include "TunkioErrorCodes.hpp"
-#include "TunkioWin32AutoHandle.hpp"
 #include "Strategies/TunkioDeviceWipe.hpp"
 #include "Strategies/TunkioFillStrategy.hpp"
 
 namespace Tunkio
 {
-    // https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering?redirectedfrom=MSDN
-    constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
-    constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-    constexpr uint32_t CreationFlags = FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
-
     class DeviceWipeImpl : IOperation
     {
     public:
 
         DeviceWipeImpl(const TunkioOptions* options) :
-            IOperation(options),
-            m_handle(CreateFileA(options->Path.Data, DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr))
+            IOperation(options)
         {
-            if (m_handle.IsValid())
-            {
-                unsigned long bytesReturned = 0; // Not needed
-                DISK_GEOMETRY diskGeo = { 0 };
-                constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
-
-                if (DeviceIoControl(m_handle, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
-                {
-                    _ASSERT(bytesReturned == sizeof(DISK_GEOMETRY));
-                    m_size = diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
-                }
-            }
         }
 
         ~DeviceWipeImpl()
         {
-            // Will not work, because the handle is open...
-            //if (m_handle.IsValid() && m_removeOnExit && !DeleteFileA(m_path.c_str()))
-            //{
-            //    ReportError(ErrorCode::RemoveFailed);
-            //}
         }
 
         uint32_t Run() override
         {
             if (!Fill())
             {
-                return GetLastError();
+                return 666;
             }
 
-            return 0; // TODO: ...
+            return 0;
         }
 
         bool Exists() override
         {
-            return m_handle.IsValid();
+            return true;
         }
 
         uint64_t Size() override
@@ -82,9 +57,15 @@ namespace Tunkio
             m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
         }
 
+        bool FakeWrite(const uint8_t*, const uint32_t size, uint32_t* written)
+        {
+            *written = size;
+            return true;
+        }
+
         bool Fill() override
         {
-            DWORD bytesWritten = 0u;
+            uint32_t bytesWritten = 0u;
             uint64_t bytesLeft = Size();
             FillStrategy fakeData(m_options->Mode, 0x100000);
 
@@ -95,13 +76,13 @@ namespace Tunkio
                     fakeData.Resize(bytesLeft);
                 }
 
-                const bool result = WriteFile(m_handle, fakeData.Front(), fakeData.Size<uint32_t>(), &bytesWritten, nullptr);
+                const bool result = FakeWrite(fakeData.Front(), fakeData.Size<uint32_t>(), &bytesWritten);
                 m_totalBytesWritten += bytesWritten;
                 bytesLeft -= bytesWritten;
 
                 if (!result)
                 {
-                    ReportError(GetLastError());
+                    ReportError(666);
                     return false;
                 }
 
@@ -113,9 +94,8 @@ namespace Tunkio
         }
 
     private:
-        uint64_t m_size = 0;
+        uint64_t m_size = 0x150000;
         uint64_t m_totalBytesWritten = 0;
-        Win32AutoHandle m_handle;
     };
 
     DeviceWipe::DeviceWipe(const TunkioOptions* options) :

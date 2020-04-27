@@ -7,42 +7,24 @@
 #include "Strategies/TunkioFileWipe.hpp"
 #include "Strategies/TunkioDeviceWipe.hpp"
 
-//namespace Tunkio
-//{
-//    FileWipeStrategy* WipeFile(const std::string& path, TunkioCallbacks callbacks, bool removeOnExit)
-//    {
-//        auto strategy = new FileWipeStrategy(path, callbacks, removeOnExit);
-//
-//        if (!strategy->Exists())
-//        {
-//            callbacks.ErrorCallback(ErrorCode::FileNotFound, 0);
-//            return strategy;
-//        }
-//
-//        if (!strategy->Size())
-//        {
-//            callbacks.ErrorCallback(ErrorCode::FileEmpty, 0);
-//        }
-//        else
-//        {
-//            strategy->Fill();
-//        }
-//
-//        return strategy;
-//    }
-//
-//    TunkioHandle* WipeDirectory(const std::string& /*path*/, TunkioCallbacks /*callbacks*/, bool/* removeOnExit*/)
-//    {
-//        std::cerr << "Wiping directories not yet implemented";
-//        return nullptr;
-//    }
-//
-//    TunkioHandle* WipeDevice(const std::string& /*path*/, TunkioCallbacks /*callbacks*/, bool/* removeOnExit*/)
-//    {
-//        std::cerr << "Wiping deviced not yet implemented";
-//        return nullptr;
-//    }
-//}
+namespace Tunkio
+{
+    uint32_t Run(Tunkio::IOperation* operation)
+    {
+        // Pre-checks
+        if (!operation->Exists())
+        {
+            return ErrorCode::FileNotFound;
+        }
+
+        if (!operation->Size())
+        {
+            return ErrorCode::FileEmpty;
+        }
+
+        return operation->Run();
+    }
+}
 
 TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
 {
@@ -50,8 +32,6 @@ TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
     {
         return nullptr;
     }
-
-    // std::string path(options->Path.Data, options->Path.Length);
 
     switch (options->Target)
     {
@@ -68,17 +48,20 @@ TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
 
 uint32_t __cdecl TunkioRun(TunkioHandle* handle)
 {
-    auto operation = reinterpret_cast<Tunkio::IOperation*>(handle);
+    const auto operation = reinterpret_cast<Tunkio::IOperation*>(handle);
 
     if (!operation)
     {
         return Tunkio::ErrorCode::InvalidArgument;
     }
 
-    return operation->Run();
+    return Tunkio::Run(operation);
 }
 
 void __cdecl TunkioFree(TunkioHandle* handle)
 {
-    delete reinterpret_cast<Tunkio::IOperation*>(handle);
+    if (handle)
+    {
+        delete reinterpret_cast<Tunkio::IOperation*>(handle);
+    }
 }
