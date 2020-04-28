@@ -4,6 +4,7 @@
 #include "TunkioTime.hpp"
 #include "TunkioAPI.h"
 #include "TunkioChildProcess.hpp"
+#include "TunkioDataUnits.hpp"
 
 namespace Tunkio
 {
@@ -68,19 +69,12 @@ namespace Tunkio
                 return;
             }
 
-            const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
+            const DataUnit::Mebibyte bytes(bytesWritten);
             const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
 
-            if (megabytesWritten && elapsedSeconds)
+            if (bytes.Value() && elapsedSeconds)
             {
-                if (megabytesWritten > 1024)
-                {
-                    std::cout << float(megabytesWritten) / 1024.0f << " gigabytes written. Speed " << static_cast<float>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
-                }
-                else
-                {
-                    std::cout << megabytesWritten << " megabytes written. Speed " << static_cast<float>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
-                }
+                std::cout << DataUnit::HumanReadable(bytes) << " written. Speed:" << bytes.Value() / elapsedSeconds << "MiB/s" << std::endl;
             }
         };
 
@@ -102,12 +96,12 @@ namespace Tunkio
         {
             std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
 
-            const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
+            const DataUnit::Mebibyte bytes(bytesWritten);
             const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
 
-            if (megabytesWritten && elapsedSeconds)
+            if (bytes.Value() && elapsedSeconds)
             {
-                std::cout << "Average speed " << static_cast<double>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
+                std::cout << "Average speed " << bytes.Value() / elapsedSeconds << "MiB/s" << std::endl;
             }
         };
 

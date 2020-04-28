@@ -21,10 +21,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\TunkioCLI\TunkioDataUnits.hpp" />
     <ClInclude Include="PCH.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp" />
+    <ClCompile Include="..\TunkioCLI\TunkioTime.cpp" />
     <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp" />
     <ClCompile Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
@@ -34,12 +36,14 @@
     </ClCompile>
     <ClCompile Include="TunkioAPITest.cpp" />
     <ClCompile Include="TunkioArgsTest.cpp" />
+    <ClCompile Include="TunkioDataUnitTest.cpp" />
     <ClCompile Include="TunkioEncodingTest.cpp" />
     <ClCompile Include="TunkioFillStategyTest.cpp" />
     <ClCompile Include="TunkioHandleTest.cpp" />
     <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="TunkioMockDeviceWipe.cpp" />
     <ClCompile Include="TunkioMockFileWipe.cpp" />
+    <ClCompile Include="TunkioTimeTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages.config" />

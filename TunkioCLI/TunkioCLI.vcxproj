@@ -18,6 +18,7 @@
   <ItemGroup>
     <ClInclude Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.hpp" />
     <ClInclude Include="TunkioChildProcess.hpp" />
+    <ClInclude Include="TunkioDataUnits.hpp" />
     <ClInclude Include="TunkioTime.hpp" />
     <ClInclude Include="TunkioArgs.hpp" />
     <ClInclude Include="PCH.hpp" />

@@ -19,7 +19,7 @@ namespace Tunkio::Time
     std::wostream& operator << (std::wostream& os, MicroSeconds us) { return os << us.count() << L"us"; }
     std::wostream& operator << (std::wostream& os, const Duration& x) { return os << x.H << L' ' << x.M << L' ' << x.S << L' ' << x.Ms << L' ' << x.Us; }
 
-    Duration::Duration(const MicroSeconds elapsed) :
+    constexpr Duration::Duration(const MicroSeconds elapsed) :
         H(std::chrono::duration_cast<Hours>(elapsed)),
         M(std::chrono::duration_cast<Minutes>(elapsed - H)),
         S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),

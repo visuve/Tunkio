@@ -13,7 +13,7 @@ namespace Tunkio::Time
 
     struct Duration
     {
-        Duration(const MicroSeconds elapsed);
+        constexpr Duration(const MicroSeconds elapsed);
 
         const Hours H;
         const Minutes M;
