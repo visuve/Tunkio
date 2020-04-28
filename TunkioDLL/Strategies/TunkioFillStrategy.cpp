@@ -3,19 +3,16 @@
 
 namespace Tunkio
 {
-    std::vector<uint8_t> Random(std::vector<uint8_t>& data)
+    void Random(std::vector<uint8_t>& data)
     {
         thread_local std::random_device device;
         thread_local std::default_random_engine engine(device());
         thread_local std::uniform_int_distribution<uint16_t> distribution(0, 255); // uint8_t is not supported
 
-        constexpr auto randchar = [&]() -> uint8_t
+        for (size_t i = 0; i < data.size(); ++i)
         {
-            return static_cast<uint8_t>(distribution(engine));
-        };
-
-        std::generate(data.begin(), data.end(), randchar);
-        return data;
+            data[i] = static_cast<uint8_t>(distribution(engine));
+        }
     }
 
     FillStrategy::FillStrategy(const TunkioMode mode, const size_t size) :

@@ -59,16 +59,27 @@ namespace Tunkio
 
     TunkioOptions* CreateOptions()
     {
+        std::cout << std::setprecision(3) << std::fixed;
+
         const auto progress = [](uint64_t bytesWritten) -> void
         {
-            if (bytesWritten)
+            if (!bytesWritten)
             {
-                const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
-                const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
+                return;
+            }
 
-                if (megabytesWritten && elapsedSeconds)
+            const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
+            const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
+
+            if (megabytesWritten && elapsedSeconds)
+            {
+                if (megabytesWritten > 1024)
                 {
-                    std::cout << megabytesWritten << " megabytes written. Speed " << static_cast<double>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
+                    std::cout << float(megabytesWritten) / 1024.0f << " gigabytes written. Speed " << static_cast<float>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
+                }
+                else
+                {
+                    std::cout << megabytesWritten << " megabytes written. Speed " << static_cast<float>(megabytesWritten / elapsedSeconds) << " MB/s" << std::endl;
                 }
             }
         };
@@ -173,6 +184,7 @@ int main(int argc, char* argv[])
 
     if (result != Tunkio::ErrorCode::Success)
     {
+        std::cerr << "FAILED: " << result << std::endl;
         return result;
     }
 

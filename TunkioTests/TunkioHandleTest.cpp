@@ -9,14 +9,14 @@ namespace Tunkio::Native::Win32
         EXPECT_FALSE(Win32AutoHandle(INVALID_HANDLE_VALUE).IsValid());
     }
 
-    TEST(AutoHandleTest, Operators)
+    TEST(AutoHandleTest, Values)
     {
         {
-            void* raw = Win32AutoHandle(nullptr);
+            void* raw = Win32AutoHandle(nullptr).Handle();
             EXPECT_TRUE(raw == nullptr);
         }
         {
-            void* raw = Win32AutoHandle(INVALID_HANDLE_VALUE);
+            void* raw = Win32AutoHandle(INVALID_HANDLE_VALUE).Handle();
             EXPECT_TRUE(raw == INVALID_HANDLE_VALUE);
         }
     }
