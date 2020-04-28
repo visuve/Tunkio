@@ -1,15 +1,13 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
 #include "TunkioErrorCodes.hpp"
-#include "TunkioTiming.hpp"
+#include "TunkioTime.hpp"
 #include "TunkioAPI.h"
-
-#include <mutex>
-#include <condition_variable>
+#include "TunkioChildProcess.hpp"
 
 namespace Tunkio
 {
-    Timing::Timer g_timer;
+    Time::Timer g_timer;
     uint32_t g_error = ErrorCode::Success;
 
     void PrintUsage(const std::filesystem::path& exe)
@@ -21,18 +19,27 @@ namespace Tunkio
         std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::cout << std::endl;
         std::cout << " Usage examples:" << std::endl << std::endl;
-        std::cout << "  " << exe << " --path=\"C:\\SecretFile.txt\" --target=" << TunkioTarget::File << " --mode=r" << std::endl;
-        std::cout << "  " << exe << " --path=\"C:\\SecretDirectory\" --target=" << TunkioTarget::Directory << " --mode=r" << std::endl;
-        std::cout << "  " << exe << " --path=\\\\.\\PHYSICALDRIVE1 --target=" << TunkioTarget::Device << " --mode=r" << std::endl;
+        std::cout << "  " << exe << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
+        std::cout << "  " << exe << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
+        std::cout << "  " << exe << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
         std::cout << std::endl;
 
-        std::cout << std::endl << "Here are your volumes:" << std::endl << std::endl;
-        int error = system("wmic diskdrive list brief");
+        ChildProcess wmic(L"C:\\Windows\\System32\\wbem\\WMIC.exe", L"diskdrive list brief");
 
-        if (error != 0)
+        if (!wmic.Run())
         {
-            std::cerr << "Listing your drives failed with wmic: " << error << std::endl;
+            std::cerr << "Failed to start wmic.exe to list disk drives. Error code: " << wmic.ErrorCode() << std::endl;
+            return;
         }
+
+        if (wmic.ExitCode() != 0)
+        {
+            std::cerr << "Listing your drives failed with wmic. Exit code: " << wmic.ExitCode() << std::endl;
+            return;
+        }
+
+        std::cout << std::endl << "Here are your volumes:" << std::endl << std::endl;
+        std::cout << wmic.Output() << std::endl;
     }
 
     std::map<std::string, Args::Argument> Arguments =
@@ -57,7 +64,7 @@ namespace Tunkio
             if (bytesWritten)
             {
                 const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
-                const uint64_t elapsedSeconds = g_timer.Elapsed<Timing::Seconds>().count();
+                const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
 
                 if (megabytesWritten && elapsedSeconds)
                 {
@@ -85,7 +92,7 @@ namespace Tunkio
             std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
 
             const uint64_t megabytesWritten = bytesWritten / 1024 / 1024;
-            const uint64_t elapsedSeconds = g_timer.Elapsed<Timing::Seconds>().count();
+            const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
 
             if (megabytesWritten && elapsedSeconds)
             {

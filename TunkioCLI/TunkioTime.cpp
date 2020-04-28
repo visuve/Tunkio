@@ -1,7 +1,7 @@
 #include "PCH.hpp"
-#include "TunkioTiming.hpp"
+#include "TunkioTime.hpp"
 
-namespace Tunkio::Timing
+namespace Tunkio::Time
 {
     std::ostream& operator << (std::ostream& os, Days s) { return os << s.count() << 'd'; }
     std::ostream& operator << (std::ostream& os, Hours s) { return os << s.count() << 'h'; }
@@ -20,7 +20,7 @@ namespace Tunkio::Timing
     std::wostream& operator << (std::wostream& os, const Duration& x) { return os << x.H << L' ' << x.M << L' ' << x.S << L' ' << x.Ms << L' ' << x.Us; }
 
     Duration::Duration(const MicroSeconds elapsed) :
-        H(std::chrono::duration_cast<Timing::Hours>(elapsed)),
+        H(std::chrono::duration_cast<Hours>(elapsed)),
         M(std::chrono::duration_cast<Minutes>(elapsed - H)),
         S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),
         Ms(std::chrono::duration_cast<MilliSeconds>(elapsed - H - M - S)),

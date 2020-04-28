@@ -23,7 +23,7 @@ namespace Tunkio
             {
                 LARGE_INTEGER fileSize = { 0 };
 
-                if (GetFileSizeEx(m_handle, &fileSize))
+                if (GetFileSizeEx(m_handle.Handle(), &fileSize))
                 {
                     m_size = fileSize.QuadPart;
                 }
@@ -92,7 +92,7 @@ namespace Tunkio
                     fakeData.Resize(bytesLeft);
                 }
 
-                const bool result = WriteFile(m_handle, fakeData.Front(), fakeData.Size<uint32_t>(), &bytesWritten, nullptr);
+                const bool result = WriteFile(m_handle.Handle(), fakeData.Front(), fakeData.Size<uint32_t>(), &bytesWritten, nullptr);
                 m_totalBytesWritten += bytesWritten;
                 bytesLeft -= bytesWritten;
 

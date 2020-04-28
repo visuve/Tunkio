@@ -1,9 +1,8 @@
 #pragma once
 
 #include <chrono>
-// #include <iostream>
 
-namespace Tunkio::Timing
+namespace Tunkio::Time
 {
     using Days = std::chrono::duration<uint64_t, std::ratio<86400, 1>>;
     using Hours = std::chrono::duration<uint64_t, std::ratio<3600, 1>>;

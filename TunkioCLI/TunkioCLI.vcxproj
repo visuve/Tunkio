@@ -16,12 +16,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="TunkioTiming.hpp" />
+    <ClInclude Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.hpp" />
+    <ClInclude Include="TunkioChildProcess.hpp" />
+    <ClInclude Include="TunkioTime.hpp" />
     <ClInclude Include="TunkioArgs.hpp" />
     <ClInclude Include="PCH.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TunkioTiming.cpp" />
+    <ClCompile Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.cpp" />
+    <ClCompile Include="TunkioChildProcess.cpp" />
+    <ClCompile Include="TunkioTime.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
