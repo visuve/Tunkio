@@ -75,4 +75,27 @@ namespace Tunkio
         EXPECT_STREQ(DataUnit::HumanReadable(DataUnit::Tebibyte(1024)).c_str(), "1.000 pebibyte");
         EXPECT_STREQ(DataUnit::HumanReadable(DataUnit::Kibibyte(1536)).c_str(), "1.500 mebibytes");
     }
+
+    TEST(TunkioDataUnitTest, Speed)
+    {
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(0), Tunkio::Time::MilliSeconds(1000)).c_str(), "unknown");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(1000), Tunkio::Time::MilliSeconds(0)).c_str(), "unknown");
+
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(1), Tunkio::Time::MilliSeconds(1000)).c_str(), "1.000 mebibytes/s");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(2), Tunkio::Time::MilliSeconds(1000)).c_str(), "2.000 mebibytes/s");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(2), Tunkio::Time::MilliSeconds(4000)).c_str(), "512.000 kibibytes/s");
+
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Kibibyte(1536), Tunkio::Time::MilliSeconds(1000)).c_str(), "1.500 mebibytes/s");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Kibibyte(1536), Tunkio::Time::Seconds(1)).c_str(), "1.500 mebibytes/s");
+
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Byte(1536), Tunkio::Time::Seconds(1)).c_str(), "1.500 kibibytes/s");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Byte(666), Tunkio::Time::Seconds(1)).c_str(), "666.000 bytes/s");
+
+
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Byte(0x40000001), Tunkio::Time::Seconds(1)).c_str(), "1.000 gibibytes/s");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Byte(0x80000000), Tunkio::Time::Seconds(1)).c_str(), "2.000 gibibytes/s");
+
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(2000), Tunkio::Time::Seconds(100)).c_str(), "20.000 mebibytes/s");
+        EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Byte(0x640000000000), Tunkio::Time::Seconds(100)).c_str(), "1.000 tebibytes/s");
+    }
 }

@@ -8,12 +8,12 @@ namespace Tunkio::DataUnit
     class DataUnit
     {
     public:
-        constexpr DataUnit(size_t value) :
+        constexpr DataUnit(uint64_t value) :
             m_bytes(value * Ratio)
         {
         }
 
-        template<size_t R>
+        template<uint64_t R>
         constexpr DataUnit(const DataUnit<R>& other) :
             m_bytes(other.Bytes())
         {
@@ -34,20 +34,20 @@ namespace Tunkio::DataUnit
             return double(m_bytes) / double(Ratio);
         }
 
-        template<size_t R>
+        template<uint64_t R>
         constexpr bool operator == (const DataUnit<R>& unit) const
         {
             return m_bytes == unit.Bytes();
         }
 
-        template<size_t R>
+        template<uint64_t R>
         DataUnit& operator + (const DataUnit<R>& other)
         {
             m_bytes += other.Bytes();
             return *this;
         }
 
-        template<size_t R>
+        template<uint64_t R>
         DataUnit& operator - (const DataUnit<R>& other)
         {
             m_bytes -= other.Bytes();
@@ -64,15 +64,18 @@ namespace Tunkio::DataUnit
     using Gibibyte = DataUnit<0x40000000>;
     using Tebibyte = DataUnit<0x10000000000>;
     using Pebibyte = DataUnit<0x4000000000000>;
+    using Exbibyte = DataUnit<0x100000000000000>;
 
-
-    template<size_t Ratio>
+    template<uint64_t Ratio>
     std::ostream& operator << (std::ostream& os, const DataUnit<Ratio>& unit)
     {
         os << unit.Value() << ' ';
 
         switch (Ratio)
         {
+            case 0x100000000000000:
+                os << "exbibyte";
+                break;
             case 0x4000000000000:
                 os << "pebibyte";
                 break;
@@ -97,16 +100,21 @@ namespace Tunkio::DataUnit
         {
             os << 's';
         }
+
         return os;
     }
 
-    template<size_t Ratio>
+    template<uint64_t Ratio>
     std::string HumanReadable(const DataUnit<Ratio>& unit)
     {
         std::stringstream os;
         os << std::setprecision(3) << std::fixed;
-
-        if (unit.Bytes() >= 0x4000000000000)
+        
+        if (unit.Bytes() >= 0x100000000000000)
+        {
+            os << Pebibyte(unit);
+        }
+        else if (unit.Bytes() >= 0x4000000000000)
         {
             os << Pebibyte(unit);
         }
@@ -132,5 +140,61 @@ namespace Tunkio::DataUnit
         }
 
         return os.str();
+    }
+
+
+    template<uint64_t T>
+    std::string SpeedPerSecond(const DataUnit<T>& unit, const Tunkio::Time::MilliSeconds& time)
+    {
+        const uint64_t millis = time.count();
+        const uint64_t bytes = unit.Bytes();
+
+        if (millis == 0 || bytes == 0)
+        {
+            return "unknown";
+        }
+
+        const double elapsedSeconds = millis / 1000.0f;
+        const double bytesPerSecond = bytes / elapsedSeconds;
+
+        std::stringstream os;
+        os << std::setprecision(3) << std::fixed;
+
+        if (bytesPerSecond >= 0x100000000000000)
+        {
+            os << bytesPerSecond / 0x100000000000000 << " exbibytes/s";
+        }
+        else if (bytesPerSecond >= 0x4000000000000)
+        {
+            os << bytesPerSecond / 0x4000000000000 << " pebibytes/s";
+        }
+        else if (bytesPerSecond >= 0x10000000000)
+        {
+            os << bytesPerSecond / 0x10000000000 << " tebibytes/s";
+        }
+        else if (bytesPerSecond >= 0x40000000)
+        {
+            os << bytesPerSecond / 0x40000000 << " gibibytes/s";
+        }
+        else if (bytesPerSecond >= 0x100000)
+        {
+            os << bytesPerSecond / 0x100000 << " mebibytes/s";
+        }
+        else if (bytesPerSecond >= 0x400)
+        {
+            os << bytesPerSecond / 0x400 << " kibibytes/s";
+        }
+        else
+        {
+            os << bytesPerSecond << " bytes/s";
+        }
+
+        return os.str();
+    }
+
+    template<uint64_t T>
+    std::string SpeedPerSecond(const DataUnit<T>& unit, const Tunkio::Time::Timer& timer)
+    {
+        return SpeedPerSecond(unit, timer.Elapsed<Time::MilliSeconds>());
     }
 }

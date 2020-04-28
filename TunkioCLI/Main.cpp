@@ -69,12 +69,12 @@ namespace Tunkio
                 return;
             }
 
-            const DataUnit::Mebibyte bytes(bytesWritten);
-            const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
+            const DataUnit::Byte bytes(bytesWritten);
+            const auto elapsed = g_timer.Elapsed<Time::MilliSeconds>();
 
-            if (bytes.Value() && elapsedSeconds)
+            if (bytes.Value() && elapsed.count())
             {
-                std::cout << DataUnit::HumanReadable(bytes) << " written. Speed:" << bytes.Value() / elapsedSeconds << "MiB/s" << std::endl;
+                std::cout << DataUnit::HumanReadable(bytes) << " written. Speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
             }
         };
 
@@ -96,12 +96,12 @@ namespace Tunkio
         {
             std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
 
-            const DataUnit::Mebibyte bytes(bytesWritten);
-            const uint64_t elapsedSeconds = g_timer.Elapsed<Time::Seconds>().count();
+            const DataUnit::Byte bytes(bytesWritten);
+            const auto elapsed = g_timer.Elapsed<Time::MilliSeconds>();
 
-            if (bytes.Value() && elapsedSeconds)
+            if (bytes.Value() && elapsed.count())
             {
-                std::cout << "Average speed " << bytes.Value() / elapsedSeconds << "MiB/s" << std::endl;
+                std::cout << "Average speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
             }
         };
 
