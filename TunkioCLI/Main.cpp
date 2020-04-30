@@ -8,8 +8,10 @@
 
 namespace Tunkio
 {
-    Time::Timer g_timer;
+    Time::Timer g_totalTimer;
+    Time::Timer g_currentTimer;
     uint32_t g_error = ErrorCode::Success;
+    uint64_t g_bytesWrittenLastTime = 0;
 
     void PrintUsage(const std::filesystem::path& exe)
     {
@@ -20,9 +22,9 @@ namespace Tunkio
         std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::cout << std::endl;
         std::cout << " Usage examples:" << std::endl << std::endl;
-        std::cout << "  " << exe << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
-        std::cout << "  " << exe << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
-        std::cout << "  " << exe << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
+        std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
+        std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
+        std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
         std::cout << std::endl;
 
         ChildProcess wmic(L"C:\\Windows\\System32\\wbem\\WMIC.exe", L"diskdrive list brief");
@@ -69,13 +71,20 @@ namespace Tunkio
                 return;
             }
 
-            const DataUnit::Byte bytes(bytesWritten);
-            const auto elapsed = g_timer.Elapsed<Time::MilliSeconds>();
+            const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
+            const auto elapsedTotal = g_totalTimer.Elapsed<Time::MilliSeconds>();
+            const DataUnit::Byte bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
+            const DataUnit::Byte bytesWrittenTotal(bytesWritten);
 
-            if (bytes.Value() && elapsed.count())
+            if (bytesWrittenTotal.Value() && elapsedSince.count())
             {
-                std::cout << DataUnit::HumanReadable(bytes) << " written. Speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
+                std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
+                    << " Current speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
+                    << ". Average speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal) << '.' << std::endl;
             }
+
+            g_currentTimer.Reset();
+            g_bytesWrittenLastTime = bytesWritten;
         };
 
         const auto errors = [](uint32_t error, uint64_t bytesWritten) -> void
@@ -97,7 +106,7 @@ namespace Tunkio
             std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
 
             const DataUnit::Byte bytes(bytesWritten);
-            const auto elapsed = g_timer.Elapsed<Time::MilliSeconds>();
+            const auto elapsed = g_totalTimer.Elapsed<Time::MilliSeconds>();
 
             if (bytes.Value() && elapsed.count())
             {
@@ -161,6 +170,7 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Invalid arguments!" << std::endl << std::endl;
         PrintUsage(argv[0]);
+        system("PAUSE");
         return ErrorCode::InvalidArgument;
     }
 

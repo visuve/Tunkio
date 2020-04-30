@@ -86,7 +86,7 @@ namespace Tunkio
         {
             DWORD bytesWritten = 0u;
             uint64_t bytesLeft = Size();
-            FillStrategy fakeData(m_options->Mode, 0xA00000);
+            FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(10));
 
             while (bytesLeft)
             {

@@ -16,12 +16,6 @@
     <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp">
       <Filter>../TunkioCLI</Filter>
     </ClCompile>
-    <ClCompile Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
     <ClCompile Include="TunkioFillStategyTest.cpp" />
     <ClCompile Include="TunkioMockDeviceWipe.cpp">
       <Filter>Mocks</Filter>
@@ -29,17 +23,11 @@
     <ClCompile Include="TunkioMockFileWipe.cpp">
       <Filter>Mocks</Filter>
     </ClCompile>
-    <ClCompile Include="..\TunkioCLI\TunkioTime.cpp">
-      <Filter>../TunkioCLI</Filter>
-    </ClCompile>
     <ClCompile Include="TunkioTimeTest.cpp" />
     <ClCompile Include="TunkioDataUnitTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="..\TunkioCLI\TunkioDataUnits.hpp">
-      <Filter>../TunkioCLI</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="../TunkioDLL">

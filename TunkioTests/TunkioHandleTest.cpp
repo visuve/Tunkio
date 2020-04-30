@@ -1,5 +1,5 @@
 #include "PCH.hpp"
-#include "Strategies/Win32/TunkioWin32AutoHandle.hpp"
+#include "TunkioWin32AutoHandle.hpp"
 
 namespace Tunkio::Native::Win32
 {

@@ -11,6 +11,9 @@
   <PropertyGroup>
     <Microsoft-googletest-v140-windesktop-msvcstl-static-rt-static-Disable-gtest_main>true</Microsoft-googletest-v140-windesktop-msvcstl-static-rt-static-Disable-gtest_main>
   </PropertyGroup>
+  <ImportGroup Label="Shared">
+    <Import Project="..\TunkioShared\TunkioShared.vcxitems" Label="Shared" />
+  </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;$(SolutionDir)\TunkioCLI;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -21,14 +24,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\TunkioCLI\TunkioDataUnits.hpp" />
     <ClInclude Include="PCH.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp" />
-    <ClCompile Include="..\TunkioCLI\TunkioTime.cpp" />
     <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp" />
-    <ClCompile Include="..\TunkioDLL\Strategies\Win32\TunkioWin32AutoHandle.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
     <ClCompile Include="PCH.cpp">

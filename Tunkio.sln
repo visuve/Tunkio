@@ -20,7 +20,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioTests", "TunkioTests\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioGUI", "TunkioGUI\TunkioGUI.vcxproj", "{89B12F02-D6FC-4B18-9A23-F78A9D1FAB3E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioShared", "TunkioShared\TunkioShared.vcxitems", "{F0FFD062-0930-4502-B0E8-BD9F781A4433}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		TunkioShared\TunkioShared.vcxitems*{1f65f01e-09c9-4be2-8cc2-7a1d65f282e6}*SharedItemsImports = 4
+		TunkioShared\TunkioShared.vcxitems*{9e670774-172a-4523-a048-1de13b8ad55d}*SharedItemsImports = 4
+		TunkioShared\TunkioShared.vcxitems*{db0a41e5-ed54-4842-9745-ffb5ef14f294}*SharedItemsImports = 4
+		TunkioShared\TunkioShared.vcxitems*{f0ffd062-0930-4502-b0e8-bd9f781a4433}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86

@@ -6,6 +6,9 @@
     <TargetName>Tunkio</TargetName>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\Tunkio.props" />
+  <ImportGroup Label="Shared">
+    <Import Project="..\TunkioShared\TunkioShared.vcxitems" Label="Shared" />
+  </ImportGroup>
   <ItemDefinitionGroup>
     <Link>
       <ModuleDefinitionFile>TunkioAPI.def</ModuleDefinitionFile>
@@ -21,7 +24,6 @@
     <ClInclude Include="Strategies\ITunkioOperation.hpp" />
     <ClInclude Include="Strategies\TunkioFileWipe.hpp" />
     <ClInclude Include="Strategies\TunkioDeviceWipe.hpp" />
-    <ClInclude Include="Strategies\Win32\TunkioWin32AutoHandle.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
@@ -34,7 +36,6 @@
     <ClCompile Include="TunkioAPI.cpp" />
     <ClCompile Include="TunkioEncoding.cpp" />
     <ClCompile Include="Strategies\TunkioFillStrategy.cpp" />
-    <ClCompile Include="Strategies\Win32\TunkioWin32AutoHandle.cpp" />
     <ClCompile Include="Strategies\Win32\TunkioWin32DeviceWipe.cpp" />
     <ClCompile Include="Strategies\Win32\TunkioWin32FileWipe.cpp" />
   </ItemGroup>

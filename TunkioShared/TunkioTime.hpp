@@ -48,8 +48,13 @@ namespace Tunkio::Time
             return std::chrono::duration_cast<T>(diff);
         }
 
+        void Reset()
+        {
+            m_start = std::chrono::high_resolution_clock::now();
+        }
+
         Duration Elapsed() const;
     private:
-        const std::chrono::high_resolution_clock::time_point m_start = std::chrono::high_resolution_clock::now();
+        std::chrono::high_resolution_clock::time_point m_start = std::chrono::high_resolution_clock::now();
     };
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iomanip>
+#include <sstream>
 #include "TunkioTime.hpp"
 
 namespace Tunkio::DataUnit

@@ -33,19 +33,20 @@ namespace Tunkio
         }
     }
 
-    FillStrategy::FillStrategy(const TunkioMode mode, const size_t size) :
+
+    FillStrategy::FillStrategy(const TunkioMode mode, const Tunkio::DataUnit::Mebibyte size) :
         m_mode(mode)
     {
         switch (mode)
         {
             case TunkioMode::Zeroes:
-                m_data = std::vector<uint8_t>(size, 0);
+                m_data = std::vector<uint8_t>(size.Bytes(), 0);
                 break;
             case TunkioMode::Ones:
-                m_data = std::vector<uint8_t>(size, 1);
+                m_data = std::vector<uint8_t>(size.Bytes(), 1);
                 break;
             case TunkioMode::Random:
-                m_data = std::vector<uint8_t>(size);
+                m_data = std::vector<uint8_t>(size.Bytes());
                 Random(m_data);
                 break;
         }

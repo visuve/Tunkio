@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include "TunkioAPI.h"
+#include "TunkioDataUnits.hpp"
 
 namespace Tunkio
 {
@@ -10,7 +10,7 @@ namespace Tunkio
     class FillStrategy
     {
     public:
-        FillStrategy(const TunkioMode mode, const size_t size);
+        FillStrategy(const TunkioMode mode, const Tunkio::DataUnit::Mebibyte size);
 
         template<typename T>
         T Size() const
