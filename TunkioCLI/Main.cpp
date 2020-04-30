@@ -174,13 +174,13 @@ int main(int argc, char* argv[])
 
     DWORD result = TunkioRun(tunkio.get());
 
-    system("PAUSE");
-
     if (result != Tunkio::ErrorCode::Success)
     {
         std::cerr << "FAILED: " << result << std::endl;
+        system("PAUSE");
         return result;
     }
 
+    system("PAUSE");
     return g_error;
 }
