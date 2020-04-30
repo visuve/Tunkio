@@ -145,6 +145,12 @@ namespace Tunkio
     };
 }
 
+void SignalHandler(int signal)
+{
+    std::cout << "Got signal: " << signal << std::endl;
+    exit(ERROR_OPERATION_ABORTED);
+}
+
 int main(int argc, char* argv[])
 {
     using namespace Tunkio;
@@ -161,6 +167,12 @@ int main(int argc, char* argv[])
     if (!Args::Parse(Arguments, std::vector<std::string>({ argv + 1, argv + argc })))
     {
         return ErrorCode::InvalidArgument;
+    }
+
+    if (std::signal(SIGINT, SignalHandler) == SIG_ERR)
+    {
+        std::cerr << "Cannot attach SIGINT handler!" << std::endl;
+        return EXIT_FAILURE;
     }
 
     const std::unique_ptr<TunkioOptions, TunkioOptionsDeleter> options(CreateOptions());

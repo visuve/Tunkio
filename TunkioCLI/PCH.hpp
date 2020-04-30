@@ -11,3 +11,5 @@
 #include <cassert>
 #include <sstream>
 #include <regex>
+#include <atomic>
+#include <csignal>
