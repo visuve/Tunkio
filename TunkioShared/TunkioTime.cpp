@@ -19,13 +19,29 @@ namespace Tunkio::Time
     std::wostream& operator << (std::wostream& os, MicroSeconds us) { return os << us.count() << L"us"; }
     std::wostream& operator << (std::wostream& os, const Duration& x) { return os << x.H << L' ' << x.M << L' ' << x.S << L' ' << x.Ms << L' ' << x.Us; }
 
-    constexpr Duration::Duration(const MicroSeconds elapsed) :
-        H(std::chrono::duration_cast<Hours>(elapsed)),
-        M(std::chrono::duration_cast<Minutes>(elapsed - H)),
-        S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),
-        Ms(std::chrono::duration_cast<MilliSeconds>(elapsed - H - M - S)),
-        Us(std::chrono::duration_cast<MicroSeconds>(elapsed - H - M - S - Ms))
+    std::string HumanReadable(const Duration& duration)
     {
+        std::stringstream os;
+
+        if (duration.H >= Hours(24))
+        {
+            os << std::chrono::duration_cast<Days>(duration.H) << ' ';
+            os << duration.H % 24 << ' ';
+            os << duration.M << ' ';
+        }
+        else if (duration.H.count() % 24)
+        {
+            os << duration.H << ' ';
+            os << duration.M << ' ';
+        }
+        else if (duration.M > Minutes(0))
+        {
+            os << duration.M << ' ';
+        }
+
+        os << duration.S;
+
+        return os.str();
     }
 
     Duration Timer::Elapsed() const

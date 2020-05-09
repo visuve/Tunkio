@@ -4,6 +4,9 @@
 #include <sstream>
 #include "TunkioTime.hpp"
 
+#undef min
+#undef max
+
 namespace Tunkio::DataUnit
 {
     template<uint64_t Ratio>
@@ -144,7 +147,6 @@ namespace Tunkio::DataUnit
         return os.str();
     }
 
-
     template<uint64_t T>
     std::string SpeedPerSecond(const DataUnit<T>& unit, const Tunkio::Time::MilliSeconds& time)
     {
@@ -198,5 +200,30 @@ namespace Tunkio::DataUnit
     std::string SpeedPerSecond(const DataUnit<T>& unit, const Tunkio::Time::Timer& timer)
     {
         return SpeedPerSecond(unit, timer.Elapsed<Time::MilliSeconds>());
+    }
+
+    template<uint64_t T>
+    Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::MilliSeconds& time)
+    {
+        const uint64_t millis = time.count();
+        const uint64_t bytesW = bytesWritten.Bytes();
+        const uint64_t bytesL = bytesLeft.Bytes();
+
+        if (millis == 0 || bytesW == 0 || bytesL == 0)
+        {
+            //return Time::Duration(0);
+            throw "FUBAR";
+        }
+
+        const double bytesPerMilliSecond = double(bytesW) / double(millis);
+        const double millisLeft = double(bytesL) / bytesPerMilliSecond;
+
+        return Time::Duration(Tunkio::Time::MilliSeconds(uint64_t(millisLeft)));
+    }
+
+    template<uint64_t T>
+    Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::Timer& timer)
+    {
+        return TimeLeft(bytesLeft, bytesWritten, timer.Elapsed<Time::MilliSeconds>());
     }
 }

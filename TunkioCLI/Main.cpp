@@ -11,6 +11,7 @@ namespace Tunkio
     Time::Timer g_totalTimer;
     Time::Timer g_currentTimer;
     uint32_t g_error = ErrorCode::Success;
+    uint64_t g_bytesToWrite = 0;
     uint64_t g_bytesWrittenLastTime = 0;
 
     void PrintUsage(const std::filesystem::path& exe)
@@ -54,6 +55,7 @@ namespace Tunkio
 
         std::cout << "Provided arguments: " << joined << std::endl << "Are you sure you want to continue? [y/n]" << std::endl;
         const int prompt = getchar();
+        std::cout << std::endl;
         return prompt == 'y' || prompt == 'Y';
     }
 
@@ -76,6 +78,11 @@ namespace Tunkio
     {
         std::cout << std::setprecision(3) << std::fixed;
 
+        const auto started = [](uint64_t bytesLeft) -> void
+        {
+            g_bytesToWrite = bytesLeft;
+        };
+
         const auto progress = [](uint64_t bytesWritten) -> void
         {
             if (!bytesWritten)
@@ -90,9 +97,12 @@ namespace Tunkio
 
             if (bytesWrittenTotal.Value() && elapsedSince.count())
             {
+                const DataUnit::Byte bytesLeft = g_bytesToWrite - bytesWritten;
                 std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
-                    << " Current speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
-                    << ". Average speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal) << '.' << std::endl;
+                    << " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
+                    << ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
+                    << ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, g_totalTimer))
+                    << std::endl;
             }
 
             g_currentTimer.Reset();
@@ -148,7 +158,7 @@ namespace Tunkio
             Arguments.at("target").Value<TunkioTarget>(),
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
-            TunkioCallbacks { progress, errors, completed },
+            TunkioCallbacks { started, progress, errors, completed },
             TunkioString{ path.size(), Clone(path) }
         };
     }
@@ -191,7 +201,12 @@ int main(int argc, char* argv[])
 {
     using namespace Tunkio;
 
-    std::cout << "Tunkio 0.1" << std::endl << std::endl;
+    std::cout << "#######   #     #   #     #   #   #   ###    #####" << std::endl;
+    std::cout << "   #      #     #   # #   #   #  #     #    #     #" << std::endl;
+    std::cout << "   #      #     #   #  #  #   ###      #    #     #" << std::endl;
+    std::cout << "   #      #     #   #   # #   #  #     #    #     #" << std::endl;
+    std::cout << "   #       #####    #     #   #   #   ###    #####" << std::endl;
+    std::cout << std::endl << "Version 0.1" << std::endl << std::endl;
 
     if (argc <= 1)
     {

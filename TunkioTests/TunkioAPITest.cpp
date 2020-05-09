@@ -6,6 +6,11 @@ namespace Tunkio
 {
     // TODO: check call counts
 
+    const auto started = [](uint64_t bytesLeft) -> void
+    {
+        std::cout << bytesLeft << " bytes left." << std::endl;
+    };
+
     const auto progress = [](uint64_t bytesWritten) -> void
     {
         const uint64_t megabytesWritten = bytesWritten / 1024;
@@ -36,7 +41,7 @@ namespace Tunkio
             TunkioTarget::Device,
             TunkioMode::Random,
             false,
-            TunkioCallbacks { progress, errors, completed },
+            TunkioCallbacks { started, progress, errors, completed },
             TunkioString{ 7, "foobar" }
         };
 
@@ -53,7 +58,7 @@ namespace Tunkio
             TunkioTarget::File,
             TunkioMode::Random,
             false,
-            TunkioCallbacks { progress, errors, completed },
+            TunkioCallbacks { started, progress, errors, completed },
             TunkioString{ 7, "foobar" }
         };
 
@@ -70,7 +75,7 @@ namespace Tunkio
             TunkioTarget::Device,
             TunkioMode::Random,
             false,
-            TunkioCallbacks { progress, errors, completed },
+            TunkioCallbacks { started, progress, errors, completed },
             TunkioString{ 7, "foobar" }
         };
 

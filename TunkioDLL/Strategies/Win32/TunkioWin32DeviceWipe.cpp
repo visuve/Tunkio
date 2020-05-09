@@ -65,6 +65,11 @@ namespace Tunkio
             return false;
         }
 
+        void ReportStarted() const
+        {
+            m_options->Callbacks.StartedCallback(m_size);
+        }
+
         void ReportProgress() const
         {
             m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
@@ -85,6 +90,8 @@ namespace Tunkio
             DWORD bytesWritten = 0u;
             uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(10));
+
+            ReportStarted();
 
             while (bytesLeft)
             {

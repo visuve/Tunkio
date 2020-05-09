@@ -13,7 +13,59 @@ namespace Tunkio::Time
 
     struct Duration
     {
-        constexpr Duration(const MicroSeconds elapsed);
+        inline constexpr Duration(const MicroSeconds elapsed) :
+            H(std::chrono::duration_cast<Hours>(elapsed)),
+            M(std::chrono::duration_cast<Minutes>(elapsed - H)),
+            S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),
+            Ms(std::chrono::duration_cast<MilliSeconds>(elapsed - H - M - S)),
+            Us(elapsed - H - M - S - Ms)
+        {
+        }
+
+        inline constexpr Duration(const MilliSeconds elapsed) :
+            H(std::chrono::duration_cast<Hours>(elapsed)),
+            M(std::chrono::duration_cast<Minutes>(elapsed - H)),
+            S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),
+            Ms(elapsed - H - M - S),
+            Us(0)
+        {
+        }
+
+        inline constexpr Duration(const Seconds elapsed) :
+            H(std::chrono::duration_cast<Hours>(elapsed)),
+            M(std::chrono::duration_cast<Minutes>(elapsed - H)),
+            S(elapsed - H - M),
+            Ms(0),
+            Us(0)
+        {
+        }
+
+        inline constexpr Duration(const Minutes elapsed) :
+            H(std::chrono::duration_cast<Hours>(elapsed)),
+            M(elapsed - H),
+            S(0),
+            Ms(0),
+            Us(0)
+        {
+        }
+
+        inline constexpr Duration(const Hours elapsed) :
+            H(elapsed),
+            M(0),
+            S(0),
+            Ms(0),
+            Us(0)
+        {
+        }
+
+        inline constexpr Duration(const Days elapsed) :
+            H(std::chrono::duration_cast<Hours>(elapsed)),
+            M(0),
+            S(0),
+            Ms(0),
+            Us(0)
+        {
+        }
 
         const Hours H;
         const Minutes M;
@@ -37,6 +89,8 @@ namespace Tunkio::Time
     std::wostream& operator << (std::wostream& os, MilliSeconds ms);
     std::wostream& operator << (std::wostream& os, MicroSeconds us);
     std::wostream& operator << (std::wostream& os, const Duration& x);
+
+    std::string HumanReadable(const Duration& duration);
 
     class Timer
     {

@@ -25,6 +25,7 @@
     </ClCompile>
     <ClCompile Include="TunkioTimeTest.cpp" />
     <ClCompile Include="TunkioDataUnitTest.cpp" />
+    <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />

@@ -1,6 +1,8 @@
 #include "PCH.hpp"
 #include "TunkioDataUnits.hpp"
 
+using namespace std::chrono_literals;
+
 namespace Tunkio
 {
     TEST(TunkioDataUnitTest, Bytes)
@@ -97,5 +99,73 @@ namespace Tunkio
 
         EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Mebibyte(2000), Tunkio::Time::Seconds(100)).c_str(), "20.000 mebibytes/s");
         EXPECT_STREQ(DataUnit::SpeedPerSecond(DataUnit::Byte(0x640000000000), Tunkio::Time::Seconds(100)).c_str(), "1.000 tebibytes/s");
+    }
+
+    TEST(TunkioDataUnitTest, TimeLeft)
+    {
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Byte(1), DataUnit::Byte(1), Tunkio::Time::MilliSeconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 0s);
+            EXPECT_EQ(dur.Ms, 1ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Byte(2), DataUnit::Byte(2), Tunkio::Time::MilliSeconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 0s);
+            EXPECT_EQ(dur.Ms, 1ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Byte(2), DataUnit::Byte(4), Tunkio::Time::MilliSeconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 0s);
+            EXPECT_EQ(dur.Ms, 0ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Byte(4), DataUnit::Byte(2), Tunkio::Time::MilliSeconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 0s);
+            EXPECT_EQ(dur.Ms, 2ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(1), DataUnit::Mebibyte(1), Tunkio::Time::Seconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 1s);
+            EXPECT_EQ(dur.Ms, 0ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(2), DataUnit::Mebibyte(2), Tunkio::Time::Seconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 1s);
+            EXPECT_EQ(dur.Ms, 0ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(2), DataUnit::Mebibyte(4), Tunkio::Time::Seconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 0s);
+            EXPECT_EQ(dur.Ms, 500ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(4), DataUnit::Mebibyte(2), Tunkio::Time::Seconds(1));
+            EXPECT_EQ(dur.H, 0h);
+            EXPECT_EQ(dur.M, 0min);
+            EXPECT_EQ(dur.S, 2s);
+            EXPECT_EQ(dur.Ms, 0ms);
+            EXPECT_EQ(dur.Us, 0us);
+        }
     }
 }

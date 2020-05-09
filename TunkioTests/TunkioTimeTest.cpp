@@ -92,4 +92,38 @@ namespace Tunkio::Time
             EXPECT_STREQ(stream.str().c_str(), "1h 1m 1s 1ms 1us");
         }
     }
+
+    TEST(TunkioTimeTest, HumanReadable)
+    {
+        {
+            {
+                Time::Duration duration(Time::Seconds(1));
+                EXPECT_STREQ("1s", Time::HumanReadable(duration).c_str());
+            }
+            {
+                Time::Duration duration(Time::Minutes(1));
+                EXPECT_STREQ("1m 0s", Time::HumanReadable(duration).c_str());
+            }
+            {
+                Time::Duration duration(Time::Hours(1));
+                EXPECT_STREQ("1h 0m 0s", Time::HumanReadable(duration).c_str());
+            }
+            {
+                Time::Duration duration(Time::Hours(24));
+                EXPECT_STREQ("1d 0h 0m 0s", Time::HumanReadable(duration).c_str());
+            }
+            {
+                Time::Duration duration(Time::Hours(36));
+                EXPECT_STREQ("1d 12h 0m 0s", Time::HumanReadable(duration).c_str());
+            }
+            {
+                Time::Duration duration(Time::Days(2));
+                EXPECT_STREQ("2d 0h 0m 0s", Time::HumanReadable(duration).c_str());
+            }
+            {
+                Time::Duration duration(Time::MicroSeconds(3661001001));
+                EXPECT_STREQ("1h 1m 1s", Time::HumanReadable(duration).c_str());
+            }
+        }
+    }
 }

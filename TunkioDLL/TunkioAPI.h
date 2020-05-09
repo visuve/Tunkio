@@ -21,6 +21,7 @@ extern "C"
         Random = 'r'
     } TunkioMode;
 
+    typedef void(*TunkioStartedCallback)(uint64_t bytesToWrite);
     typedef void(*TunkioProgressCallback)(uint64_t bytesWritten);
     typedef void(*TunkioErrorCallback)(uint32_t error, uint64_t bytesWritten);
     typedef void(*TunkioCompletedCallback)(uint64_t bytesWritten);
@@ -38,6 +39,7 @@ extern "C"
 
     struct TunkioCallbacks
     {
+        TunkioStartedCallback StartedCallback;
         TunkioProgressCallback ProgressCallback;
         TunkioErrorCallback ErrorCallback;
         TunkioCompletedCallback CompletedCallback;
