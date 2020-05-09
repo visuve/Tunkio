@@ -45,6 +45,18 @@ namespace Tunkio
         std::cout << wmic.Output() << std::endl;
     }
 
+    bool PrintArgumentsAndPrompt(const std::vector<std::string>& args)
+    {
+        const std::string joined = std::accumulate(args.cbegin(), args.cend(), std::string(), [](const std::string& accumulated, const std::string& value)
+        {
+            return value.empty() ? accumulated : accumulated + "\n  " + value;
+        });
+
+        std::cout << "Provided arguments: " << joined << std::endl << "Are you sure you want to continue? [y/n]" << std::endl;
+        const int prompt = getchar();
+        return prompt == 'y' || prompt == 'Y';
+    }
+
     std::map<std::string, Args::Argument> Arguments =
     {
         { "target", Args::Argument(false, TunkioTarget::File) },
@@ -91,11 +103,11 @@ namespace Tunkio
         {
             if (bytesWritten)
             {
-                std::cout << "Error " << error << "  occurred. Bytes written: " << bytesWritten << std::endl;
+                std::cerr << "Error " << error << "  occurred. Bytes written: " << bytesWritten << std::endl;
             }
             else
             {
-                std::cout << "Wipe failed. Error. " << error << std::endl;
+                std::cerr << "Error " << error << "  occurred" << std::endl;
             }
 
             g_error = error;
@@ -174,7 +186,14 @@ int main(int argc, char* argv[])
         return ErrorCode::InvalidArgument;
     }
 
-    if (!Args::Parse(Arguments, std::vector<std::string>({ argv + 1, argv + argc })))
+    auto args = std::vector<std::string>({ argv + 1, argv + argc });
+
+    if (!PrintArgumentsAndPrompt(args))
+    {
+        return ErrorCode::UserCancelled;
+    }
+
+    if (!Args::Parse(Arguments, args))
     {
         return ErrorCode::InvalidArgument;
     }
@@ -194,15 +213,13 @@ int main(int argc, char* argv[])
         return -666; // TODO: FIX
     }
 
-    DWORD result = TunkioRun(tunkio.get());
+    const DWORD result = TunkioRun(tunkio.get());
 
     if (result != Tunkio::ErrorCode::Success)
     {
         std::cerr << "FAILED: " << result << std::endl;
-        system("PAUSE");
         return result;
     }
 
-    system("PAUSE");
     return g_error;
 }

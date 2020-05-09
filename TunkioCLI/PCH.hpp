@@ -13,3 +13,4 @@
 #include <regex>
 #include <atomic>
 #include <csignal>
+#include <numeric>
