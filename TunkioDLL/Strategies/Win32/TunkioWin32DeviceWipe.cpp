@@ -35,31 +35,29 @@ namespace Tunkio
 
         ~DeviceWipeImpl()
         {
-            // Will not work, because the handle is open...
-            //if (m_handle.IsValid() && m_removeOnExit && !DeleteFileA(m_path.c_str()))
-            //{
-            //    ReportError(ErrorCode::RemoveFailed);
-            //}
         }
 
-        uint32_t Run() override
+        bool Run() override
         {
-            if (!Fill())
+            if (!m_handle.IsValid())
             {
-                return GetLastError();
+                ReportError(GetLastError());
+                return false;
             }
 
-            return 0; // TODO: ...
-        }
+            if (!m_size)
+            {
+                ReportError(ErrorCode::FileEmpty);
+                return false;
+            }
 
-        bool Exists() override
-        {
-            return m_handle.IsValid();
-        }
+            if (!Fill())
+            {
+                ReportError(GetLastError());
+                return false;
+            }
 
-        uint64_t Size() override
-        {
-            return m_size;
+            return true;
         }
 
         bool Remove() override
@@ -85,7 +83,7 @@ namespace Tunkio
         bool Fill() override
         {
             DWORD bytesWritten = 0u;
-            uint64_t bytesLeft = Size();
+            uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(10));
 
             while (bytesLeft)
@@ -129,19 +127,9 @@ namespace Tunkio
         delete m_impl;
     }
 
-    uint32_t DeviceWipe::Run()
+    bool DeviceWipe::Run()
     {
         return m_impl->Run();
-    }
-
-    bool DeviceWipe::Exists()
-    {
-        return m_impl->Exists();
-    }
-
-    uint64_t DeviceWipe::Size()
-    {
-        return m_impl->Size();
     }
 
     bool DeviceWipe::Fill()

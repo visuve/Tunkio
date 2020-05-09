@@ -13,10 +13,8 @@ namespace Tunkio
         FileWipe(const TunkioOptions* options);
         ~FileWipe();
 
-        uint32_t Run() override;
+        bool Run() override;
     protected:
-        bool Exists() override;
-        uint64_t Size() override;
         bool Fill() override;
         bool Remove() override;
     private:

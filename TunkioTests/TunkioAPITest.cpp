@@ -58,7 +58,7 @@ namespace Tunkio
         };
 
         TunkioHandle* handle = TunkioCreate(&options);
-        EXPECT_EQ(Tunkio::ErrorCode::Success, int(TunkioRun(handle)));
+        EXPECT_EQ(true, TunkioRun(handle));
         EXPECT_NE(handle, nullptr);
         TunkioFree(handle);
     }
@@ -75,7 +75,7 @@ namespace Tunkio
         };
 
         TunkioHandle* handle = TunkioCreate(&options);
-        EXPECT_EQ(Tunkio::ErrorCode::Success, int(TunkioRun(handle)));
+        EXPECT_EQ(true, TunkioRun(handle));
         EXPECT_NE(handle, nullptr);
         TunkioFree(handle);
     }

@@ -7,25 +7,6 @@
 #include "Strategies/TunkioFileWipe.hpp"
 #include "Strategies/TunkioDeviceWipe.hpp"
 
-namespace Tunkio
-{
-    uint32_t Run(Tunkio::IOperation* operation)
-    {
-        // Pre-checks
-        if (!operation->Exists())
-        {
-            return ErrorCode::FileNotFound;
-        }
-
-        if (!operation->Size())
-        {
-            return ErrorCode::FileEmpty;
-        }
-
-        return operation->Run();
-    }
-}
-
 TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
 {
     if (!options)
@@ -46,16 +27,16 @@ TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
     return nullptr;
 }
 
-uint32_t __cdecl TunkioRun(TunkioHandle* handle)
+bool __cdecl TunkioRun(TunkioHandle* handle)
 {
     const auto operation = reinterpret_cast<Tunkio::IOperation*>(handle);
 
     if (!operation)
     {
-        return Tunkio::ErrorCode::InvalidArgument;
+        return false;
     }
 
-    return Tunkio::Run(operation);
+    return operation->Run();
 }
 
 void __cdecl TunkioFree(TunkioHandle* handle)

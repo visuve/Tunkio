@@ -103,12 +103,27 @@ namespace Tunkio
         {
             if (bytesWritten)
             {
-                std::cerr << "Error " << error << "  occurred. Bytes written: " << bytesWritten << std::endl;
+                std::cerr << "Error " << error << " occurred. Bytes written: " << bytesWritten << std::endl;
             }
             else
             {
-                std::cerr << "Error " << error << "  occurred" << std::endl;
+                std::cerr << "Error " << error << " occurred." << std::endl;
             }
+
+#ifdef WIN32
+            std::string buffer(0x400, 0);
+            if (FormatMessageA(
+                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
+                    nullptr, 
+                    error, 
+                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                    buffer.data(), 
+                    static_cast<DWORD>(buffer.size()), 
+                    nullptr))
+            {
+                std::cerr << "Detailed description: " << buffer << std::endl;
+            }
+#endif
 
             g_error = error;
         };
@@ -169,7 +184,7 @@ namespace Tunkio
 void SignalHandler(int signal)
 {
     std::cout << "Got signal: " << signal << std::endl;
-    exit(ERROR_OPERATION_ABORTED);
+    exit(Tunkio::ErrorCode::UserCancelled);
 }
 
 int main(int argc, char* argv[])
@@ -193,15 +208,15 @@ int main(int argc, char* argv[])
         return ErrorCode::UserCancelled;
     }
 
-    if (!Args::Parse(Arguments, args))
-    {
-        return ErrorCode::InvalidArgument;
-    }
-
     if (std::signal(SIGINT, SignalHandler) == SIG_ERR)
     {
         std::cerr << "Cannot attach SIGINT handler!" << std::endl;
         return EXIT_FAILURE;
+    }
+
+    if (!Args::Parse(Arguments, args))
+    {
+        return ErrorCode::InvalidArgument;
     }
 
     const std::unique_ptr<TunkioOptions, TunkioOptionsDeleter> options(CreateOptions());

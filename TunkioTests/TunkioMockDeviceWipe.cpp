@@ -17,24 +17,15 @@ namespace Tunkio
         {
         }
 
-        uint32_t Run() override
+        bool Run() override
         {
             if (!Fill())
             {
-                return 666;
+                ReportError(666);
+                return false;
             }
 
-            return 0;
-        }
-
-        bool Exists() override
-        {
             return true;
-        }
-
-        uint64_t Size() override
-        {
-            return m_size;
         }
 
         bool Remove() override
@@ -66,7 +57,7 @@ namespace Tunkio
         bool Fill() override
         {
             uint32_t bytesWritten = 0u;
-            uint64_t bytesLeft = Size();
+            uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, 0x100000);
 
             while (bytesLeft)
@@ -109,19 +100,9 @@ namespace Tunkio
         delete m_impl;
     }
 
-    uint32_t DeviceWipe::Run()
+    bool DeviceWipe::Run()
     {
         return m_impl->Run();
-    }
-
-    bool DeviceWipe::Exists()
-    {
-        return m_impl->Exists();
-    }
-
-    uint64_t DeviceWipe::Size()
-    {
-        return m_impl->Size();
     }
 
     bool DeviceWipe::Fill()

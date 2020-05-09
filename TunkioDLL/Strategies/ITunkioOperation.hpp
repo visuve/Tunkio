@@ -15,14 +15,12 @@ namespace Tunkio
 
         virtual ~IOperation() = default;
 
-        virtual uint32_t Run() = 0;
-
-        virtual bool Exists() = 0;
-        virtual uint64_t Size() = 0;
-        virtual bool Fill() = 0;
+        virtual bool Run() = 0;
         virtual bool Remove() = 0;
 
     protected:
+        virtual bool Fill() = 0;
+
         const TunkioOptions* m_options;
     };
 }

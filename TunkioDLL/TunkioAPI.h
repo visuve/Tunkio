@@ -53,7 +53,7 @@ extern "C"
     };
 
     struct TunkioHandle* __cdecl TunkioCreate(const struct TunkioOptions*);
-    uint32_t __cdecl TunkioRun(struct TunkioHandle*);
+    bool __cdecl TunkioRun(struct TunkioHandle*);
     void __cdecl TunkioFree(struct TunkioHandle*);
 
 #if defined(__cplusplus)
