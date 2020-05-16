@@ -7,12 +7,10 @@
   <Import Project="$(SolutionDir)\Tunkio.props" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioDLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioLIB;$(SolutionDir)\TunkioDLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Tunkio.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -36,6 +34,9 @@
   <ItemGroup>
     <ProjectReference Include="..\TunkioDLL\TunkioDLL.vcxproj">
       <Project>{1f65f01e-09c9-4be2-8cc2-7a1d65f282e6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\TunkioLIB\TunkioLIB.vcxproj">
+      <Project>{eeeea30f-e090-41d0-bb6c-588df660d33a}</Project>
     </ProjectReference>
   </ItemGroup>
 </Project>

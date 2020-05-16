@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <regex>
 
 namespace Tunkio::Args
 {

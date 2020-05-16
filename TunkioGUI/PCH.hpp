@@ -8,9 +8,18 @@
 #include <CommCtrl.h>
 
 // STL
-#include <cmath>
 #include <iostream>
+#include <string>
+#include <algorithm>
+#include <filesystem>
+#include <memory>
+#include <cassert>
 #include <sstream>
+#include <atomic>
+#include <csignal>
+#include <numeric>
 
 // Project
 #include "TunkioAPI.h"
+
+

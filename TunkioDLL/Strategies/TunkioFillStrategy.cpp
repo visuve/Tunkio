@@ -40,13 +40,13 @@ namespace Tunkio
         switch (mode)
         {
             case TunkioMode::Zeroes:
-                m_data = std::vector<uint8_t>(size.Bytes(), 0);
+                m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()), 0u);
                 break;
             case TunkioMode::Ones:
-                m_data = std::vector<uint8_t>(size.Bytes(), 1);
+                m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()), 1u);
                 break;
             case TunkioMode::Random:
-                m_data = std::vector<uint8_t>(size.Bytes());
+                m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()));
                 Random(m_data);
                 break;
         }

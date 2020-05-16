@@ -10,7 +10,8 @@
 #include <memory>
 #include <cassert>
 #include <sstream>
-#include <regex>
 #include <atomic>
 #include <csignal>
 #include <numeric>
+
+#include "TunkioAPI.h"

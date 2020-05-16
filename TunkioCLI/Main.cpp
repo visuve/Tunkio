@@ -2,9 +2,9 @@
 #include "TunkioArgs.hpp"
 #include "TunkioErrorCodes.hpp"
 #include "TunkioTime.hpp"
-#include "TunkioAPI.h"
 #include "TunkioChildProcess.hpp"
 #include "TunkioDataUnits.hpp"
+#include "TunkioMemory.hpp"
 
 namespace Tunkio
 {
@@ -66,13 +66,6 @@ namespace Tunkio
         { "remove", Args::Argument(false, false) },
         { "path", Args::Argument(true, std::filesystem::path()) }
     };
-
-    template <typename T>
-    const T* Clone(const std::basic_string<T>& str)
-    {
-        const size_t bytes = str.length() * sizeof(T) + sizeof(T);
-        return reinterpret_cast<const T*>(memcpy(new T[bytes], str.c_str(), bytes));
-    }
 
     TunkioOptions* CreateOptions()
     {
@@ -159,36 +152,9 @@ namespace Tunkio
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
             TunkioCallbacks { started, progress, errors, completed },
-            TunkioString{ path.size(), Clone(path) }
+            TunkioString{ path.size(), Memory::CloneString(path) }
         };
     }
-
-    struct TunkioOptionsDeleter
-    {
-        void operator()(TunkioOptions* options)
-        {
-            if (options)
-            {
-                if (options->Path.Data)
-                {
-                    delete[] options->Path.Data;
-                }
-
-                delete options;
-            }
-        }
-    };
-
-    struct TunkioDeleter
-    {
-        void operator()(TunkioHandle* tunkio)
-        {
-            if (tunkio)
-            {
-                TunkioFree(tunkio);
-            }
-        }
-    };
 }
 
 void SignalHandler(int signal)
@@ -234,8 +200,8 @@ int main(int argc, char* argv[])
         return ErrorCode::InvalidArgument;
     }
 
-    const std::unique_ptr<TunkioOptions, TunkioOptionsDeleter> options(CreateOptions());
-    const std::unique_ptr<TunkioHandle, TunkioDeleter> tunkio(TunkioCreate(options.get()));
+    const std::unique_ptr<TunkioOptions, Memory::TunkioOptionsDeleter> options(CreateOptions());
+    const std::unique_ptr<TunkioHandle, Memory::TunkioDeleter> tunkio(TunkioCreate(options.get()));
 
     if (!tunkio)
     {

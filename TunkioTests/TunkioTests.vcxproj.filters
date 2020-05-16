@@ -13,9 +13,6 @@
     <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\TunkioCLI\TunkioArgs.cpp">
-      <Filter>../TunkioCLI</Filter>
-    </ClCompile>
     <ClCompile Include="TunkioFillStategyTest.cpp" />
     <ClCompile Include="TunkioMockDeviceWipe.cpp">
       <Filter>Mocks</Filter>
@@ -26,6 +23,15 @@
     <ClCompile Include="TunkioTimeTest.cpp" />
     <ClCompile Include="TunkioDataUnitTest.cpp" />
     <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp" />
+    <ClCompile Include="..\TunkioLIB\TunkioArgs.cpp">
+      <Filter>../TunkioLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioLIB\TunkioTime.cpp">
+      <Filter>../TunkioLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioLIB\TunkioWin32AutoHandle.cpp">
+      <Filter>../TunkioLIB</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
@@ -37,8 +43,8 @@
     <Filter Include="Mocks">
       <UniqueIdentifier>{32fbaaf0-9e68-410c-90b6-56ca26c1d16e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="../TunkioCLI">
-      <UniqueIdentifier>{a91f6553-a60c-4621-aed6-739abf5c8126}</UniqueIdentifier>
+    <Filter Include="../TunkioLIB">
+      <UniqueIdentifier>{3617bf0a-8a75-40b0-af24-c92eb7f907a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

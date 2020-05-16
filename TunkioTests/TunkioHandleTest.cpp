@@ -20,4 +20,11 @@ namespace Tunkio::Native::Win32
             EXPECT_TRUE(raw == INVALID_HANDLE_VALUE);
         }
     }
+
+    TEST(AutoHandleTest, Reset)
+    {
+        Win32AutoHandle null(nullptr);
+        null.Reset(INVALID_HANDLE_VALUE);
+        EXPECT_FALSE(null.IsValid());
+    }
 }

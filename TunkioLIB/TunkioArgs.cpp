@@ -1,6 +1,6 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
-#include "TunkioAPI.h"
+#include "../TunkioDLL/TunkioAPI.h"
 
 namespace Tunkio::Args
 {

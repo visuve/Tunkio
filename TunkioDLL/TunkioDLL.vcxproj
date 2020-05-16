@@ -6,10 +6,10 @@
     <TargetName>Tunkio</TargetName>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\Tunkio.props" />
-  <ImportGroup Label="Shared">
-    <Import Project="..\TunkioShared\TunkioShared.vcxitems" Label="Shared" />
-  </ImportGroup>
   <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)\TunkioLIB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <Link>
       <ModuleDefinitionFile>TunkioAPI.def</ModuleDefinitionFile>
       <AdditionalDependencies />
@@ -41,5 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TunkioAPI.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TunkioLIB\TunkioLIB.vcxproj">
+      <Project>{eeeea30f-e090-41d0-bb6c-588df660d33a}</Project>
+    </ProjectReference>
   </ItemGroup>
 </Project>

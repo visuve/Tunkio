@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Tunkio.props = Tunkio.props
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioLIB", "TunkioLIB\TunkioLIB.vcxproj", "{EEEEA30F-E090-41D0-BB6C-588DF660D33A}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioDLL", "TunkioDLL\TunkioDLL.vcxproj", "{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioCLI", "TunkioCLI\TunkioCLI.vcxproj", "{DB0A41E5-ED54-4842-9745-FFB5EF14F294}"
@@ -20,15 +22,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioTests", "TunkioTests\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioGUI", "TunkioGUI\TunkioGUI.vcxproj", "{89B12F02-D6FC-4B18-9A23-F78A9D1FAB3E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TunkioShared", "TunkioShared\TunkioShared.vcxitems", "{F0FFD062-0930-4502-B0E8-BD9F781A4433}"
-EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		TunkioShared\TunkioShared.vcxitems*{1f65f01e-09c9-4be2-8cc2-7a1d65f282e6}*SharedItemsImports = 4
-		TunkioShared\TunkioShared.vcxitems*{9e670774-172a-4523-a048-1de13b8ad55d}*SharedItemsImports = 4
-		TunkioShared\TunkioShared.vcxitems*{db0a41e5-ed54-4842-9745-ffb5ef14f294}*SharedItemsImports = 4
-		TunkioShared\TunkioShared.vcxitems*{f0ffd062-0930-4502-b0e8-bd9f781a4433}*SharedItemsImports = 9
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -36,6 +30,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Debug|x64.ActiveCfg = Debug|x64
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Debug|x64.Build.0 = Debug|x64
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Debug|x86.ActiveCfg = Debug|Win32
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Debug|x86.Build.0 = Debug|Win32
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Release|x64.ActiveCfg = Release|x64
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Release|x64.Build.0 = Release|x64
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Release|x86.ActiveCfg = Release|Win32
+		{EEEEA30F-E090-41D0-BB6C-588DF660D33A}.Release|x86.Build.0 = Release|Win32
 		{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}.Debug|x64.ActiveCfg = Debug|x64
 		{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}.Debug|x64.Build.0 = Debug|x64
 		{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}.Debug|x86.ActiveCfg = Debug|Win32
@@ -73,6 +75,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {33F16E6E-BE35-4F2C-8691-CFF6DF1FB919}
+		SolutionGuid = {34785564-798C-4F44-8184-D2CF5519307A}
 	EndGlobalSection
 EndGlobal
