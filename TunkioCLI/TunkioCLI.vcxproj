@@ -5,8 +5,6 @@
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\Tunkio.props" />
-  <ImportGroup Label="Shared">
-  </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\TunkioLIB;$(SolutionDir)\TunkioDLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
