@@ -1,69 +1,71 @@
 #include "PCH.hpp"
+#include <Windows.h>
 
-namespace
+void OnExitClicked()
 {
-    constexpr int WindowWidth = 500;
-    constexpr int WindowHeight = 255;
-
-    constexpr int LabelMargin = 10;
-    constexpr int LabelSpacing = 5;
-    constexpr int LabelWidth = 480;
-    constexpr int LabelHeight = 30;
-
-    constexpr int ButtonWidth = 100;
-
-    void OnRunButtonClicked(Fl_Widget*, void*)
-    {
-        std::cout << "RUN!" << std::endl;
-    }
-
-    void OnAbortButtonClicked(Fl_Widget*, void*)
-    {
-        std::cout << "ABORT!" << std::endl;
-    }
+    nana::API::exit();
 }
 
-int main(int argc, char* argv[]) 
+void OnRunClicked()
 {
-    auto window = new Fl_Window(WindowWidth, WindowHeight, "Tunkio");
+    std::cout << "RUN!" << std::endl;
+}
 
+void OnAbortClicked()
+{
+    std::cout << "ABORT!" << std::endl;
+}
+
+class GUI
+{
+public:
+    GUI(const std::string& cmdline) :
+        form(nana::API::make_center(500, 300)),
+        cmdParamsLabel(form, "Parameters given: " + cmdline.empty() ? "none." : cmdline),
+        progressLabel(form, "Progress: not started."),
+        progressBar(form),
+        exitButton(form),
+        abortButton(form),
+        runButton(form),
+        place(form)
     {
-        auto cmdParams = new Fl_Box(FL_EMBOSSED_FRAME, LabelMargin, LabelSpacing, LabelWidth, LabelHeight, "CMD PARAMS:");
-        cmdParams->align(Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE));
+        form.caption(L"Tunkio GUI");
 
-        auto dataWrittenLabel = new Fl_Box(FL_EMBOSSED_FRAME, LabelMargin, LabelHeight + LabelSpacing * 2, LabelWidth, LabelHeight, "WRITTEN:");
-        dataWrittenLabel->align(Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE));
+        progressBar.amount(100);
+        progressBar.value(50);
 
-        auto speedLabel = new Fl_Box(FL_EMBOSSED_FRAME, LabelMargin, LabelHeight * 2 + LabelSpacing * 3, LabelWidth, LabelHeight, "SPEED:");
-        speedLabel->align(Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE));
+        exitButton.caption(L"Exit");
+        exitButton.events().click(OnExitClicked);
 
-        auto avgSpeedLabel = new Fl_Box(FL_EMBOSSED_FRAME, LabelMargin, LabelHeight * 3 + LabelSpacing * 4, LabelWidth, LabelHeight, "AVG. SPEED:");
-        avgSpeedLabel->align(Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE));
+        abortButton.caption(L"Abort");
+        abortButton.events().click(OnAbortClicked);
 
-        auto timeLeftLabel = new Fl_Box(FL_EMBOSSED_FRAME, LabelMargin, LabelHeight * 4 + LabelSpacing * 5, LabelWidth, LabelHeight, "TIME LEFT:");
-        timeLeftLabel->align(Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE));
+        runButton.caption(L"Run");
+        runButton.events().click(OnRunClicked);
 
-        auto progress = new Fl_Progress(LabelMargin, LabelHeight * 5 + LabelSpacing * 6, LabelWidth, LabelHeight);
-        progress->minimum(0);
-        progress->maximum(100);
-        progress->value(50.0f);
-        progress->label("50%");
-        progress->color(FL_DARK3);
-        progress->selection_color(FL_DARK_BLUE);
-        progress->labelcolor(FL_BLACK);
+        place.div("vert margin=3% <labels vertical gap=10 arrange=[75,75,25]> <buttons weight=25 gap=10 >");
+        place.field("labels") << cmdParamsLabel << progressLabel << progressBar;
+        place.field("buttons") << exitButton << abortButton << runButton;
 
+        place.collocate();
 
-        auto runButton = new Fl_Button(WindowWidth - ButtonWidth - LabelMargin, LabelHeight * 6 + LabelSpacing * 7, ButtonWidth, LabelHeight, "Run");
-        runButton->callback(OnRunButtonClicked);
-
-        auto abortButton = new Fl_Button(WindowWidth - ButtonWidth - LabelMargin - LabelSpacing - ButtonWidth, LabelHeight * 6 + LabelSpacing * 7, 100, LabelHeight, "Abort");
-        abortButton->callback(OnAbortButtonClicked);
-
-
+        form.show();
     }
+private:
+    nana::form form;
+    nana::label cmdParamsLabel;
+    nana::label progressLabel;
+    nana::progress progressBar;
+    nana::button exitButton;
+    nana::button abortButton;
+    nana::button runButton;
+    nana::place place;
+};
 
-    window->end();
-    window->show(argc, argv);
+int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdline, int)
+{
+    GUI gui(cmdline);
+    nana::exec();
 
-    return Fl::run();
+    return 0;
 }
