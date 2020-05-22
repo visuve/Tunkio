@@ -14,23 +14,23 @@ namespace Tunkio::Args
 
     TEST(TunkioArgsTest, ParseRequiredSuccess)
     {
-        EXPECT_TRUE(Parse(Arguments, { "--path=xyz" }));
-        EXPECT_TRUE(Parse(Arguments, { "--path=x" }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--path=xyz" }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--path=x" }));
 
         EXPECT_STREQ(Arguments.at("path").Value<std::filesystem::path>().c_str(), L"x");
     }
 
     TEST(TunkioArgsTest, ParseRequiredFailure)
     {
-        EXPECT_FALSE(Parse(Arguments, { "--path=" }));
-        EXPECT_FALSE(Parse(Arguments, { "--path" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--path=" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--path" }));
     }
 
     TEST(TunkioArgsTest, ParseOptionalSuccess)
     {
-        EXPECT_TRUE(Parse(Arguments, { "--path=xyz", "--target=d", "--mode=0" }));
-        EXPECT_TRUE(Parse(Arguments, { "--path=x", "--target=D", "--mode=1" }));
-        EXPECT_TRUE(Parse(Arguments, { "--path=x", "--target=D", "--mode=1", "--remove=y" }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--path=xyz", "--target=d", "--mode=0" }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--path=x", "--target=D", "--mode=1" }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--path=x", "--target=D", "--mode=1", "--remove=y" }));
 
         EXPECT_STREQ(Arguments.at("path").Value<std::filesystem::path>().c_str(), L"x");
         EXPECT_EQ(Arguments.at("target").Value<TunkioTarget>(), TunkioTarget::Device);
@@ -40,15 +40,15 @@ namespace Tunkio::Args
 
     TEST(TunkioArgsTest, ParseOptionalFailure)
     {
-        EXPECT_FALSE(Parse(Arguments, { "--path=xyz", "--target=x", "--mode=0" }));
-        EXPECT_FALSE(Parse(Arguments, { "--path=x", "--target=m", "--mode=z" }));
-        EXPECT_FALSE(Parse(Arguments, { "--path=xyz", "--target=m", "--mode=rofl" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--path=xyz", "--target=x", "--mode=0" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--path=x", "--target=m", "--mode=z" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--path=xyz", "--target=m", "--mode=rofl" }));
     }
 
     TEST(TunkioArgsTest, ParseAbnormalOrderSuccess)
     {
-        EXPECT_TRUE(Parse(Arguments, { "--mode=0",  "--target=d", "--path=xyz" }));
-        EXPECT_TRUE(Parse(Arguments, { "--mode=1", "--path=x", "--target=D", }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--mode=0",  "--target=d", "--path=xyz" }));
+        EXPECT_TRUE(ParseVector(Arguments, { "--mode=1", "--path=x", "--target=D", }));
 
         EXPECT_STREQ(Arguments.at("path").Value<std::filesystem::path>().c_str(), L"x");
         EXPECT_EQ(Arguments.at("target").Value<TunkioTarget>(), TunkioTarget::Device);
@@ -58,29 +58,29 @@ namespace Tunkio::Args
 
     TEST(TunkioArgsTest, ParseAbnormalOrderFailure)
     {
-        EXPECT_FALSE(Parse(Arguments, { "--mode=0",  "--target=a", "--path=" }));
-        EXPECT_FALSE(Parse(Arguments, { "--mode=a", "--path=x", "--target=0", }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--mode=0",  "--target=a", "--path=" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--mode=a", "--path=x", "--target=0", }));
     }
 
     TEST(TunkioArgsTest, ParseUtterNonsense)
     {
-        EXPECT_FALSE(Parse(Arguments, { "--path=\0", " ", "\0" }));
-        EXPECT_FALSE(Parse(Arguments, { "a", "b", "c" }));
-        EXPECT_FALSE(Parse(Arguments, { "a b c", "d e f" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "--path=\0", " ", "\0" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "a", "b", "c" }));
+        EXPECT_FALSE(ParseVector(Arguments, { "a b c", "d e f" }));
     }
 
-    /*TEST(TunkioArgsTest, ParsePimppiLinna)
+    TEST(TunkioArgsTest, ParseString)
     {
-        EXPECT_TRUE(Parse(Arguments, "--path=xyz --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, "--path=xyz --target=d --mode=0"));
 
-        EXPECT_TRUE(Parse(Arguments, "--path=\"foo/foo bar/bar/\" --target=d --mode=0"));
-        EXPECT_TRUE(Parse(Arguments, "--path=\"foo bar/foo/bar\" --target=d --mode=0"));
-        EXPECT_TRUE(Parse(Arguments, "--path=\"foo/bar/foo bar\" --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, "--path=\"foo/foo bar/bar/\" --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, "--path=\"foo bar/foo/bar\" --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, "--path=\"foo/bar/foo bar\" --target=d --mode=0"));
 
-        EXPECT_TRUE(Parse(Arguments, " --path=\"foo/bar/foo bar\" --target=d --mode=0"));
-        EXPECT_TRUE(Parse(Arguments, "--path=\"foo/bar/foo bar\" --target=d --mode=0"));
-        EXPECT_TRUE(Parse(Arguments, " --path=\"foo/bar/foo bar\"  --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, " --path=\"foo/bar/foo bar\" --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, "--path=\"foo/bar/foo bar\" --target=d --mode=0"));
+        EXPECT_TRUE(ParseString(Arguments, " --path=\"foo/bar/foo bar\"  --target=d --mode=0"));
 
-        EXPECT_FALSE(Parse(Arguments, "\" BARBABABA"));
-    }*/
+        EXPECT_FALSE(ParseString(Arguments, "\" BARBABABA"));
+    }
 }

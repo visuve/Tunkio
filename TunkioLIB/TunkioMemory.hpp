@@ -39,4 +39,7 @@ namespace Tunkio::Memory
         const size_t bytes = str.length() * sizeof(T) + sizeof(T);
         return reinterpret_cast<const T*>(memcpy(new T[bytes], str.c_str(), bytes));
     }
+
+    using AutoOptionsHandle = std::unique_ptr<TunkioOptions, Tunkio::Memory::TunkioOptionsDeleter>;
+    using AutoHandle = std::unique_ptr<TunkioHandle, Tunkio::Memory::TunkioDeleter>;
 }

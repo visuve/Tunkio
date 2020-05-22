@@ -13,6 +13,8 @@ namespace Tunkio::DataUnit
     class DataUnit
     {
     public:
+        constexpr DataUnit() = default;
+
         constexpr DataUnit(uint64_t value) :
             m_bytes(value * Ratio)
         {
@@ -20,6 +22,12 @@ namespace Tunkio::DataUnit
 
         template<uint64_t R>
         constexpr DataUnit(const DataUnit<R>& other) :
+            m_bytes(other.Bytes())
+        {
+        }
+
+        template<uint64_t R>
+        DataUnit<Ratio>& operator = (const DataUnit<R>& other) :
             m_bytes(other.Bytes())
         {
         }
@@ -60,7 +68,7 @@ namespace Tunkio::DataUnit
         }
 
     private:
-        uint64_t m_bytes;
+        uint64_t m_bytes = 0;
     };
 
     using Byte = DataUnit<1>;

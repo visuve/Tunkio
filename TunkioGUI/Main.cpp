@@ -1,70 +1,100 @@
 #include "PCH.hpp"
-#include <Windows.h>
+#include "TunkioProgressDialog.hpp"
 
-void OnExitClicked()
+namespace Tunkio
 {
-    nana::API::exit();
-}
+    ProgressDialog* g_dialog = nullptr;
 
-void OnRunClicked()
-{
-    std::cout << "RUN!" << std::endl;
-}
-
-void OnAbortClicked()
-{
-    std::cout << "ABORT!" << std::endl;
-}
-
-class GUI
-{
-public:
-    GUI(const std::string& cmdline) :
-        form(nana::API::make_center(500, 300)),
-        cmdParamsLabel(form, "Parameters given: " + cmdline.empty() ? "none." : cmdline),
-        progressLabel(form, "Progress: not started."),
-        progressBar(form),
-        exitButton(form),
-        abortButton(form),
-        runButton(form),
-        place(form)
+    void OnStarted(uint64_t bytesLeft)
     {
-        form.caption(L"Tunkio GUI");
+        if (!g_dialog)
+        {
+            std::cerr << "Dialog is null" << std::endl;
+            return;
+        }
 
-        progressBar.amount(100);
-        progressBar.value(50);
-
-        exitButton.caption(L"Exit");
-        exitButton.events().click(OnExitClicked);
-
-        abortButton.caption(L"Abort");
-        abortButton.events().click(OnAbortClicked);
-
-        runButton.caption(L"Run");
-        runButton.events().click(OnRunClicked);
-
-        place.div("vert margin=3% <labels vertical gap=10 arrange=[75,75,25]> <buttons weight=25 gap=10 >");
-        place.field("labels") << cmdParamsLabel << progressLabel << progressBar;
-        place.field("buttons") << exitButton << abortButton << runButton;
-
-        place.collocate();
-
-        form.show();
+        g_dialog->OnStarted(bytesLeft);
     }
-private:
-    nana::form form;
-    nana::label cmdParamsLabel;
-    nana::label progressLabel;
-    nana::progress progressBar;
-    nana::button exitButton;
-    nana::button abortButton;
-    nana::button runButton;
-    nana::place place;
-};
+
+    void OnProgress(uint64_t bytesWritten)
+    {
+        if (!g_dialog)
+        {
+            std::cerr << "Dialog is null" << std::endl;
+            return;
+        }
+
+        g_dialog->OnProgress(bytesWritten);
+    }
+
+    void OnErrors(uint32_t error, uint64_t bytesWritten)
+    {
+        if (!g_dialog)
+        {
+            std::cerr << "Dialog is null" << std::endl;
+            return;
+        }
+
+        g_dialog->OnErrors(error, bytesWritten);
+    }
+
+    void OnCompleted(uint64_t bytesWritten)
+    {
+        if (!g_dialog)
+        {
+            std::cerr << "Dialog is null" << std::endl;
+            return;
+        }
+
+        g_dialog->OnCompleted(bytesWritten);
+    }
+
+    std::map<std::string, Args::Argument> Arguments =
+    {
+        { "target", Args::Argument(false, TunkioTarget::File) },
+        { "mode", Args::Argument(false, TunkioMode::Zeroes) },
+        { "remove", Args::Argument(false, false) },
+        { "path", Args::Argument(true, std::filesystem::path()) }
+    };
+
+    TunkioOptions* CreateOptions()
+    {
+        std::cout << std::setprecision(3) << std::fixed;
+
+        const auto path = Arguments.at("path").Value<std::filesystem::path>().string();
+
+        return new TunkioOptions
+        {
+            Arguments.at("target").Value<TunkioTarget>(),
+            Arguments.at("mode").Value<TunkioMode>(),
+            Arguments.at("remove").Value<bool>(),
+            TunkioCallbacks { OnStarted, OnProgress, OnErrors, OnCompleted },
+            TunkioString{ path.size(), Memory::CloneString(path) }
+        };
+    }
+}
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdline, int)
 {
-    GUI gui(cmdline);
+    if (!Tunkio::Args::ParseString(Tunkio::Arguments, cmdline))
+    {
+        return -1;
+    }
+
+    const Tunkio::Memory::AutoOptionsHandle options(Tunkio::CreateOptions());
+    const Tunkio::Memory::AutoHandle tunkio(TunkioCreate(options.get()));
+
+    if (!tunkio)
+    {
+        std::cerr << "Failed to create TunkioHandle!" << std::endl;
+        return -666; // TODO: FIX
+    }
+
+    Tunkio::ProgressDialog progressDialog(cmdline, tunkio.get());
+    progressDialog.Show();
+
+    Tunkio::g_dialog = &progressDialog;
+
     nana::exec();
 
     return 0;

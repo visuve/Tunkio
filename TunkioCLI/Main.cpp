@@ -195,13 +195,13 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (!Args::Parse(Arguments, args))
+    if (!Args::ParseVector(Arguments, args))
     {
         return ErrorCode::InvalidArgument;
     }
 
-    const std::unique_ptr<TunkioOptions, Memory::TunkioOptionsDeleter> options(CreateOptions());
-    const std::unique_ptr<TunkioHandle, Memory::TunkioDeleter> tunkio(TunkioCreate(options.get()));
+    const Tunkio::Memory::AutoOptionsHandle options(Tunkio::CreateOptions());
+    const Tunkio::Memory::AutoHandle tunkio(TunkioCreate(options.get()));
 
     if (!tunkio)
     {
