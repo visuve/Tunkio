@@ -2,8 +2,6 @@
 
 #include "../TunkioDLL/TunkioAPI.h"
 
-#include <string>
-
 namespace Tunkio::Memory
 {
     struct TunkioOptionsDeleter

@@ -5,8 +5,6 @@
 
 namespace Tunkio
 {
-    // TODO: turn into a generator class
-    // std::vector<uint8_t> InitByMode(const TunkioMode mode, const size_t size);
     class FillStrategy
     {
     public:

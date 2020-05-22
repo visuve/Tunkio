@@ -1,6 +1,5 @@
 #include "PCH.hpp"
 #include "TunkioAPI.h"
-#include "TunkioEncoding.hpp"
 #include "TunkioErrorCodes.hpp"
 
 #include "Strategies/ITunkioOperation.hpp"

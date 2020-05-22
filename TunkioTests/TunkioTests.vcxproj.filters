@@ -6,11 +6,7 @@
     <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="TunkioArgsTest.cpp" />
     <ClCompile Include="TunkioAPITest.cpp" />
-    <ClCompile Include="TunkioEncodingTest.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp">
-      <Filter>../TunkioDLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp">
       <Filter>../TunkioDLL</Filter>
     </ClCompile>
     <ClCompile Include="TunkioFillStategyTest.cpp" />

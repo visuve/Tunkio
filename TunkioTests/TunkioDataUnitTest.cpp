@@ -21,6 +21,22 @@ namespace Tunkio
         EXPECT_EQ(DataUnit::Tebibyte(0).Bytes(), 0);
         EXPECT_EQ(DataUnit::Pebibyte(0).Bytes(), 0);
     }
+
+    TEST(TunkioDataUnitTest, CopyConstruct)
+    {
+        {
+            DataUnit::Byte x = DataUnit::Kibibyte(1);
+            EXPECT_EQ(x.Bytes(), 1024);
+            EXPECT_EQ(x, DataUnit::Kibibyte(1));
+        }
+        {
+            DataUnit::Kibibyte x = DataUnit::Byte(1);
+            EXPECT_EQ(x.Bytes(), 1);
+            EXPECT_EQ(x, DataUnit::Byte(1));
+        }
+
+    }
+
     TEST(TunkioDataUnitTest, Equals)
     {
         EXPECT_EQ(DataUnit::Byte(1024), DataUnit::Kibibyte(1));
@@ -38,6 +54,7 @@ namespace Tunkio
         EXPECT_EQ(DataUnit::Mebibyte(3) - DataUnit::Mebibyte(1), DataUnit::Kibibyte(2048));
         EXPECT_EQ(DataUnit::Mebibyte(4) - DataUnit::Kibibyte(1), DataUnit::Kibibyte(4095));
     }
+
     TEST(TunkioDataUnitTest, ToString)
     {
         {

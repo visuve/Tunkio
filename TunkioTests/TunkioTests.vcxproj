@@ -25,7 +25,6 @@
   <ItemGroup>
     <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp" />
     <ClCompile Include="..\TunkioDLL\TunkioAPI.cpp" />
-    <ClCompile Include="..\TunkioDLL\TunkioEncoding.cpp" />
     <ClCompile Include="..\TunkioLIB\TunkioArgs.cpp" />
     <ClCompile Include="..\TunkioLIB\TunkioTime.cpp" />
     <ClCompile Include="..\TunkioLIB\TunkioWin32AutoHandle.cpp" />
@@ -35,7 +34,6 @@
     <ClCompile Include="TunkioAPITest.cpp" />
     <ClCompile Include="TunkioArgsTest.cpp" />
     <ClCompile Include="TunkioDataUnitTest.cpp" />
-    <ClCompile Include="TunkioEncodingTest.cpp" />
     <ClCompile Include="TunkioFillStategyTest.cpp" />
     <ClCompile Include="TunkioHandleTest.cpp" />
     <ClCompile Include="TestMain.cpp" />

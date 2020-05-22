@@ -21,6 +21,7 @@
 #include <nana/gui/widgets/button.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <map>
 
 #include "TunkioAPI.h"
