@@ -192,11 +192,6 @@ int main(int argc, char* argv[])
 
     auto args = std::vector<std::string>({ argv + 1, argv + argc });
 
-    if (!PrintArgumentsAndPrompt(args))
-    {
-        return ErrorCode::UserCancelled;
-    }
-
     if (std::signal(SIGINT, Tunkio::SignalHandler) == SIG_ERR)
     {
         std::cerr << "Cannot attach SIGINT handler!" << std::endl;
@@ -205,7 +200,14 @@ int main(int argc, char* argv[])
 
     if (!Args::ParseVector(Arguments, args))
     {
+        std::cerr << "Invalid arguments!" << std::endl << std::endl;
+        PrintUsage(argv[0]);
         return ErrorCode::InvalidArgument;
+    }
+
+    if (!PrintArgumentsAndPrompt(args))
+    {
+        return ErrorCode::UserCancelled;
     }
 
     const Tunkio::Memory::AutoOptionsHandle options(Tunkio::CreateOptions());
