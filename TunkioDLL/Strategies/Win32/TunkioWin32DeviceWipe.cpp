@@ -11,7 +11,6 @@ namespace Tunkio
     constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
     constexpr uint32_t CreationFlags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
-    // TODO: do not open the device in the CTOR
     class DeviceWipeImpl : IOperation
     {
     public:

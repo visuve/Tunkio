@@ -18,7 +18,6 @@
     </ClCompile>
     <ClCompile Include="TunkioTimeTest.cpp" />
     <ClCompile Include="TunkioDataUnitTest.cpp" />
-    <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp" />
     <ClCompile Include="..\TunkioLIB\TunkioArgs.cpp">
       <Filter>../TunkioLIB</Filter>
     </ClCompile>
@@ -27,6 +26,9 @@
     </ClCompile>
     <ClCompile Include="..\TunkioLIB\TunkioWin32AutoHandle.cpp">
       <Filter>../TunkioLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TunkioDLL\Strategies\TunkioFillStrategy.cpp">
+      <Filter>../TunkioDLL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

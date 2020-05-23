@@ -23,13 +23,7 @@ namespace Tunkio
 
         bool Run()
         {
-            if (!Fill())
-            {
-                ReportError(666);
-                return false;
-            }
-
-            return true;
+            return Fill();
         }
 
         bool Remove() override
@@ -62,7 +56,7 @@ namespace Tunkio
         {
             uint32_t bytesWritten = 0u;
             uint64_t bytesLeft = m_size;
-            FillStrategy fakeData(m_options->Mode, 0x100000);
+            FillStrategy fakeData(m_options->Mode, Tunkio::DataUnit::Mebibyte(1));
 
             while (bytesLeft)
             {

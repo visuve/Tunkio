@@ -20,7 +20,7 @@ namespace Tunkio
 
         UInt64Union randomNumber;
 
-        for (size_t i = 0; i < data.size(); i += 8)
+        for (size_t i = 0; i + 8 < data.size(); i += 8)
         {
             randomNumber.u64 = distribution(engine);
             data[i + 0] = randomNumber.u8[0];
@@ -47,6 +47,10 @@ namespace Tunkio
                 m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()), 1u);
                 break;
             case TunkioMode::Random:
+                if (size.Bytes() % 8 != 0)
+                {
+                    std::cerr << "Warning, requested size not divisible by 8. A few last bytes might not get randomized." << std::endl;
+                }
                 m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()));
                 Random(m_data);
                 break;
