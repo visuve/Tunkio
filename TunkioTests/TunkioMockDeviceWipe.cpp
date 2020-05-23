@@ -28,6 +28,11 @@ namespace Tunkio
             return true;
         }
 
+        bool Open() override
+        {
+            return true;
+        }
+
         bool Remove() override
         {
             return false;
@@ -103,6 +108,11 @@ namespace Tunkio
     bool DeviceWipe::Run()
     {
         return m_impl->Run();
+    }
+
+    bool DeviceWipe::Open()
+    {
+        return m_impl->Open();
     }
 
     bool DeviceWipe::Fill()

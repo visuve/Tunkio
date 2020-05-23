@@ -16,6 +16,11 @@ namespace Tunkio
         {
         }
 
+        bool Open()
+        {
+            return true;
+        }
+
         bool Run()
         {
             if (!Fill())
@@ -102,6 +107,11 @@ namespace Tunkio
     bool FileWipe::Run()
     {
         return m_impl->Run();
+    }
+
+    bool FileWipe::Open()
+    {
+        return m_impl->Open();
     }
 
     bool FileWipe::Fill()

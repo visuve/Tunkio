@@ -15,6 +15,7 @@ namespace Tunkio
 
         bool Run() override;
     protected:
+        bool Open() override;
         bool Fill() override;
         bool Remove() override;
     private:

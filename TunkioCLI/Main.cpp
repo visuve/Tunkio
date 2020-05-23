@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
 
     if (!TunkioRun(tunkio.get()))
     {
-        std::cerr << "Failed to start." << std::endl;
+        std::cerr << "Failed." << std::endl;
     }
 
     return g_error;

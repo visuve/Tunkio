@@ -16,29 +16,39 @@ namespace Tunkio
     public:
 
         FileWipeImpl(const TunkioOptions* options) :
-            IOperation(options),
-            m_handle(CreateFileA(options->Path.Data, DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr))
+            IOperation(options)
         {
-            if (m_handle.IsValid())
-            {
-                LARGE_INTEGER fileSize = { 0 };
-
-                if (GetFileSizeEx(m_handle.Handle(), &fileSize))
-                {
-                    m_size = fileSize.QuadPart;
-                }
-            }
         }
 
         ~FileWipeImpl()
         {
         }
 
-        bool Run()
+        bool Open()
         {
+            m_handle.Reset(CreateFileA(m_options->Path.Data, DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr));
+
             if (!m_handle.IsValid())
             {
-                ReportError(ErrorCode::FileNotFound);
+                return false;
+            }
+
+            LARGE_INTEGER fileSize = { 0 };
+
+            if (!GetFileSizeEx(m_handle.Handle(), &fileSize))
+            {
+                return false;
+            }
+
+            m_size = fileSize.QuadPart;
+            return true;
+        }
+
+        bool Run()
+        {
+            if (!Open())
+            {
+                ReportError(GetLastError());
                 return false;
             }
 
@@ -131,6 +141,11 @@ namespace Tunkio
     bool FileWipe::Run()
     {
         return m_impl->Run();
+    }
+
+    bool FileWipe::Open()
+    {
+        return m_impl->Open();
     }
 
     bool FileWipe::Fill()

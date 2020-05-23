@@ -19,6 +19,7 @@ namespace Tunkio
         virtual bool Remove() = 0;
 
     protected:
+        virtual bool Open() = 0;
         virtual bool Fill() = 0;
 
         const TunkioOptions* m_options;
