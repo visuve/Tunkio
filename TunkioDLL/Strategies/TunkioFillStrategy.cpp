@@ -5,6 +5,7 @@
 
 namespace Tunkio
 {
+    // Hack to speed up random number generation
     union UInt64Union
     {
         uint64_t u64;
@@ -17,7 +18,7 @@ namespace Tunkio
         thread_local std::default_random_engine engine(device());
         thread_local std::uniform_int_distribution<uint64_t> distribution(0, std::numeric_limits<uint64_t>::max()); 
 
-        UInt64Union randomNumber; // uint8_t is not supported, so we need to hack!
+        UInt64Union randomNumber;
 
         for (size_t i = 0; i < data.size(); i += 8)
         {

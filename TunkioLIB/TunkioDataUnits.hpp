@@ -2,9 +2,6 @@
 
 #include "TunkioTime.hpp"
 
-#undef min
-#undef max
-
 namespace Tunkio::DataUnit
 {
     template<uint64_t Ratio>

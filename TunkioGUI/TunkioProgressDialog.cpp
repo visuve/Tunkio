@@ -4,38 +4,49 @@
 namespace Tunkio
 {
     ProgressDialog::ProgressDialog(const std::string& cmdline, TunkioHandle* tunkio) :
-        m_form(nana::API::make_center(500, 300)),
-        m_cmdParamsLabel(m_form, "Parameters given:\n"),
-        m_progressLabel(m_form, "Progress:\nNot started."),
-        m_progressBar(m_form),
-        m_exitButton(m_form),
-        m_stopButton(m_form),
-        m_startButton(m_form),
+        m_form(nana::API::make_center(500, 550)),
+        m_cmdParamsGroup(m_form, "Parameters:"),
+        m_cmdParamsTextbox(m_cmdParamsGroup),
+        m_progressMsgGroup(m_form, "Progress:"),
+        m_progressMsgTextbox(m_progressMsgGroup, "Not started."),
+        m_progressBar(m_progressMsgGroup),
+        m_errorMsgGroup(m_form, "Errors:"),
+        m_errorMsgTextbox(m_errorMsgGroup, "No errors."),
+        m_exitButton(m_form, "Exit"),
+        m_stopButton(m_form, "Stop"),
+        m_startButton(m_form, "Start"),
         m_place(m_form),
         m_tunkio(tunkio)
     {
         m_form.caption(L"Tunkio GUI");
+        m_form.icon(nana::paint::image("D:\\DEV\\Tunkio\\out\\x64\\bin\\Tunkio.ico")); // TODO:!
 
         if (cmdline.empty())
         {
-            m_cmdParamsLabel.caption(m_cmdParamsLabel.caption() + "None.");
+            m_cmdParamsTextbox.caption(m_cmdParamsTextbox.caption() + "None.");
         }
         else
         {
-            m_cmdParamsLabel.caption(m_cmdParamsLabel.caption() + cmdline);
+            m_cmdParamsTextbox.caption(m_cmdParamsTextbox.caption() + cmdline);
         }
 
-        m_exitButton.caption(L"Exit");
+        m_cmdParamsGroup.div("<cmdparams margin=2%>");
+        m_cmdParamsGroup["cmdparams"] << m_cmdParamsTextbox;
+
+        m_progressMsgGroup.div("<vertical progress margin=2% gap=10 arrange=[75%,20%]>");
+        m_progressMsgGroup["progress"] << m_progressMsgTextbox;
+        m_progressMsgGroup["progress"] << m_progressBar;
+
+        m_errorMsgGroup.div("<errors margin=2%>");
+        m_errorMsgGroup["errors"] << m_errorMsgTextbox;
+
         m_exitButton.events().click(std::bind(&ProgressDialog::OnExit, this));
-
-        m_stopButton.caption(L"Stop");
         m_stopButton.events().click(std::bind(&ProgressDialog::OnStop, this));
-
-        m_startButton.caption(L"Start");
+        m_stopButton.enabled(false);
         m_startButton.events().click(std::bind(&ProgressDialog::OnStart, this));
 
-        m_place.div("vert margin=3% <labels vertical gap=10 arrange=[50,100,25]> <buttons weight=25 gap=10 >");
-        m_place.field("labels") << m_cmdParamsLabel << m_progressLabel << m_progressBar;
+        m_place.div("vert margin=1% <groups vertical gap=10 arrange=[20%,50%,20%]> <buttons weight=25 gap=10 >");
+        m_place.field("groups") << m_cmdParamsGroup << m_progressMsgGroup << m_errorMsgGroup;
         m_place.field("buttons") << m_exitButton << m_stopButton << m_startButton;
 
         m_place.collocate();
@@ -53,7 +64,7 @@ namespace Tunkio
 
     void ProgressDialog::OnStarted(uint64_t bytesLeft)
     {
-        m_progressLabel.caption("Progress: Tunkio started! Bytes to write: " + std::to_string(bytesLeft) + '.');
+        m_progressMsgTextbox.caption("Tunkio started!\nBytes to write: " + DataUnit::HumanReadable(DataUnit::Byte(bytesLeft)) + '.');
         SetProgressBarAmount(bytesLeft);
 
         m_totalTimer.Reset();
@@ -80,15 +91,11 @@ namespace Tunkio
         {
             const DataUnit::Byte bytesLeft = m_bytesToWrite - bytesWritten;
 
-            std::stringstream ss;
-
-            ss << "Progress:" << std::endl
-                << '\t' << DataUnit::HumanReadable(bytesWrittenTotal) << " written." << std::endl
-                << "\tSpeed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince) << '.' << std::endl
-                << "\tAvg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal) << '.' << std::endl
-                << "\tTime left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, m_totalTimer)) << '.';
-
-            m_progressLabel.caption(ss.str());
+            m_progressMsgTextbox.caption(DataUnit::HumanReadable(bytesWrittenTotal) + " written.\n");
+            m_progressMsgTextbox.append(DataUnit::HumanReadable(bytesLeft) + " left.\n", false);
+            m_progressMsgTextbox.append("Speed: " + DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince) + ".\n", false);
+            m_progressMsgTextbox.append("Avg. speed: " + DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal) + ".\n", false);
+            m_progressMsgTextbox.append("Time left: " + Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, m_totalTimer)) + '.', false);
         }
 
         m_currentTimer.Reset();
@@ -98,52 +105,50 @@ namespace Tunkio
 
     void ProgressDialog::OnErrors(uint32_t error, uint64_t bytesWritten)
     {
-        std::stringstream ss;
+        m_stopButton.enabled(false);
+        m_errorMsgTextbox.caption("Error " + std::to_string(error) + " occurred.\n");
 
         if (bytesWritten)
         {
-            ss << "Error " << error << " occurred. Bytes written: " << bytesWritten << std::endl;
-        }
-        else
-        {
-            ss << "Error " << error << " occurred." << std::endl;
+            m_errorMsgTextbox.append("Bytes written: " + std::to_string(bytesWritten), false);
         }
 
 #ifdef WIN32
         std::string buffer(0x400, 0);
-        if (FormatMessageA(
+
+        DWORD formattedSize = FormatMessageA(
             FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             buffer.data(),
             static_cast<DWORD>(buffer.size()),
-            nullptr))
+            nullptr);
+
+        if (formattedSize)
         {
-            ss << "Detailed description: " << buffer << std::endl;
+            buffer.resize(formattedSize - 2); // Trim \r\n
+            m_errorMsgTextbox.append("Detailed description: " + buffer + '\n', false);
         }
 #endif
-
-        m_progressLabel.caption(ss.str());
+        m_errorMsgTextbox.append("Time: " + Time::Timestamp(), false);
     }
 
     void ProgressDialog::OnCompleted(uint64_t bytesWritten)
     {
         SetProgressBarValue(bytesWritten);
 
-        std::stringstream ss;
-
-        ss << "Finished:" << std::endl << "\tBytes written: " << bytesWritten << std::endl;
+        m_progressMsgTextbox.append("\nFinished!\nBytes written: " + std::to_string(bytesWritten) + ".\n", false);
 
         const DataUnit::Byte bytes(bytesWritten);
         const auto elapsed = m_totalTimer.Elapsed<Time::MilliSeconds>();
 
         if (bytes.Value() && elapsed.count())
         {
-            ss << "\tAverage speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
+            m_progressMsgTextbox.append("Time taken: " + Time::HumanReadable(elapsed) + ".\n", false);
         }
 
-        m_progressLabel.caption(ss.str());
+        m_progressMsgTextbox.append("Time finished: " + Time::Timestamp(), false);
     }
 
 
@@ -156,15 +161,21 @@ namespace Tunkio
     void ProgressDialog::OnStop()
     {
         m_keepRunning = false;
-        m_progressLabel.caption(m_progressLabel.caption() + "\nStopped!");
+        m_progressMsgTextbox.append("\nStopped!", false);
+        m_stopButton.enabled(false);
     }
 
     void ProgressDialog::OnStart()
     {
+        m_startButton.enabled(false);
+
         m_future = std::async(std::launch::async, [&]
         {
             return TunkioRun(m_tunkio);
         });
+
+        m_stopButton.enabled(true);
+        m_progressMsgTextbox.caption("");
     }
 
     void ProgressDialog::WaitForFinished()

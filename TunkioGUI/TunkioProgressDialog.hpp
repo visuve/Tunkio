@@ -23,9 +23,13 @@ namespace Tunkio
         void SetProgressBarValue(uint64_t bytes);
 
         nana::form m_form;
-        nana::label m_cmdParamsLabel;
-        nana::label m_progressLabel;
+        nana::group m_cmdParamsGroup;
+        nana::textbox m_cmdParamsTextbox;
+        nana::group m_progressMsgGroup;
+        nana::textbox m_progressMsgTextbox;
         nana::progress m_progressBar;
+        nana::group m_errorMsgGroup;
+        nana::textbox m_errorMsgTextbox;
         nana::button m_exitButton;
         nana::button m_stopButton;
         nana::button m_startButton;
