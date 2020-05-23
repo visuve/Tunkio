@@ -1,5 +1,8 @@
 #pragma once
 
+/*#undef min*/
+#undef max
+
 namespace Tunkio::Time
 {
     using Days = std::chrono::duration<uint64_t, std::ratio<86400, 1>>;
@@ -9,8 +12,20 @@ namespace Tunkio::Time
     using MilliSeconds = std::chrono::duration<uint64_t, std::ratio<1, 1000>>;
     using MicroSeconds = std::chrono::duration<uint64_t, std::ratio<1, 1000'000>>;
 
-    struct Duration
+    class Duration
     {
+    public:
+        constexpr static Duration None()
+        {
+            return Duration(Hours(0), Minutes(0), Seconds(0), MilliSeconds(0), MicroSeconds(0));
+        }
+
+        constexpr static Duration Infinite()
+        {
+            constexpr auto maximum = std::numeric_limits<uint64_t>::max();
+            return Duration(Hours(maximum), Minutes(maximum), Seconds(maximum), MilliSeconds(maximum), MicroSeconds(maximum));
+        }
+
         inline constexpr Duration(const MicroSeconds elapsed) :
             H(std::chrono::duration_cast<Hours>(elapsed)),
             M(std::chrono::duration_cast<Minutes>(elapsed - H)),
@@ -65,11 +80,31 @@ namespace Tunkio::Time
         {
         }
 
+        inline constexpr bool operator == (const Duration& other) const
+        {
+            return Us == other.Us &&
+                Ms == other.Ms &&
+                S == other.S &&
+                M == other.M &&
+                H == other.H;
+        }
+
+
         const Hours H;
         const Minutes M;
         const Seconds S;
         const MilliSeconds Ms;
         const MicroSeconds Us;
+
+    private:
+        inline constexpr Duration(const Hours h, const Minutes m, const Seconds s, const MilliSeconds ms, const MicroSeconds us) :
+            H(h),
+            M(m),
+            S(s),
+            Ms(ms),
+            Us(us)
+        {
+        }
     };
 
     std::ostream& operator << (std::ostream& os, Days s);

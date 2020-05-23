@@ -124,6 +124,9 @@ namespace Tunkio::Time
                 Time::Duration duration(Time::MicroSeconds(3661001001));
                 EXPECT_STREQ("1h 1m 1s", Time::HumanReadable(duration).c_str());
             }
+            {
+                EXPECT_STREQ("infinite", Time::HumanReadable(Time::Duration::Infinite()).c_str());
+            }
         }
     }
 

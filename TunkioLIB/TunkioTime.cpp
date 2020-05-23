@@ -21,6 +21,11 @@ namespace Tunkio::Time
 
     std::string HumanReadable(const Duration& duration)
     {
+        if (duration == Duration::Infinite())
+        {
+            return "infinite";
+        }
+
         std::stringstream os;
 
         if (duration.H >= Hours(24))

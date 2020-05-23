@@ -53,12 +53,15 @@ namespace Tunkio
                 return false;
             }
 
+            ReportStarted();
+
             if (!Fill())
             {
                 ReportError(GetLastError());
                 return false;
             }
 
+            ReportComplete();
             return true;
         }
 
@@ -93,8 +96,6 @@ namespace Tunkio
             uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
 
-            ReportStarted();
-
             while (bytesLeft)
             {
                 if (fakeData.Size<uint64_t>() > bytesLeft)
@@ -115,7 +116,6 @@ namespace Tunkio
                 ReportProgress();
             }
 
-            ReportComplete();
             return true;
         }
 

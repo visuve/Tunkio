@@ -185,4 +185,20 @@ namespace Tunkio
             EXPECT_EQ(dur.Us, 0us);
         }
     }
+
+    TEST(TunkioDataUnitTest, TimeLeftCornerCases)
+    {
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(0), DataUnit::Mebibyte(100), Tunkio::Time::Seconds(123));
+            EXPECT_EQ(dur, Time::Duration::None());
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(100), DataUnit::Mebibyte(0), Tunkio::Time::Seconds(123));
+            EXPECT_EQ(dur, Time::Duration::Infinite());
+        }
+        {
+            const Time::Duration dur = DataUnit::TimeLeft(DataUnit::Mebibyte(100), DataUnit::Mebibyte(100), Tunkio::Time::Seconds(0));
+            EXPECT_EQ(dur, Time::Duration::None());
+        }
+    }
 }

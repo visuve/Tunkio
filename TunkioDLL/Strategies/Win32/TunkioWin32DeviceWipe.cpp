@@ -51,12 +51,15 @@ namespace Tunkio
                 return false;
             }
 
+            ReportStarted();
+
             if (!Fill())
             {
                 ReportError(GetLastError());
                 return false;
             }
 
+            ReportComplete();
             return true;
         }
 
@@ -75,14 +78,14 @@ namespace Tunkio
             m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
         }
 
-        void ReportComplete() const
-        {
-            m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
-        }
-
         void ReportError(uint32_t error) const
         {
             m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
+        }
+
+        void ReportComplete() const
+        {
+            m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
         }
 
         bool Fill() override
@@ -90,8 +93,6 @@ namespace Tunkio
             DWORD bytesWritten = 0u;
             uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(10));
-
-            ReportStarted();
 
             while (bytesLeft)
             {
@@ -113,7 +114,6 @@ namespace Tunkio
                 ReportProgress();
             }
 
-            ReportComplete();
             return true;
         }
 

@@ -215,12 +215,9 @@ int main(int argc, char* argv[])
         return -666; // TODO: FIX
     }
 
-    const DWORD result = TunkioRun(tunkio.get());
-
-    if (result != Tunkio::ErrorCode::Success)
+    if (!TunkioRun(tunkio.get()))
     {
-        std::cerr << "FAILED: " << result << std::endl;
-        return result;
+        std::cerr << "Failed to start." << std::endl;
     }
 
     return g_error;

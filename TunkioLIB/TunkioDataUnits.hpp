@@ -14,7 +14,7 @@ namespace Tunkio::DataUnit
         constexpr DataUnit() = default;
 
         constexpr DataUnit(uint64_t value) :
-            m_bytes(value * Ratio)
+            m_bytes(value* Ratio)
         {
         }
 
@@ -120,7 +120,7 @@ namespace Tunkio::DataUnit
     {
         std::stringstream os;
         os << std::setprecision(3) << std::fixed;
-        
+
         if (unit.Bytes() >= 0x100000000000000)
         {
             os << Pebibyte(unit);
@@ -209,16 +209,26 @@ namespace Tunkio::DataUnit
     }
 
     template<uint64_t T>
-    Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::MilliSeconds& time)
+    Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::MilliSeconds& elapsed)
     {
-        const uint64_t millis = time.count();
-        const uint64_t bytesW = bytesWritten.Bytes();
         const uint64_t bytesL = bytesLeft.Bytes();
 
-        if (millis == 0 || bytesW == 0 || bytesL == 0)
+        if (bytesL == 0)
         {
-            //return Time::Duration(0);
-            throw "FUBAR";
+            return Time::Duration::None();
+        }
+        const uint64_t bytesW = bytesWritten.Bytes();
+
+        if (bytesW == 0)
+        {
+            return Time::Duration::Infinite();
+        }
+
+        const uint64_t millis = elapsed.count();
+        
+        if (millis == 0)
+        {
+            return Time::Duration::None();
         }
 
         const double bytesPerMilliSecond = double(bytesW) / double(millis);
@@ -228,8 +238,8 @@ namespace Tunkio::DataUnit
     }
 
     template<uint64_t T>
-    Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::Timer& timer)
+    Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::Timer& elapsed)
     {
-        return TimeLeft(bytesLeft, bytesWritten, timer.Elapsed<Time::MilliSeconds>());
+        return TimeLeft(bytesLeft, bytesWritten, elapsed.Elapsed<Time::MilliSeconds>());
     }
 }
