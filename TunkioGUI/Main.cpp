@@ -16,15 +16,15 @@ namespace Tunkio
         g_dialog->OnStarted(bytesLeft);
     }
 
-    void OnProgress(uint64_t bytesWritten)
+    bool OnProgress(uint64_t bytesWritten)
     {
         if (!g_dialog)
         {
             std::cerr << "Dialog is null" << std::endl;
-            return;
+            return false;
         }
 
-        g_dialog->OnProgress(bytesWritten);
+        return g_dialog->OnProgress(bytesWritten);
     }
 
     void OnErrors(uint32_t error, uint64_t bytesWritten)
@@ -91,10 +91,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdline, int)
     }
 
     Tunkio::ProgressDialog progressDialog(cmdline, tunkio.get());
-    progressDialog.Show();
-
     Tunkio::g_dialog = &progressDialog;
 
+    progressDialog.Show();
     nana::exec();
 
     return 0;

@@ -22,7 +22,7 @@ extern "C"
     } TunkioMode;
 
     typedef void(*TunkioStartedCallback)(uint64_t bytesToWrite);
-    typedef void(*TunkioProgressCallback)(uint64_t bytesWritten);
+    typedef bool(*TunkioProgressCallback)(uint64_t bytesWritten); // Return false to cancel
     typedef void(*TunkioErrorCallback)(uint32_t error, uint64_t bytesWritten);
     typedef void(*TunkioCompletedCallback)(uint64_t bytesWritten);
 

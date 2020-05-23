@@ -13,6 +13,7 @@ namespace Tunkio
     uint32_t g_error = ErrorCode::Success;
     uint64_t g_bytesToWrite = 0;
     uint64_t g_bytesWrittenLastTime = 0;
+    std::atomic<bool> g_keepRunning = true;
 
     void PrintUsage(const std::filesystem::path& exe)
     {
@@ -78,11 +79,11 @@ namespace Tunkio
         std::cout << Time::Timestamp() << " Started!" << std::endl;
     }
 
-    void OnProgress(uint64_t bytesWritten)
+    bool OnProgress(uint64_t bytesWritten)
     {
-        if (!bytesWritten)
+        if (!g_keepRunning)
         {
-            return;
+            return false;
         }
 
         const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
@@ -102,6 +103,7 @@ namespace Tunkio
 
         g_currentTimer.Reset();
         g_bytesWrittenLastTime = bytesWritten;
+        return g_keepRunning;
     }
 
     void OnError(uint32_t error, uint64_t bytesWritten)
@@ -161,12 +163,12 @@ namespace Tunkio
             TunkioString{ path.size(), Memory::CloneString(path) }
         };
     }
-}
 
-void SignalHandler(int signal)
-{
-    std::cout << "Got signal: " << signal << std::endl;
-    exit(Tunkio::ErrorCode::UserCancelled);
+    void SignalHandler(int signal)
+    {
+        std::cout << "Got signal: " << signal << std::endl;
+        g_keepRunning = false;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -195,7 +197,7 @@ int main(int argc, char* argv[])
         return ErrorCode::UserCancelled;
     }
 
-    if (std::signal(SIGINT, SignalHandler) == SIG_ERR)
+    if (std::signal(SIGINT, Tunkio::SignalHandler) == SIG_ERR)
     {
         std::cerr << "Cannot attach SIGINT handler!" << std::endl;
         return EXIT_FAILURE;

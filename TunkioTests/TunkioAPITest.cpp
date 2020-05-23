@@ -11,10 +11,11 @@ namespace Tunkio
         std::cout << bytesLeft << " bytes left." << std::endl;
     };
 
-    const auto progress = [](uint64_t bytesWritten) -> void
+    const auto progress = [](uint64_t bytesWritten) -> bool
     {
         const uint64_t megabytesWritten = bytesWritten / 1024;
         std::cout << megabytesWritten << " megabytes written." << std::endl;
+        return true;
     };
 
     const auto errors = [](uint32_t error, uint64_t bytesWritten) -> void

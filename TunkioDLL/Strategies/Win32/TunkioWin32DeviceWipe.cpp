@@ -51,16 +51,7 @@ namespace Tunkio
                 return false;
             }
 
-            ReportStarted();
-
-            if (!Fill())
-            {
-                ReportError(GetLastError());
-                return false;
-            }
-
-            ReportComplete();
-            return true;
+            return Fill();
         }
 
         bool Remove() override
@@ -73,9 +64,9 @@ namespace Tunkio
             m_options->Callbacks.StartedCallback(m_size);
         }
 
-        void ReportProgress() const
+        bool ReportProgress() const
         {
-            m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
+            return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
         }
 
         void ReportError(uint32_t error) const
@@ -94,6 +85,8 @@ namespace Tunkio
             uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(10));
 
+            ReportStarted();
+
             while (bytesLeft)
             {
                 if (fakeData.Size<uint64_t>() > bytesLeft)
@@ -111,9 +104,13 @@ namespace Tunkio
                     return false;
                 }
 
-                ReportProgress();
+                if (!ReportProgress())
+                {
+                    return true;
+                }
             }
 
+            ReportComplete();
             return true;
         }
 

@@ -32,11 +32,6 @@ namespace Tunkio
 
         ~FileWipeImpl()
         {
-            // Will not work, because the handle is open...
-            //if (m_handle.IsValid() && m_removeOnExit && !DeleteFileA(m_path.c_str()))
-            //{
-            //    ReportError(ErrorCode::RemoveFailed);
-            //}
         }
 
         bool Run()
@@ -53,16 +48,7 @@ namespace Tunkio
                 return false;
             }
 
-            ReportStarted();
-
-            if (!Fill())
-            {
-                ReportError(GetLastError());
-                return false;
-            }
-
-            ReportComplete();
-            return true;
+            return Fill();
         }
 
         bool Remove() override
@@ -75,9 +61,9 @@ namespace Tunkio
             m_options->Callbacks.StartedCallback(m_size);
         }
 
-        void ReportProgress() const
+        bool ReportProgress() const
         {
-            m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
+            return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
         }
 
         void ReportComplete() const
@@ -96,6 +82,8 @@ namespace Tunkio
             uint64_t bytesLeft = m_size;
             FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
 
+            ReportStarted();
+
             while (bytesLeft)
             {
                 if (fakeData.Size<uint64_t>() > bytesLeft)
@@ -113,9 +101,13 @@ namespace Tunkio
                     return false;
                 }
 
-                ReportProgress();
+                if (!ReportProgress())
+                {
+                    return true;
+                }
             }
 
+            ReportComplete();
             return true;
         }
 

@@ -23,6 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <future>
 
 #include "TunkioAPI.h"
 #include "TunkioArgs.hpp"

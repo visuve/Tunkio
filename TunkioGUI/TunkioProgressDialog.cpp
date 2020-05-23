@@ -5,45 +5,45 @@ namespace Tunkio
 {
     ProgressDialog::ProgressDialog(const std::string& cmdline, TunkioHandle* tunkio) :
         m_form(nana::API::make_center(500, 300)),
-        m_cmdParamsLabel(m_form, "Parameters given: " + cmdline.empty() ? "none." : cmdline),
-        m_progressLabel(m_form, "Progress: not started."),
+        m_cmdParamsLabel(m_form, "Parameters given:\n"),
+        m_progressLabel(m_form, "Progress:\nNot started."),
         m_progressBar(m_form),
         m_exitButton(m_form),
-        m_abortButton(m_form),
-        m_runButton(m_form),
+        m_stopButton(m_form),
+        m_startButton(m_form),
         m_place(m_form),
         m_tunkio(tunkio)
     {
         m_form.caption(L"Tunkio GUI");
 
-        m_progressBar.amount(100);
-        m_progressBar.value(50);
+        if (cmdline.empty())
+        {
+            m_cmdParamsLabel.caption(m_cmdParamsLabel.caption() + "None.");
+        }
+        else
+        {
+            m_cmdParamsLabel.caption(m_cmdParamsLabel.caption() + cmdline);
+        }
 
         m_exitButton.caption(L"Exit");
-        m_exitButton.events().click([]
-        {
-            nana::API::exit();
-        });
+        m_exitButton.events().click(std::bind(&ProgressDialog::OnExit, this));
 
-        m_abortButton.caption(L"Abort");
-        m_abortButton.events().click([=]
-        {
-            // TODO
-            std::cout << "ABORT!" << std::endl;
-        });
+        m_stopButton.caption(L"Stop");
+        m_stopButton.events().click(std::bind(&ProgressDialog::OnStop, this));
 
-        m_runButton.caption(L"Run");
-        m_runButton.events().click([=]()
-        {
-            // TODO check result
-            TunkioRun(m_tunkio);
-        });
+        m_startButton.caption(L"Start");
+        m_startButton.events().click(std::bind(&ProgressDialog::OnStart, this));
 
-        m_place.div("vert margin=3% <labels vertical gap=10 arrange=[75,75,25]> <buttons weight=25 gap=10 >");
+        m_place.div("vert margin=3% <labels vertical gap=10 arrange=[50,100,25]> <buttons weight=25 gap=10 >");
         m_place.field("labels") << m_cmdParamsLabel << m_progressLabel << m_progressBar;
-        m_place.field("buttons") << m_exitButton << m_abortButton << m_runButton;
+        m_place.field("buttons") << m_exitButton << m_stopButton << m_startButton;
 
         m_place.collocate();
+    }
+
+    ProgressDialog::~ProgressDialog()
+    {
+        WaitForFinished();
     }
 
     void ProgressDialog::Show()
@@ -55,13 +55,18 @@ namespace Tunkio
     {
         m_progressLabel.caption("Progress: Tunkio started! Bytes to write: " + std::to_string(bytesLeft) + '.');
         SetProgressBarAmount(bytesLeft);
+
+        m_totalTimer.Reset();
+        m_currentTimer.Reset();
+        m_bytesToWrite = bytesLeft;
+        m_bytesWrittenLastTime = 0;
     }
 
-    void ProgressDialog::OnProgress(uint64_t bytesWritten)
+    bool ProgressDialog::OnProgress(uint64_t bytesWritten)
     {
-        if (!bytesWritten)
+        if (!m_keepRunning)
         {
-            return;
+            return false;
         }
 
         SetProgressBarValue(bytesWritten);
@@ -73,18 +78,22 @@ namespace Tunkio
 
         if (bytesWrittenTotal.Value() && elapsedSince.count())
         {
+            const DataUnit::Byte bytesLeft = m_bytesToWrite - bytesWritten;
+
             std::stringstream ss;
 
-            const DataUnit::Byte bytesLeft = m_bytesToWrite - bytesWritten;
-            ss << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
-                << " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
-                << ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
-                << ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, m_totalTimer))
-                << std::endl;
+            ss << "Progress:" << std::endl
+                << '\t' << DataUnit::HumanReadable(bytesWrittenTotal) << " written." << std::endl
+                << "\tSpeed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince) << '.' << std::endl
+                << "\tAvg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal) << '.' << std::endl
+                << "\tTime left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, m_totalTimer)) << '.';
+
+            m_progressLabel.caption(ss.str());
         }
 
         m_currentTimer.Reset();
         m_bytesWrittenLastTime = bytesWritten;
+        return m_keepRunning;
     }
 
     void ProgressDialog::OnErrors(uint32_t error, uint64_t bytesWritten)
@@ -124,17 +133,48 @@ namespace Tunkio
 
         std::stringstream ss;
 
-        ss << "Finished. Bytes written: " << bytesWritten << std::endl;
+        ss << "Finished:" << std::endl << "\tBytes written: " << bytesWritten << std::endl;
 
         const DataUnit::Byte bytes(bytesWritten);
         const auto elapsed = m_totalTimer.Elapsed<Time::MilliSeconds>();
 
         if (bytes.Value() && elapsed.count())
         {
-            ss << "Average speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
+            ss << "\tAverage speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
         }
 
         m_progressLabel.caption(ss.str());
+    }
+
+
+    void ProgressDialog::OnExit()
+    {
+        WaitForFinished();
+        nana::API::exit();
+    }
+
+    void ProgressDialog::OnStop()
+    {
+        m_keepRunning = false;
+        m_progressLabel.caption(m_progressLabel.caption() + "\nStopped!");
+    }
+
+    void ProgressDialog::OnStart()
+    {
+        m_future = std::async(std::launch::async, [&]
+        {
+            return TunkioRun(m_tunkio);
+        });
+    }
+
+    void ProgressDialog::WaitForFinished()
+    {
+        m_keepRunning = false;
+
+        if (m_future.valid())
+        {
+            std::cout << std::boolalpha << m_future.get() << std::endl;
+        }
     }
 
     void ProgressDialog::SetProgressBarAmount(uint64_t bytes)
