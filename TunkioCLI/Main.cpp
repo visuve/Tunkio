@@ -173,6 +173,7 @@ int main(int argc, char* argv[])
 {
     using namespace Tunkio;
 
+    std::cout << std::endl;
     std::cout << "#######   #     #   #     #   #   #   ###    #####" << std::endl;
     std::cout << "   #      #     #   # #   #   #  #     #    #     #" << std::endl;
     std::cout << "   #      #     #   #  #  #   ###      #    #     #" << std::endl;
@@ -184,7 +185,6 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Invalid arguments!" << std::endl << std::endl;
         PrintUsage(argv[0]);
-        system("PAUSE");
         return ErrorCode::InvalidArgument;
     }
 

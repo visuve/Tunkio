@@ -17,7 +17,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="Resource.h" />
     <ClInclude Include="TunkioProgressDialog.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -27,12 +26,7 @@
     </ClCompile>
     <ClCompile Include="TunkioProgressDialog.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="TunkioGUI.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Tunkio.ico" />
-  </ItemGroup>
+  <Import Project="$(SolutionDir)\TunkioResources\TunkioResources.props" />
   <ItemGroup>
     <ProjectReference Include="..\TunkioDLL\TunkioDLL.vcxproj">
       <Project>{1f65f01e-09c9-4be2-8cc2-7a1d65f282e6}</Project>

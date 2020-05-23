@@ -24,6 +24,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
+  <Import Project="$(SolutionDir)\TunkioResources\TunkioResources.props" />
   <ItemGroup>
     <ProjectReference Include="..\TunkioDLL\TunkioDLL.vcxproj">
       <Project>{1f65f01e-09c9-4be2-8cc2-7a1d65f282e6}</Project>

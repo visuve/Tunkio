@@ -1,0 +1,3 @@
+#include "TunkioResources.h"
+
+IDI_TUNKIO_ICON ICON "Tunkio.ico"
