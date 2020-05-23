@@ -90,6 +90,9 @@ namespace Tunkio::Time
 
     std::string HumanReadable(const Duration& duration);
 
+    std::string Timestamp(const std::chrono::system_clock::time_point& time = std::chrono::system_clock::now());
+    std::string TimestampUTC(const std::chrono::system_clock::time_point& time = std::chrono::system_clock::now());
+
     class Timer
     {
     public:

@@ -44,6 +44,32 @@ namespace Tunkio::Time
         return os.str();
     }
 
+    template <typename T>
+    std::string Timestamp(const std::chrono::system_clock::time_point& time, T* converterFunction)
+    {
+        const std::time_t tt = std::chrono::system_clock::to_time_t(time);
+        std::tm tm = { 0 };
+
+        if (converterFunction(&tm, &tt) != 0)
+        {
+            return {};
+        }
+
+        constexpr size_t bufferSize = 20;
+        char buffer[bufferSize] = { 0 };
+        return std::string(buffer, std::strftime(buffer, bufferSize, "%Y-%m-%d %H:%M:%S", &tm));
+    }
+
+    std::string Timestamp(const std::chrono::system_clock::time_point& time)
+    {
+        return Timestamp(time, localtime_s);
+    }
+
+    std::string TimestampUTC(const std::chrono::system_clock::time_point& time)
+    {
+        return Timestamp(time, gmtime_s);
+    }
+
     Duration Timer::Elapsed() const
     {
         return Duration(Elapsed<MicroSeconds>());

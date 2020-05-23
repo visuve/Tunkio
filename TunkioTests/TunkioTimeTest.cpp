@@ -126,4 +126,22 @@ namespace Tunkio::Time
             }
         }
     }
+
+    TEST(TunkioTimeTest, Timestamp)
+    {
+        {
+            auto localTime = Time::Timestamp();
+            EXPECT_FALSE(localTime.empty());
+
+            auto utcTime = Time::TimestampUTC();
+            EXPECT_FALSE(utcTime.empty());
+        }
+        {
+            std::time_t tt = 1590229315;
+            auto time = std::chrono::system_clock::from_time_t(tt);
+            auto timestamp = Time::TimestampUTC(time);
+            EXPECT_STREQ("2020-05-23 10:21:55", timestamp.c_str());
+        }
+
+    }
 }
