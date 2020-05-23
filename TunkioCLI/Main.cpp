@@ -67,82 +67,88 @@ namespace Tunkio
         { "path", Args::Argument(true, std::filesystem::path()) }
     };
 
+    void OnStarted(uint64_t bytesLeft)
+    {
+        g_totalTimer.Reset();
+        g_currentTimer.Reset();
+        g_error = ErrorCode::Success;
+        g_bytesToWrite = bytesLeft;
+        g_bytesWrittenLastTime = 0;
+
+        std::cout << Time::Timestamp() << " Started!" << std::endl;
+    }
+
+    void OnProgress(uint64_t bytesWritten)
+    {
+        if (!bytesWritten)
+        {
+            return;
+        }
+
+        const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
+        const auto elapsedTotal = g_totalTimer.Elapsed<Time::MilliSeconds>();
+        const DataUnit::Byte bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
+        const DataUnit::Byte bytesWrittenTotal(bytesWritten);
+
+        if (bytesWrittenTotal.Value() && elapsedSince.count())
+        {
+            const DataUnit::Byte bytesLeft = g_bytesToWrite - bytesWritten;
+            std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
+                << " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
+                << ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
+                << ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, g_totalTimer))
+                << std::endl;
+        }
+
+        g_currentTimer.Reset();
+        g_bytesWrittenLastTime = bytesWritten;
+    }
+
+    void OnError(uint32_t error, uint64_t bytesWritten)
+    {
+        if (bytesWritten)
+        {
+            std::cerr << Time::Timestamp() << " Error " << error << " occurred. Bytes written: " << bytesWritten << std::endl;
+        }
+        else
+        {
+            std::cerr << Time::Timestamp() << " Error " << error << " occurred." << std::endl;
+        }
+
+#ifdef WIN32
+        std::string buffer(0x400, 0);
+        if (FormatMessageA(
+            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            nullptr,
+            error,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            buffer.data(),
+            static_cast<DWORD>(buffer.size()),
+            nullptr))
+        {
+            std::cerr << "Detailed description: " << buffer << std::endl;
+        }
+#endif
+
+        g_error = error;
+    }
+
+    void OnCompleted(uint64_t bytesWritten)
+    {
+        std::cout << Time::Timestamp() << " Finished. Bytes written: " << bytesWritten << std::endl;
+
+        const DataUnit::Byte bytes(bytesWritten);
+        const auto elapsed = g_totalTimer.Elapsed<Time::MilliSeconds>();
+
+        if (bytes.Value() && elapsed.count())
+        {
+            std::cout << "Average speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
+        }
+    }
+
     TunkioOptions* CreateOptions()
     {
         std::cout << std::setprecision(3) << std::fixed;
-
-        const auto started = [](uint64_t bytesLeft) -> void
-        {
-            g_bytesToWrite = bytesLeft;
-        };
-
-        const auto progress = [](uint64_t bytesWritten) -> void
-        {
-            if (!bytesWritten)
-            {
-                return;
-            }
-
-            const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
-            const auto elapsedTotal = g_totalTimer.Elapsed<Time::MilliSeconds>();
-            const DataUnit::Byte bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
-            const DataUnit::Byte bytesWrittenTotal(bytesWritten);
-
-            if (bytesWrittenTotal.Value() && elapsedSince.count())
-            {
-                const DataUnit::Byte bytesLeft = g_bytesToWrite - bytesWritten;
-                std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
-                    << " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
-                    << ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
-                    << ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, g_totalTimer))
-                    << std::endl;
-            }
-
-            g_currentTimer.Reset();
-            g_bytesWrittenLastTime = bytesWritten;
-        };
-
-        const auto errors = [](uint32_t error, uint64_t bytesWritten) -> void
-        {
-            if (bytesWritten)
-            {
-                std::cerr << "Error " << error << " occurred. Bytes written: " << bytesWritten << std::endl;
-            }
-            else
-            {
-                std::cerr << "Error " << error << " occurred." << std::endl;
-            }
-
-#ifdef WIN32
-            std::string buffer(0x400, 0);
-            if (FormatMessageA(
-                    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
-                    nullptr, 
-                    error, 
-                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                    buffer.data(), 
-                    static_cast<DWORD>(buffer.size()), 
-                    nullptr))
-            {
-                std::cerr << "Detailed description: " << buffer << std::endl;
-            }
-#endif
-
-            g_error = error;
-        };
-
-        const auto completed = [](uint64_t bytesWritten) -> void
-        {
-            std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
-
-            const DataUnit::Byte bytes(bytesWritten);
-            const auto elapsed = g_totalTimer.Elapsed<Time::MilliSeconds>();
-
-            if (bytes.Value() && elapsed.count())
-            {
-                std::cout << "Average speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
-            }
-        };
 
         const auto path = Arguments.at("path").Value<std::filesystem::path>().string();
 
@@ -151,7 +157,7 @@ namespace Tunkio
             Arguments.at("target").Value<TunkioTarget>(),
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
-            TunkioCallbacks { started, progress, errors, completed },
+            TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
             TunkioString{ path.size(), Memory::CloneString(path) }
         };
     }
