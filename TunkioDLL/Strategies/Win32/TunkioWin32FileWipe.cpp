@@ -26,7 +26,8 @@ namespace Tunkio
 
         bool Open()
         {
-            m_handle.Reset(CreateFileA(m_options->Path.Data, DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr));
+            const std::string path(m_options->Path.Data, m_options->Path.Length);
+            m_handle.Reset(CreateFileA(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr));
 
             if (!m_handle.IsValid())
             {

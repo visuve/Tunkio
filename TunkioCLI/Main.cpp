@@ -86,6 +86,7 @@ namespace Tunkio
             return false;
         }
 
+        // TODO: current speed sometimes shows incorrectly
         const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
         const auto elapsedTotal = g_totalTimer.Elapsed<Time::MilliSeconds>();
         const DataUnit::Byte bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
