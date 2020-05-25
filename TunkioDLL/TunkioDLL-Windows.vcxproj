@@ -3,9 +3,10 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1F65F01E-09C9-4BE2-8CC2-7A1D65F282E6}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ProjectName>TunkioDLL-Windows</ProjectName>
     <TargetName>Tunkio</TargetName>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\Tunkio.props" />
+  <Import Project="$(SolutionDir)\Tunkio-Windows.props" />
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\TunkioLIB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -41,7 +42,7 @@
     <None Include="TunkioAPI.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TunkioLIB\TunkioLIB.vcxproj">
+    <ProjectReference Include="..\TunkioLIB\TunkioLIB-Windows.vcxproj">
       <Project>{eeeea30f-e090-41d0-bb6c-588df660d33a}</Project>
     </ProjectReference>
   </ItemGroup>

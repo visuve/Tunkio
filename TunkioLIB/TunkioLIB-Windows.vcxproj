@@ -3,8 +3,10 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EEEEA30F-E090-41D0-BB6C-588DF660D33A}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ProjectName>TunkioLIB-Windows</ProjectName>
+    <TargetName>TunkioLIB</TargetName>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\Tunkio.props" />
+  <Import Project="$(SolutionDir)\Tunkio-Windows.props" />
   <ItemGroup>
     <ClInclude Include="TunkioArgs.hpp" />
     <ClInclude Include="TunkioDataUnits.hpp" />
@@ -12,6 +14,7 @@
     <ClInclude Include="TunkioTime.hpp" />
     <ClInclude Include="TunkioWin32AutoHandle.hpp" />
     <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="TunkioWin32ChildProcess.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PCH.cpp">
@@ -20,5 +23,6 @@
     <ClCompile Include="TunkioArgs.cpp" />
     <ClCompile Include="TunkioTime.cpp" />
     <ClCompile Include="TunkioWin32AutoHandle.cpp" />
+    <ClCompile Include="TunkioWin32ChildProcess.cpp" />
   </ItemGroup>
 </Project>

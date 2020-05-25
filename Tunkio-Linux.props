@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup>
+    <Keyword>Linux</Keyword>
+    <ApplicationType>Linux</ApplicationType>
+    <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
+    <PlatformToolset>WSL_1_0</PlatformToolset>
+    <UseOfStl>libstdc++_static</UseOfStl>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <IntDir>$(SolutionDir)out\x86d\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x86d\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <IntDir>$(SolutionDir)out\x86\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x86\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <IntDir>$(SolutionDir)out\x64d\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x64d\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <IntDir>$(SolutionDir)out\x64\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\x64\bin\</OutDir>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
+      <Verbose>true</Verbose>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>stdc++fs;%(AdditionalDependencies)</AdditionalDependencies>
+      <VerboseOutput>true</VerboseOutput>
+      <Version>true</Version>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{339b6ab7-1f49-411d-84ae-2cc3b8e1ad1c}</ProjectGuid>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Tunkio-Linux.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>../TunkioLIB;../TunkioDLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="TunkioAPI.h" />
+    <ClInclude Include="TunkioErrorCodes.hpp" />
+    <ClInclude Include="Strategies\TunkioFillStrategy.hpp" />
+    <ClInclude Include="Strategies\ITunkioOperation.hpp" />
+    <ClInclude Include="Strategies\TunkioFileWipe.hpp" />
+    <ClInclude Include="Strategies\TunkioDeviceWipe.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PCH.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TunkioAPICheck.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TunkioAPI.cpp" />
+    <ClCompile Include="Strategies\TunkioFillStrategy.cpp" />
+    <ClCompile Include="Strategies\Posix\TunkioPosixDeviceWipe.cpp" />
+    <ClCompile Include="Strategies\Posix\TunkioPosixFileWipe.cpp" />
+  </ItemGroup>
+</Project>

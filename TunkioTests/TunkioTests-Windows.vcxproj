@@ -3,8 +3,10 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9e670774-172a-4523-a048-1de13b8ad55d}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
+    <ProjectName>TunkioTests-Windows</ProjectName>
+    <TargetName>TunkioTests</TargetName>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\Tunkio.props" />
+  <Import Project="$(SolutionDir)\Tunkio-Windows.props" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static.1.8.1\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static.targets" Condition="Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static.1.8.1\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-static.targets')" />
   </ImportGroup>

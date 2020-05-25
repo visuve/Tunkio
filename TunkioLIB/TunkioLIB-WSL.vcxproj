@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{099eef54-7b09-4e98-994e-4b12eb56643b}</ProjectGuid>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\Tunkio-Linux.props" />
+  <ItemGroup>
+    <ClInclude Include="TunkioProcess.hpp" />
+    <ClInclude Include="TunkioArgs.hpp" />
+    <ClInclude Include="TunkioDataUnits.hpp" />
+    <ClInclude Include="TunkioMemory.hpp" />
+    <ClInclude Include="TunkioPosixChildProcess.hpp" />
+    <ClInclude Include="TunkioTime.hpp" />
+    <ClInclude Include="TunkioPosixAutoHandle.hpp" />
+    <ClInclude Include="PCH.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PCH.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TunkioArgs.cpp" />
+    <ClCompile Include="TunkioPosixChildProcess.cpp" />
+    <ClCompile Include="TunkioTime.cpp" />
+    <ClCompile Include="TunkioPosixAutoHandle.cpp" />
+  </ItemGroup>
+</Project>
