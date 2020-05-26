@@ -61,9 +61,13 @@ namespace Tunkio
     {
         switch (m_mode)
         {
+            case TunkioMode::Ones:
+            case TunkioMode::Zeroes:
+                break;
             case TunkioMode::Random:
                 Random(m_data);
                 break;
+            
         }
 
         return m_data.data();

@@ -69,7 +69,7 @@ namespace Tunkio
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
             TunkioCallbacks { OnStarted, OnProgress, OnErrors, OnCompleted },
-            TunkioString{ path.size(), Memory::CloneString(path) }
+            TunkioString { static_cast<uint32_t>(path.size()), Memory::CloneString(path) }
         };
     }
 }

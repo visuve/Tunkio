@@ -1,29 +1,32 @@
 #include "PCH.hpp"
 #include "TunkioErrorCodes.hpp"
 #include "TunkioPosixAutoHandle.hpp"
-#include "Strategies/TunkioDeviceWipe.hpp"
+#include "Strategies/TunkioFileWipe.hpp"
 #include "Strategies/TunkioFillStrategy.hpp"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/fs.h>
+#include <unistd.h>  
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/sysmacros.h>
 
 namespace Tunkio
 {
     constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
 
-    class DeviceWipeImpl : IOperation
+    class FileWipeImpl : IOperation
     {
     public:
 
-        DeviceWipeImpl(const TunkioOptions* options) :
+        FileWipeImpl(const TunkioOptions* options) :
             IOperation(options)
         {
         }
 
-        ~DeviceWipeImpl()
+        ~FileWipeImpl()
         {
         }
 
@@ -54,8 +57,8 @@ namespace Tunkio
                 return false;
             }
 
-            stat64 buffer;
-            m_error = fstat64(m_handle.Descriptor(), &buffer);
+            struct ::stat64 buffer = { 0 };
+            m_error = ::fstat64(m_handle.Descriptor(), &buffer);
 
             if (m_error != 0)
             {
@@ -136,33 +139,33 @@ namespace Tunkio
         int m_error = 0;
     };
 
-    DeviceWipe::DeviceWipe(const TunkioOptions* options) :
+    FileWipe::FileWipe(const TunkioOptions* options) :
         IOperation(options),
-        m_impl(new DeviceWipeImpl(options))
+        m_impl(new FileWipeImpl(options))
     {
     }
 
-    DeviceWipe::~DeviceWipe()
+    FileWipe::~FileWipe()
     {
         delete m_impl;
     }
 
-    bool DeviceWipe::Run()
+    bool FileWipe::Run()
     {
         return m_impl->Run();
     }
 
-    bool DeviceWipe::Open()
+    bool FileWipe::Open()
     {
         return m_impl->Open();
     }
 
-    bool DeviceWipe::Fill()
+    bool FileWipe::Fill()
     {
         return m_impl->Fill();
     }
 
-    bool DeviceWipe::Remove()
+    bool FileWipe::Remove()
     {
         return m_impl->Remove();
     }

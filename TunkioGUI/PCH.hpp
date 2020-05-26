@@ -13,8 +13,8 @@
 
 #include <iostream>
 #include <sstream>
-#include <map>
 #include <future>
+#include <array>
 
 #include "TunkioAPI.h"
 #include "TunkioArgs.hpp"

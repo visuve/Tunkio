@@ -2,9 +2,14 @@
 #include "TunkioArgs.hpp"
 #include "TunkioErrorCodes.hpp"
 #include "TunkioTime.hpp"
-#include "TunkioChildProcess.hpp"
 #include "TunkioDataUnits.hpp"
 #include "TunkioMemory.hpp"
+
+#if defined(_WIN32) || defined(_WIN64)
+#include "TunkioWin32ChildProcess.hpp"
+#else
+#include "TunkioPosixChildProcess.hpp"
+#endif
 
 namespace Tunkio
 {
@@ -29,22 +34,26 @@ namespace Tunkio
         std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
         std::cout << std::endl;
 
-        ChildProcess wmic(L"C:\\Windows\\System32\\wbem\\WMIC.exe", L"diskdrive list brief");
+#if defined(_WIN32) || defined(_WIN64)
+        Win32ChildProcess process(L"C:\\Windows\\System32\\wbem\\WMIC.exe", L"diskdrive list brief");
+#else
+        PosixChildProcess process("/bin/df", "-h");
+#endif
 
-        if (!wmic.Run())
+        if (!process.Start())
         {
-            std::cerr << "Failed to start wmic.exe to list disk drives. Error code: " << wmic.ErrorCode() << std::endl;
+            std::cerr << "Failed to start " << process.Executable() << " to list disk drives. Error code: " << process.ErrorCode() << std::endl;
             return;
         }
 
-        if (wmic.ExitCode() != 0)
+        if (process.ExitCode() != 0)
         {
-            std::cerr << "Listing your drives failed with wmic. Exit code: " << wmic.ExitCode() << std::endl;
+            std::cerr << "Listing your drives failed with " << process.Executable() << ". Exit code: " << process.ExitCode() << std::endl;
             return;
         }
 
-        std::cout << std::endl << "Here are your volumes:" << std::endl << std::endl;
-        std::cout << wmic.Output() << std::endl;
+        std::cout << std::endl << "Here are your drives:" << std::endl << std::endl;
+        std::cout << process.StdOut() << std::endl;
     }
 
     bool PrintArgumentsAndPrompt(const std::vector<std::string>& args)
@@ -119,17 +128,19 @@ namespace Tunkio
         }
 
 #ifdef WIN32
-        std::string buffer(0x400, 0);
-        if (FormatMessageA(
+        std::array<wchar_t, 0x400> buffer;
+        DWORD size = FormatMessageW(
             FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             nullptr,
             error,
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             buffer.data(),
             static_cast<DWORD>(buffer.size()),
-            nullptr))
+            nullptr);
+        
+        if (size)
         {
-            std::cerr << "Detailed description: " << buffer << std::endl;
+            std::wcerr << L"Detailed description: " << std::wstring(buffer.data(), size) << std::endl;
         }
 #endif
 
@@ -161,7 +172,7 @@ namespace Tunkio
             Arguments.at("mode").Value<TunkioMode>(),
             Arguments.at("remove").Value<bool>(),
             TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
-            TunkioString{ path.size(), Memory::CloneString(path) }
+            TunkioString{ static_cast<uint32_t>(path.size()), Memory::CloneString(path) }
         };
     }
 

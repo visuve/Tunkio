@@ -11,6 +11,12 @@
     <ClCompile>
       <AdditionalIncludeDirectories>../TunkioLIB;../TunkioDLL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">../out/x86d/bin/TunkioLIB-WSL.out</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x86'">../out/x86/bin/TunkioLIB-WSL.out</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../out/x64d/bin/TunkioLIB-WSL.out</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../out/x64/bin/TunkioLIB-WSL.out</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PCH.hpp" />
@@ -32,5 +38,10 @@
     <ClCompile Include="Strategies\TunkioFillStrategy.cpp" />
     <ClCompile Include="Strategies\Posix\TunkioPosixDeviceWipe.cpp" />
     <ClCompile Include="Strategies\Posix\TunkioPosixFileWipe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TunkioLIB\TunkioLIB-WSL.vcxproj">
+      <Project>{099eef54-7b09-4e98-994e-4b12eb56643b}</Project>
+    </ProjectReference>
   </ItemGroup>
 </Project>

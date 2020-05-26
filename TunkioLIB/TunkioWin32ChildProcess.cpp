@@ -1,26 +1,33 @@
 #include "PCH.hpp"
-#include "TunkioChildProcess.hpp"
+#include "TunkioWin32ChildProcess.hpp"
 #include "TunkioTime.hpp"
 
 namespace Tunkio
 {
-    bool WaitForProcess(const PROCESS_INFORMATION& pi, DWORD& exitCode, const Time::Seconds seconds = Time::Seconds(INFINITE))
+    bool WaitForProcess(const PROCESS_INFORMATION& pi, uint32_t& exitCode, const Time::Seconds seconds = Time::Seconds(INFINITE))
     {
         if (WaitForSingleObject(pi.hProcess, static_cast<DWORD>(seconds.count())) != WAIT_OBJECT_0)
         {
             return false;
         }
 
-        return GetExitCodeProcess(pi.hProcess, &exitCode);
+        DWORD buffer = 0;
+
+        if (GetExitCodeProcess(pi.hProcess, &buffer))
+        {
+            exitCode = buffer;
+            return true;
+        }
+
+        return false;
     }
 
-    ChildProcess::ChildProcess(const std::filesystem::path& path, const std::wstring& arguments) :
-        m_path(path),
-        m_arguments(arguments)
+    Win32ChildProcess::Win32ChildProcess(const std::filesystem::path& executable, const std::wstring& arguments) :
+        IProcess(executable, arguments)
     {
     }
 
-    bool ChildProcess::Run()
+    bool Win32ChildProcess::Start()
     {
         if (!InitializePipes())
         {
@@ -52,22 +59,7 @@ namespace Tunkio
         return true;
     }
 
-    uint32_t ChildProcess::ErrorCode() const
-    {
-        return m_errorCode;
-    }
-
-    uint32_t ChildProcess::ExitCode() const
-    {
-        return m_exitCode;
-    }
-
-    std::string ChildProcess::Output() const
-    {
-        return m_stdout;
-    }
-
-    bool ChildProcess::InitializePipes()
+    bool Win32ChildProcess::InitializePipes()
     {
         SECURITY_ATTRIBUTES sa = { 0 };
         sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -86,28 +78,26 @@ namespace Tunkio
         return true;
     }
 
-    bool ChildProcess::CreateChildProcess(PROCESS_INFORMATION& pi)
+    bool Win32ChildProcess::CreateChildProcess(PROCESS_INFORMATION& pi)
     {
         STARTUPINFO si = { 0 };
         si.cb = sizeof(STARTUPINFO);
         si.hStdOutput = m_stdoutWrite.Handle();
         si.dwFlags |= STARTF_USESTDHANDLES;
 
-        std::wstring commandLine = m_path.wstring() + L" " + m_arguments;
+        std::wstring commandLine = m_executable.wstring() + L" " + m_arguments;
 
-        return CreateProcess(m_path.c_str(), commandLine.data(), nullptr, nullptr, true, 0, nullptr, nullptr, &si, &pi);
+        return CreateProcess(m_executable.c_str(), commandLine.data(), nullptr, nullptr, true, 0, nullptr, nullptr, &si, &pi);
     }
 
-    void ChildProcess::ReadFromPipe()
+    void Win32ChildProcess::ReadFromPipe()
     {
-        constexpr DWORD bufferSize = 0x1000;
-
         DWORD bytesRead;
-        char buffer[bufferSize] = { 0 };
+        std::array<char, 0x1000> buffer;
 
-        while(ReadFile(m_stdoutRead.Handle(), buffer, bufferSize, &bytesRead, nullptr) && bytesRead > 0)
+        while(ReadFile(m_stdoutRead.Handle(), buffer.data(), static_cast<DWORD>(buffer.size()), &bytesRead, nullptr) && bytesRead > 0)
         {
-            m_stdout.append(buffer, bytesRead);
+            m_stdout.append(buffer.data(), bytesRead);
         }
     }
 }

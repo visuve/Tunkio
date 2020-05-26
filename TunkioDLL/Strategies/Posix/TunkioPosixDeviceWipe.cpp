@@ -7,8 +7,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
+#include <unistd.h>
 #include <linux/fs.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
 
 namespace Tunkio
 {
@@ -55,7 +57,8 @@ namespace Tunkio
                 return false;
             }
 
-            m_error = ioctl(m_handle.Descriptor(), BLKGETSIZE64, &m_size);
+            uint64_t nr_blocks;
+            m_error = ioctl(m_handle.Descriptor(), BLKGETSIZE64, &nr_blocks);
 
             if (m_error != 0)
             {

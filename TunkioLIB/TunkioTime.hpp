@@ -1,7 +1,8 @@
 #pragma once
 
-/*#undef min*/
+#if defined(_WIN32) || defined(_WIN64)
 #undef max
+#endif
 
 namespace Tunkio::Time
 {

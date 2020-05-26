@@ -55,7 +55,7 @@ namespace Tunkio
 
             if (!m_size)
             {
-                ReportError(ErrorCode::FileEmpty);
+                ReportError(ErrorCode::NoData);
                 return false;
             }
 

@@ -3,26 +3,20 @@
 #ifdef WIN32
 #include <Windows.h>
 #else
-#include <errno-base.h>
+#include <errno.h>
 #endif
 
 namespace Tunkio::ErrorCode
 {
     constexpr int Success = 0;
 
-#ifdef WIN32
-    constexpr int FileNotFound = ERROR_FILE_NOT_FOUND;
-    constexpr int OpenFailed = ERROR_OPEN_FAILED;
-    constexpr int NotImplemented = ERROR_CALL_NOT_IMPLEMENTED;
+#if defined(_WIN32) || defined(_WIN64)
     constexpr int InvalidArgument = ERROR_BAD_ARGUMENTS;
     constexpr int UserCancelled = ERROR_CANCELLED;
-    constexpr int FileEmpty = ERROR_EMPTY;
-    constexpr int RemoveFailed = ERROR_CANT_DELETE_LAST_ITEM;
-
+	constexpr int NoData = ERROR_EMPTY;
 #else
     constexpr int InvalidArgument = EINVAL;
-    constexpr int NotImplemented = ENOSYS;
-    constexpr int FileNotFound = ENOENT;
-    constexpr int FileEmpty = ENODATA;
+    constexpr int UserCancelled = ECANCELED;
+	constexpr int NoData = ENODATA;
 #endif
 }

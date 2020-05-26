@@ -6,7 +6,7 @@
 #include "Strategies/TunkioFileWipe.hpp"
 #include "Strategies/TunkioDeviceWipe.hpp"
 
-TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
+TunkioHandle* CALLING_CONVENTION TunkioCreate(const TunkioOptions* options)
 {
     if (!options)
     {
@@ -26,7 +26,7 @@ TunkioHandle* __cdecl TunkioCreate(const TunkioOptions* options)
     return nullptr;
 }
 
-bool __cdecl TunkioRun(TunkioHandle* handle)
+bool CALLING_CONVENTION TunkioRun(TunkioHandle* handle)
 {
     const auto operation = reinterpret_cast<Tunkio::IOperation*>(handle);
 
@@ -38,7 +38,7 @@ bool __cdecl TunkioRun(TunkioHandle* handle)
     return operation->Run();
 }
 
-void __cdecl TunkioFree(TunkioHandle* handle)
+void CALLING_CONVENTION TunkioFree(TunkioHandle* handle)
 {
     if (handle)
     {

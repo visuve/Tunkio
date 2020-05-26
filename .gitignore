@@ -1,5 +1,6 @@
 out/
 obj/
+bin/
 packages/
 .vs/
 *.opendb

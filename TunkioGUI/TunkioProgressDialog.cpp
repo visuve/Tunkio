@@ -114,7 +114,7 @@ namespace Tunkio
         }
 
 #ifdef WIN32
-        std::string buffer(0x400, 0);
+        std::array<char, 0x400> buffer;
 
         DWORD formattedSize = FormatMessageA(
             FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -125,10 +125,9 @@ namespace Tunkio
             static_cast<DWORD>(buffer.size()),
             nullptr);
 
-        if (formattedSize)
+        if (formattedSize > 2)
         {
-            buffer.resize(formattedSize - 2); // Trim \r\n
-            m_errorMsgTextbox.append("Detailed description: " + buffer + '\n', false);
+            m_errorMsgTextbox.append("Detailed description: " + std::string(buffer.data(), formattedSize) + '\n', false); // Trim \r\n
         }
 #endif
         m_errorMsgTextbox.append("Time: " + Time::Timestamp(), false);

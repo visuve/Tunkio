@@ -3,6 +3,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#if defined(_WIN32) || defined(_WIN64)
+#define CALLING_CONVENTION __cdecl
+#else
+#define CALLING_CONVENTION
+#endif
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -28,12 +34,12 @@ extern "C"
 
     struct TunkioHandle
     {
-        int Unused;
+        int32_t Unused;
     };
 
     struct TunkioString
     {
-        size_t Length;
+        uint32_t Length;
         const char* Data;
     };
 
@@ -54,9 +60,9 @@ extern "C"
         struct TunkioString Path;
     };
 
-    struct TunkioHandle* __cdecl TunkioCreate(const struct TunkioOptions*);
-    bool __cdecl TunkioRun(struct TunkioHandle*);
-    void __cdecl TunkioFree(struct TunkioHandle*);
+    struct TunkioHandle* CALLING_CONVENTION TunkioCreate(const struct TunkioOptions*);
+    bool CALLING_CONVENTION TunkioRun(struct TunkioHandle*);
+    void CALLING_CONVENTION TunkioFree(struct TunkioHandle*);
 
 #if defined(__cplusplus)
 };

@@ -55,9 +55,7 @@
       <Verbose>true</Verbose>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>stdc++fs;%(AdditionalDependencies)</AdditionalDependencies>
-      <VerboseOutput>true</VerboseOutput>
-      <Version>true</Version>
+      <LibraryDependencies>stdc++fs</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

@@ -2,6 +2,8 @@
 
 #include "TunkioTime.hpp"
 
+#include <iomanip>
+
 namespace Tunkio::DataUnit
 {
     template<uint64_t Ratio>
@@ -22,9 +24,10 @@ namespace Tunkio::DataUnit
         }
 
         template<uint64_t R>
-        DataUnit<Ratio>& operator = (const DataUnit<R>& other) :
-            m_bytes(other.Bytes())
+        DataUnit<Ratio>& operator = (const DataUnit<R>& other)
         {
+            m_bytes = other.Bytes();
+            return *this;
         }
 
         uint64_t Bytes() const
@@ -161,8 +164,8 @@ namespace Tunkio::DataUnit
             return "unknown";
         }
 
-        const double elapsedSeconds = millis / 1000.0f;
-        const double bytesPerSecond = bytes / elapsedSeconds;
+        const double elapsedSeconds = double(millis) / 1000.0f;
+        const double bytesPerSecond = double(bytes) / elapsedSeconds;
 
         std::stringstream os;
         os << std::setprecision(3) << std::fixed;
