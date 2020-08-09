@@ -23,15 +23,25 @@ namespace Tunkio
     void PrintUsage(const std::filesystem::path& exe)
     {
         std::cout << " Usage:" << std::endl << std::endl;
-        std::cout << "  --path=\"P:\\Path\\To\\File|Disk|Volume\" (Required) " << std::endl;
+#if defined(_WIN32) || defined(_WIN64)
+        std::cout << "  --path=\"P:\\Path\\To\\File or Device\" (Required) " << std::endl;
+#else
+        std::cout << "  --path=/path/to/file_or_device" (Required)" << std::endl;
+#endif
         std::cout << "  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
         std::cout << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
         std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
         std::cout << std::endl;
         std::cout << " Usage examples:" << std::endl << std::endl;
+#if defined(_WIN32) || defined(_WIN64)
         std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
         std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
         std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
+#else
+        std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
+        std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
+        std::cout << "  " << exe.string() << " --path=/dev/sdx --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
+#endif
         std::cout << std::endl;
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -202,7 +212,7 @@ int main(int argc, char* argv[])
         return ErrorCode::InvalidArgument;
     }
 
-    auto args = std::vector<std::string>({ argv + 1, argv + argc });
+    const std::vector<std::string> args({ argv + 1, argv + argc });
 
     if (std::signal(SIGINT, Tunkio::SignalHandler) == SIG_ERR)
     {
