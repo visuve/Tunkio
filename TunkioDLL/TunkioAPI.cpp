@@ -2,9 +2,9 @@
 #include "TunkioAPI.h"
 #include "TunkioErrorCodes.hpp"
 
-#include "Strategies/ITunkioOperation.hpp"
-#include "Strategies/TunkioFileWipe.hpp"
-#include "Strategies/TunkioDeviceWipe.hpp"
+#include "ITunkioOperation.hpp"
+#include "TunkioFileWipe.hpp"
+#include "TunkioDeviceWipe.hpp"
 
 TunkioHandle* CALLING_CONVENTION TunkioCreate(const TunkioOptions* options)
 {

@@ -1,6 +1,6 @@
-#include "PCH.hpp"
+#include "../PCH.hpp"
+#include "../TunkioTime.hpp"
 #include "TunkioWin32ChildProcess.hpp"
-#include "TunkioTime.hpp"
 
 namespace Tunkio
 {
@@ -80,14 +80,14 @@ namespace Tunkio
 
     bool Win32ChildProcess::CreateChildProcess(PROCESS_INFORMATION& pi)
     {
-        STARTUPINFO si = { 0 };
-        si.cb = sizeof(STARTUPINFO);
+        STARTUPINFOW si = { 0 };
+        si.cb = sizeof(STARTUPINFOW);
         si.hStdOutput = m_stdoutWrite.Handle();
         si.dwFlags |= STARTF_USESTDHANDLES;
 
         std::wstring commandLine = m_executable.wstring() + L" " + m_arguments;
 
-        return CreateProcess(m_executable.c_str(), commandLine.data(), nullptr, nullptr, true, 0, nullptr, nullptr, &si, &pi);
+        return CreateProcessW(m_executable.c_str(), commandLine.data(), nullptr, nullptr, true, 0, nullptr, nullptr, &si, &pi);
     }
 
     void Win32ChildProcess::ReadFromPipe()

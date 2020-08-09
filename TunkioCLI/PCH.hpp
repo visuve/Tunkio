@@ -1,6 +1,5 @@
 #pragma once
 
-
 #if defined(_WIN32) || defined(_WIN64)
 #include <SDKDDKVer.h>
 #include <Windows.h>

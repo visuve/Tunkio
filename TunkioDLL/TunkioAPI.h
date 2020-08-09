@@ -4,8 +4,10 @@
 #include <stdbool.h>
 
 #if defined(_WIN32) || defined(_WIN64)
+#define EXPORT __declspec(dllexport)
 #define CALLING_CONVENTION __cdecl
 #else
+#define EXPORT __attribute__((visibility("default")))
 #define CALLING_CONVENTION
 #endif
 
@@ -60,9 +62,9 @@ extern "C"
         struct TunkioString Path;
     };
 
-    struct TunkioHandle* CALLING_CONVENTION TunkioCreate(const struct TunkioOptions*);
-    bool CALLING_CONVENTION TunkioRun(struct TunkioHandle*);
-    void CALLING_CONVENTION TunkioFree(struct TunkioHandle*);
+    EXPORT struct TunkioHandle* CALLING_CONVENTION TunkioCreate(const struct TunkioOptions*);
+    EXPORT bool CALLING_CONVENTION TunkioRun(struct TunkioHandle*);
+    EXPORT void CALLING_CONVENTION TunkioFree(struct TunkioHandle*);
 
 #if defined(__cplusplus)
 };

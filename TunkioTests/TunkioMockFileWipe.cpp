@@ -1,6 +1,6 @@
 #include "PCH.hpp"
-#include "Strategies/TunkioFileWipe.hpp"
-#include "Strategies/TunkioFillStrategy.hpp"
+#include "TunkioFileWipe.hpp"
+#include "TunkioFillStrategy.hpp"
 
 namespace Tunkio
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TunkioProcess.hpp"
+#include "../TunkioProcess.hpp"
 #include "TunkioPosixAutoHandle.hpp"
 
 namespace Tunkio

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TunkioWin32AutoHandle.hpp"
-#include "TunkioProcess.hpp"
+#include "../TunkioProcess.hpp"
 
 namespace Tunkio
 {
@@ -10,8 +10,6 @@ namespace Tunkio
     public:
         Win32ChildProcess(const std::filesystem::path& executable, const std::wstring& arguments);
         bool Start() override;
-
-
 
     private:
         bool InitializePipes();

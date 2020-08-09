@@ -1,8 +1,8 @@
-#include "PCH.hpp"
+#include "../PCH.hpp"
 #include "TunkioErrorCodes.hpp"
 #include "TunkioPosixAutoHandle.hpp"
-#include "Strategies/TunkioDeviceWipe.hpp"
-#include "Strategies/TunkioFillStrategy.hpp"
+#include "TunkioDeviceWipe.hpp"
+#include "TunkioFillStrategy.hpp"
 
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -1,8 +1,8 @@
-#include "PCH.hpp"
-#include "TunkioErrorCodes.hpp"
+#include "../PCH.hpp"
+#include "../TunkioErrorCodes.hpp"
+#include "../TunkioFileWipe.hpp"
+#include "../TunkioFillStrategy.hpp"
 #include "TunkioWin32AutoHandle.hpp"
-#include "Strategies/TunkioDeviceWipe.hpp"
-#include "Strategies/TunkioFillStrategy.hpp"
 
 namespace Tunkio
 {
@@ -11,20 +11,41 @@ namespace Tunkio
     constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
     constexpr uint32_t CreationFlags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
-    class DeviceWipeImpl : IOperation
+    class FileWipeImpl : IOperation
     {
     public:
 
-        DeviceWipeImpl(const TunkioOptions* options) :
+        FileWipeImpl(const TunkioOptions* options) :
             IOperation(options)
         {
         }
 
-        ~DeviceWipeImpl()
+        ~FileWipeImpl()
         {
         }
 
-        bool Run() override
+        bool Open()
+        {
+            const std::string path(m_options->Path.Data, m_options->Path.Length);
+            m_handle.Reset(CreateFileA(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr));
+
+            if (!m_handle.IsValid())
+            {
+                return false;
+            }
+
+            LARGE_INTEGER fileSize = { 0 };
+
+            if (!GetFileSizeEx(m_handle.Handle(), &fileSize))
+            {
+                return false;
+            }
+
+            m_size = fileSize.QuadPart;
+            return true;
+        }
+
+        bool Run()
         {
             if (!Open())
             {
@@ -39,30 +60,6 @@ namespace Tunkio
             }
 
             return Fill();
-        }
-
-        bool Open() override
-        {
-            const std::string path(m_options->Path.Data, m_options->Path.Length);
-            m_handle.Reset(CreateFileA(path.c_str(), DesiredAccess, ShareMode, nullptr, OPEN_EXISTING, CreationFlags, nullptr));
-
-            if (!m_handle.IsValid())
-            {
-                return false;
-            }
-
-            unsigned long bytesReturned = 0;
-            DISK_GEOMETRY diskGeo = { 0 };
-            constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
-
-            if (!DeviceIoControl(m_handle.Handle(), IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
-            {
-                return false;
-            }
-
-            _ASSERT(bytesReturned == sizeof(DISK_GEOMETRY));
-            m_size = diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
-            return true;
         }
 
         bool Remove() override
@@ -80,14 +77,14 @@ namespace Tunkio
             return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
         }
 
-        void ReportError(uint32_t error) const
-        {
-            m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
-        }
-
         void ReportComplete() const
         {
             m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
+        }
+
+        void ReportError(uint32_t error) const
+        {
+            m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
         }
 
         bool Fill() override
@@ -131,33 +128,33 @@ namespace Tunkio
         Win32AutoHandle m_handle;
     };
 
-    DeviceWipe::DeviceWipe(const TunkioOptions* options) :
+    FileWipe::FileWipe(const TunkioOptions* options) :
         IOperation(options),
-        m_impl(new DeviceWipeImpl(options))
+        m_impl(new FileWipeImpl(options))
     {
     }
 
-    DeviceWipe::~DeviceWipe()
+    FileWipe::~FileWipe()
     {
         delete m_impl;
     }
 
-    bool DeviceWipe::Run()
+    bool FileWipe::Run()
     {
         return m_impl->Run();
     }
 
-    bool DeviceWipe::Open()
+    bool FileWipe::Open()
     {
         return m_impl->Open();
     }
 
-    bool DeviceWipe::Fill()
+    bool FileWipe::Fill()
     {
         return m_impl->Fill();
     }
 
-    bool DeviceWipe::Remove()
+    bool FileWipe::Remove()
     {
         return m_impl->Remove();
     }
