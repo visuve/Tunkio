@@ -138,9 +138,9 @@ namespace Tunkio
             static_cast<DWORD>(buffer.size()),
             nullptr);
         
-        if (size)
+        if (size > 2)
         {
-            std::wcerr << L"Detailed description: " << std::wstring(buffer.data(), size) << std::endl;
+            std::wcerr << L"Detailed description: " << std::wstring(buffer.data(), size - 2) << std::endl; // Trim excess /r/n
         }
 #endif
 
@@ -233,7 +233,7 @@ int main(int argc, char* argv[])
 
     if (!TunkioRun(tunkio.get()))
     {
-        std::cerr << "Failed." << std::endl;
+        std::cerr << "Tunkio failed." << std::endl;
     }
 
     return g_error;
