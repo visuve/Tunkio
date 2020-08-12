@@ -3,6 +3,8 @@
 file(GLOB TunkioCLISource "*.cpp")
 add_executable(TunkioCLI ${TunkioCLISource})
 
+target_precompile_headers(TunkioCLI PRIVATE "PCH.hpp")
+
 target_include_directories(TunkioCLI PRIVATE "../TunkioDLL/") # TODO: This is shit
 
 if(WIN32)

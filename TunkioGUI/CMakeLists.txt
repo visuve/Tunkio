@@ -8,6 +8,8 @@ else()
 	add_executable(TunkioGUI ${TunkioGUISource})
 endif()
 
+target_precompile_headers(TunkioGUI PRIVATE "PCH.hpp")
+
 target_include_directories(TunkioGUI PRIVATE "../TunkioDLL/") # TODO: This is shit
 
 target_link_libraries(TunkioGUI LINK_PRIVATE TunkioDLL TunkioLIB nana)
