@@ -5,20 +5,20 @@
 
 namespace Tunkio
 {
-    class FileWipeImpl;
+	class FileWipeImpl;
 
-    class FileWipe : public IOperation
-    {
-    public:
-        FileWipe(const TunkioOptions* options);
-        ~FileWipe();
+	class FileWipe : public IOperation
+	{
+	public:
+		FileWipe(const TunkioOptions* options);
+		~FileWipe();
 
-        bool Run() override;
-    protected:
-        bool Open() override;
-        bool Fill() override;
-        bool Remove() override;
-    private:
-        FileWipeImpl* m_impl = nullptr;
-    };
+		bool Run() override;
+	protected:
+		bool Open() override;
+		bool Fill() override;
+		bool Remove() override;
+	private:
+		FileWipeImpl* m_impl = nullptr;
+	};
 }

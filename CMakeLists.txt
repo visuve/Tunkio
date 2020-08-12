@@ -4,11 +4,11 @@ set(CMAKE_CXX_STANDARD 17)
 project("Tunkio")
 
 if(MSVC)
-    add_compile_options(
-        $<$<CONFIG:>:/MT>
-        $<$<CONFIG:Debug>:/MTd>
-        $<$<CONFIG:Release>:/MT>
-    )
+	add_compile_options(
+		$<$<CONFIG:>:/MT>
+		$<$<CONFIG:Debug>:/MTd>
+		$<$<CONFIG:Release>:/MT>
+	)
 endif()
 
 add_subdirectory("TunkioLIB")

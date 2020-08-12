@@ -15,158 +15,159 @@
 
 namespace Tunkio
 {
-    constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
+	constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
 
-    class FileWipeImpl : IOperation
-    {
-    public:
+	class FileWipeImpl : IOperation
+	{
+	public:
 
-        FileWipeImpl(const TunkioOptions* options) :
-            IOperation(options)
-        {
-        }
+		FileWipeImpl(const TunkioOptions* options) :
+			IOperation(options)
+		{
+		}
 
-        ~FileWipeImpl()
-        {
-        }
+		~FileWipeImpl()
+		{
+		}
 
-        bool Run() override
-        {
-            if (!Open())
-            {
-                ReportError(errno);
-                return false;
-            }
+		bool Run() override
+		{
+			if (!Open())
+			{
+				ReportError(errno);
+				return false;
+			}
 
-            if (!m_size)
-            {
-                ReportError(m_error);
-                return false;
-            }
+			if (!m_size)
+			{
+				ReportError(m_error);
+				return false;
+			}
 
-            return Fill();
-        }
+			return Fill();
+		}
 
-        bool Open() override
-        {
-            const std::string path(m_options->Path.Data, m_options->Path.Length);
-            m_handle.Reset(open(path.c_str(), Flags));
+		bool Open() override
+		{
+			const std::string path(m_options->Path.Data, m_options->Path.Length);
+			m_handle.Reset(open(path.c_str(), Flags));
 
-            if (!m_handle.IsValid())
-            {
-                return false;
-            }
+			if (!m_handle.IsValid())
+			{
+				return false;
+			}
 
-            struct ::stat64 buffer = { 0 };
-            m_error = ::fstat64(m_handle.Descriptor(), &buffer);
+			struct ::stat64 buffer = { 0 };
+			m_error = ::fstat64(m_handle.Descriptor(), &buffer);
 
-            if (m_error != 0)
-            {
-                return false;
-            }
-            
-            m_size = buffer.st_size;
+			if (m_error != 0)
+			{
+				return false;
+			}
 
-            return true;
+			m_size = buffer.st_size;
 
-        }
+			return true;
 
-        bool Remove() override
-        {
-            return false;
-        }
+		}
 
-        void ReportStarted() const
-        {
-            m_options->Callbacks.StartedCallback(m_size);
-        }
+		bool Remove() override
+		{
+			return false;
+		}
 
-        bool ReportProgress() const
-        {
-            return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
-        }
+		void ReportStarted() const
+		{
+			m_options->Callbacks.StartedCallback(m_size);
+		}
 
-        void ReportError(uint32_t error) const
-        {
-            m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
-        }
+		bool ReportProgress() const
+		{
+			return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
+		}
 
-        void ReportComplete() const
-        {
-            m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
-        }
+		void ReportError(uint32_t error) const
+		{
+			m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
+		}
 
-        bool Fill() override
-        {
-            size_t bytesWritten = 0u;
-            uint64_t bytesLeft = m_size;
-            FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
+		void ReportComplete() const
+		{
+			m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
+		}
 
-            ReportStarted();
+		bool Fill() override
+		{
+			size_t bytesWritten = 0u;
+			uint64_t bytesLeft = m_size;
+			FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
 
-            while (bytesLeft)
-            {
-                if (fakeData.Size<uint64_t>() > bytesLeft)
-                {
-                    fakeData.Resize(bytesLeft);
-                }
+			ReportStarted();
 
-                bytesWritten = write(m_handle.Descriptor(), fakeData.Front(), fakeData.Size<size_t>());
+			while (bytesLeft)
+			{
+				if (fakeData.Size<uint64_t>() > bytesLeft)
+				{
+					fakeData.Resize(bytesLeft);
+				}
 
-                if (!bytesWritten)
-                {
-                    ReportError(errno);
-                    return false;
-                }
+				bytesWritten =
+					write(m_handle.Descriptor(), fakeData.Front(), fakeData.Size<size_t>());
 
-                m_totalBytesWritten += bytesWritten;
-                bytesLeft -= bytesWritten;
+				if (!bytesWritten)
+				{
+					ReportError(errno);
+					return false;
+				}
 
-                if (!ReportProgress())
-                {
-                    return true;
-                }
-            }
+				m_totalBytesWritten += bytesWritten;
+				bytesLeft -= bytesWritten;
 
-            ReportComplete();
-            return true;
-        }
+				if (!ReportProgress())
+				{
+					return true;
+				}
+			}
 
-    private:
-        uint64_t m_size = 0;
-        uint64_t m_totalBytesWritten = 0;
-        PosixAutoHandle m_handle;
-        int m_error = 0;
-    };
+			ReportComplete();
+			return true;
+		}
 
-    FileWipe::FileWipe(const TunkioOptions* options) :
-        IOperation(options),
-        m_impl(new FileWipeImpl(options))
-    {
-    }
+	private:
+		uint64_t m_size = 0;
+		uint64_t m_totalBytesWritten = 0;
+		PosixAutoHandle m_handle;
+		int m_error = 0;
+	};
 
-    FileWipe::~FileWipe()
-    {
-        delete m_impl;
-    }
+	FileWipe::FileWipe(const TunkioOptions* options) :
+		IOperation(options),
+		m_impl(new FileWipeImpl(options))
+	{
+	}
 
-    bool FileWipe::Run()
-    {
-        return m_impl->Run();
-    }
+	FileWipe::~FileWipe()
+	{
+		delete m_impl;
+	}
 
-    bool FileWipe::Open()
-    {
-        return m_impl->Open();
-    }
+	bool FileWipe::Run()
+	{
+		return m_impl->Run();
+	}
 
-    bool FileWipe::Fill()
-    {
-        return m_impl->Fill();
-    }
+	bool FileWipe::Open()
+	{
+		return m_impl->Open();
+	}
 
-    bool FileWipe::Remove()
-    {
-        return m_impl->Remove();
-    }
+	bool FileWipe::Fill()
+	{
+		return m_impl->Fill();
+	}
+
+	bool FileWipe::Remove()
+	{
+		return m_impl->Remove();
+	}
 }

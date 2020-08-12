@@ -5,20 +5,20 @@
 
 namespace Tunkio
 {
-    class DeviceWipeImpl;
+	class DeviceWipeImpl;
 
-    class DeviceWipe : public IOperation
-    {
-    public:
-        DeviceWipe(const TunkioOptions* options);
-        ~DeviceWipe();
+	class DeviceWipe : public IOperation
+	{
+	public:
+		DeviceWipe(const TunkioOptions* options);
+		~DeviceWipe();
 
-        bool Run() override;
-    protected:
-        bool Open() override;
-        bool Fill() override;
-        bool Remove() override;
-    private:
-        DeviceWipeImpl* m_impl = nullptr;
-    };
+		bool Run() override;
+	protected:
+		bool Open() override;
+		bool Fill() override;
+		bool Remove() override;
+	private:
+		DeviceWipeImpl* m_impl = nullptr;
+	};
 }

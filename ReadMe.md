@@ -7,17 +7,17 @@
 ## Folders
 
 - ``TunkioLIB/``
-  - Tunkio Static Library, contains various C++ wrappers for e.g. measuring time, getting process output, etc.
+	- Tunkio Static Library, contains various C++ wrappers for e.g. measuring time, getting process output, etc.
 - ``TunkioDLL/``
-  - Tunkio Shared Library, contains all the actual wiping logic and nothing else
-  - C-compatible interface
-  - Depengs on ``TunkioLIB``
+	- Tunkio Shared Library, contains all the actual wiping logic and nothing else
+	- C-compatible interface
+	- Depengs on ``TunkioLIB``
 - ``TunkioCLI/``
-  - Tunkio Command Line Interface, shows nice progress output etc.
-  - Depends on ``TunkioDLL`` & ``TunkioLIB``
+	- Tunkio Command Line Interface, shows nice progress output etc.
+	- Depends on ``TunkioDLL`` & ``TunkioLIB``
 - ``TunkioGUI/``
-  - Tunkio Graphical User Interface, a simple dialog to show progress
-  - Depends on ``TunkioDLL`` & ``TunkioLIB``
+	- Tunkio Graphical User Interface, a simple dialog to show progress
+	- Depends on ``TunkioDLL`` & ``TunkioLIB``
 
 ## Submodules
 
@@ -27,10 +27,10 @@
 ## TODO
 
 - Implementation
-  - Add support to wipe directories
+	- Add support to wipe directories
 
 - Testing
-  - Add also non other than "happy path" unit tests
+	- Add also non other than "happy path" unit tests
 
 ## Tools
 

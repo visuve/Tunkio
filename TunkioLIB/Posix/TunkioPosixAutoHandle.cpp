@@ -3,38 +3,38 @@
 
 namespace Tunkio
 {
-    PosixAutoHandle::PosixAutoHandle(int handle) :
-        m_handle(handle)
-    {
-    }
+	PosixAutoHandle::PosixAutoHandle(int handle) :
+		m_handle(handle)
+	{
+	}
 
-    PosixAutoHandle::~PosixAutoHandle()
-    {
-        Reset();
-    }
+	PosixAutoHandle::~PosixAutoHandle()
+	{
+		Reset();
+	}
 
-    void PosixAutoHandle::Reset(int handle)
-    {
-        if (m_handle == handle)
-        {
-            return;
-        }
+	void PosixAutoHandle::Reset(int handle)
+	{
+		if (m_handle == handle)
+		{
+			return;
+		}
 
-        if (m_handle)
-        {
-            close(m_handle);
-        }
+		if (m_handle)
+		{
+			close(m_handle);
+		}
 
-        m_handle = handle;
-    }
+		m_handle = handle;
+	}
 
-    const int PosixAutoHandle::Descriptor() const
-    {
-        return m_handle;
-    }
+	const int PosixAutoHandle::Descriptor() const
+	{
+		return m_handle;
+	}
 
-    bool PosixAutoHandle::IsValid() const
-    {
-        return m_handle > 0;
-    }
+	bool PosixAutoHandle::IsValid() const
+	{
+		return m_handle > 0;
+	}
 }

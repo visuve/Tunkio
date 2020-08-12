@@ -1,9 +1,9 @@
 # TunkioDLL
 
 if(WIN32)
-	file(GLOB TunkioDLLSource "*.cpp" "Win32/*.cpp")
+	file(GLOB TunkioDLLSource "*.c" "*.cpp" "Win32/*.cpp")
 else()
-	file(GLOB TunkioDLLSource "*.cpp" "Posix/*.cpp")
+	file(GLOB TunkioDLLSource "*.c" "*.cpp" "Posix/*.cpp")
 endif()
 
 add_library(TunkioDLL SHARED ${TunkioDLLSource})
