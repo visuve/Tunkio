@@ -1,9 +1,11 @@
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#define WIN32_LEAN_AND_MEAN
 #include <SDKDDKVer.h>
 #include <Windows.h>
+#endif
 
-#define GTEST_HAS_TR1_TUPLE 0
 #include <gtest/gtest.h>
 
 #include <vector>

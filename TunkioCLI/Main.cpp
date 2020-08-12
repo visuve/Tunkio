@@ -26,7 +26,7 @@ namespace Tunkio
 #if defined(_WIN32) || defined(_WIN64)
 		std::cout << "  --path=\"P:\\Path\\To\\File or Device\" (Required) " << std::endl;
 #else
-		std::cout << "  --path=/path/to/file_or_device" (Required)" << std::endl;
+		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
 		std::cout << "  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
 		std::cout << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;

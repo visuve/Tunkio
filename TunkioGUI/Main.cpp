@@ -81,7 +81,7 @@ namespace Tunkio::GUI
 #if defined(_WIN32) || defined(_WIN64)
 		mb << "  --path=\"P:\\Path\\To\\File or Device\" (Required) " << std::endl;
 #else
-		mb << "  --path=/path/to/file_or_device" (Required)" << std::endl;
+		mb << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
 		mb << "  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
 		mb << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
@@ -127,12 +127,12 @@ int main(int argc, char** argv)
 {
 	const std::vector<std::string> args({ argv + 1, argv + argc });
 
-	if (!Tunkio::Args::ParseString(Tunkio::GUI::Arguments, args))
+	if (!Tunkio::Args::ParseVector(Tunkio::GUI::Arguments, args))
 	{
 		Tunkio::GUI::Usage();
 		return -1;
 	}
 
-	return Tunkio::GUI::Run()
+	return Tunkio::GUI::Run();
 }
 #endif

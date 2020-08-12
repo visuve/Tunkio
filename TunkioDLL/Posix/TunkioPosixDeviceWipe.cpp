@@ -1,8 +1,8 @@
 #include "../PCH.hpp"
-#include "TunkioErrorCodes.hpp"
+#include "../TunkioErrorCodes.hpp"
+#include "../TunkioFillStrategy.hpp"
+#include "../TunkioDeviceWipe.hpp"
 #include "TunkioPosixAutoHandle.hpp"
-#include "TunkioDeviceWipe.hpp"
-#include "TunkioFillStrategy.hpp"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -57,8 +57,7 @@ namespace Tunkio
 				return false;
 			}
 
-			uint64_t nr_blocks;
-			m_error = ioctl(m_handle.Descriptor(), BLKGETSIZE64, &nr_blocks);
+			m_error = ioctl(m_handle.Descriptor(), BLKGETSIZE64, &m_size);
 
 			if (m_error != 0)
 			{

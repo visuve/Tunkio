@@ -1,4 +1,6 @@
 #include "PCH.hpp"
+
+#if defined(_WIN32) || defined(_WIN64)
 #include "TunkioWin32AutoHandle.hpp"
 
 namespace Tunkio::Native::Win32
@@ -28,3 +30,4 @@ namespace Tunkio::Native::Win32
 		EXPECT_FALSE(null.IsValid());
 	}
 }
+#endif

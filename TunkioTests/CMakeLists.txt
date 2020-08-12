@@ -6,4 +6,8 @@ add_executable(TunkioTests ${TunkioTestsSource})
 target_include_directories(TunkioTests PRIVATE "../TunkioDLL/") # TODO: This is shit
 target_include_directories(TunkioTests PRIVATE "../googletest/googletest/include/") # TODO: This is shit
 
-target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest)
+if(WIN32)
+	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest)
+else()
+	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest stdc++fs)
+endif()

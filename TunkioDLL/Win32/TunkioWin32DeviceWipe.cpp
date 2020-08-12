@@ -63,8 +63,10 @@ namespace Tunkio
 			}
 
 			_ASSERT(bytesReturned == sizeof(DISK_GEOMETRY));
+
 			m_size =
 				diskGeo.Cylinders.QuadPart * diskGeo.TracksPerCylinder * diskGeo.SectorsPerTrack * diskGeo.BytesPerSector;
+
 			return true;
 		}
 
