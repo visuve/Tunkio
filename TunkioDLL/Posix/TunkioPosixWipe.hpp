@@ -23,6 +23,8 @@ namespace Tunkio
 		void ReportComplete() const;
 		void ReportError(uint32_t error) const;
 
+		static int Open(const std::string& path);
+
 	protected:
 		uint64_t m_size = 0;
 		uint64_t m_totalBytesWritten = 0;

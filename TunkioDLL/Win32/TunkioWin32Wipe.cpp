@@ -15,22 +15,8 @@ namespace Tunkio
 
 	bool Win32Wipe::Open()
 	{
-		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering?redirectedfrom=MSDN
-		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-		constexpr uint32_t CreationFlags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
-
 		const std::string path(m_options->Path.Data, m_options->Path.Length);
-
-		m_handle.Reset(CreateFileA(
-			path.c_str(),
-			DesiredAccess,
-			ShareMode,
-			nullptr,
-			OPEN_EXISTING,
-			CreationFlags,
-			nullptr));
-
+		m_handle.Reset(Open(path));
 		return m_handle.IsValid();
 	}
 
@@ -92,5 +78,22 @@ namespace Tunkio
 	void Win32Wipe::ReportError(uint32_t error) const
 	{
 		m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
+	}
+
+	HANDLE Win32Wipe::Open(const std::string& path)
+	{
+		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering?redirectedfrom=MSDN
+		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
+		constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+		constexpr uint32_t CreationFlags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+
+		return CreateFileA(
+			path.c_str(),
+			DesiredAccess,
+			ShareMode,
+			nullptr,
+			OPEN_EXISTING,
+			CreationFlags,
+			nullptr);
 	}
 }

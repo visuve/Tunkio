@@ -51,7 +51,6 @@ namespace Tunkio
 			m_size = buffer.st_size;
 
 			return true;
-
 		}
 
 		bool Remove() override

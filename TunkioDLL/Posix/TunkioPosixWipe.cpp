@@ -15,12 +15,8 @@ namespace Tunkio
 
 	bool PosixWipe::Open()
 	{
-		// https://linux.die.net/man/2/open
-		constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
 		const std::string path(m_options->Path.Data, m_options->Path.Length);
-
-		m_handle.Reset(open(path.c_str(), Flags));
-
+		m_handle.Reset(Open(path));
 		return m_handle.IsValid();
 	}
 
@@ -78,5 +74,12 @@ namespace Tunkio
 	void PosixWipe::ReportError(uint32_t error) const
 	{
 		m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
+	}
+
+	int PosixWipe::Open(const std::string& path)
+	{
+		// https://linux.die.net/man/2/open
+		constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
+		return open(path.c_str(), Flags);
 	}
 }

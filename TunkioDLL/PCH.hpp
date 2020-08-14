@@ -21,3 +21,4 @@
 #include <random>
 #include <sstream>
 #include <limits>
+#include <numeric>

@@ -4,6 +4,7 @@
 
 #include "TunkioOperation.hpp"
 #include "TunkioFileWipe.hpp"
+#include "TunkioDirectoryWipe.hpp"
 #include "TunkioDeviceWipe.hpp"
 
 TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioCreate(const TunkioOptions* options)
@@ -17,10 +18,10 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioCreate(const TunkioOptions* option
 	{
 		case TunkioTarget::File:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(options));
+		case TunkioTarget::Directory:
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(options));
 		case TunkioTarget::Device:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::DeviceWipe(options));
-		default:
-			std::cerr << "Not implemented yet!" << std::endl;
 	}
 
 	return nullptr;
