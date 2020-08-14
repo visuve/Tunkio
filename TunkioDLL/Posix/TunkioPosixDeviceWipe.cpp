@@ -1,32 +1,19 @@
 #include "../PCH.hpp"
 #include "../TunkioErrorCodes.hpp"
-#include "../TunkioFillStrategy.hpp"
 #include "../TunkioDeviceWipe.hpp"
-#include "TunkioPosixAutoHandle.hpp"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <linux/fs.h>
-#include <sys/ioctl.h>
-#include <stdio.h>
+#include "TunkioPosixWipe.hpp"
 
 namespace Tunkio
 {
-	constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
-
-	// https://linux.die.net/man/2/open
-	class DeviceWipeImpl : IOperation
+	class PosixDeviceWipe: public PosixWipe
 	{
 	public:
-
-		DeviceWipeImpl(const TunkioOptions* options) :
-			IOperation(options)
+		PosixDeviceWipe(const TunkioOptions* options) :
+			PosixWipe(options)
 		{
 		}
 
-		~DeviceWipeImpl()
+		~PosixDeviceWipe()
 		{
 		}
 
@@ -38,6 +25,8 @@ namespace Tunkio
 				return false;
 			}
 
+			m_size = Size();
+
 			if (!m_size)
 			{
 				ReportError(m_error);
@@ -47,86 +36,27 @@ namespace Tunkio
 			return Fill();
 		}
 
-		bool Open() override
+		uint64_t Size() override
 		{
-			const std::string path(m_options->Path.Data, m_options->Path.Length);
-			m_handle.Reset(open(path.c_str(), Flags));
-
 			if (!m_handle.IsValid())
 			{
-				return false;
+				return 0;
 			}
 
-			m_error = ioctl(m_handle.Value(), BLKGETSIZE64, &m_size);
+			uint64_t size = 0;
+			m_error = ioctl(m_handle.Value(), BLKGETSIZE64, &size);
 
 			if (m_error != 0)
 			{
-				return false;
+				return 0;
 			}
 
-			return true;
-
+			return size;
 		}
 
 		bool Remove() override
 		{
 			return false;
-		}
-
-		void ReportStarted() const
-		{
-			m_options->Callbacks.StartedCallback(m_size);
-		}
-
-		bool ReportProgress() const
-		{
-			return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
-		}
-
-		void ReportError(uint32_t error) const
-		{
-			m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
-		}
-
-		void ReportComplete() const
-		{
-			m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
-		}
-
-		bool Fill() override
-		{
-			uint64_t bytesLeft = m_size;
-			FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
-
-			ReportStarted();
-
-			while (bytesLeft)
-			{
-				if (fakeData.Size<uint64_t>() > bytesLeft)
-				{
-					fakeData.Resize(bytesLeft);
-				}
-
-				ssize_t bytesWritten =
-					write(m_handle.Value(), fakeData.Front(), fakeData.Size<size_t>());
-
-				if (!bytesWritten)
-				{
-					ReportError(errno);
-					return false;
-				}
-
-				m_totalBytesWritten += bytesWritten;
-				bytesLeft -= bytesWritten;
-
-				if (!ReportProgress())
-				{
-					return true;
-				}
-			}
-
-			ReportComplete();
-			return true;
 		}
 
 	private:
@@ -138,7 +68,7 @@ namespace Tunkio
 
 	DeviceWipe::DeviceWipe(const TunkioOptions* options) :
 		IOperation(options),
-		m_impl(new DeviceWipeImpl(options))
+		m_impl(new PosixDeviceWipe(options))
 	{
 	}
 
@@ -155,6 +85,11 @@ namespace Tunkio
 	bool DeviceWipe::Open()
 	{
 		return m_impl->Open();
+	}
+
+	uint64_t DeviceWipe::Size()
+	{
+		return m_impl->Size();
 	}
 
 	bool DeviceWipe::Fill()

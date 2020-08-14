@@ -4,7 +4,7 @@
 
 namespace Tunkio
 {
-	class FileWipeImpl : IOperation
+	class FileWipeImpl : public IOperation
 	{
 	public:
 		FileWipeImpl(const TunkioOptions* options) :
@@ -19,6 +19,11 @@ namespace Tunkio
 		bool Open()
 		{
 			return true;
+		}
+
+		uint64_t Size()
+		{
+			return m_size;
 		}
 
 		bool Run()
@@ -106,6 +111,11 @@ namespace Tunkio
 	bool FileWipe::Open()
 	{
 		return m_impl->Open();
+	}
+
+	uint64_t FileWipe::Size()
+	{
+		return m_impl->Size();
 	}
 
 	bool FileWipe::Fill()

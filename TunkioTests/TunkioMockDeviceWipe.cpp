@@ -4,7 +4,7 @@
 
 namespace Tunkio
 {
-	class DeviceWipeImpl : IOperation
+	class DeviceWipeImpl : public IOperation
 	{
 	public:
 
@@ -25,6 +25,11 @@ namespace Tunkio
 		bool Open() override
 		{
 			return true;
+		}
+
+		uint64_t Size() override
+		{
+			return m_size;
 		}
 
 		bool Remove() override
@@ -107,6 +112,11 @@ namespace Tunkio
 	bool DeviceWipe::Open()
 	{
 		return m_impl->Open();
+	}
+
+	uint64_t DeviceWipe::Size()
+	{
+		return m_impl->Size();
 	}
 
 	bool DeviceWipe::Fill()

@@ -1,32 +1,21 @@
 #include "../PCH.hpp"
 #include "../TunkioErrorCodes.hpp"
 #include "../TunkioFileWipe.hpp"
-#include "../TunkioFillStrategy.hpp"
-#include "TunkioPosixAutoHandle.hpp"
+#include "TunkioPosixWipe.hpp"
 
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>  
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/sysmacros.h>
 
 namespace Tunkio
 {
-	constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
-
-	class FileWipeImpl : IOperation
+	class PosixFileWipe : public PosixWipe
 	{
 	public:
-
-		FileWipeImpl(const TunkioOptions* options) :
-			IOperation(options)
+		PosixFileWipe(const TunkioOptions* options) :
+			PosixWipe(options)
 		{
 		}
 
-		~FileWipeImpl()
+		~PosixFileWipe()
 		{
 		}
 
@@ -38,6 +27,8 @@ namespace Tunkio
 				return false;
 			}
 
+			m_size = Size();
+
 			if (!m_size)
 			{
 				ReportError(m_error);
@@ -47,16 +38,8 @@ namespace Tunkio
 			return Fill();
 		}
 
-		bool Open() override
+		uint64_t Size() override
 		{
-			const std::string path(m_options->Path.Data, m_options->Path.Length);
-			m_handle.Reset(open(path.c_str(), Flags));
-
-			if (!m_handle.IsValid())
-			{
-				return false;
-			}
-
 			struct ::stat64 buffer = { 0 };
 			m_error = ::fstat64(m_handle.Value(), &buffer);
 
@@ -76,62 +59,6 @@ namespace Tunkio
 			return false;
 		}
 
-		void ReportStarted() const
-		{
-			m_options->Callbacks.StartedCallback(m_size);
-		}
-
-		bool ReportProgress() const
-		{
-			return m_options->Callbacks.ProgressCallback(m_totalBytesWritten);
-		}
-
-		void ReportError(uint32_t error) const
-		{
-			m_options->Callbacks.ErrorCallback(error, m_totalBytesWritten);
-		}
-
-		void ReportComplete() const
-		{
-			m_options->Callbacks.CompletedCallback(m_totalBytesWritten);
-		}
-
-		bool Fill() override
-		{
-			uint64_t bytesLeft = m_size;
-			FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
-
-			ReportStarted();
-
-			while (bytesLeft)
-			{
-				if (fakeData.Size<uint64_t>() > bytesLeft)
-				{
-					fakeData.Resize(bytesLeft);
-				}
-
-				ssize_t bytesWritten =
-					write(m_handle.Value(), fakeData.Front(), fakeData.Size<size_t>());
-
-				if (!bytesWritten)
-				{
-					ReportError(errno);
-					return false;
-				}
-
-				m_totalBytesWritten += bytesWritten;
-				bytesLeft -= bytesWritten;
-
-				if (!ReportProgress())
-				{
-					return true;
-				}
-			}
-
-			ReportComplete();
-			return true;
-		}
-
 	private:
 		uint64_t m_size = 0;
 		uint64_t m_totalBytesWritten = 0;
@@ -141,7 +68,7 @@ namespace Tunkio
 
 	FileWipe::FileWipe(const TunkioOptions* options) :
 		IOperation(options),
-		m_impl(new FileWipeImpl(options))
+		m_impl(new PosixFileWipe(options))
 	{
 	}
 
@@ -158,6 +85,11 @@ namespace Tunkio
 	bool FileWipe::Open()
 	{
 		return m_impl->Open();
+	}
+
+	uint64_t FileWipe::Size()
+	{
+		return m_impl->Size();
 	}
 
 	bool FileWipe::Fill()

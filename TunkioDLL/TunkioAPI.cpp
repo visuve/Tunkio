@@ -2,7 +2,7 @@
 #include "TunkioAPI.h"
 #include "TunkioErrorCodes.hpp"
 
-#include "ITunkioOperation.hpp"
+#include "TunkioOperation.hpp"
 #include "TunkioFileWipe.hpp"
 #include "TunkioDeviceWipe.hpp"
 

@@ -1,12 +1,10 @@
 #pragma once
 
 #include "TunkioAPI.h"
-#include "ITunkioOperation.hpp"
+#include "TunkioOperation.hpp"
 
 namespace Tunkio
 {
-	class DeviceWipeImpl;
-
 	class DeviceWipe : public IOperation
 	{
 	public:
@@ -16,9 +14,10 @@ namespace Tunkio
 		bool Run() override;
 	protected:
 		bool Open() override;
+		uint64_t Size() override;
 		bool Fill() override;
 		bool Remove() override;
 	private:
-		DeviceWipeImpl* m_impl = nullptr;
+		IOperation* m_impl = nullptr;
 	};
 }
