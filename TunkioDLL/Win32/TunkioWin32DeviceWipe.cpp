@@ -57,7 +57,7 @@ namespace Tunkio
 			constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
 
 			if (!DeviceIoControl(
-				m_handle.Handle(), IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
+				m_handle.Value(), IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &diskGeo, diskGeoSize, &bytesReturned, nullptr))
 			{
 				return false;
 			}
@@ -111,7 +111,7 @@ namespace Tunkio
 				}
 
 				const bool result =
-					WriteFile(m_handle.Handle(), fakeData.Front(), fakeData.Size<uint32_t>(), &bytesWritten, nullptr);
+					WriteFile(m_handle.Value(), fakeData.Front(), fakeData.Size<uint32_t>(), &bytesWritten, nullptr);
 
 				m_totalBytesWritten += bytesWritten;
 				bytesLeft -= bytesWritten;

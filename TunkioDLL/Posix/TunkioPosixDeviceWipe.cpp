@@ -57,7 +57,7 @@ namespace Tunkio
 				return false;
 			}
 
-			m_error = ioctl(m_handle.Descriptor(), BLKGETSIZE64, &m_size);
+			m_error = ioctl(m_handle.Value(), BLKGETSIZE64, &m_size);
 
 			if (m_error != 0)
 			{
@@ -109,7 +109,7 @@ namespace Tunkio
 				}
 
 				bytesWritten = 
-					write(m_handle.Descriptor(), fakeData.Front(), fakeData.Size<size_t>());
+					write(m_handle.Value(), fakeData.Front(), fakeData.Size<size_t>());
 
 				if (!bytesWritten)
 				{

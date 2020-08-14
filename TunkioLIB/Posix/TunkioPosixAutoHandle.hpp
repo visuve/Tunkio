@@ -1,21 +1,24 @@
 #pragma once
 
+#include <unistd.h>
+#include "../TunkioAutoHandle.hpp"
+
 namespace Tunkio
 {
-	constexpr int InvalidFileDescriptor = -1;
-
-	// https://en.wikipedia.org/wiki/File_descriptor
-	class PosixAutoHandle
+	class PosixAutoHandle : public AutoHandle<int, 0, -1, close>
 	{
 	public:
-		PosixAutoHandle() = default;
-		PosixAutoHandle(int handle);
-		~PosixAutoHandle();
+		// Produces relocation R_X86_64_PC32 linker error in TunkioDLL if moved to .cpp
+		PosixAutoHandle() :
+			AutoHandle()
+		{
+		}
 
-		void Reset(int handle = InvalidFileDescriptor);
-		const int Descriptor() const;
-		bool IsValid() const;
-	private:
-		int m_handle = InvalidFileDescriptor;
+		explicit PosixAutoHandle(int handle) :
+			AutoHandle(handle)
+		{
+		}
+
+		~PosixAutoHandle() = default;
 	};
 }

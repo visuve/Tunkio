@@ -58,7 +58,7 @@ namespace Tunkio
 			}
 
 			struct ::stat64 buffer = { 0 };
-			m_error = ::fstat64(m_handle.Descriptor(), &buffer);
+			m_error = ::fstat64(m_handle.Value(), &buffer);
 
 			if (m_error != 0)
 			{
@@ -112,7 +112,7 @@ namespace Tunkio
 				}
 
 				bytesWritten =
-					write(m_handle.Descriptor(), fakeData.Front(), fakeData.Size<size_t>());
+					write(m_handle.Value(), fakeData.Front(), fakeData.Size<size_t>());
 
 				if (!bytesWritten)
 				{

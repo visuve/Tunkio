@@ -1,33 +1,50 @@
 #include "PCH.hpp"
 
-#if defined(_WIN32) || defined(_WIN64)
-#include "TunkioWin32AutoHandle.hpp"
+#include "TunkioAutoHandle.hpp"
 
-namespace Tunkio::Native::Win32
+namespace Tunkio
 {
+	int count;
+
+	void FakeClose(char chr)
+	{
+		std::cout << "Closing: " << chr << std::endl;
+		++count;
+	}
+
+	class TestHandle : public AutoHandle<char, 0, 0x7F, FakeClose>
+	{
+	public:
+		 TestHandle(char value) :
+			AutoHandle(value)
+		{
+		}
+	};
+
 	TEST(AutoHandleTest, IsValid)
 	{
-		EXPECT_FALSE(Win32AutoHandle(nullptr).IsValid());
-		EXPECT_FALSE(Win32AutoHandle(INVALID_HANDLE_VALUE).IsValid());
+		count = 0;
+
+		EXPECT_FALSE(TestHandle(0).IsValid());
+		EXPECT_TRUE(TestHandle('*').IsValid());
+		EXPECT_FALSE(TestHandle(127).IsValid());
+
+		EXPECT_EQ(count, 1);
 	}
 
-	TEST(AutoHandleTest, Values)
+	TEST(AutoHandleTest, Assign)
 	{
-		{
-			void* raw = Win32AutoHandle(nullptr).Handle();
-			EXPECT_TRUE(raw == nullptr);
-		}
-		{
-			void* raw = Win32AutoHandle(INVALID_HANDLE_VALUE).Handle();
-			EXPECT_TRUE(raw == INVALID_HANDLE_VALUE);
-		}
-	}
+		count = 0;
 
-	TEST(AutoHandleTest, Reset)
-	{
-		Win32AutoHandle null(nullptr);
-		null.Reset(INVALID_HANDLE_VALUE);
-		EXPECT_FALSE(null.IsValid());
+		TestHandle handle('a');
+		EXPECT_EQ(handle.Value(), 'a');
+		
+		handle = TestHandle('b');
+		EXPECT_EQ(count, 1);
+		EXPECT_EQ(handle.Value(), 'b');
+
+		handle = 'c';
+		EXPECT_EQ(count, 2);
+		EXPECT_EQ(handle.Value(), 'c');
 	}
 }
-#endif

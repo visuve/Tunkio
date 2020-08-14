@@ -1,19 +1,16 @@
 #pragma once
 
+#include "../TunkioAutoHandle.hpp"
+
 namespace Tunkio
 {
-	class Win32AutoHandle
+	class Win32AutoHandle : public AutoHandle<HANDLE, nullptr, INVALID_HANDLE_VALUE, CloseHandle>
 	{
 	public:
-		Win32AutoHandle() = default;
-		Win32AutoHandle(const HANDLE handle);
-		~Win32AutoHandle();
+		Win32AutoHandle();
+		explicit Win32AutoHandle(HANDLE handle);
+		~Win32AutoHandle() = default;
 
-		void Reset(HANDLE handle = nullptr);
-		const HANDLE Handle() const;
 		PHANDLE PHandle();
-		bool IsValid() const;
-	private:
-		HANDLE m_handle = INVALID_HANDLE_VALUE;
 	};
 }

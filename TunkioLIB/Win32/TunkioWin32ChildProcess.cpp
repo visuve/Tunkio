@@ -70,7 +70,7 @@ namespace Tunkio
 			return false;
 		}
 
-		if (!SetHandleInformation(m_stdoutRead.Handle(), HANDLE_FLAG_INHERIT, 0))
+		if (!SetHandleInformation(m_stdoutRead.Value(), HANDLE_FLAG_INHERIT, 0))
 		{
 			return false;
 		}
@@ -82,7 +82,7 @@ namespace Tunkio
 	{
 		STARTUPINFOW si = { 0 };
 		si.cb = sizeof(STARTUPINFOW);
-		si.hStdOutput = m_stdoutWrite.Handle();
+		si.hStdOutput = m_stdoutWrite.Value();
 		si.dwFlags |= STARTF_USESTDHANDLES;
 
 		std::wstring commandLine = m_executable.wstring() + L" " + m_arguments;
@@ -97,7 +97,7 @@ namespace Tunkio
 		std::array<char, 0x1000> buffer;
 
 		while (ReadFile(
-			m_stdoutRead.Handle(), buffer.data(), static_cast<DWORD>(buffer.size()), &bytesRead, nullptr) && bytesRead > 0)
+			m_stdoutRead.Value(), buffer.data(), static_cast<DWORD>(buffer.size()), &bytesRead, nullptr) && bytesRead > 0)
 		{
 			m_stdout.append(buffer.data(), bytesRead);
 		}
