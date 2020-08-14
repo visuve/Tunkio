@@ -98,7 +98,6 @@ namespace Tunkio
 
 		bool Fill() override
 		{
-			size_t bytesWritten = 0u;
 			uint64_t bytesLeft = m_size;
 			FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
 
@@ -111,7 +110,7 @@ namespace Tunkio
 					fakeData.Resize(bytesLeft);
 				}
 
-				bytesWritten =
+				ssize_t bytesWritten =
 					write(m_handle.Value(), fakeData.Front(), fakeData.Size<size_t>());
 
 				if (!bytesWritten)

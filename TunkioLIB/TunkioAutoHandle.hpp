@@ -25,7 +25,9 @@ namespace Tunkio
 
 		bool IsValid() const
 		{
-			return m_handle > NullValue && m_handle != InvalidValue;
+			if (m_handle != InvalidValue)
+				return m_handle > NullValue;
+			return false;
 		}
 
 		void Reset(T handle = NullValue)

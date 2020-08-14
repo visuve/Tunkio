@@ -24,7 +24,7 @@ namespace Tunkio
 		{
 		}
 
-		bool Open()
+		bool Open() override
 		{
 			const std::string path(m_options->Path.Data, m_options->Path.Length);
 			m_handle.Reset(
@@ -46,7 +46,7 @@ namespace Tunkio
 			return true;
 		}
 
-		bool Run()
+		bool Run() override
 		{
 			if (!Open())
 			{
