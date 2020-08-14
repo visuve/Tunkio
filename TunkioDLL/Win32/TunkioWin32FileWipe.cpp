@@ -59,11 +59,6 @@ namespace Tunkio
 			m_handle.Reset();
 			return DeleteFileA(path.c_str());
 		}
-
-	private:
-		uint64_t m_size = 0;
-		uint64_t m_totalBytesWritten = 0;
-		Win32AutoHandle m_handle;
 	};
 
 	FileWipe::FileWipe(const TunkioOptions* options) :

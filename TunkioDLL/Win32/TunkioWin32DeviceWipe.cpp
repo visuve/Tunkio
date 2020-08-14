@@ -71,11 +71,6 @@ namespace Tunkio
 		{
 			return false;
 		}
-
-	private:
-		uint64_t m_size = 0;
-		uint64_t m_totalBytesWritten = 0;
-		Win32AutoHandle m_handle;
 	};
 
 	DeviceWipe::DeviceWipe(const TunkioOptions* options) :

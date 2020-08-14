@@ -38,13 +38,17 @@ namespace Tunkio
 
 		TestHandle handle('a');
 		EXPECT_EQ(handle.Value(), 'a');
+
+		handle = 'a'; // TODO: causes unnecessary reopen...
+		EXPECT_EQ(count, 1);
+		EXPECT_EQ(handle.Value(), 'a');
 		
 		handle = TestHandle('b');
-		EXPECT_EQ(count, 1);
+		EXPECT_EQ(count, 2);
 		EXPECT_EQ(handle.Value(), 'b');
 
 		handle = 'c';
-		EXPECT_EQ(count, 2);
+		EXPECT_EQ(count, 3);
 		EXPECT_EQ(handle.Value(), 'c');
 	}
 }

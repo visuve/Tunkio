@@ -60,9 +60,6 @@ namespace Tunkio
 		}
 
 	private:
-		uint64_t m_size = 0;
-		uint64_t m_totalBytesWritten = 0;
-		PosixAutoHandle m_handle;
 		int m_error = 0;
 	};
 
