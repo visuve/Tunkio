@@ -55,7 +55,9 @@ namespace Tunkio
 
 		bool Remove() override
 		{
-			return false;
+			const std::string path(m_options->Path.Data, m_options->Path.Length);
+			m_handle.Reset();
+			return remove(path.c_str()) == 0;
 		}
 
 	private:
