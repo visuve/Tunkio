@@ -27,7 +27,7 @@ namespace Tunkio::GUI
 		return g_dialog->OnProgress(bytesWritten);
 	}
 
-	void OnErrors(uint32_t error, uint64_t bytesWritten)
+	void OnErrors(TunkioStage stage, uint64_t bytesWritten, uint32_t error)
 	{
 		if (!g_dialog)
 		{
@@ -35,7 +35,7 @@ namespace Tunkio::GUI
 			return;
 		}
 
-		g_dialog->OnErrors(error, bytesWritten);
+		g_dialog->OnErrors(stage, bytesWritten, error);
 	}
 
 	void OnCompleted(uint64_t bytesWritten)

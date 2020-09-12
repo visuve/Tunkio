@@ -29,9 +29,17 @@ extern "C"
 		Random = 'r'
 	} TunkioMode;
 
+	typedef enum
+	{
+		Open,
+		Size,
+		Write,
+		Delete,
+	} TunkioStage;
+
 	typedef void(*TunkioStartedCallback)(uint64_t bytesToWrite);
 	typedef bool(*TunkioProgressCallback)(uint64_t bytesWritten); // Return false to cancel
-	typedef void(*TunkioErrorCallback)(uint32_t error, uint64_t bytesWritten);
+	typedef void(*TunkioErrorCallback)(TunkioStage stage, uint64_t bytesWritten, uint32_t errorCode);
 	typedef void(*TunkioCompletedCallback)(uint64_t bytesWritten);
 
 	struct TunkioHandle

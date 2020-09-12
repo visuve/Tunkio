@@ -26,11 +26,9 @@
 
 ## TODO
 
-- Implementation
-	- Add support to wipe directories
 
 - Testing
-	- Add also non other than "happy path" unit tests
+	- Add other than "happy path" unit tests
 
 ## Tools
 

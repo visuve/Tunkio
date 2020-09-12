@@ -10,7 +10,7 @@ namespace Tunkio
 		void Show();
 		void OnStarted(uint64_t bytesLeft);
 		bool OnProgress(uint64_t bytesWritten);
-		void OnErrors(uint32_t error, uint64_t bytesWritten);
+		void OnErrors(TunkioStage stage, uint64_t bytesWritten, uint32_t error);
 		void OnCompleted(uint64_t bytesWritten);
 
 	private:

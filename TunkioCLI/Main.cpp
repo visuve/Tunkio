@@ -127,7 +127,7 @@ namespace Tunkio
 		return g_keepRunning;
 	}
 
-	void OnError(uint32_t error, uint64_t bytesWritten)
+	void OnError(TunkioStage, uint64_t bytesWritten, uint32_t error)
 	{
 		if (bytesWritten)
 		{

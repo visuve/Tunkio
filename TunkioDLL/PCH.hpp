@@ -23,3 +23,9 @@
 #include <sstream>
 #include <limits>
 #include <numeric>
+
+#if defined(_WIN32) || defined(_WIN64)
+#define LastError GetLastError()
+#else
+#define LastError errno
+#endif

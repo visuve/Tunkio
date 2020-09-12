@@ -4,35 +4,47 @@
 
 namespace Tunkio
 {
-	// TODO: check call counts
+	int OnStartedCount, OnProgressCount, OnErrorCount, OnCompletedCount = 0;
 
-	const auto started = [](uint64_t bytesLeft) -> void
+	void OnStarted(uint64_t)
 	{
-		std::cout << bytesLeft << " bytes left." << std::endl;
-	};
+		++OnStartedCount;
+	}
 
-	const auto progress = [](uint64_t bytesWritten) -> bool
+	bool OnProgress(uint64_t)
 	{
-		const uint64_t megabytesWritten = bytesWritten / 1024;
-		std::cout << megabytesWritten << " megabytes written." << std::endl;
+		++OnProgressCount;
 		return true;
-	};
+	}
 
-	const auto errors = [](uint32_t error, uint64_t bytesWritten) -> void
+	void OnError(TunkioStage, uint64_t, uint32_t)
 	{
-		std::cout << "Error " << error << "  occurred. Bytes written: " << bytesWritten << std::endl;
-	};
+		++OnErrorCount;
+	}
 
-	const auto completed = [](uint64_t bytesWritten) -> void
+	void OnCompleted(uint64_t)
 	{
-		std::cout << "Finished. Bytes written: " << bytesWritten << std::endl;
-	};
+		++OnCompletedCount;
+	}
+
+	void ResetCounters()
+	{
+		OnStartedCount = 0;
+		OnProgressCount = 0;
+		OnErrorCount = 0;
+		OnCompletedCount = 0;
+	}
 
 	TEST(TunkioAPITest, CreateHandleFail)
 	{
 		TunkioHandle* handle = TunkioCreate(nullptr);
 		EXPECT_EQ(handle, nullptr);
 		TunkioFree(handle);
+
+		EXPECT_EQ(OnStartedCount, 0);
+		EXPECT_EQ(OnProgressCount, 0);
+		EXPECT_EQ(OnErrorCount, 0);
+		EXPECT_EQ(OnCompletedCount, 0);
 	}
 
 	TEST(TunkioAPITest, CreateHandleSuccess)
@@ -42,15 +54,19 @@ namespace Tunkio
 			TunkioTarget::Device,
 			TunkioMode::Random,
 			false,
-			TunkioCallbacks { started, progress, errors, completed },
+			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }
 		};
 
 		TunkioHandle* handle = TunkioCreate(&options);
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
-	}
 
+		EXPECT_EQ(OnStartedCount, 0);
+		EXPECT_EQ(OnProgressCount, 0);
+		EXPECT_EQ(OnErrorCount, 0);
+		EXPECT_EQ(OnCompletedCount, 0);
+	}
 
 	TEST(TunkioAPITest, WipeFileSuccess)
 	{
@@ -59,7 +75,7 @@ namespace Tunkio
 			TunkioTarget::File,
 			TunkioMode::Random,
 			false,
-			TunkioCallbacks { started, progress, errors, completed },
+			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }
 		};
 
@@ -67,6 +83,35 @@ namespace Tunkio
 		EXPECT_EQ(true, TunkioRun(handle));
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
+
+		EXPECT_EQ(OnStartedCount, 1);
+		EXPECT_EQ(OnProgressCount, 1);
+		EXPECT_EQ(OnErrorCount, 0);
+		EXPECT_EQ(OnCompletedCount, 1);
+		ResetCounters();
+	}
+
+	TEST(TunkioAPITest, DirectoryDeviceSuccess)
+	{
+		const TunkioOptions options
+		{
+			TunkioTarget::Directory,
+			TunkioMode::Random,
+			false,
+			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
+			TunkioString{ 7, "foobar" }
+		};
+
+		TunkioHandle* handle = TunkioCreate(&options);
+		EXPECT_EQ(true, TunkioRun(handle));
+		EXPECT_NE(handle, nullptr);
+		TunkioFree(handle);
+
+		EXPECT_EQ(OnStartedCount, 1);
+		EXPECT_EQ(OnProgressCount, 1);
+		EXPECT_EQ(OnErrorCount, 0);
+		EXPECT_EQ(OnCompletedCount, 1);
+		ResetCounters();
 	}
 
 	TEST(TunkioAPITest, WipeDeviceSuccess)
@@ -76,7 +121,7 @@ namespace Tunkio
 			TunkioTarget::Device,
 			TunkioMode::Random,
 			false,
-			TunkioCallbacks { started, progress, errors, completed },
+			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }
 		};
 
@@ -84,5 +129,11 @@ namespace Tunkio
 		EXPECT_EQ(true, TunkioRun(handle));
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
+
+		EXPECT_EQ(OnStartedCount, 1);
+		EXPECT_EQ(OnProgressCount, 1);
+		EXPECT_EQ(OnErrorCount, 0);
+		EXPECT_EQ(OnCompletedCount, 1);
+		ResetCounters();
 	}
 }

@@ -103,7 +103,7 @@ namespace Tunkio
 		return m_keepRunning;
 	}
 
-	void ProgressDialog::OnErrors(uint32_t error, uint64_t bytesWritten)
+	void ProgressDialog::OnErrors(TunkioStage, uint64_t bytesWritten, uint32_t error)
 	{
 		m_stopButton.enabled(false);
 		m_errorMsgTextbox.caption("Error " + std::to_string(error) + " occurred.\n");
