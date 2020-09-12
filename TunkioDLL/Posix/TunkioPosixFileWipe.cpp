@@ -3,8 +3,6 @@
 #include "../TunkioFileWipe.hpp"
 #include "TunkioPosixWipe.hpp"
 
-#include <sys/stat.h>
-
 namespace Tunkio
 {
 	class PosixFileWipe : public PosixWipe
@@ -40,8 +38,8 @@ namespace Tunkio
 
 		uint64_t Size() override
 		{
-			struct ::stat64 buffer = { 0 };
-			m_error = ::fstat64(m_handle.Value(), &buffer);
+			struct stat64 buffer = { 0 };
+			m_error = fstat64(m_handle.Value(), &buffer);
 
 			if (m_error != 0)
 			{

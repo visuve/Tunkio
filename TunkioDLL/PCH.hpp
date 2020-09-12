@@ -7,8 +7,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/fs.h>
-#include <sys/types.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #endif

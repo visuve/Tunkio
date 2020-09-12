@@ -21,7 +21,14 @@ namespace Tunkio
 				return;
 			}
 
-			Size = std::filesystem::file_size(path);
+			struct stat64 buffer = { 0 };
+
+			if (fstat64(Descriptor, &buffer) != 0)
+			{
+				return;
+			}
+
+			Size = buffer.st_size;
 		}
 
 		~PosixFile()
