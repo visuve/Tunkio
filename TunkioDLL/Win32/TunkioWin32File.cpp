@@ -7,7 +7,7 @@ namespace Tunkio
 	{
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering
 		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		constexpr uint32_t ShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE; // TODO: should be zero?
+		constexpr uint32_t ShareMode = FILE_SHARE_READ;
 		constexpr uint32_t CreationFlags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
 		return CreateFileA(
