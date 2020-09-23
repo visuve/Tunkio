@@ -12,7 +12,9 @@ namespace Tunkio
 	{
 		std::array<char, 0xFF> buffer;
 
-		FILE* pipe = popen("/bin/df -h", "r"); // TODO...
+		const std::string command = m_executable.string() + " " + m_arguments;
+
+		FILE* pipe = popen(command.c_str(), "r");
 
 		if (!pipe)
 		{
