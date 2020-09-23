@@ -1,6 +1,6 @@
 #include "PCH.hpp"
 #include "TunkioDirectoryWipe.hpp"
-#include "TunkioFillStrategy.hpp"
+#include "TunkioFillGenerator.hpp"
 #include "TunkioFile.hpp"
 
 namespace Tunkio
@@ -56,7 +56,8 @@ namespace Tunkio
 
 		uint64_t totalBytesWritten = 0;
 
-		FillStrategy fakeData(m_options->Mode, DataUnit::Mebibyte(1));
+		const DataUnit::Mebibyte bufferSize(1);
+		FillGenerator fakeData(m_options->Mode, bufferSize);
 
 		m_options->Callbacks.StartedCallback(totalBytesLeft);
 
@@ -66,12 +67,8 @@ namespace Tunkio
 
 			while (bytesLeft)
 			{
-				if (fakeData.Size<uint64_t>() > bytesLeft)
-				{
-					fakeData.Resize(bytesLeft);
-				}
-
-				const auto result = file.Write(fakeData.Front(), fakeData.Size<uint32_t>());
+				const uint64_t bytesToWrite = bufferSize > bytesLeft ? bytesLeft : bufferSize.Bytes();
+				const auto result = file.Write(fakeData.Data(), bytesToWrite);
 
 				totalBytesWritten += result.second;
 				bytesLeft -= result.second;

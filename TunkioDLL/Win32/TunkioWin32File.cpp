@@ -112,11 +112,11 @@ namespace Tunkio
 		return m_size;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const uint8_t* data, const uint32_t size) const
+	std::pair<bool, uint64_t> File::Write(const uint8_t* data, const uint64_t size) const
 	{
 		DWORD bytesWritten = 0;
 
-		if (!WriteFile(m_handle, data, size, &bytesWritten, nullptr))
+		if (!WriteFile(m_handle, data, static_cast<DWORD>(size), &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}

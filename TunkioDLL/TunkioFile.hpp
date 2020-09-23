@@ -13,7 +13,7 @@ namespace Tunkio
 
 		bool IsValid() const;
 		uint64_t Size() const;
-		std::pair<bool, uint64_t> Write(const uint8_t* data, const uint32_t size) const;
+		std::pair<bool, uint64_t> Write(const uint8_t* data, const uint64_t size) const;
 		bool Delete();
 
 	private:

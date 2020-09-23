@@ -1,6 +1,6 @@
 # TunkioTests
 
-file(GLOB TunkioTestsSource "*.cpp" "../TunkioDLL/TunkioAPI.cpp" "../TunkioDLL/TunkioFillStrategy.cpp")
+file(GLOB TunkioTestsSource "*.cpp" "../TunkioDLL/TunkioAPI.cpp" "../TunkioDLL/TunkioFillGenerator.cpp")
 add_executable(TunkioTests ${TunkioTestsSource})
 
 target_precompile_headers(TunkioTests PRIVATE "PCH.hpp")

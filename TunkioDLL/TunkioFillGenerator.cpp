@@ -1,5 +1,5 @@
 #include "PCH.hpp"
-#include "TunkioFillStrategy.hpp"
+#include "TunkioFillGenerator.hpp"
 
 #undef max
 
@@ -34,29 +34,30 @@ namespace Tunkio
 		}
 	}
 
-	FillStrategy::FillStrategy(const TunkioMode mode, const Tunkio::DataUnit::Mebibyte size) :
+	FillGenerator::FillGenerator(const TunkioMode mode, const Tunkio::DataUnit::Mebibyte size) :
 		m_mode(mode)
 	{
 		switch (mode)
 		{
 			case TunkioMode::Zeroes:
-				m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()), 0u);
+				m_data.resize(size.Bytes(), 0u);
 				break;
 			case TunkioMode::Ones:
-				m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()), 1u);
+				m_data.resize(size.Bytes(), 0xFFu);
 				break;
 			case TunkioMode::Random:
+
 				if (size.Bytes() % 8 != 0)
 				{
 					std::cerr << "Warning, requested size not divisible by 8. A few last bytes might not get randomized." << std::endl;
 				}
-				m_data = std::vector<uint8_t>(static_cast<size_t>(size.Bytes()));
-				Random(m_data);
+
+				m_data.resize(size.Bytes());
 				break;
 		}
 	}
 
-	const uint8_t* FillStrategy::Front()
+	const uint8_t* FillGenerator::Data()
 	{
 		switch (m_mode)
 		{

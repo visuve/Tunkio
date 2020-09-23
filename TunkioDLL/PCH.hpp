@@ -23,6 +23,7 @@
 #include <sstream>
 #include <limits>
 #include <numeric>
+#include <bitset>
 
 #if defined(_WIN32) || defined(_WIN64)
 #define LastError GetLastError()

@@ -45,6 +45,16 @@ namespace Tunkio::DataUnit
 			return double(m_bytes) / double(Ratio);
 		}
 
+		constexpr bool operator < (uint64_t bytes) const
+		{
+			return m_bytes < bytes;
+		}
+
+		constexpr bool operator > (uint64_t bytes) const
+		{
+			return m_bytes > bytes;
+		}
+
 		template<uint64_t R>
 		constexpr bool operator == (const DataUnit<R>& unit) const
 		{
