@@ -46,8 +46,16 @@ namespace Tunkio
 		bool result = WaitForProcess(pi, m_exitCode);
 
 		m_stdoutWrite.Reset();
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
+
+		if (pi.hProcess)
+		{
+			CloseHandle(pi.hProcess);
+		}
+		
+		if (pi.hThread)
+		{
+			CloseHandle(pi.hThread);
+		}
 
 		if (!result)
 		{
@@ -94,12 +102,27 @@ namespace Tunkio
 	void Win32ChildProcess::ReadFromPipe()
 	{
 		DWORD bytesRead;
-		std::array<char, 0x1000> buffer;
+		std::array<char, 0xF> buffer;
+		std::stringstream stream;
 
 		while (ReadFile(
 			m_stdoutRead.Value(), buffer.data(), static_cast<DWORD>(buffer.size()), &bytesRead, nullptr) && bytesRead > 0)
 		{
-			m_stdout.append(buffer.data(), bytesRead);
+			stream.write(buffer.data(), bytesRead);
+		}
+
+		std::string line;
+
+		while (std::getline(stream, line))
+		{
+			line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+
+			if (line.empty())
+			{
+				continue;
+			}
+
+			m_stdout.emplace_back(line);
 		}
 	}
 }

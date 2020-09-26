@@ -62,8 +62,12 @@ namespace Tunkio
 			return;
 		}
 
-		std::cout << std::endl << "Here are your drives:" << std::endl << std::endl;
-		std::cout << process.StdOut() << std::endl;
+		std::cout << std::endl << " Here are your drives:" << std::endl << std::endl;
+
+		for (const std::string& line : process.StdOut())
+		{
+			std::cout << ' ' << line << std::endl;
+		}
 	}
 
 	bool PrintArgumentsAndPrompt(const std::vector<std::string>& args)

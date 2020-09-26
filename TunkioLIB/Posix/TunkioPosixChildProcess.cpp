@@ -10,8 +10,6 @@ namespace Tunkio
 
 	bool PosixChildProcess::Start()
 	{
-		std::array<char, 0xFF> buffer;
-
 		const std::string command = m_executable.string() + " " + m_arguments;
 
 		FILE* pipe = popen(command.c_str(), "r");
@@ -22,9 +20,27 @@ namespace Tunkio
 			return false;
 		}
 
+		std::array<char, 0xFF> buffer;
+		std::stringstream stream;
+		long lastPosition = 0;
+
 		while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
 		{
-			m_stdout += buffer.data();
+			stream << buffer.data();
+		}
+
+		std::string line;
+
+		while (std::getline(stream, line))
+		{
+			line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
+
+			if (line.empty())
+			{
+				continue;
+			}
+
+			m_stdout.emplace_back(line);
 		}
 
 		m_exitCode = WEXITSTATUS(pclose(pipe));

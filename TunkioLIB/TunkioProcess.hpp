@@ -34,7 +34,7 @@ namespace Tunkio
 			return m_exitCode;
 		}
 
-		std::string StdOut() const
+		const std::vector<std::string>& StdOut() const
 		{
 			return m_stdout;
 		}
@@ -44,6 +44,6 @@ namespace Tunkio
 		const std::basic_string<T> m_arguments;
 		uint32_t m_errorCode = 0;
 		uint32_t m_exitCode = 0;
-		std::string m_stdout;
+		std::vector<std::string> m_stdout;
 	};
 }
