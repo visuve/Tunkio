@@ -75,17 +75,10 @@ namespace Tunkio::GUI
 
 	void Usage()
 	{
-		nana::msgbox mb("Tunkio Device Wipe");
+		nana::msgbox mb("Tunkio GUI");
 		mb << "This program is intended to be run through you OS's context menus." << std::endl << std::endl;;
-		mb << "However, you can call this application trough command line with the following options:" << std::endl << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
-		mb << "  --path=\"P:\\Path\\To\\File or Device\" (Required) " << std::endl;
-#else
-		mb << "  --path=/path/to/file_or_device (Required)" << std::endl;
-#endif
-		mb << "  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
-		mb << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
-		mb << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
+		mb << "However, you can call this application trough command line, ";
+		mb << "see TunkioCLI for example usage. Same parameters apply for this GUI.";
 		mb.show();
 		nana::exec();
 	}

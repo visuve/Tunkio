@@ -6,9 +6,9 @@
 #include "TunkioMemory.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
-#include "TunkioWin32ChildProcess.hpp"
+#include "Win32/TunkioWin32ChildProcess.hpp"
 #else
-#include "TunkioPosixChildProcess.hpp"
+#include "Posix/TunkioPosixChildProcess.hpp"
 #endif
 
 namespace Tunkio
