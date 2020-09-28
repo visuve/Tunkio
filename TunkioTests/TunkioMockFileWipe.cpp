@@ -3,16 +3,16 @@
 
 namespace Tunkio
 {
-	FileWipe::FileWipe(const TunkioOptions* options) :
-		IOperation(options)
+	FileWipe::FileWipe(const std::string& path) :
+		IOperation(path)
 	{
 	}
 
 	bool FileWipe::Run()
 	{
-		m_options->Callbacks.StartedCallback(1);
-		m_options->Callbacks.ProgressCallback(1);
-		m_options->Callbacks.CompletedCallback(1);
+		m_startedCallback(1);
+		m_progressCallback(1);
+		m_completedCallback(1);
 		return true;
 	}
 }

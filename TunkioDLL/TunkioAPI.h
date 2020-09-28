@@ -47,30 +47,17 @@ extern "C"
 		int32_t Unused;
 	};
 
-	struct TunkioString
-	{
-		uint32_t Length;
-		const char* Data;
-	};
+	TUNKIO_EXPORT struct TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type);
 
-	struct TunkioCallbacks
-	{
-		TunkioStartedCallback StartedCallback;
-		TunkioProgressCallback ProgressCallback;
-		TunkioErrorCallback ErrorCallback;
-		TunkioCompletedCallback CompletedCallback;
-	};
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetFillMode(struct TunkioHandle*, TunkioFillMode mode);
 
-	struct TunkioOptions
-	{
-		TunkioTargetType Target;
-		TunkioFillMode Mode;
-		bool Remove;
-		struct TunkioCallbacks Callbacks;
-		struct TunkioString Path;
-	};
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(struct TunkioHandle*, TunkioStartedCallback);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(struct TunkioHandle*, TunkioProgressCallback);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(struct TunkioHandle*, TunkioErrorCallback);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(struct TunkioHandle*, TunkioCompletedCallback);
 
-	TUNKIO_EXPORT struct TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioCreate(const struct TunkioOptions*);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(struct TunkioHandle*, bool remove);
+
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioRun(struct TunkioHandle*);
 	TUNKIO_EXPORT void TUNKIO_CALLING_CONVENTION TunkioFree(struct TunkioHandle*);
 

@@ -26,7 +26,7 @@ namespace Tunkio::Fill
 
 		for (size_t i = 0; i < Mebibyte.Bytes(); ++i)
 		{
-			EXPECT_EQ(data[i], 1);
+			EXPECT_EQ(data[i], 0xFF);
 		}
 	}
 

@@ -175,20 +175,6 @@ namespace Tunkio
 		}
 	}
 
-	TunkioOptions* CreateOptions()
-	{
-		const auto path = Arguments.at("path").Value<std::string>();
-
-		return new TunkioOptions
-		{
-			Arguments.at("target").Value<TunkioTargetType>(),
-			Arguments.at("mode").Value<TunkioFillMode>(),
-			Arguments.at("remove").Value<bool>(),
-			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
-			TunkioString{ static_cast<uint32_t>(path.size()), Memory::CloneString(path) }
-		};
-	}
-
 	void SignalHandler(int signal)
 	{
 		std::cout << "Got signal: " << signal << std::endl;
@@ -235,14 +221,23 @@ int main(int argc, char* argv[])
 		return ErrorCode::UserCancelled;
 	}
 
-	const Tunkio::Memory::AutoOptionsHandle options(Tunkio::CreateOptions());
-	const Tunkio::Memory::AutoHandle tunkio(TunkioCreate(options.get()));
+	const Tunkio::Memory::AutoHandle tunkio(TunkioInitialize(
+		Arguments.at("path").Value<std::string>().c_str(), 
+		Arguments.at("target").Value<TunkioTargetType>()));
 
 	if (!tunkio)
 	{
 		std::cerr << "Failed to create TunkioHandle!" << std::endl;
 		return -666; // TODO: FIX
 	}
+
+	// TODO: check for success
+	TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>());
+	TunkioSetStartedCallback(tunkio.get(), OnStarted);
+	TunkioSetProgressCallback(tunkio.get(), OnProgress);
+	TunkioSetCompletedCallback(tunkio.get(), OnCompleted);
+	TunkioSetErrorCallback(tunkio.get(), OnError);
+	TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>());
 
 	if (!TunkioRun(tunkio.get()))
 	{

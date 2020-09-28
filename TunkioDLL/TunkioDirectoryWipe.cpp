@@ -5,18 +5,16 @@
 
 namespace Tunkio
 {
-	DirectoryWipe::DirectoryWipe(const TunkioOptions* options) :
-		IOperation(options)
+	DirectoryWipe::DirectoryWipe(const std::string& path) :
+		IOperation(path)
 	{
 	}
 
 	bool DirectoryWipe::Run()
 	{
-		const std::string path(m_options->Path.Data, m_options->Path.Length);
-
 		std::vector<File> files;
 
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(m_path))
 		{
 			if (!entry.is_regular_file())
 			{
@@ -27,7 +25,7 @@ namespace Tunkio
 
 			if (file.IsValid())
 			{
-				m_options->Callbacks.ErrorCallback(
+				m_errorCallback(
 					TunkioStage::Open,
 					0,
 					LastError);
@@ -37,7 +35,7 @@ namespace Tunkio
 
 			if (!file.Size())
 			{
-				m_options->Callbacks.ErrorCallback(
+				m_errorCallback(
 					TunkioStage::Size,
 					0,
 					LastError);
@@ -57,9 +55,9 @@ namespace Tunkio
 		uint64_t totalBytesWritten = 0;
 
 		const DataUnit::Mebibyte bufferSize(1);
-		FillGenerator fakeData(m_options->Mode, bufferSize);
+		FillGenerator fakeData(m_fillMode, bufferSize);
 
-		m_options->Callbacks.StartedCallback(totalBytesLeft);
+		m_startedCallback(totalBytesLeft);
 
 		for (File& file : files)
 		{
@@ -75,7 +73,7 @@ namespace Tunkio
 
 				if (!result.first)
 				{
-					m_options->Callbacks.ErrorCallback(
+					m_errorCallback(
 						TunkioStage::Write,
 						totalBytesWritten,
 						LastError);
@@ -83,15 +81,15 @@ namespace Tunkio
 					return false;
 				}
 
-				if (!m_options->Callbacks.ProgressCallback(totalBytesWritten))
+				if (!m_progressCallback(totalBytesWritten))
 				{
 					return true;
 				}
 			}
 
-			if (m_options->Remove && !file.Delete())
+			if (m_removeAfterFill && !file.Delete())
 			{
-				m_options->Callbacks.ErrorCallback(
+				m_errorCallback(
 					TunkioStage::Delete,
 					totalBytesWritten,
 					LastError);
@@ -100,7 +98,7 @@ namespace Tunkio
 			}
 		}
 
-		m_options->Callbacks.CompletedCallback(totalBytesWritten);
+		m_completedCallback(totalBytesWritten);
 		return true;
 	}
 }

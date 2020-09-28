@@ -5,20 +5,18 @@
 
 namespace Tunkio
 {
-	DeviceWipe::DeviceWipe(const TunkioOptions* options) :
-		IOperation(options)
+	DeviceWipe::DeviceWipe(const std::string& path) :
+		IOperation(path)
 	{
 	}
 
 	bool DeviceWipe::Run()
 	{
-		const std::string path(m_options->Path.Data, m_options->Path.Length);
-
-		const File disk(path);
+		const File disk(m_path);
 
 		if (disk.IsValid())
 		{
-			m_options->Callbacks.ErrorCallback(
+			m_errorCallback(
 				TunkioStage::Open,
 				0,
 				LastError);
@@ -28,7 +26,7 @@ namespace Tunkio
 
 		if (disk.Size())
 		{
-			m_options->Callbacks.ErrorCallback(
+			m_errorCallback(
 				TunkioStage::Size,
 				0,
 				LastError);
@@ -40,9 +38,9 @@ namespace Tunkio
 		uint64_t bytesLeft = disk.Size();
 		uint64_t bytesWritten = 0;
 
-		FillGenerator fakeData(m_options->Mode, bufferSize);
+		FillGenerator fakeData(m_fillMode, bufferSize);
 
-		m_options->Callbacks.StartedCallback(bytesLeft);
+		m_startedCallback(bytesLeft);
 
 		while (bytesLeft)
 		{
@@ -54,7 +52,7 @@ namespace Tunkio
 
 			if (!result.first)
 			{
-				m_options->Callbacks.ErrorCallback(
+				m_errorCallback(
 					TunkioStage::Write,
 					bytesWritten,
 					LastError);
@@ -62,13 +60,13 @@ namespace Tunkio
 				return false;
 			}
 
-			if (!m_options->Callbacks.ProgressCallback(bytesWritten))
+			if (!m_progressCallback(bytesWritten))
 			{
 				return true;
 			}
 		}
 
-		m_options->Callbacks.CompletedCallback(bytesWritten);
+		m_completedCallback(bytesWritten);
 		return true;
 	}
 }

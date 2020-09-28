@@ -8,7 +8,7 @@ namespace Tunkio
 	class FileWipe : public IOperation
 	{
 	public:
-		FileWipe(const TunkioOptions* options);
+		FileWipe(const std::string& path);
 		bool Run() override;
 	};
 }

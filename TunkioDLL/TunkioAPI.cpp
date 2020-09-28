@@ -7,24 +7,82 @@
 #include "TunkioDirectoryWipe.hpp"
 #include "TunkioDeviceWipe.hpp"
 
-TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioCreate(const TunkioOptions* options)
+TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type)
 {
-	if (!options)
+	if (!path)
 	{
 		return nullptr;
 	}
 
-	switch (options->Target)
+	switch (type)
 	{
 		case TunkioTargetType::File:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(options));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path));
 		case TunkioTargetType::Directory:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(options));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path));
 		case TunkioTargetType::Device:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DeviceWipe(options));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DeviceWipe(path));
 	}
 
 	return nullptr;
+}
+
+
+template <typename T>
+bool Assign(TunkioHandle* handle, T(Tunkio::IOperation::*field), T value)
+{
+	const auto instance = reinterpret_cast<Tunkio::IOperation*>(handle);
+
+	if (!instance)
+	{
+		return false;
+	}
+
+	instance->*field = value;
+
+	return true;
+}
+
+template<typename Base>
+inline bool IsInstanceOf(const TunkioHandle* handle)
+{
+	auto instance = reinterpret_cast<const Tunkio::IOperation*>(handle);
+	return dynamic_cast<const Base*>(instance) != nullptr;
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetFillMode(TunkioHandle* handle, TunkioFillMode mode)
+{
+	return Assign(handle, &Tunkio::IOperation::m_fillMode, mode);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(TunkioHandle* handle, TunkioStartedCallback callback)
+{
+	return Assign(handle, &Tunkio::IOperation::m_startedCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(TunkioHandle* handle, TunkioProgressCallback callback)
+{
+	return Assign(handle, &Tunkio::IOperation::m_progressCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(TunkioHandle* handle, TunkioErrorCallback callback)
+{
+	return Assign(handle, &Tunkio::IOperation::m_errorCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, TunkioCompletedCallback callback)
+{
+	return Assign(handle, &Tunkio::IOperation::m_completedCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)
+{
+	if (IsInstanceOf<Tunkio::DeviceWipe>(handle) && remove)
+	{
+		return false; // Devices cannot be deleted
+	}
+
+	return Assign(handle, &Tunkio::IOperation::m_removeAfterFill, remove);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioRun(TunkioHandle* handle)

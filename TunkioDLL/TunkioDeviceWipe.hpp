@@ -8,7 +8,7 @@ namespace Tunkio
 	class DeviceWipe : public IOperation
 	{
 	public:
-		DeviceWipe(const TunkioOptions* options);
+		DeviceWipe(const std::string& path);
 		bool Run() override;
 	};
 }

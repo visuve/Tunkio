@@ -3,16 +3,16 @@
 
 namespace Tunkio
 {
-	DeviceWipe::DeviceWipe(const TunkioOptions* options) :
-		IOperation(options)
+	DeviceWipe::DeviceWipe(const std::string& path) :
+		IOperation(path)
 	{
 	}
 
 	bool DeviceWipe::Run()
 	{
-		m_options->Callbacks.StartedCallback(1);
-		m_options->Callbacks.ProgressCallback(1);
-		m_options->Callbacks.CompletedCallback(1);
+		m_startedCallback(1);
+		m_progressCallback(1);
+		m_completedCallback(1);
 		return true;
 	}
 }
