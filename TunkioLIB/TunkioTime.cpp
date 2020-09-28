@@ -58,7 +58,7 @@ namespace Tunkio::Time
 #if defined(_WIN32) || defined(_WIN64)
 		if (converterFunction(&dateTime, &seconds) != 0)
 #else
-		if (converterFunction(&seconds, &dateTime) != 0)
+		if (converterFunction(&seconds, &dateTime) <= 0)
 #endif
 		{
 			return {};
