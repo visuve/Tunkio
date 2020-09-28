@@ -20,14 +20,14 @@ extern "C"
 		File = 'f',
 		Directory = 'd',
 		Device = 'D'
-	} TunkioTarget;
+	} TunkioTargetType;
 
 	typedef enum
 	{
 		Zeroes = '0',
 		Ones = '1',
 		Random = 'r'
-	} TunkioMode;
+	} TunkioFillMode;
 
 	typedef enum
 	{
@@ -63,8 +63,8 @@ extern "C"
 
 	struct TunkioOptions
 	{
-		TunkioTarget Target;
-		TunkioMode Mode;
+		TunkioTargetType Target;
+		TunkioFillMode Mode;
 		bool Remove;
 		struct TunkioCallbacks Callbacks;
 		struct TunkioString Path;

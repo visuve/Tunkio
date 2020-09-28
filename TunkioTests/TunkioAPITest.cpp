@@ -51,8 +51,8 @@ namespace Tunkio
 	{
 		const TunkioOptions options
 		{
-			TunkioTarget::Device,
-			TunkioMode::Random,
+			TunkioTargetType::Device,
+			TunkioFillMode::Random,
 			false,
 			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }
@@ -72,8 +72,8 @@ namespace Tunkio
 	{
 		const TunkioOptions options
 		{
-			TunkioTarget::File,
-			TunkioMode::Random,
+			TunkioTargetType::File,
+			TunkioFillMode::Random,
 			false,
 			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }
@@ -95,8 +95,8 @@ namespace Tunkio
 	{
 		const TunkioOptions options
 		{
-			TunkioTarget::Directory,
-			TunkioMode::Random,
+			TunkioTargetType::Directory,
+			TunkioFillMode::Random,
 			false,
 			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }
@@ -118,8 +118,8 @@ namespace Tunkio
 	{
 		const TunkioOptions options
 		{
-			TunkioTarget::Device,
-			TunkioMode::Random,
+			TunkioTargetType::Device,
+			TunkioFillMode::Random,
 			false,
 			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ 7, "foobar" }

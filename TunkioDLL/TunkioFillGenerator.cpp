@@ -34,18 +34,18 @@ namespace Tunkio
 		}
 	}
 
-	FillGenerator::FillGenerator(const TunkioMode mode, const Tunkio::DataUnit::Mebibyte size) :
+	FillGenerator::FillGenerator(const TunkioFillMode mode, const Tunkio::DataUnit::Mebibyte size) :
 		m_mode(mode)
 	{
 		switch (mode)
 		{
-			case TunkioMode::Zeroes:
+			case TunkioFillMode::Zeroes:
 				m_data.resize(size.Bytes(), 0u);
 				break;
-			case TunkioMode::Ones:
+			case TunkioFillMode::Ones:
 				m_data.resize(size.Bytes(), 0xFFu);
 				break;
-			case TunkioMode::Random:
+			case TunkioFillMode::Random:
 
 				if (size.Bytes() % 8 != 0)
 				{
@@ -61,10 +61,10 @@ namespace Tunkio
 	{
 		switch (m_mode)
 		{
-			case TunkioMode::Ones:
-			case TunkioMode::Zeroes:
+			case TunkioFillMode::Ones:
+			case TunkioFillMode::Zeroes:
 				break;
-			case TunkioMode::Random:
+			case TunkioFillMode::Random:
 				Random(m_data);
 				break;
 		}

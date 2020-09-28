@@ -16,11 +16,11 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioCreate(const TunkioOptions* option
 
 	switch (options->Target)
 	{
-		case TunkioTarget::File:
+		case TunkioTargetType::File:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(options));
-		case TunkioTarget::Directory:
+		case TunkioTargetType::Directory:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(options));
-		case TunkioTarget::Device:
+		case TunkioTargetType::Device:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::DeviceWipe(options));
 	}
 

@@ -17,7 +17,7 @@ namespace Tunkio::Args
 			return true;
 		}
 
-		if (Type == typeid(TunkioTarget))
+		if (Type == typeid(TunkioTargetType))
 		{
 			if (value.size() != 1)
 			{
@@ -28,7 +28,7 @@ namespace Tunkio::Args
 			return TargetFromChar(value.front(), m_value);
 		}
 
-		if (Type == typeid(TunkioMode))
+		if (Type == typeid(TunkioFillMode))
 		{
 			if (value.size() != 1)
 			{
@@ -58,19 +58,19 @@ namespace Tunkio::Args
 	{
 		switch (c)
 		{
-			case static_cast<uint8_t>(TunkioTarget::File) :
+			case static_cast<uint8_t>(TunkioTargetType::File) :
 			{
-				result = TunkioTarget::File;
+				result = TunkioTargetType::File;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioTarget::Directory) :
+			case static_cast<uint8_t>(TunkioTargetType::Directory) :
 			{
-				result = TunkioTarget::Directory;
+				result = TunkioTargetType::Directory;
 				return true;
 			}
-			case  static_cast<uint8_t>(TunkioTarget::Device) :
+			case  static_cast<uint8_t>(TunkioTargetType::Device) :
 			{
-				result = TunkioTarget::Device;
+				result = TunkioTargetType::Device;
 				return true;
 			}
 		}
@@ -82,19 +82,19 @@ namespace Tunkio::Args
 	{
 		switch (c)
 		{
-			case static_cast<uint8_t>(TunkioMode::Zeroes) :
+			case static_cast<uint8_t>(TunkioFillMode::Zeroes) :
 			{
-				result = TunkioMode::Zeroes;
+				result = TunkioFillMode::Zeroes;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioMode::Ones) :
+			case static_cast<uint8_t>(TunkioFillMode::Ones) :
 			{
-				result = TunkioMode::Ones;
+				result = TunkioFillMode::Ones;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioMode::Random) :
+			case static_cast<uint8_t>(TunkioFillMode::Random) :
 			{
-				result = TunkioMode::Random;
+				result = TunkioFillMode::Random;
 				return true;
 			}
 		}

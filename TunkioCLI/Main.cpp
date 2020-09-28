@@ -34,13 +34,13 @@ namespace Tunkio
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32) || defined(_WIN64)
-		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTargetType::Device) << " --mode=r" << std::endl;
 #else
-		std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=" << char(TunkioTarget::File) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=" << char(TunkioTarget::Directory) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/dev/sdx --target=" << char(TunkioTarget::Device) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/dev/sdx --target=" << char(TunkioTargetType::Device) << " --mode=r" << std::endl;
 #endif
 		std::cout << std::endl;
 
@@ -86,8 +86,8 @@ namespace Tunkio
 
 	std::map<std::string, Args::Argument> Arguments =
 	{
-		{ "target", Args::Argument(false, TunkioTarget::File) },
-		{ "mode", Args::Argument(false, TunkioMode::Zeroes) },
+		{ "target", Args::Argument(false, TunkioTargetType::File) },
+		{ "mode", Args::Argument(false, TunkioFillMode::Zeroes) },
 		{ "remove", Args::Argument(false, false) },
 		{ "path", Args::Argument(true, std::string()) }
 	};
@@ -181,8 +181,8 @@ namespace Tunkio
 
 		return new TunkioOptions
 		{
-			Arguments.at("target").Value<TunkioTarget>(),
-			Arguments.at("mode").Value<TunkioMode>(),
+			Arguments.at("target").Value<TunkioTargetType>(),
+			Arguments.at("mode").Value<TunkioFillMode>(),
 			Arguments.at("remove").Value<bool>(),
 			TunkioCallbacks { OnStarted, OnProgress, OnError, OnCompleted },
 			TunkioString{ static_cast<uint32_t>(path.size()), Memory::CloneString(path) }

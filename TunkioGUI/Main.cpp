@@ -51,8 +51,8 @@ namespace Tunkio::GUI
 
 	std::map<std::string, Args::Argument> Arguments =
 	{
-		{ "target", Args::Argument(false, TunkioTarget::File) },
-		{ "mode", Args::Argument(false, TunkioMode::Zeroes) },
+		{ "target", Args::Argument(false, TunkioTargetType::File) },
+		{ "mode", Args::Argument(false, TunkioFillMode::Zeroes) },
 		{ "remove", Args::Argument(false, false) },
 		{ "path", Args::Argument(true, std::filesystem::path()) }
 	};
@@ -65,8 +65,8 @@ namespace Tunkio::GUI
 
 		return new TunkioOptions
 		{
-			Arguments.at("target").Value<TunkioTarget>(),
-			Arguments.at("mode").Value<TunkioMode>(),
+			Arguments.at("target").Value<TunkioTargetType>(),
+			Arguments.at("mode").Value<TunkioFillMode>(),
 			Arguments.at("remove").Value<bool>(),
 			TunkioCallbacks { OnStarted, OnProgress, OnErrors, OnCompleted },
 			TunkioString { static_cast<uint32_t>(path.size()), Memory::CloneString(path) }

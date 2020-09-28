@@ -8,7 +8,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, ZeroFill)
 	{
-		FillGenerator fill(TunkioMode::Zeroes, 1);
+		FillGenerator fill(TunkioFillMode::Zeroes, 1);
 
 		auto data = fill.Data();
 
@@ -20,7 +20,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, OneFill)
 	{
-		FillGenerator fill(TunkioMode::Ones, Mebibyte);
+		FillGenerator fill(TunkioFillMode::Ones, Mebibyte);
 
 		auto data = fill.Data();
 
@@ -32,7 +32,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, RandomFill)
 	{
-		FillGenerator fill(TunkioMode::Random, Mebibyte);
+		FillGenerator fill(TunkioFillMode::Random, Mebibyte);
 
 		auto data = fill.Data();
 		EXPECT_NE(data, nullptr);
@@ -40,7 +40,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, RandomFillIllustrateProblem)
 	{
-		FillGenerator fill(TunkioMode::Random, DataUnit::Byte(10));
+		FillGenerator fill(TunkioFillMode::Random, DataUnit::Byte(10));
 
 		auto data = fill.Data();
 		EXPECT_NE(data, nullptr);
