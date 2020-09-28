@@ -17,12 +17,6 @@ namespace Tunkio::Args
 			return true;
 		}
 
-		if (Type == typeid(std::filesystem::path))
-		{
-			m_value = std::make_any<std::filesystem::path>(value);
-			return true;
-		}
-
 		if (Type == typeid(TunkioTarget))
 		{
 			if (value.size() != 1)

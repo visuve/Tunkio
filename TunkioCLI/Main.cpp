@@ -89,7 +89,7 @@ namespace Tunkio
 		{ "target", Args::Argument(false, TunkioTarget::File) },
 		{ "mode", Args::Argument(false, TunkioMode::Zeroes) },
 		{ "remove", Args::Argument(false, false) },
-		{ "path", Args::Argument(true, std::filesystem::path()) }
+		{ "path", Args::Argument(true, std::string()) }
 	};
 
 	void OnStarted(uint64_t bytesLeft)
@@ -177,9 +177,7 @@ namespace Tunkio
 
 	TunkioOptions* CreateOptions()
 	{
-		std::cout << std::setprecision(3) << std::fixed;
-
-		const auto path = Arguments.at("path").Value<std::filesystem::path>().string();
+		const auto path = Arguments.at("path").Value<std::string>();
 
 		return new TunkioOptions
 		{
