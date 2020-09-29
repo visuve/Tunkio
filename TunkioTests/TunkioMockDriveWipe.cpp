@@ -1,14 +1,14 @@
 #include "PCH.hpp"
-#include "TunkioDeviceWipe.hpp"
+#include "TunkioDriveWipe.hpp"
 
 namespace Tunkio
 {
-	DeviceWipe::DeviceWipe(const std::string& path) :
+	DriveWipe::DriveWipe(const std::string& path) :
 		IOperation(path)
 	{
 	}
 
-	bool DeviceWipe::Run()
+	bool DriveWipe::Run()
 	{
 		m_startedCallback(1);
 		m_progressCallback(1);

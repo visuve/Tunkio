@@ -1,16 +1,16 @@
 #include "PCH.hpp"
-#include "TunkioDeviceWipe.hpp"
+#include "TunkioDriveWipe.hpp"
 #include "TunkioFillGenerator.hpp"
 #include "TunkioFile.hpp"
 
 namespace Tunkio
 {
-	DeviceWipe::DeviceWipe(const std::string& path) :
+	DriveWipe::DriveWipe(const std::string& path) :
 		IOperation(path)
 	{
 	}
 
-	bool DeviceWipe::Run()
+	bool DriveWipe::Run()
 	{
 		const File disk(m_path);
 

@@ -19,22 +19,22 @@ extern "C"
 	{
 		File = 'f',
 		Directory = 'd',
-		Device = 'D'
+		Drive = 'D'
 	} TunkioTargetType;
 
 	typedef enum
 	{
 		Zeroes = '0',
 		Ones = '1',
-		Random = 'r'
+		Random = 'R'
 	} TunkioFillMode;
 
 	typedef enum
 	{
-		Open,
-		Size,
-		Write,
-		Remove,
+		Open = 'o',
+		Size = 's',
+		Write = 'w',
+		Remove = 'r',
 	} TunkioStage;
 
 	typedef void(TunkioStartedCallback)(uint64_t bytesToWrite);

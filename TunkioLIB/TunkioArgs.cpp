@@ -68,9 +68,9 @@ namespace Tunkio::Args
 				result = TunkioTargetType::Directory;
 				return true;
 			}
-			case  static_cast<uint8_t>(TunkioTargetType::Device) :
+			case  static_cast<uint8_t>(TunkioTargetType::Drive) :
 			{
-				result = TunkioTargetType::Device;
+				result = TunkioTargetType::Drive;
 				return true;
 			}
 		}

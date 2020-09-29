@@ -49,7 +49,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, CreateHandleSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Device);
+		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Drive);
 		EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillMode::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
 		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
@@ -110,7 +110,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, WipeDeviceSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Device);
+		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Drive);
 		EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillMode::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
 		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));

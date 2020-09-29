@@ -5,7 +5,7 @@
 #include "TunkioOperation.hpp"
 #include "TunkioFileWipe.hpp"
 #include "TunkioDirectoryWipe.hpp"
-#include "TunkioDeviceWipe.hpp"
+#include "TunkioDriveWipe.hpp"
 
 TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type)
 {
@@ -20,8 +20,8 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, Tunki
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path));
 		case TunkioTargetType::Directory:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path));
-		case TunkioTargetType::Device:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DeviceWipe(path));
+		case TunkioTargetType::Drive:
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(path));
 	}
 
 	return nullptr;
@@ -76,7 +76,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, 
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)
 {
-	if (IsInstanceOf<Tunkio::DeviceWipe>(handle) && remove)
+	if (IsInstanceOf<Tunkio::DriveWipe>(handle) && remove)
 	{
 		return false; // Devices cannot be deleted
 	}

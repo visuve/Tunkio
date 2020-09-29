@@ -24,7 +24,7 @@ namespace Tunkio
 	{
 		std::cout << " Usage:" << std::endl << std::endl;
 #if defined(_WIN32) || defined(_WIN64)
-		std::cout << "  --path=\"P:\\Path\\To\\File or Device\" (Required) " << std::endl;
+		std::cout << "  --path=\"P:\\Path\\To\\File or Drive\" (Required) " << std::endl;
 #else
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
@@ -36,11 +36,11 @@ namespace Tunkio
 #if defined(_WIN32) || defined(_WIN64)
 		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
 		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTargetType::Device) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTargetType::Drive) << " --mode=r" << std::endl;
 #else
 		std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
 		std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/dev/sdx --target=" << char(TunkioTargetType::Device) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/dev/sdx --target=" << char(TunkioTargetType::Drive) << " --mode=r" << std::endl;
 #endif
 		std::cout << std::endl;
 

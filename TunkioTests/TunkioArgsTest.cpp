@@ -33,7 +33,7 @@ namespace Tunkio::Args
 		EXPECT_TRUE(ParseVector(Arguments, { "--path=x", "--target=D", "--mode=1", "--remove=y" }));
 
 		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
-		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Device);
+		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Drive);
 		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillMode>(), TunkioFillMode::Ones);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}
@@ -51,7 +51,7 @@ namespace Tunkio::Args
 		EXPECT_TRUE(ParseVector(Arguments, { "--mode=1", "--path=x", "--target=D", }));
 
 		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
-		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Device);
+		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Drive);
 		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillMode>(), TunkioFillMode::Ones);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}

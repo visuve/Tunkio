@@ -5,10 +5,10 @@
 
 namespace Tunkio
 {
-	class DeviceWipe : public IOperation
+	class DriveWipe : public IOperation
 	{
 	public:
-		DeviceWipe(const std::string& path);
+		DriveWipe(const std::string& path);
 		bool Run() override;
 	};
 }
