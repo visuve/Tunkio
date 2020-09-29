@@ -10,33 +10,33 @@ namespace Tunkio
 		return open(path.c_str(), Flags);
 	}
 
-	uint64_t FileSize(const int fileDescriptor)
+	std::pair<bool, uint64_t> FileSize(const int fileDescriptor)
 	{
 		struct stat64 buffer = { 0 };
 
 		if (fstat64(fileDescriptor, &buffer) != 0)
 		{
-			return false;
+			return { false, buffer.st_size };
 		}
 
-		return buffer.st_size;
+		return { true, buffer.st_size };
 	}
 
-	uint64_t DiskSize(const int fileDescriptor)
+	std::pair<bool, uint64_t> DiskSize(const int fileDescriptor)
 	{
 		if (!fileDescriptor)
 		{
-			return 0;
+			return { false, 0 };
 		}
 
 		uint64_t size = 0;
 
 		if (ioctl(fileDescriptor, BLKGETSIZE64, &size) != 0)
 		{
-			return 0;
+			return { false, size };
 		}
 
-		return size;
+		return { true, size };
 	}
 
 	File::File(const std::filesystem::path& path) :
@@ -77,7 +77,7 @@ namespace Tunkio
 		return m_fileDescriptor > 0;
 	}
 
-	uint64_t File::Size() const
+	std::pair<bool, uint64_t> File::Size() const
 	{
 		return m_size;
 	}

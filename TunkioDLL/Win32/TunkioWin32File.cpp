@@ -20,28 +20,36 @@ namespace Tunkio
 			nullptr);
 	}
 
-	uint64_t FileSize(const HANDLE handle)
+	std::pair<bool, uint64_t> FileSize(const HANDLE handle)
 	{
 		if (handle != INVALID_HANDLE_VALUE)
 		{
-			return 0;
+			return { false, 0 };
 		}
 
 		LARGE_INTEGER fileSize = { 0 };
 
 		if (!GetFileSizeEx(handle, &fileSize))
 		{
-			return 0;
+			return { false, fileSize.QuadPart };
 		}
 
-		return fileSize.QuadPart;
+		return { true, fileSize.QuadPart };
 	}
 
-	uint64_t DiskSize(const HANDLE handle)
+	uint64_t Bytes(const DISK_GEOMETRY& diskGeo)
+	{
+		return diskGeo.Cylinders.QuadPart *
+			diskGeo.TracksPerCylinder *
+			diskGeo.SectorsPerTrack *
+			diskGeo.BytesPerSector;
+	}
+
+	std::pair<bool, uint64_t> DiskSize(const HANDLE handle)
 	{
 		if (handle != INVALID_HANDLE_VALUE)
 		{
-			return 0;
+			return { false, 0 };
 		}
 
 		unsigned long bytesReturned = 0;
@@ -58,15 +66,10 @@ namespace Tunkio
 			&bytesReturned,
 			nullptr))
 		{
-			return 0;
+			return { false, Bytes(diskGeo) };
 		}
 
-		_ASSERT(bytesReturned == sizeof(DISK_GEOMETRY));
-
-		return diskGeo.Cylinders.QuadPart *
-			diskGeo.TracksPerCylinder *
-			diskGeo.SectorsPerTrack *
-			diskGeo.BytesPerSector;
+		return { bytesReturned == sizeof(DISK_GEOMETRY), Bytes(diskGeo) };
 	}
 
 	File::File(const std::filesystem::path& path) :
@@ -107,7 +110,7 @@ namespace Tunkio
 		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
 	}
 
-	uint64_t File::Size() const
+	std::pair<bool, uint64_t> File::Size() const
 	{
 		return m_size;
 	}

@@ -20,13 +20,14 @@ namespace Tunkio
 			return false;
 		}
 
-		if (!file.Size())
+		if (!file.Size().first)
 		{
 			m_errorCallback(TunkioStage::Size, 0, LastError);
+			return false;
 		}
 
 		const DataUnit::Mebibyte bufferSize(1);
-		uint64_t bytesLeft = file.Size();
+		uint64_t bytesLeft = file.Size().second;
 		uint64_t bytesWritten = 0;
 
 		FillGenerator fakeData(m_fillMode, DataUnit::Mebibyte(1));

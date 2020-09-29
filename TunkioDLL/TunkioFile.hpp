@@ -12,12 +12,12 @@ namespace Tunkio
 		~File();
 
 		bool IsValid() const;
-		uint64_t Size() const;
+		std::pair<bool, uint64_t> Size() const;
 		std::pair<bool, uint64_t> Write(const uint8_t* data, const uint64_t size) const;
 		bool Remove();
 
 	private:
-		uint64_t m_size = 0;
+		std::pair<bool, uint64_t> m_size;
 
 #ifdef WIN32
 		HANDLE m_handle = INVALID_HANDLE_VALUE;

@@ -29,9 +29,10 @@ namespace Tunkio
 				return false;
 			}
 
-			if (!file.Size())
+			if (!file.Size().first)
 			{
 				m_errorCallback(TunkioStage::Size, 0, LastError);
+				return false;
 			}
 
 			files.emplace_back(file);
@@ -39,7 +40,7 @@ namespace Tunkio
 
 		const auto sum = [](uint64_t sum, const File& file)
 		{
-			return sum + file.Size();
+			return sum + file.Size().second;
 		};
 
 		const uint64_t totalBytesLeft =
@@ -54,7 +55,7 @@ namespace Tunkio
 
 		for (File& file : files)
 		{
-			uint64_t bytesLeft = file.Size();
+			uint64_t bytesLeft = file.Size().second;
 
 			while (bytesLeft)
 			{
