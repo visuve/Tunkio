@@ -94,7 +94,7 @@ namespace Tunkio
 		return { true, static_cast<uint64_t>(result) };
 	}
 
-	bool File::Delete()
+	bool File::Remove()
 	{
 		if (IsValid() && close(m_fileDescriptor))
 		{

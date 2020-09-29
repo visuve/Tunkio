@@ -27,9 +27,8 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, Tunki
 	return nullptr;
 }
 
-
 template <typename T>
-bool Assign(TunkioHandle* handle, T(Tunkio::IOperation::*field), T value)
+bool Assign(TunkioHandle* handle, T(Tunkio::IOperation::* field), T value)
 {
 	const auto instance = reinterpret_cast<Tunkio::IOperation*>(handle);
 
@@ -55,22 +54,22 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetFillMode(TunkioHandle* handle, TunkioFil
 	return Assign(handle, &Tunkio::IOperation::m_fillMode, mode);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(TunkioHandle* handle, TunkioStartedCallback callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(TunkioHandle* handle, TunkioStartedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IOperation::m_startedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(TunkioHandle* handle, TunkioProgressCallback callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(TunkioHandle* handle, TunkioProgressCallback* callback)
 {
 	return Assign(handle, &Tunkio::IOperation::m_progressCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(TunkioHandle* handle, TunkioErrorCallback callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(TunkioHandle* handle, TunkioErrorCallback* callback)
 {
 	return Assign(handle, &Tunkio::IOperation::m_errorCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, TunkioCompletedCallback callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, TunkioCompletedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IOperation::m_completedCallback, callback);
 }

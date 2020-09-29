@@ -16,21 +16,13 @@ namespace Tunkio
 
 		if (disk.IsValid())
 		{
-			m_errorCallback(
-				TunkioStage::Open,
-				0,
-				LastError);
-
+			m_errorCallback(TunkioStage::Open, 0, LastError);
 			return false;
 		}
 
 		if (disk.Size())
 		{
-			m_errorCallback(
-				TunkioStage::Size,
-				0,
-				LastError);
-
+			m_errorCallback(TunkioStage::Size, 0, LastError);
 			return false;
 		}
 
@@ -52,11 +44,7 @@ namespace Tunkio
 
 			if (!result.first)
 			{
-				m_errorCallback(
-					TunkioStage::Write,
-					bytesWritten,
-					LastError);
-
+				m_errorCallback(TunkioStage::Write, bytesWritten, LastError);
 				return false;
 			}
 

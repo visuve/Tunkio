@@ -34,13 +34,13 @@ extern "C"
 		Open,
 		Size,
 		Write,
-		Delete,
+		Remove,
 	} TunkioStage;
 
-	typedef void(*TunkioStartedCallback)(uint64_t bytesToWrite);
-	typedef bool(*TunkioProgressCallback)(uint64_t bytesWritten); // Return false to cancel
-	typedef void(*TunkioErrorCallback)(TunkioStage stage, uint64_t bytesWritten, uint32_t errorCode);
-	typedef void(*TunkioCompletedCallback)(uint64_t bytesWritten);
+	typedef void(TunkioStartedCallback)(uint64_t bytesToWrite);
+	typedef bool(TunkioProgressCallback)(uint64_t bytesWritten); // Return false to cancel
+	typedef void(TunkioErrorCallback)(TunkioStage stage, uint64_t bytesWritten, uint32_t errorCode);
+	typedef void(TunkioCompletedCallback)(uint64_t bytesWritten);
 
 	struct TunkioHandle
 	{
@@ -50,12 +50,10 @@ extern "C"
 	TUNKIO_EXPORT struct TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type);
 
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetFillMode(struct TunkioHandle*, TunkioFillMode mode);
-
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(struct TunkioHandle*, TunkioStartedCallback);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(struct TunkioHandle*, TunkioProgressCallback);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(struct TunkioHandle*, TunkioErrorCallback);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(struct TunkioHandle*, TunkioCompletedCallback);
-
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(struct TunkioHandle*, TunkioStartedCallback*);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(struct TunkioHandle*, TunkioProgressCallback*);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(struct TunkioHandle*, TunkioErrorCallback*);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(struct TunkioHandle*, TunkioCompletedCallback*);
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(struct TunkioHandle*, bool remove);
 
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioRun(struct TunkioHandle*);

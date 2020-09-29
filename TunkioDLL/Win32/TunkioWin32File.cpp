@@ -124,7 +124,7 @@ namespace Tunkio
 		return { true, bytesWritten };
 	}
 
-	bool File::Delete()
+	bool File::Remove()
 	{
 		if (IsValid() && CloseHandle(m_handle))
 		{

@@ -25,20 +25,13 @@ namespace Tunkio
 
 			if (file.IsValid())
 			{
-				m_errorCallback(
-					TunkioStage::Open,
-					0,
-					LastError);
-
+				m_errorCallback(TunkioStage::Open, 0, LastError);
 				return false;
 			}
 
 			if (!file.Size())
 			{
-				m_errorCallback(
-					TunkioStage::Size,
-					0,
-					LastError);
+				m_errorCallback(TunkioStage::Size, 0, LastError);
 			}
 
 			files.emplace_back(file);
@@ -73,11 +66,7 @@ namespace Tunkio
 
 				if (!result.first)
 				{
-					m_errorCallback(
-						TunkioStage::Write,
-						totalBytesWritten,
-						LastError);
-
+					m_errorCallback(TunkioStage::Write, totalBytesWritten, LastError);
 					return false;
 				}
 
@@ -87,13 +76,9 @@ namespace Tunkio
 				}
 			}
 
-			if (m_removeAfterFill && !file.Delete())
+			if (m_removeAfterFill && !file.Remove())
 			{
-				m_errorCallback(
-					TunkioStage::Delete,
-					totalBytesWritten,
-					LastError);
-
+				m_errorCallback(TunkioStage::Remove, totalBytesWritten, LastError);
 				return false;
 			}
 		}
