@@ -1,9 +1,11 @@
 #include "PCH.hpp"
 #include "TunkioProgressDialog.hpp"
+#include "TunkioErrorCodes.hpp"
 
 namespace Tunkio::GUI
 {
 	ProgressDialog* g_dialog = nullptr;
+	uint32_t g_error = ErrorCode::Success;
 
 	void OnStarted(uint64_t bytesLeft)
 	{
@@ -29,6 +31,8 @@ namespace Tunkio::GUI
 
 	void OnError(TunkioStage stage, uint64_t bytesWritten, uint32_t error)
 	{
+		g_error = error;
+
 		if (!g_dialog)
 		{
 			std::cerr << "Dialog is null" << std::endl;
@@ -76,7 +80,7 @@ namespace Tunkio::GUI
 		if (!tunkio)
 		{
 			std::cerr << "Failed to create TunkioHandle!" << std::endl;
-			return -666; // TODO: FIX
+			return ErrorCode::InvalidArgument;
 		}
 
 		// TODO: check for success
@@ -87,19 +91,13 @@ namespace Tunkio::GUI
 		TunkioSetErrorCallback(tunkio.get(), OnError);
 		TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>());
 
-		if (!tunkio)
-		{
-			std::cerr << "Failed to create TunkioHandle!" << std::endl;
-			return -666; // TODO: FIX
-		}
-
 		ProgressDialog progressDialog("TODO", tunkio.get());
 		g_dialog = &progressDialog;
 
 		progressDialog.Show();
 		nana::exec();
 
-		return 0;
+		return g_error;
 	}
 }
 
@@ -109,7 +107,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdLine, int)
 	if (!Tunkio::Args::ParseString(Tunkio::GUI::Arguments, cmdLine))
 	{
 		Tunkio::GUI::Usage();
-		return -1;
+		return Tunkio::ErrorCode::InvalidArgument;
 	}
 
 	return Tunkio::GUI::Run();
@@ -122,7 +120,7 @@ int main(int argc, char** argv)
 	if (!Tunkio::Args::ParseVector(Tunkio::GUI::Arguments, args))
 	{
 		Tunkio::GUI::Usage();
-		return -1;
+		return Tunkio::ErrorCode::InvalidArgument;
 	}
 
 	return Tunkio::GUI::Run();

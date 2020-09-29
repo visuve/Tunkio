@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 
 	if (argc <= 1)
 	{
-		std::cerr << "Invalid arguments!" << std::endl << std::endl;
+		std::cerr << "Too few arguments!" << std::endl << std::endl;
 		PrintUsage(argv[0]);
 		return ErrorCode::InvalidArgument;
 	}
@@ -205,8 +205,8 @@ int main(int argc, char* argv[])
 
 	if (std::signal(SIGINT, Tunkio::SignalHandler) == SIG_ERR)
 	{
-		std::cerr << "Cannot attach SIGINT handler!" << std::endl;
-		return EXIT_FAILURE;
+		std::cerr << "Cannot attach CTRL+C interrupt handler!" << std::endl;
+		return ErrorCode::Generic;
 	}
 
 	if (!Args::ParseVector(Arguments, args))
@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
 	if (!tunkio)
 	{
 		std::cerr << "Failed to create TunkioHandle!" << std::endl;
-		return -666; // TODO: FIX
+		return ErrorCode::InvalidArgument;
 	}
 
 	// TODO: check for success

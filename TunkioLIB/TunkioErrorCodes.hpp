@@ -13,10 +13,10 @@ namespace Tunkio::ErrorCode
 #if defined(_WIN32) || defined(_WIN64)
 	constexpr int InvalidArgument = ERROR_BAD_ARGUMENTS;
 	constexpr int UserCancelled = ERROR_CANCELLED;
-	constexpr int NoData = ERROR_EMPTY;
+	constexpr int Generic = ERROR_INVALID_FUNCTION;
 #else
 	constexpr int InvalidArgument = EINVAL;
 	constexpr int UserCancelled = ECANCELED;
-	constexpr int NoData = ENODATA;
+	constexpr int Generic = EPERM;
 #endif
 }
