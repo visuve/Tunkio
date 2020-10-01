@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #include <Windows.h>
 #else
 #include <stdio.h>
@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <filesystem>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 #include <string>

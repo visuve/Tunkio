@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #define TUNKIO_EXPORT __declspec(dllexport)
 #define TUNKIO_CALLING_CONVENTION __cdecl
 #else
@@ -26,15 +26,15 @@ extern "C"
 	{
 		Zeroes = '0',
 		Ones = '1',
-		Random = 'R'
+		Random = 'r'
 	} TunkioFillMode;
 
 	typedef enum
 	{
-		Open = 'o',
-		Size = 's',
-		Write = 'w',
-		Remove = 'r',
+		Open = 'O',
+		Size = 'S',
+		Write = 'W',
+		Remove = 'R',
 	} TunkioStage;
 
 	typedef void(TunkioStartedCallback)(uint64_t bytesToWrite);

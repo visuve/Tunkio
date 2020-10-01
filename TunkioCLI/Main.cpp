@@ -5,7 +5,7 @@
 #include "TunkioDataUnits.hpp"
 #include "TunkioMemory.hpp"
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #include "Win32/TunkioWin32ChildProcess.hpp"
 #else
 #include "Posix/TunkioPosixChildProcess.hpp"
@@ -23,17 +23,17 @@ namespace Tunkio
 	void PrintUsage(const std::filesystem::path& exe)
 	{
 		std::cout << " Usage:" << std::endl << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		std::cout << "  --path=\"P:\\Path\\To\\File or Drive\" (Required) " << std::endl;
 #else
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
-		std::cout << "  --target=[f|d|m] where f=file, d=directory, m=mass storage device (Optional) " << std::endl;
+		std::cout << "  --target=[f|d|m] where f=file, d=directory, D=drive (Optional) " << std::endl;
 		std::cout << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
 		std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
 		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
 		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTargetType::Drive) << " --mode=r" << std::endl;
@@ -44,7 +44,7 @@ namespace Tunkio
 #endif
 		std::cout << std::endl;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		Win32ChildProcess process(L"C:\\Windows\\System32\\wbem\\WMIC.exe", L"diskdrive list brief");
 #else
 		PosixChildProcess process("/bin/df", "-h");
@@ -131,16 +131,32 @@ namespace Tunkio
 		return g_keepRunning;
 	}
 
-	void OnError(TunkioStage, uint64_t bytesWritten, uint32_t error)
+	void OnError(TunkioStage stage, uint64_t bytesWritten, uint32_t error)
 	{
+		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
+				
+		switch (stage)
+		{
+			case TunkioStage::Open:
+				std::cerr << "opening!";
+				break;
+			case TunkioStage::Size:
+				std::cerr << "querying size!";
+				break;
+			case TunkioStage::Write:
+				std::cerr << "writing!";
+				break;
+			case TunkioStage::Remove:
+				std::cerr << "removing file!";
+				break;
+		}
+			
 		if (bytesWritten)
 		{
-			std::cerr << Time::Timestamp() << " Error " << error << " occurred. Bytes written: " << bytesWritten << std::endl;
+			std::cerr << " Bytes written: " << bytesWritten;
 		}
-		else
-		{
-			std::cerr << Time::Timestamp() << " Error " << error << " occurred." << std::endl;
-		}
+
+		std::cerr << std::endl;
 
 #ifdef WIN32
 		std::array<wchar_t, 0x400> buffer;

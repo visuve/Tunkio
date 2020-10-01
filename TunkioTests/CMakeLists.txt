@@ -5,11 +5,11 @@ add_executable(TunkioTests ${TunkioTestsSource})
 
 target_precompile_headers(TunkioTests PRIVATE "PCH.hpp")
 
-target_include_directories(TunkioTests PRIVATE "../TunkioDLL/") # TODO: This is shit
-target_include_directories(TunkioTests PRIVATE "../googletest/googletest/include/") # TODO: This is shit
+target_include_directories(TunkioTests PRIVATE "../TunkioDLL/")
+target_include_directories(TunkioTests PRIVATE "../googletest/googletest/include/")
 
-if(WIN32)
-	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest)
-else()
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest stdc++fs)
+else()
+	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest)
 endif()

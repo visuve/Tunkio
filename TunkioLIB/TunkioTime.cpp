@@ -55,10 +55,10 @@ namespace Tunkio::Time
 		const std::time_t seconds = std::chrono::system_clock::to_time_t(time);
 		std::tm dateTime = { 0 };
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		if (converterFunction(&dateTime, &seconds) != 0)
 #else
-		if (converterFunction(&seconds, &dateTime) <= 0)
+		if (converterFunction(&seconds, &dateTime) == nullptr)
 #endif
 		{
 			return {};
@@ -70,7 +70,7 @@ namespace Tunkio::Time
 
 	std::string Timestamp(const std::chrono::system_clock::time_point& time)
 	{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		return Timestamp(time, localtime_s);
 #else
 		return Timestamp(time, localtime_r);
@@ -79,7 +79,7 @@ namespace Tunkio::Time
 
 	std::string TimestampUTC(const std::chrono::system_clock::time_point& time)
 	{
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		return Timestamp(time, gmtime_s);
 #else
 		return Timestamp(time, gmtime_r);

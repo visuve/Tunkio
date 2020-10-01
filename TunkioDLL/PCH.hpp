@@ -1,12 +1,16 @@
 #pragma once
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #include <SDKDDKVer.h>
 #include <Windows.h>
-#else
-
-#include <fcntl.h>
+#elif defined(__linux__)
 #include <linux/fs.h>
+#else
+#include <sys/disk.h>
+#endif
+
+#if !defined(_WIN32)
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
@@ -15,7 +19,6 @@
 #include <unistd.h>
 #endif
 
-#include <bitset>
 #include <filesystem>
 #include <iostream>
 #include <iomanip>
@@ -26,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #define LastError GetLastError()
 #else
 #define LastError errno

@@ -23,14 +23,15 @@
 
 - Nana C++
   - https://github.com/cnjinhao/nana
-
-## TODO
-
-
-- Testing
-	- Add other than "happy path" unit tests
+- Google Test
+  - https://github.com/google/googletest
 
 ## Tools
 
-- Visual Studio >= 2019 or GCC >= 8.3.0
+- Visual Studio >= 2019 or GCC >= 8.3.0 or Clang >= 7.0.1
 - CMake >= 3.17
+
+## TODO:
+
+- Testing
+	- Add other than "happy path" unit tests

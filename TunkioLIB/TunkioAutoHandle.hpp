@@ -26,7 +26,10 @@ namespace Tunkio
 		bool IsValid() const
 		{
 			if (m_handle != InvalidValue)
+			{
 				return m_handle > NullValue;
+			}
+
 			return false;
 		}
 

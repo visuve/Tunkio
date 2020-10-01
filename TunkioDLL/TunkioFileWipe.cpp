@@ -12,9 +12,11 @@ namespace Tunkio
 
 	bool FileWipe::Run()
 	{
-		File file(m_path);
+		const std::filesystem::path path(m_path);
 
-		if (file.IsValid())
+		File file(path);
+
+		if (!file.IsValid())
 		{
 			m_errorCallback(TunkioStage::Open, 0, LastError);
 			return false;

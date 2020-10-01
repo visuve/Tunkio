@@ -3,18 +3,18 @@
 
 namespace Tunkio
 {
-	int Open(const std::string& path)
-	{
-		// https://linux.die.net/man/2/open
-		constexpr uint32_t Flags = O_WRONLY | O_DIRECT | O_LARGEFILE | O_SYNC;
-		return open(path.c_str(), Flags);
-	}
+	// https://linux.die.net/man/2/open
+	constexpr uint32_t OpenFlags = O_WRONLY | O_DIRECT | O_SYNC;
 
 	std::pair<bool, uint64_t> FileSize(const int fileDescriptor)
 	{
+#if defined(__linux__)
 		struct stat64 buffer = { 0 };
-
 		if (fstat64(fileDescriptor, &buffer) != 0)
+#else
+		struct stat buffer = { 0 };
+		if (fstat(fileDescriptor, &buffer) != 0)
+#endif
 		{
 			return { false, buffer.st_size };
 		}
@@ -31,7 +31,11 @@ namespace Tunkio
 
 		uint64_t size = 0;
 
+#if defined(__linux__)
 		if (ioctl(fileDescriptor, BLKGETSIZE64, &size) != 0)
+#else
+		if (ioctl(fileDescriptor, DIOCGMEDIASIZE, &size) != 0)
+#endif
 		{
 			return { false, size };
 		}
@@ -41,7 +45,7 @@ namespace Tunkio
 
 	File::File(const std::filesystem::path& path) :
 		Path(path.string()),
-		m_fileDescriptor(Open(path.string()))
+		m_fileDescriptor(open(path.c_str(), OpenFlags))
 	{
 		if (!IsValid())
 		{
@@ -53,7 +57,7 @@ namespace Tunkio
 
 	File::File(const std::string& path) :
 		Path(path),
-		m_fileDescriptor(Open(path))
+		m_fileDescriptor(open(path.c_str(), OpenFlags))
 	{
 		if (!IsValid())
 		{

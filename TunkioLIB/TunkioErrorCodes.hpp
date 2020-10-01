@@ -10,7 +10,7 @@ namespace Tunkio::ErrorCode
 {
 	constexpr int Success = 0;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 	constexpr int InvalidArgument = ERROR_BAD_ARGUMENTS;
 	constexpr int UserCancelled = ERROR_CANCELLED;
 	constexpr int Generic = ERROR_INVALID_FUNCTION;

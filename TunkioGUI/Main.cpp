@@ -101,7 +101,7 @@ namespace Tunkio::GUI
 	}
 }
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdLine, int)
 {
 	if (!Tunkio::Args::ParseString(Tunkio::GUI::Arguments, cmdLine))

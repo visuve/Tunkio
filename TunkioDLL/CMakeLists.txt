@@ -7,9 +7,12 @@ else()
 endif()
 
 add_library(TunkioDLL SHARED ${TunkioDLLSource})
-
 target_precompile_headers(TunkioDLL PRIVATE "PCH.hpp")
 set_source_files_properties("TunkioAPICompliance.c" PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
-
 set_target_properties(TunkioDLL PROPERTIES PUBLIC_HEADER "TunkioAPI.h")
-target_link_libraries(TunkioDLL LINK_PRIVATE TunkioLIB)
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	target_link_libraries(TunkioDLL LINK_PRIVATE TunkioLIB stdc++fs)
+else()
+	target_link_libraries(TunkioDLL LINK_PRIVATE TunkioLIB)
+endif()
