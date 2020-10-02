@@ -60,5 +60,5 @@ extern "C"
 	TUNKIO_EXPORT void TUNKIO_CALLING_CONVENTION TunkioFree(struct TunkioHandle*);
 
 #if defined(__cplusplus)
-};
+}
 #endif

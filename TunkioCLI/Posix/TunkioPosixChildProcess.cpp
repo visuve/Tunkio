@@ -22,7 +22,6 @@ namespace Tunkio
 
 		std::array<char, 0xFF> buffer;
 		std::stringstream stream;
-		long lastPosition = 0;
 
 		while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
 		{

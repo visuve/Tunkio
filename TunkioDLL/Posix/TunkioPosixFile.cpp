@@ -9,10 +9,10 @@ namespace Tunkio
 	std::pair<bool, uint64_t> FileSize(const int fileDescriptor)
 	{
 #if defined(__linux__)
-		struct stat64 buffer = { 0 };
+		struct stat64 buffer = { };
 		if (fstat64(fileDescriptor, &buffer) != 0)
 #else
-		struct stat buffer = { 0 };
+		struct stat buffer = { };
 		if (fstat(fileDescriptor, &buffer) != 0)
 #endif
 		{
@@ -108,4 +108,4 @@ namespace Tunkio
 
 		return false;
 	}
-};
+}

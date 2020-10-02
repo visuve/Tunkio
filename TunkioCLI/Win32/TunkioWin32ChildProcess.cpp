@@ -102,7 +102,7 @@ namespace Tunkio
 	void Win32ChildProcess::ReadFromPipe()
 	{
 		DWORD bytesRead;
-		std::array<char, 0xF> buffer;
+		std::array<char, 0xFF> buffer;
 		std::stringstream stream;
 
 		while (ReadFile(
