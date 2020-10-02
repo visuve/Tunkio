@@ -16,80 +16,16 @@ namespace Tunkio::Time
 	class Duration
 	{
 	public:
-		constexpr static Duration None()
-		{
-			return Duration(Hours(0), Minutes(0), Seconds(0), MilliSeconds(0), MicroSeconds(0));
-		}
+		static Duration None();
+		static Duration Infinite();
 
-		constexpr static Duration Infinite()
-		{
-			constexpr auto maximum = std::numeric_limits<uint64_t>::max();
-			return Duration(Hours(maximum), Minutes(maximum), Seconds(maximum), MilliSeconds(maximum), MicroSeconds(maximum));
-		}
-
-		inline constexpr Duration(const MicroSeconds elapsed) :
-			H(std::chrono::duration_cast<Hours>(elapsed)),
-			M(std::chrono::duration_cast<Minutes>(elapsed - H)),
-			S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),
-			Ms(std::chrono::duration_cast<MilliSeconds>(elapsed - H - M - S)),
-			Us(elapsed - H - M - S - Ms)
-		{
-		}
-
-		inline constexpr Duration(const MilliSeconds elapsed) :
-			H(std::chrono::duration_cast<Hours>(elapsed)),
-			M(std::chrono::duration_cast<Minutes>(elapsed - H)),
-			S(std::chrono::duration_cast<Seconds>(elapsed - H - M)),
-			Ms(elapsed - H - M - S),
-			Us(0)
-		{
-		}
-
-		inline constexpr Duration(const Seconds elapsed) :
-			H(std::chrono::duration_cast<Hours>(elapsed)),
-			M(std::chrono::duration_cast<Minutes>(elapsed - H)),
-			S(elapsed - H - M),
-			Ms(0),
-			Us(0)
-		{
-		}
-
-		inline constexpr Duration(const Minutes elapsed) :
-			H(std::chrono::duration_cast<Hours>(elapsed)),
-			M(elapsed - H),
-			S(0),
-			Ms(0),
-			Us(0)
-		{
-		}
-
-		inline constexpr Duration(const Hours elapsed) :
-			H(elapsed),
-			M(0),
-			S(0),
-			Ms(0),
-			Us(0)
-		{
-		}
-
-		inline constexpr Duration(const Days elapsed) :
-			H(std::chrono::duration_cast<Hours>(elapsed)),
-			M(0),
-			S(0),
-			Ms(0),
-			Us(0)
-		{
-		}
-
-		inline constexpr bool operator == (const Duration& other) const
-		{
-			return Us == other.Us &&
-				Ms == other.Ms &&
-				S == other.S &&
-				M == other.M &&
-				H == other.H;
-		}
-
+		Duration(MicroSeconds elapsed);
+		Duration(MilliSeconds elapsed);
+		Duration(Seconds elapsed);
+		Duration(Minutes elapsed);
+		Duration(Hours elapsed);
+		Duration(Days elapsed);
+		bool operator == (const Duration& other) const;
 
 		const Hours H;
 		const Minutes M;
@@ -98,14 +34,7 @@ namespace Tunkio::Time
 		const MicroSeconds Us;
 
 	private:
-		inline constexpr Duration(const Hours h, const Minutes m, const Seconds s, const MilliSeconds ms, const MicroSeconds us) :
-			H(h),
-			M(m),
-			S(s),
-			Ms(ms),
-			Us(us)
-		{
-		}
+		Duration(Hours h, Minutes m, Seconds s, MilliSeconds ms, MicroSeconds us);
 	};
 
 	std::ostream& operator << (std::ostream& os, Days s);
@@ -125,7 +54,6 @@ namespace Tunkio::Time
 	std::wostream& operator << (std::wostream& os, const Duration& x);
 
 	std::string HumanReadable(const Duration& duration);
-
 	std::string Timestamp(const std::chrono::system_clock::time_point& time = std::chrono::system_clock::now());
 	std::string TimestampUTC(const std::chrono::system_clock::time_point& time = std::chrono::system_clock::now());
 
