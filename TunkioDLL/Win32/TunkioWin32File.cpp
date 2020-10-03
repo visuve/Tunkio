@@ -8,7 +8,8 @@ namespace Tunkio
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering
 		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		constexpr uint32_t ShareMode = FILE_SHARE_READ;
-		constexpr uint32_t CreationFlags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+		constexpr uint32_t CreationFlags = 
+			FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
 		return CreateFileA(
 			path.c_str(),
@@ -20,14 +21,19 @@ namespace Tunkio
 			nullptr);
 	}
 
+	constexpr bool IsValidHandle(const HANDLE handle)
+	{
+		return handle != nullptr && handle != INVALID_HANDLE_VALUE;
+	}
+
 	std::pair<bool, uint64_t> FileSize(const HANDLE handle)
 	{
-		if (handle != INVALID_HANDLE_VALUE)
+		if (!IsValidHandle(handle))
 		{
 			return { false, 0 };
 		}
 
-		LARGE_INTEGER fileSize = { 0 };
+		LARGE_INTEGER fileSize = { };
 
 		if (!GetFileSizeEx(handle, &fileSize))
 		{
@@ -47,13 +53,13 @@ namespace Tunkio
 
 	std::pair<bool, uint64_t> DiskSize(const HANDLE handle)
 	{
-		if (handle != INVALID_HANDLE_VALUE)
+		if (!IsValidHandle(handle))
 		{
 			return { false, 0 };
 		}
 
 		unsigned long bytesReturned = 0;
-		DISK_GEOMETRY diskGeo = { 0 };
+		DISK_GEOMETRY diskGeo = { };
 		constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
 
 		if (!DeviceIoControl(
@@ -107,7 +113,7 @@ namespace Tunkio
 
 	bool File::IsValid() const
 	{
-		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
+		return IsValidHandle(m_handle);
 	}
 
 	std::pair<bool, uint64_t> File::Size() const

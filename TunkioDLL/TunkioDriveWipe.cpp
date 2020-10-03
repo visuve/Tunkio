@@ -14,7 +14,7 @@ namespace Tunkio
 	{
 		const File disk(m_path);
 
-		if (disk.IsValid())
+		if (!disk.IsValid())
 		{
 			m_errorCallback(TunkioStage::Open, 0, LastError);
 			return false;
@@ -25,6 +25,8 @@ namespace Tunkio
 			m_errorCallback(TunkioStage::Size, 0, LastError);
 			return false;
 		}
+		
+		// TODO: use FSCTL_DISMOUNT_VOLUME IOCTL
 
 		const DataUnit::Mebibyte bufferSize(1);
 		uint64_t bytesLeft = disk.Size().second;
