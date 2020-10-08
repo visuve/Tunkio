@@ -28,7 +28,7 @@ namespace Tunkio
 #else
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
-		std::cout << "  --target=[f|d|m] where f=file, d=directory, D=drive (Optional) " << std::endl;
+		std::cout << "  --target=[f|d|D] where f=file, d=directory, D=drive (Optional) " << std::endl;
 		std::cout << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
 		std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
 		std::cout << std::endl;
@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
 	}
 
 	const Tunkio::Memory::AutoHandle tunkio(TunkioInitialize(
-		Arguments.at("path").Value<std::string>().c_str(), 
+		Arguments.at("path").Value<std::string>().c_str(),
 		Arguments.at("target").Value<TunkioTargetType>()));
 
 	if (!tunkio)
@@ -247,13 +247,17 @@ int main(int argc, char* argv[])
 		return ErrorCode::InvalidArgument;
 	}
 
-	// TODO: check for success
-	TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>());
-	TunkioSetStartedCallback(tunkio.get(), OnStarted);
-	TunkioSetProgressCallback(tunkio.get(), OnProgress);
-	TunkioSetCompletedCallback(tunkio.get(), OnCompleted);
-	TunkioSetErrorCallback(tunkio.get(), OnError);
-	TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>());
+
+	if (!TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>()) ||
+		!TunkioSetStartedCallback(tunkio.get(), OnStarted) ||
+		!TunkioSetProgressCallback(tunkio.get(), OnProgress) ||
+		!TunkioSetCompletedCallback(tunkio.get(), OnCompleted) ||
+		!TunkioSetErrorCallback(tunkio.get(), OnError) ||
+		!TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>()))
+	{
+		std::cerr << "Failed to pass arguments!" << std::endl;
+		return ErrorCode::InvalidArgument;
+	}
 
 	if (!TunkioRun(tunkio.get()))
 	{

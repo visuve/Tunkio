@@ -58,7 +58,7 @@ namespace Tunkio::GUI
 		{ "target", Args::Argument(false, TunkioTargetType::File) },
 		{ "mode", Args::Argument(false, TunkioFillMode::Zeroes) },
 		{ "remove", Args::Argument(false, false) },
-		{ "path", Args::Argument(true, std::filesystem::path()) }
+		{ "path", Args::Argument(true, std::string()) }
 	};
 
 	void Usage()
@@ -71,7 +71,7 @@ namespace Tunkio::GUI
 		nana::exec();
 	}
 
-	int Run()
+	int Run(const std::string& title)
 	{
 		const Tunkio::Memory::AutoHandle tunkio(TunkioInitialize(
 			Arguments.at("path").Value<std::string>().c_str(),
@@ -83,15 +83,18 @@ namespace Tunkio::GUI
 			return ErrorCode::InvalidArgument;
 		}
 
-		// TODO: check for success
-		TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>());
-		TunkioSetStartedCallback(tunkio.get(), OnStarted);
-		TunkioSetProgressCallback(tunkio.get(), OnProgress);
-		TunkioSetCompletedCallback(tunkio.get(), OnCompleted);
-		TunkioSetErrorCallback(tunkio.get(), OnError);
-		TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>());
+		if (!TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>()) ||
+			!TunkioSetStartedCallback(tunkio.get(), OnStarted) ||
+			!TunkioSetProgressCallback(tunkio.get(), OnProgress) ||
+			!TunkioSetCompletedCallback(tunkio.get(), OnCompleted) ||
+			!TunkioSetErrorCallback(tunkio.get(), OnError) ||
+			!TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>()))
+		{
+			std::cerr << "Failed to pass arguments!" << std::endl;
+			return ErrorCode::InvalidArgument;
+		}
 
-		ProgressDialog progressDialog("TODO", tunkio.get());
+		ProgressDialog progressDialog(title, tunkio.get());
 		g_dialog = &progressDialog;
 
 		progressDialog.Show();
@@ -110,19 +113,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdLine, int)
 		return Tunkio::ErrorCode::InvalidArgument;
 	}
 
-	return Tunkio::GUI::Run();
+	return Tunkio::GUI::Run(cmdLine);
 }
 #else
 int main(int argc, char** argv)
 {
 	const std::vector<std::string> args({ argv + 1, argv + argc });
 
+	auto join = [](std::string a, std::string b)
+	{
+		return a + ' ' + b;
+	};
+
+	const std::string cmdLine =
+		std::accumulate(std::next(args.begin()), args.end(), args.front(), join);
+
 	if (!Tunkio::Args::ParseVector(Tunkio::GUI::Arguments, args))
 	{
-		Tunkio::GUI::Usage();
+		Tunkio::GUI::Usage(cmdLine);
 		return Tunkio::ErrorCode::InvalidArgument;
 	}
 
-	return Tunkio::GUI::Run();
+	return Tunkio::GUI::Run(cmdLine);
 }
 #endif

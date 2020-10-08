@@ -12,10 +12,11 @@
 #include <nana/gui/widgets/progress.hpp>
 #include <nana/gui/widgets/button.hpp>
 
-#include <iostream>
-#include <sstream>
-#include <future>
 #include <array>
+#include <future>
+#include <iostream>
+#include <numeric>
+#include <sstream>
 
 #include "TunkioAPI.h"
 #include "TunkioArgs.hpp"
