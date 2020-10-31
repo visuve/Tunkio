@@ -1,7 +1,7 @@
-#include "PCH.hpp"
+#include "../PCH.hpp"
 #include "TunkioDirectoryWipe.hpp"
-#include "TunkioFillGenerator.hpp"
-#include "TunkioFile.hpp"
+#include "../TunkioFillGenerator.hpp"
+#include "../TunkioFile.hpp"
 
 namespace Tunkio
 {

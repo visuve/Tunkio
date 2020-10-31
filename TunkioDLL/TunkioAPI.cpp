@@ -2,10 +2,10 @@
 #include "TunkioAPI.h"
 #include "TunkioErrorCodes.hpp"
 
-#include "TunkioOperation.hpp"
-#include "TunkioFileWipe.hpp"
-#include "TunkioDirectoryWipe.hpp"
-#include "TunkioDriveWipe.hpp"
+#include "Workloads/TunkioOperation.hpp"
+#include "Workloads/TunkioFileWipe.hpp"
+#include "Workloads/TunkioDirectoryWipe.hpp"
+#include "Workloads/TunkioDriveWipe.hpp"
 
 TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type)
 {

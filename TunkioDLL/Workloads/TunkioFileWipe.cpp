@@ -1,45 +1,45 @@
-#include "PCH.hpp"
-#include "TunkioDriveWipe.hpp"
-#include "TunkioFillGenerator.hpp"
-#include "TunkioFile.hpp"
+#include "../PCH.hpp"
+#include "TunkioFileWipe.hpp"
+#include "../TunkioFillGenerator.hpp"
+#include "../TunkioFile.hpp"
 
 namespace Tunkio
 {
-	DriveWipe::DriveWipe(const std::string& path) :
+	FileWipe::FileWipe(const std::string& path) :
 		IOperation(path)
 	{
 	}
 
-	bool DriveWipe::Run()
+	bool FileWipe::Run()
 	{
-		const File disk(m_path);
+		const std::filesystem::path path(m_path);
 
-		if (!disk.IsValid())
+		File file(path);
+
+		if (!file.IsValid())
 		{
 			m_errorCallback(TunkioStage::Open, 0, LastError);
 			return false;
 		}
 
-		if (!disk.Size().first)
+		if (!file.Size().first)
 		{
 			m_errorCallback(TunkioStage::Size, 0, LastError);
 			return false;
 		}
-		
-		// TODO: use FSCTL_DISMOUNT_VOLUME IOCTL
 
 		const DataUnit::Mebibyte bufferSize(1);
-		uint64_t bytesLeft = disk.Size().second;
+		uint64_t bytesLeft = file.Size().second;
 		uint64_t bytesWritten = 0;
 
-		FillGenerator fakeData(m_fillMode, bufferSize);
+		FillGenerator fakeData(m_fillMode, DataUnit::Mebibyte(1));
 
 		m_startedCallback(bytesLeft);
 
 		while (bytesLeft)
 		{
 			const uint64_t bytesToWrite = bufferSize > bytesLeft ? bytesLeft : bufferSize.Bytes();
-			const auto result = disk.Write(fakeData.Data(), bytesToWrite);
+			const auto result = file.Write(fakeData.Data(), bytesToWrite);
 
 			bytesWritten += result.second;
 			bytesLeft -= result.second;
@@ -57,6 +57,13 @@ namespace Tunkio
 		}
 
 		m_completedCallback(bytesWritten);
+
+		if (m_removeAfterFill && !file.Remove())
+		{
+			m_errorCallback(TunkioStage::Remove, bytesWritten, LastError);
+			return false;
+		}
+
 		return true;
 	}
 }

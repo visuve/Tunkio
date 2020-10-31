@@ -1,5 +1,5 @@
 #include "PCH.hpp"
-#include "TunkioDirectoryWipe.hpp"
+#include "Workloads/TunkioDirectoryWipe.hpp"
 
 namespace Tunkio
 {
