@@ -21,7 +21,7 @@ namespace Tunkio
 				continue;
 			}
 
-			const File file(entry.path());
+			const File file(entry.path().string());
 
 			if (file.IsValid())
 			{

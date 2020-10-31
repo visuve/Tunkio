@@ -7,8 +7,7 @@ namespace Tunkio
 	public:
 		const std::string Path;
 
-		explicit File(const std::filesystem::path& path); // For files
-		explicit File(const std::string& path); // For disks
+		explicit File(const std::string& path);
 		~File();
 
 		bool IsValid() const;

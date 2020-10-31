@@ -6,22 +6,6 @@ namespace Tunkio
 	// https://linux.die.net/man/2/open
 	constexpr uint32_t OpenFlags = O_WRONLY | O_DIRECT | O_SYNC;
 
-	std::pair<bool, uint64_t> FileSize(const int fileDescriptor)
-	{
-#if defined(__linux__)
-		struct stat64 buffer = { };
-		if (fstat64(fileDescriptor, &buffer) != 0)
-#else
-		struct stat buffer = { };
-		if (fstat(fileDescriptor, &buffer) != 0)
-#endif
-		{
-			return { false, buffer.st_size };
-		}
-
-		return { true, buffer.st_size };
-	}
-
 	std::pair<bool, uint64_t> DiskSize(const int fileDescriptor)
 	{
 		if (!fileDescriptor)
@@ -43,18 +27,6 @@ namespace Tunkio
 		return { true, size };
 	}
 
-	File::File(const std::filesystem::path& path) :
-		Path(path.string()),
-		m_fileDescriptor(open(path.c_str(), OpenFlags))
-	{
-		if (!IsValid())
-		{
-			return;
-		}
-
-		m_size = FileSize(m_fileDescriptor);
-	}
-
 	File::File(const std::string& path) :
 		Path(path),
 		m_fileDescriptor(open(path.c_str(), OpenFlags))
@@ -64,7 +36,27 @@ namespace Tunkio
 			return;
 		}
 
-		m_size = DiskSize(m_fileDescriptor);
+#if defined(__linux__)
+		struct stat64 buffer = { };
+		if (fstat64(m_fileDescriptor, &buffer) != 0)
+		{
+			return;
+		}
+#else
+		struct stat buffer = { };
+		if (fstat(m_fileDescriptor, &buffer) != 0)
+		{
+			return;
+		}
+#endif
+		if ((buffer.st_mode & S_IFMT) == S_IFBLK)
+		{
+			m_size = DiskSize(m_fileDescriptor);
+		}
+		else
+		{
+			m_size = { true, buffer.st_size };
+		}
 	}
 
 	File::~File()

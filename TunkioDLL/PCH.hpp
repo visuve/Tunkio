@@ -19,6 +19,7 @@
 #include <unistd.h>
 #endif
 
+#include <cassert>
 #include <filesystem>
 #include <iostream>
 #include <iomanip>

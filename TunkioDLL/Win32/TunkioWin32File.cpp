@@ -45,6 +45,11 @@ namespace Tunkio
 
 	uint64_t Bytes(const DISK_GEOMETRY& diskGeo)
 	{
+		assert(diskGeo.Cylinders.QuadPart);
+		assert(diskGeo.TracksPerCylinder);
+		assert(diskGeo.SectorsPerTrack);
+		assert(diskGeo.BytesPerSector);
+
 		return diskGeo.Cylinders.QuadPart *
 			diskGeo.TracksPerCylinder *
 			diskGeo.SectorsPerTrack *
@@ -78,17 +83,6 @@ namespace Tunkio
 		return { bytesReturned == sizeof(DISK_GEOMETRY), Bytes(diskGeo) };
 	}
 
-	File::File(const std::filesystem::path& path) :
-		Path(path.string()),
-		m_handle(Open(path.string()))
-	{
-		if (!IsValid())
-		{
-			return;
-		}
-
-		m_size = FileSize(m_handle);
-	}
 
 	File::File(const std::string& path) :
 		Path(path),
@@ -99,7 +93,14 @@ namespace Tunkio
 			return;
 		}
 
-		m_size = DiskSize(m_handle);
+		if (GetFileType(m_handle) == FILE_TYPE_DISK)
+		{
+			m_size = DiskSize(m_handle);
+		}
+		else
+		{
+			m_size = FileSize(m_handle);
+		}	
 	}
 
 	File::~File()
