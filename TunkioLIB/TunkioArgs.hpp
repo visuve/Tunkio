@@ -1,23 +1,30 @@
 #pragma once
 
-#include <string>
+#include "../TunkioDLL/TunkioAPI.h"
+
 #include <any>
-#include <typeindex>
 #include <map>
+#include <string>
+#include <typeindex>
+#include <variant>
 #include <vector>
-#include <sstream>
-#include <regex>
 
 namespace Tunkio::Args
 {
 	class Argument
 	{
 	public:
+		using Variant = std::variant<
+			std::string,
+			TunkioTargetType,
+			TunkioFillMode,
+			bool>;
+
 		template <typename T>
 		Argument(bool required, T&& value) :
 			Required(required),
 			Type(typeid(value)),
-			m_value(std::make_any<T>(value))
+			m_value(value)
 		{
 		}
 
@@ -26,19 +33,19 @@ namespace Tunkio::Args
 		template <class T>
 		const T& Value() const
 		{
-			return std::any_cast<const T&>(m_value);
+			return std::get<T>(m_value);
 		}
 
 		const bool Required;
 		const std::type_index Type;
 
 	private:
-		std::any m_value;
+		Variant m_value;
 	};
 
-	bool TargetFromChar(char c, std::any& result);
-	bool ModeFromChar(char c, std::any& result);
-	bool BoolFromChar(char c, std::any& result);
+	bool TargetFromChar(char c, Argument::Variant& result);
+	bool ModeFromChar(char c, Argument::Variant& result);
+	bool BoolFromChar(char c, Argument::Variant& result);
 
 	bool ParseVector(std::map<std::string, Argument>& arguments, const std::vector<std::string>& rawArgs);
 	bool ParseString(std::map<std::string, Argument>& arguments, const std::string& rawArgs);

@@ -1,6 +1,5 @@
 #include "PCH.hpp"
 #include "TunkioArgs.hpp"
-#include "../TunkioDLL/TunkioAPI.h"
 
 namespace Tunkio::Args
 {
@@ -13,7 +12,7 @@ namespace Tunkio::Args
 
 		if (Type == typeid(std::string))
 		{
-			m_value = std::make_any<std::string>(value);
+			m_value = value;
 			return true;
 		}
 
@@ -54,7 +53,7 @@ namespace Tunkio::Args
 		return false;
 	}
 
-	bool TargetFromChar(char c, std::any& result)
+	bool TargetFromChar(char c, Argument::Variant& result)
 	{
 		switch (c)
 		{
@@ -78,7 +77,7 @@ namespace Tunkio::Args
 		return false;
 	}
 
-	bool ModeFromChar(char c, std::any& result)
+	bool ModeFromChar(char c, Argument::Variant& result)
 	{
 		switch (c)
 		{
@@ -102,7 +101,7 @@ namespace Tunkio::Args
 		return false;
 	}
 
-	bool BoolFromChar(char c, std::any& result)
+	bool BoolFromChar(char c, Argument::Variant& result)
 	{
 		switch (c)
 		{

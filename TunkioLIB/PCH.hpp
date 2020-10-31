@@ -10,11 +10,16 @@
 #endif
 
 #include <algorithm>
+#include <any>
 #include <array>
 #include <chrono>
 #include <ctime>
 #include <iostream>
+#include <map>
+#include <regex>
 #include <sstream>
 #include <string>
+#include <typeindex>
 #include <random>
+#include <variant>
 #include <vector>

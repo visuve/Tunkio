@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 
 	if (!Tunkio::Args::ParseVector(Tunkio::GUI::Arguments, args))
 	{
-		Tunkio::GUI::Usage(cmdLine);
+		Tunkio::GUI::Usage();
 		return Tunkio::ErrorCode::InvalidArgument;
 	}
 
