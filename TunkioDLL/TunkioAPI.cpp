@@ -2,7 +2,7 @@
 #include "TunkioAPI.h"
 #include "TunkioErrorCodes.hpp"
 
-#include "Workloads/TunkioOperation.hpp"
+#include "Workloads/TunkioWorkload.hpp"
 #include "Workloads/TunkioFileWipe.hpp"
 #include "Workloads/TunkioDirectoryWipe.hpp"
 #include "Workloads/TunkioDriveWipe.hpp"
@@ -28,9 +28,9 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, Tunki
 }
 
 template <typename T>
-bool Assign(TunkioHandle* handle, T(Tunkio::IOperation::* field), T value)
+bool Assign(TunkioHandle* handle, T(Tunkio::IWorkload::* field), T value)
 {
-	const auto instance = reinterpret_cast<Tunkio::IOperation*>(handle);
+	const auto instance = reinterpret_cast<Tunkio::IWorkload*>(handle);
 
 	if (!instance)
 	{
@@ -45,33 +45,33 @@ bool Assign(TunkioHandle* handle, T(Tunkio::IOperation::* field), T value)
 template<typename Base>
 inline bool IsInstanceOf(const TunkioHandle* handle)
 {
-	auto instance = reinterpret_cast<const Tunkio::IOperation*>(handle);
+	auto instance = reinterpret_cast<const Tunkio::IWorkload*>(handle);
 	return dynamic_cast<const Base*>(instance) != nullptr;
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetFillMode(TunkioHandle* handle, TunkioFillMode mode)
 {
-	return Assign(handle, &Tunkio::IOperation::m_fillMode, mode);
+	return Assign(handle, &Tunkio::IWorkload::m_fillMode, mode);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(TunkioHandle* handle, TunkioStartedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IOperation::m_startedCallback, callback);
+	return Assign(handle, &Tunkio::IWorkload::m_startedCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(TunkioHandle* handle, TunkioProgressCallback* callback)
 {
-	return Assign(handle, &Tunkio::IOperation::m_progressCallback, callback);
+	return Assign(handle, &Tunkio::IWorkload::m_progressCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(TunkioHandle* handle, TunkioErrorCallback* callback)
 {
-	return Assign(handle, &Tunkio::IOperation::m_errorCallback, callback);
+	return Assign(handle, &Tunkio::IWorkload::m_errorCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, TunkioCompletedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IOperation::m_completedCallback, callback);
+	return Assign(handle, &Tunkio::IWorkload::m_completedCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)
@@ -81,12 +81,12 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bo
 		return false; // Devices cannot be deleted
 	}
 
-	return Assign(handle, &Tunkio::IOperation::m_removeAfterFill, remove);
+	return Assign(handle, &Tunkio::IWorkload::m_removeAfterFill, remove);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioRun(TunkioHandle* handle)
 {
-	const auto operation = reinterpret_cast<Tunkio::IOperation*>(handle);
+	const auto operation = reinterpret_cast<Tunkio::IWorkload*>(handle);
 
 	if (!operation)
 	{
@@ -100,6 +100,6 @@ void TUNKIO_CALLING_CONVENTION TunkioFree(TunkioHandle* handle)
 {
 	if (handle)
 	{
-		delete reinterpret_cast<Tunkio::IOperation*>(handle);
+		delete reinterpret_cast<Tunkio::IWorkload*>(handle);
 	}
 }

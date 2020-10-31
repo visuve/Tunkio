@@ -4,15 +4,15 @@
 
 namespace Tunkio
 {
-	class IOperation
+	class IWorkload
 	{
 	public:
-		IOperation(const std::string& path) :
+		IWorkload(const std::string& path) :
 			m_path(path)
 		{
 		}
 
-		virtual ~IOperation() = default;
+		virtual ~IWorkload() = default;
 		virtual bool Run() = 0;
 
 		TunkioFillMode m_fillMode = TunkioFillMode::Zeroes;

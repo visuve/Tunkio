@@ -6,7 +6,7 @@
 namespace Tunkio
 {
 	DriveWipe::DriveWipe(const std::string& path) :
-		IOperation(path)
+		IWorkload(path)
 	{
 	}
 

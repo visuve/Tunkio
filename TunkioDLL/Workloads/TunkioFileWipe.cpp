@@ -6,7 +6,7 @@
 namespace Tunkio
 {
 	FileWipe::FileWipe(const std::string& path) :
-		IOperation(path)
+		IWorkload(path)
 	{
 	}
 

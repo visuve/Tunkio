@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../TunkioAPI.h"
-#include "TunkioOperation.hpp"
+#include "TunkioWorkload.hpp"
 
 namespace Tunkio
 {
-	class FileWipe : public IOperation
+	class FileWipe : public IWorkload
 	{
 	public:
 		FileWipe(const std::string& path);
