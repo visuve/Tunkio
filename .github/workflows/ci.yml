@@ -17,7 +17,7 @@ jobs:
 
     - name: Install tools
       run: |
-        sudo apt install cppcheck build-essential cmake ninja-build libxcursor-dev -y
+        sudo apt install cppcheck build-essential cmake ninja-build qtbase5-dev
 
     - name: Static analysis
       run: |

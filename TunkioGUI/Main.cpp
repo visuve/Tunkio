@@ -1,139 +1,111 @@
-#include "PCH.hpp"
-#include "TunkioProgressDialog.hpp"
-#include "TunkioErrorCodes.hpp"
+#include "MainWindow.hpp"
 
-namespace Tunkio::GUI
+#include <QApplication>
+#include <QDebug>
+#include <QTime>
+#include <QScreen>
+
+#include <iostream>
+
+char QtMesssageTypeToChar(QtMsgType type)
 {
-	ProgressDialog* g_dialog = nullptr;
-	uint32_t g_error = ErrorCode::Success;
-
-	void OnStarted(uint64_t bytesLeft)
+	switch (type)
 	{
-		if (!g_dialog)
-		{
-			std::cerr << "Dialog is null" << std::endl;
-			return;
-		}
-
-		g_dialog->OnStarted(bytesLeft);
+		case QtDebugMsg:
+			return 'D';
+		case QtInfoMsg:
+			return 'I';
+		case QtWarningMsg:
+			return 'W';
+		case QtCriticalMsg:
+			return 'C';
+		case QtFatalMsg:
+			return 'F';
 	}
 
-	bool OnProgress(uint64_t bytesWritten)
-	{
-		if (!g_dialog)
-		{
-			std::cerr << "Dialog is null" << std::endl;
-			return false;
-		}
+	return '?';
+}
 
-		return g_dialog->OnProgress(bytesWritten);
+std::ostream& QtMessageTypeToStreamType(QtMsgType type)
+{
+	switch (type)
+	{
+		case QtDebugMsg:
+		case QtInfoMsg:
+			return std::cout;
+		case QtWarningMsg:
+			return std::clog;
+		case QtCriticalMsg:
+		case QtFatalMsg:
+			return std::cerr;
 	}
 
-	void OnError(TunkioStage stage, uint64_t bytesWritten, uint32_t error)
+	return std::cerr;
+}
+
+void TunkioLogMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
+{
+	const QString time = QTime::currentTime().toString();
+
+	if (context.function && !message.isEmpty())
 	{
-		g_error = error;
-
-		if (!g_dialog)
-		{
-			std::cerr << "Dialog is null" << std::endl;
-			return;
-		}
-
-		g_dialog->OnErrors(stage, bytesWritten, error);
+		QtMessageTypeToStreamType(type)
+			<< time.toStdString() << " ["
+			<< QtMesssageTypeToChar(type) << "] "
+			<< context.function << ':'
+			<< context.line << ": "
+			<< message.toStdString() << std::endl;
 	}
 
-	void OnCompleted(uint64_t bytesWritten)
+	if (context.function && message.isEmpty())
 	{
-		if (!g_dialog)
-		{
-			std::cerr << "Dialog is null" << std::endl;
-			return;
-		}
-
-		g_dialog->OnCompleted(bytesWritten);
-	}
-
-	std::map<std::string, Args::Argument> Arguments =
-	{
-		{ "target", Args::Argument(false, TunkioTargetType::File) },
-		{ "mode", Args::Argument(false, TunkioFillMode::Zeroes) },
-		{ "remove", Args::Argument(false, false) },
-		{ "path", Args::Argument(true, std::string()) }
-	};
-
-	void Usage()
-	{
-		nana::msgbox mb("Tunkio GUI");
-		mb << "This program is intended to be run through you OS's context menus." << std::endl << std::endl;;
-		mb << "However, you can call this application trough command line, ";
-		mb << "see TunkioCLI for example usage. Same parameters apply for this GUI.";
-		mb.show();
-		nana::exec();
-	}
-
-	int Run(const std::string& title)
-	{
-		const Tunkio::Memory::AutoHandle tunkio(TunkioInitialize(
-			Arguments.at("path").Value<std::string>().c_str(),
-			Arguments.at("target").Value<TunkioTargetType>()));
-
-		if (!tunkio)
-		{
-			std::cerr << "Failed to create TunkioHandle!" << std::endl;
-			return ErrorCode::InvalidArgument;
-		}
-
-		if (!TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>()) ||
-			!TunkioSetStartedCallback(tunkio.get(), OnStarted) ||
-			!TunkioSetProgressCallback(tunkio.get(), OnProgress) ||
-			!TunkioSetCompletedCallback(tunkio.get(), OnCompleted) ||
-			!TunkioSetErrorCallback(tunkio.get(), OnError) ||
-			!TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>()))
-		{
-			std::cerr << "Failed to pass arguments!" << std::endl;
-			return ErrorCode::InvalidArgument;
-		}
-
-		ProgressDialog progressDialog(title, tunkio.get());
-		g_dialog = &progressDialog;
-
-		progressDialog.Show();
-		nana::exec();
-
-		return g_error;
+		QtMessageTypeToStreamType(type)
+			<< time.toStdString() << " ["
+			<< QtMesssageTypeToChar(type) << "] "
+			<< context.function << ':'
+			<< context.line << std::endl;
 	}
 }
 
-#if defined(_WIN32)
-int WINAPI WinMain(HINSTANCE, HINSTANCE, char* cmdLine, int)
+void LoadIcon(QApplication& application)
 {
-	if (!Tunkio::Args::ParseString(Tunkio::GUI::Arguments, cmdLine))
+	QPixmap pixmap;
+
+	if (!pixmap.load(":/Tunkio.png"))
 	{
-		Tunkio::GUI::Usage();
-		return Tunkio::ErrorCode::InvalidArgument;
+		qWarning() << "Failed to load application icon!";
+		return;
 	}
 
-	return Tunkio::GUI::Run(cmdLine);
+	application.setWindowIcon(pixmap);
 }
-#else
-int main(int argc, char** argv)
+
+void ResizeToScreen(MainWindow& window)
 {
-	const std::vector<std::string> args({ argv + 1, argv + argc });
+	const QScreen* screen = QGuiApplication::primaryScreen();
 
-	auto join = [](std::string a, std::string b)
+	if (!screen)
 	{
-		return a + ' ' + b;
-	};
-
-	const std::string cmdLine =
-		std::accumulate(std::next(args.begin()), args.end(), args.front(), join);
-
-	if (!Tunkio::Args::ParseVector(Tunkio::GUI::Arguments, args))
-	{
-		Tunkio::GUI::Usage();
-		return Tunkio::ErrorCode::InvalidArgument;
+		qWarning() << "Failed to detect primary screen!";
 	}
-
-	return Tunkio::GUI::Run(cmdLine);
+	else
+	{
+		QRect screenGeometry = screen->geometry();
+		window.resize(screenGeometry.width() / 2, screenGeometry.height() / 2);
+	}
 }
-#endif
+
+int main(int argc, char* argv[])
+{
+	qInstallMessageHandler(TunkioLogMessageHandler);
+
+	QApplication application(argc, argv);
+	MainWindow window;
+
+	LoadIcon(application);
+	ResizeToScreen(window);
+
+	window.show();
+
+	return application.exec();
+}

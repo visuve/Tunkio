@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="Tunkio.png">../TunkioResources/Tunkio.png</file>
+  </qresource>
+</RCC>
