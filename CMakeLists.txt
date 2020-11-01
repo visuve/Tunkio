@@ -3,14 +3,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 project("Tunkio")
 
-#if(MSVC)
-#	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-#	set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-#	set(CMAKE_C_FLAGS_RELEASE "/MT")
-# 	set(CMAKE_C_FLAGS_DEBUG "/MTd")
-# endif()
-
-# add_subdirectory("nana")
 add_subdirectory("googletest")
 
 if(MSVC)
