@@ -27,7 +27,7 @@ namespace Tunkio::Args
 			return TargetFromChar(value.front(), m_value);
 		}
 
-		if (Type == typeid(TunkioFillMode))
+		if (Type == typeid(TunkioFillType))
 		{
 			if (value.size() != 1)
 			{
@@ -81,19 +81,29 @@ namespace Tunkio::Args
 	{
 		switch (c)
 		{
-			case static_cast<uint8_t>(TunkioFillMode::Zeroes) :
+			case static_cast<uint8_t>(TunkioFillType::Zeroes) :
 			{
-				result = TunkioFillMode::Zeroes;
+				result = TunkioFillType::Zeroes;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillMode::Ones) :
+			case static_cast<uint8_t>(TunkioFillType::Ones) :
 			{
-				result = TunkioFillMode::Ones;
+				result = TunkioFillType::Ones;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillMode::Random) :
+			case static_cast<uint8_t>(TunkioFillType::Character) :
 			{
-				result = TunkioFillMode::Random;
+				result = TunkioFillType::Character;
+				return false;
+			}
+			case static_cast<uint8_t>(TunkioFillType::String) :
+			{
+				result = TunkioFillType::String;
+				return false;
+			}
+			case static_cast<uint8_t>(TunkioFillType::Random) :
+			{
+				result = TunkioFillType::Random;
 				return true;
 			}
 		}

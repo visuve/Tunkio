@@ -1,8 +1,10 @@
 # TunkioTests
 
-file(GLOB TunkioTestsSource "*.cpp" 
-	"../TunkioDLL/TunkioAPI.cpp" 
+file(GLOB TunkioTestsSource 
+	"*.cpp"
+	"../TunkioDLL/TunkioAPI.cpp"
 	"../TunkioDLL/TunkioFillGenerator.cpp"
+	"../TunkioDLL/FillProviders/*.cpp"
 	"../TunkioDLL/TunkioTime.cpp")
 
 add_executable(TunkioTests ${TunkioTestsSource})

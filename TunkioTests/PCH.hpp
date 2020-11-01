@@ -12,6 +12,7 @@
 #include <functional>
 #include <chrono>
 #include <iomanip>
+#include <queue>
 #include <random>
 #include <regex>
 #include <sstream>

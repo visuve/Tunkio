@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../TunkioAPI.h"
+#include "../FillProviders/TunkioFillProvider.hpp"
 
 namespace Tunkio
 {
@@ -12,14 +12,19 @@ namespace Tunkio
 		{
 		}
 
-		virtual ~IWorkload() = default;
+		virtual ~IWorkload()
+		{
+			assert(m_fillers.empty());
+		}
+
 		virtual bool Run() = 0;
 
-		TunkioFillMode m_fillMode = TunkioFillMode::Zeroes;
+		std::queue<std::shared_ptr<IFillProvider>> m_fillers;
 		TunkioStartedCallback* m_startedCallback = nullptr;
 		TunkioProgressCallback* m_progressCallback = nullptr;
 		TunkioErrorCallback* m_errorCallback = nullptr;
-		TunkioCompletedCallback* m_completedCallback = nullptr;		
+		TunkioCompletedCallback* m_completedCallback = nullptr;
+		bool m_verifyAfterWipe = false;
 		bool m_removeAfterFill = false;
 
 	protected:

@@ -30,7 +30,7 @@ namespace Tunkio::DataUnit
 			return *this;
 		}
 
-		uint64_t Bytes() const
+		constexpr uint64_t Bytes() const
 		{
 			return m_bytes;
 		}

@@ -20,6 +20,12 @@ namespace Tunkio
 	uint64_t g_bytesWrittenLastTime = 0;
 	std::atomic<bool> g_keepRunning = true;
 
+	void SignalHandler(int signal)
+	{
+		std::cout << "Got signal: " << signal << std::endl;
+		g_keepRunning = false;
+	}
+
 	void PrintUsage(const std::filesystem::path& exe)
 	{
 		std::cout << " Usage:" << std::endl << std::endl;
@@ -29,18 +35,19 @@ namespace Tunkio
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
 		std::cout << "  --target=[f|d|D] where f=file, d=directory, D=drive (Optional) " << std::endl;
-		std::cout << "  --mode=[0|1|r] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random (Optional)" << std::endl;
+		std::cout << "  --mode=[0|1|r|c|s] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random, c=character, s=string. Note: with option 'c' or 's' you need to provide filler argument. (Optional) " << std::endl;
 		std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
+		std::cout << "  --filler=[character|string] required when --mode=c or --mode=s" << std::endl;
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32)
-		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=" << char(TunkioTargetType::Drive) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=f --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --targetd --mode=r"<< std::endl;
+		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=D --mode=r" << std::endl;
 #else
-		std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=" << char(TunkioTargetType::File) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=" << char(TunkioTargetType::Directory) << " --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/dev/sdx --target=" << char(TunkioTargetType::Drive) << " --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
+		std::cout << "  " << exe.string() << " --path=/dev/sdx --target= --target=D --mode=r" << std::endl;
 #endif
 		std::cout << std::endl;
 
@@ -86,13 +93,14 @@ namespace Tunkio
 
 	std::map<std::string, Args::Argument> Arguments =
 	{
+		{ "path", Args::Argument(true, std::string()) },
 		{ "target", Args::Argument(false, TunkioTargetType::File) },
-		{ "mode", Args::Argument(false, TunkioFillMode::Zeroes) },
+		{ "mode", Args::Argument(false, TunkioFillType::Zeroes) },
 		{ "remove", Args::Argument(false, false) },
-		{ "path", Args::Argument(true, std::string()) }
+		{ "filler", Args::Argument(true, std::string()) },
 	};
 
-	void OnStarted(uint64_t bytesLeft)
+	void OnStarted(uint16_t, uint64_t bytesLeft)
 	{
 		g_totalTimer.Reset();
 		g_currentTimer.Reset();
@@ -103,7 +111,7 @@ namespace Tunkio
 		std::cout << Time::Timestamp() << " Started!" << std::endl;
 	}
 
-	bool OnProgress(uint64_t bytesWritten)
+	bool OnProgress(uint16_t, uint64_t bytesWritten)
 	{
 		if (!g_keepRunning)
 		{
@@ -131,7 +139,7 @@ namespace Tunkio
 		return g_keepRunning;
 	}
 
-	void OnError(TunkioStage stage, uint64_t bytesWritten, uint32_t error)
+	void OnError(TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
 	{
 		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
 				
@@ -145,6 +153,9 @@ namespace Tunkio
 				break;
 			case TunkioStage::Write:
 				std::cerr << "writing!";
+				break;
+			case TunkioStage::Verify:
+				std::cerr << "verifying!";
 				break;
 			case TunkioStage::Remove:
 				std::cerr << "removing file!";
@@ -178,7 +189,7 @@ namespace Tunkio
 		g_error = error;
 	}
 
-	void OnCompleted(uint64_t bytesWritten)
+	void OnCompleted(uint16_t, uint64_t bytesWritten)
 	{
 		std::cout << Time::Timestamp() << " Finished. Bytes written: " << bytesWritten << std::endl;
 
@@ -191,10 +202,34 @@ namespace Tunkio
 		}
 	}
 
-	void SignalHandler(int signal)
+	bool CheckArguments()
 	{
-		std::cout << "Got signal: " << signal << std::endl;
-		g_keepRunning = false;
+		auto mode = Arguments.at("mode").Value<TunkioFillType>();
+		auto filler = Arguments.at("filler").Value<std::string>();
+
+		if (mode == TunkioFillType::Character)
+		{
+			if (filler.size() != 1)
+			{
+				std::cerr << "Filler argument needs to be one character!" << std::endl << std::endl;
+				return false;
+			}
+		}
+		else if (mode == TunkioFillType::String)
+		{
+			if (filler.empty())
+			{
+				std::cerr << "String argument needts to be at least one character!" << std::endl << std::endl;
+				return false;
+			}
+		}
+		else if (!filler.empty())
+		{
+			std::cerr << "Filler argument can only be used with --mode=c or --mode=s!" << std::endl << std::endl;
+			return false;
+		}
+
+		return true;
 	}
 }
 
@@ -232,6 +267,12 @@ int main(int argc, char* argv[])
 		return ErrorCode::InvalidArgument;
 	}
 
+	if (!CheckArguments())
+	{
+		PrintUsage(argv[0]);
+		return ErrorCode::InvalidArgument;
+	}
+
 	if (!PrintArgumentsAndPrompt(args))
 	{
 		return ErrorCode::UserCancelled;
@@ -247,8 +288,10 @@ int main(int argc, char* argv[])
 		return ErrorCode::InvalidArgument;
 	}
 
+	auto mode = Arguments.at("mode").Value<TunkioFillType>();
+	auto filler = Arguments.at("filler").Value<std::string>();
 
-	if (!TunkioSetFillMode(tunkio.get(), Arguments.at("mode").Value<TunkioFillMode>()) ||
+	if (!TunkioAddWipeRound(tunkio.get(), mode, filler.c_str()) ||
 		!TunkioSetStartedCallback(tunkio.get(), OnStarted) ||
 		!TunkioSetProgressCallback(tunkio.get(), OnProgress) ||
 		!TunkioSetCompletedCallback(tunkio.get(), OnCompleted) ||

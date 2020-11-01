@@ -8,7 +8,7 @@ namespace Tunkio::Args
 	{
 		{ "path", Argument(true, std::string()) },
 		{ "target", Argument(false, TunkioTargetType::File) },
-		{ "mode", Argument(false, TunkioFillMode::Zeroes) },
+		{ "mode", Argument(false, TunkioFillType::Zeroes) },
 		{ "remove", Argument(false, false) },
 	};
 
@@ -34,7 +34,7 @@ namespace Tunkio::Args
 
 		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
 		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Drive);
-		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillMode>(), TunkioFillMode::Ones);
+		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::Ones);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}
 
@@ -52,7 +52,7 @@ namespace Tunkio::Args
 
 		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
 		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Drive);
-		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillMode>(), TunkioFillMode::Ones);
+		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::Ones);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}
 

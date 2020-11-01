@@ -7,25 +7,10 @@
 #include "Workloads/TunkioDirectoryWipe.hpp"
 #include "Workloads/TunkioDriveWipe.hpp"
 
-TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type)
-{
-	if (!path)
-	{
-		return nullptr;
-	}
-
-	switch (type)
-	{
-		case TunkioTargetType::File:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path));
-		case TunkioTargetType::Directory:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path));
-		case TunkioTargetType::Drive:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(path));
-	}
-
-	return nullptr;
-}
+#include "FillProviders/TunkioFillProvider.hpp"
+#include "FillProviders/TunkioCharFiller.hpp"
+#include "FillProviders/TunkioStringFiller.hpp"
+#include "FillProviders/TunkioRandomFiller.hpp"
 
 template <typename T>
 bool Assign(TunkioHandle* handle, T(Tunkio::IWorkload::* field), T value)
@@ -49,14 +34,80 @@ inline bool IsInstanceOf(const TunkioHandle* handle)
 	return dynamic_cast<const Base*>(instance) != nullptr;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetFillMode(TunkioHandle* handle, TunkioFillMode mode)
+TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_fillMode, mode);
+	if (!path)
+	{
+		return nullptr;
+	}
+
+	switch (type)
+	{
+		case TunkioTargetType::File:
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path));
+		case TunkioTargetType::Directory:
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path));
+		case TunkioTargetType::Drive:
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(path));
+	}
+
+	return nullptr;
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle* handle, TunkioFillType round, const char* optional)
+{
+	const auto instance = reinterpret_cast<Tunkio::IWorkload*>(handle);
+
+	if (!instance)
+	{
+		return false;
+	}
+
+	switch (round)
+	{
+		case TunkioFillType::Zeroes:
+			instance->m_fillers.emplace(new Tunkio::CharFiller(0x00));
+			return true;
+
+		case TunkioFillType::Ones:
+			instance->m_fillers.emplace(new Tunkio::CharFiller(0xFF));
+			return true;
+
+		case TunkioFillType::Character:
+			if (!optional || strlen(optional) != 1)
+			{
+				return false;
+			}
+
+			instance->m_fillers.emplace(new Tunkio::CharFiller(optional[0]));
+			return true;
+
+		case TunkioFillType::String:
+			if (!optional || !strlen(optional))
+			{
+				return false;
+			}
+
+			instance->m_fillers.emplace(new Tunkio::StringFiller(optional));
+			return true;
+
+		case TunkioFillType::Random:
+			instance->m_fillers.emplace(new Tunkio::RandomFiller());
+			return true;
+
+	}
+
+	return false;
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(TunkioHandle* handle, TunkioStartedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_startedCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(TunkioHandle*, TunkioIterationStartedCallback*)
+{
+	return false;
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(TunkioHandle* handle, TunkioProgressCallback* callback)
@@ -69,9 +120,19 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(TunkioHandle* handle, Tunk
 	return Assign(handle, &Tunkio::IWorkload::m_errorCallback, callback);
 }
 
+bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(TunkioHandle*, TunkioIterationCompleteCallback*)
+{
+	return false;
+}
+
 bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, TunkioCompletedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_completedCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetVerifyAfterWipe(TunkioHandle* handle, bool verify)
+{
+	return Assign(handle, &Tunkio::IWorkload::m_verifyAfterWipe, verify);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)

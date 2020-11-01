@@ -17,7 +17,7 @@ namespace Tunkio::Args
 		using Variant = std::variant<
 			std::string,
 			TunkioTargetType,
-			TunkioFillMode,
+			TunkioFillType,
 			bool>;
 
 		template <typename T>

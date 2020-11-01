@@ -1,7 +1,7 @@
 #include "../PCH.hpp"
 #include "TunkioFileWipe.hpp"
-#include "../TunkioFillGenerator.hpp"
 #include "../TunkioFile.hpp"
+#include "../FillProviders/TunkioFillProvider.hpp"
 
 namespace Tunkio
 {
@@ -16,49 +16,55 @@ namespace Tunkio
 
 		if (!file.IsValid())
 		{
-			m_errorCallback(TunkioStage::Open, 0, LastError);
+			m_errorCallback(TunkioStage::Open, 0, 0, LastError);
 			return false;
 		}
 
 		if (!file.Size().first)
 		{
-			m_errorCallback(TunkioStage::Size, 0, LastError);
+			m_errorCallback(TunkioStage::Size, 0, 0, LastError);
 			return false;
 		}
 
-		const DataUnit::Mebibyte bufferSize(1);
+		uint16_t iteration = 0;
 		uint64_t bytesLeft = file.Size().second;
 		uint64_t bytesWritten = 0;
 
-		FillGenerator fakeData(m_fillMode, DataUnit::Mebibyte(1));
+		m_startedCallback(static_cast<uint16_t>(m_fillers.size()), bytesLeft);
 
-		m_startedCallback(bytesLeft);
-
-		while (bytesLeft)
+		while (!m_fillers.empty())
 		{
-			const uint64_t bytesToWrite = bufferSize > bytesLeft ? bytesLeft : bufferSize.Bytes();
-			const auto result = file.Write(fakeData.Data(), bytesToWrite);
+			++iteration;
 
-			bytesWritten += result.second;
-			bytesLeft -= result.second;
+			std::shared_ptr<IFillProvider> filler = m_fillers.front();
 
-			if (!result.first)
+			while (bytesLeft)
 			{
-				m_errorCallback(TunkioStage::Write, bytesWritten, LastError);
-				return false;
+				const auto result = file.Write(filler->Data(), filler->Size(bytesLeft));
+
+				bytesWritten += result.second;
+				bytesLeft -= result.second;
+
+				if (!result.first)
+				{
+					m_errorCallback(TunkioStage::Write, iteration, bytesWritten, LastError);
+					return false;
+				}
+
+				if (!m_progressCallback(iteration, bytesWritten))
+				{
+					return true;
+				}
 			}
 
-			if (!m_progressCallback(bytesWritten))
-			{
-				return true;
-			}
+			m_fillers.pop();
 		}
 
-		m_completedCallback(bytesWritten);
+		m_completedCallback(iteration, bytesWritten);
 
 		if (m_removeAfterFill && !file.Remove())
 		{
-			m_errorCallback(TunkioStage::Remove, bytesWritten, LastError);
+			m_errorCallback(TunkioStage::Remove, iteration, bytesWritten, LastError);
 			return false;
 		}
 

@@ -22,9 +22,11 @@
 ## Submodules
 
 - Nana C++
-  - https://github.com/cnjinhao/nana
+	- https://github.com/cnjinhao/nana
+		- Used in GUI
 - Google Test
-  - https://github.com/google/googletest
+	- https://github.com/google/googletest
+		- Used for unit tests
 
 ## Tools
 

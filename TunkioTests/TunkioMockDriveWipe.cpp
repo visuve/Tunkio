@@ -10,9 +10,6 @@ namespace Tunkio
 
 	bool DriveWipe::Run()
 	{
-		m_startedCallback(1);
-		m_progressCallback(1);
-		m_completedCallback(1);
-		return true;
+		return FileWipe::Run();
 	}
 }

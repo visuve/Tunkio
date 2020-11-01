@@ -1,7 +1,7 @@
 #include "../PCH.hpp"
 #include "TunkioDirectoryWipe.hpp"
-#include "../TunkioFillGenerator.hpp"
 #include "../TunkioFile.hpp"
+#include "../FillProviders/TunkioFillProvider.hpp"
 
 namespace Tunkio
 {
@@ -25,13 +25,13 @@ namespace Tunkio
 
 			if (file.IsValid())
 			{
-				m_errorCallback(TunkioStage::Open, 0, LastError);
+				m_errorCallback(TunkioStage::Open, 0, 0, LastError);
 				return false;
 			}
 
 			if (!file.Size().first)
 			{
-				m_errorCallback(TunkioStage::Size, 0, LastError);
+				m_errorCallback(TunkioStage::Size, 0, 0, LastError);
 				return false;
 			}
 
@@ -43,48 +43,58 @@ namespace Tunkio
 			return sum + file.Size().second;
 		};
 
+		uint16_t iteration = 0;
 		const uint64_t totalBytesLeft =
 			std::accumulate(files.cbegin(), files.cend(), uint64_t(0), sum);
 
 		uint64_t totalBytesWritten = 0;
 
-		const DataUnit::Mebibyte bufferSize(1);
-		FillGenerator fakeData(m_fillMode, bufferSize);
+		m_startedCallback(static_cast<uint16_t>(m_fillers.size()), totalBytesLeft);
 
-		m_startedCallback(totalBytesLeft);
-
-		for (File& file : files)
+		while (!m_fillers.empty())
 		{
-			uint64_t bytesLeft = file.Size().second;
+			++iteration;
 
-			while (bytesLeft)
+			std::shared_ptr<IFillProvider> filler = m_fillers.front();
+
+			for (File& file : files)
 			{
-				const uint64_t bytesToWrite = bufferSize > bytesLeft ? bytesLeft : bufferSize.Bytes();
-				const auto result = file.Write(fakeData.Data(), bytesToWrite);
+				uint64_t bytesLeft = file.Size().second;
 
-				totalBytesWritten += result.second;
-				bytesLeft -= result.second;
-
-				if (!result.first)
+				while (bytesLeft)
 				{
-					m_errorCallback(TunkioStage::Write, totalBytesWritten, LastError);
-					return false;
-				}
+					const auto result = file.Write(filler->Data(), filler->Size(bytesLeft));
 
-				if (!m_progressCallback(totalBytesWritten))
-				{
-					return true;
-				}
-			}
+					totalBytesWritten += result.second;
+					bytesLeft -= result.second;
 
-			if (m_removeAfterFill && !file.Remove())
-			{
-				m_errorCallback(TunkioStage::Remove, totalBytesWritten, LastError);
-				return false;
+					if (!result.first)
+					{
+						m_errorCallback(TunkioStage::Write, iteration, totalBytesWritten, LastError);
+						return false;
+					}
+
+					if (!m_progressCallback(iteration, totalBytesWritten))
+					{
+						return true;
+					}
+				}
 			}
 		}
 
-		m_completedCallback(totalBytesWritten);
+		if (m_removeAfterFill)
+		{
+			for (File& file : files)
+			{
+				if (!file.Remove())
+				{
+					m_errorCallback(TunkioStage::Remove, iteration, totalBytesWritten, LastError);
+					return false;
+				}
+			}
+		}
+
+		m_completedCallback(iteration, totalBytesWritten);
 		return true;
 	}
 }

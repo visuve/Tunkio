@@ -20,11 +20,14 @@
 #endif
 
 #include <cassert>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <limits>
 #include <numeric>
+#include <memory>
+#include <queue>
 #include <random>
 #include <sstream>
 #include <string>
