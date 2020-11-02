@@ -15,8 +15,10 @@ public:
 	~MainWindow();
 
 private slots:
-	void OnOpenDirectoryDialog();
-	void OnAbout();
+	void onOpenFileDialog();
+	void onOpenDirectoryDialog();
+	void onOpenDiskDialog();
+	void onAbout();
 
 private:
 	Ui::MainWindow* ui;

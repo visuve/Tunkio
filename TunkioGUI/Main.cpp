@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-char QtMesssageTypeToChar(QtMsgType type)
+char qtMesssageTypeToChar(QtMsgType type)
 {
 	switch (type)
 	{
@@ -26,7 +26,7 @@ char QtMesssageTypeToChar(QtMsgType type)
 	return '?';
 }
 
-std::ostream& QtMessageTypeToStreamType(QtMsgType type)
+std::ostream& qtMessageTypeToStreamType(QtMsgType type)
 {
 	switch (type)
 	{
@@ -43,15 +43,15 @@ std::ostream& QtMessageTypeToStreamType(QtMsgType type)
 	return std::cerr;
 }
 
-void TunkioLogMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
+void tunkioLogMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
 {
 	const QString time = QTime::currentTime().toString();
 
 	if (context.function && !message.isEmpty())
 	{
-		QtMessageTypeToStreamType(type)
+		qtMessageTypeToStreamType(type)
 			<< time.toStdString() << " ["
-			<< QtMesssageTypeToChar(type) << "] "
+			<< qtMesssageTypeToChar(type) << "] "
 			<< context.function << ':'
 			<< context.line << ": "
 			<< message.toStdString() << std::endl;
@@ -59,15 +59,15 @@ void TunkioLogMessageHandler(QtMsgType type, const QMessageLogContext& context, 
 
 	if (context.function && message.isEmpty())
 	{
-		QtMessageTypeToStreamType(type)
+		qtMessageTypeToStreamType(type)
 			<< time.toStdString() << " ["
-			<< QtMesssageTypeToChar(type) << "] "
+			<< qtMesssageTypeToChar(type) << "] "
 			<< context.function << ':'
 			<< context.line << std::endl;
 	}
 }
 
-void LoadIcon(QApplication& application)
+void loadIcon(QApplication& application)
 {
 	QPixmap pixmap;
 
@@ -80,7 +80,7 @@ void LoadIcon(QApplication& application)
 	application.setWindowIcon(pixmap);
 }
 
-void ResizeToScreen(MainWindow& window)
+void resizeToScreen(MainWindow& window)
 {
 	const QScreen* screen = QGuiApplication::primaryScreen();
 
@@ -97,13 +97,13 @@ void ResizeToScreen(MainWindow& window)
 
 int main(int argc, char* argv[])
 {
-	qInstallMessageHandler(TunkioLogMessageHandler);
+	qInstallMessageHandler(tunkioLogMessageHandler);
 
 	QApplication application(argc, argv);
 	MainWindow window;
 
-	LoadIcon(application);
-	ResizeToScreen(window);
+	loadIcon(application);
+	resizeToScreen(window);
 
 	window.show();
 
