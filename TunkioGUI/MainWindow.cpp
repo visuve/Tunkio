@@ -12,6 +12,8 @@
 #include <QMapIterator>
 #include <QDir>
 #include <QActionGroup>
+#include <QInputDialog>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
@@ -25,9 +27,8 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->actionOpenDirectory->setIcon(QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon));
 	connect(ui->actionOpenDirectory, &QAction::triggered, this, &MainWindow::onOpenDirectoryDialog);
 
-	ui->actionOpenDisk->setIcon(QApplication::style()->standardIcon(QStyle::SP_DriveHDIcon));
-	connect(ui->actionOpenDisk, &QAction::triggered, this, &MainWindow::onOpenDiskDialog);
-
+	ui->actionOpenDrive->setIcon(QApplication::style()->standardIcon(QStyle::SP_DriveHDIcon));
+	connect(ui->actionOpenDrive, &QAction::triggered, this, &MainWindow::onOpenDriveDialog);
 
 	ui->actionExit->setIcon(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton));
 	connect(ui->actionExit, &QAction::triggered, qApp, &QApplication::quit);
@@ -102,8 +103,9 @@ void MainWindow::onOpenDirectoryDialog()
 	}
 }
 
-void MainWindow::onOpenDiskDialog()
+void MainWindow::onOpenDriveDialog()
 {
+
 }
 
 void MainWindow::onAbout()

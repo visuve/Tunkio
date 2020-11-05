@@ -1,11 +1,11 @@
 #pragma once
 
-#if defined(_WIN32)
+/*#if defined(_WIN32)
 #include <SDKDDKVer.h>
 #include <Windows.h>
 #else
 #include <sys/wait.h>
-#endif
+#endif*/
 
 #include <algorithm>
 #include <array>
@@ -14,6 +14,7 @@
 #include <csignal>
 #include <filesystem>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <numeric>
 #include <sstream>

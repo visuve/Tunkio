@@ -84,6 +84,7 @@ namespace Tunkio::Args
 		EXPECT_FALSE(ParseString(Arguments, "\" BARBABABA"));
 	}
 
+#ifndef __clang__
 	TEST(TunkioArgsTest, ParseUnsupportedTypes)
 	{
 		std::map<std::string, Argument> unsupported =
@@ -93,5 +94,5 @@ namespace Tunkio::Args
 
 		EXPECT_FALSE(ParseString(unsupported, "--x=555"));
 	}
-
+#endif
 }

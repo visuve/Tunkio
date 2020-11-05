@@ -1,16 +1,22 @@
 # TunkioLIB
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	file(GLOB TunkioLIBSource "*.cpp" "Win32/*.cpp")
-else()
-	file(GLOB TunkioLIBSource "*.cpp" "Posix/*.cpp")
+	add_library("TunkioDEV" STATIC ${TunkioLIBSource}) # -> TunkioDEV.lib
+	target_precompile_headers("TunkioDEV" PRIVATE "PCH.hpp")
+	target_link_libraries("TunkioDEV" wbemuuid)
 endif()
 
-add_library(TunkioLIB STATIC ${TunkioLIBSource})
-target_precompile_headers(TunkioLIB PRIVATE "PCH.hpp")
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	file(GLOB TunkioLIBSource "*.cpp" "Posix/*.cpp" "Linux/*.cpp")
+	add_library("tunkio-dev" STATIC  ${TunkioLIBSource}) # -> libtunkio-dev.a
+	target_precompile_headers("tunkio-dev" PRIVATE "PCH.hpp")
+	target_link_libraries("tunkio-dev" udev stdc++fs)
+endif()
 
-if(WIN32)
-	target_include_directories(TunkioLIB PUBLIC "." "Win32")
-else()
-	target_include_directories(TunkioLIB PUBLIC "." "Posix")
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	file(GLOB TunkioLIBSource "*.cpp" "Posix/*.cpp" "BSD/*.cpp")
+	add_library("tunkio-dev" STATIC  ${TunkioLIBSource}) # -> libtunkio-dev.a
+	target_precompile_headers("tunkio-dev" PRIVATE "PCH.hpp")
+	target_link_libraries("tunkio-dev" geom)
 endif()

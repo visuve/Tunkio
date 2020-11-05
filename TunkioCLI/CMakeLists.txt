@@ -1,17 +1,13 @@
 # TunkioCLI
 
-if(WIN32)
-	file(GLOB TunkioCLISource "*.cpp" "Win32/*.cpp")
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+	add_executable("TunkioCLI" "Main.cpp")
+	target_precompile_headers("TunkioCLI" PRIVATE "PCH.hpp")
+	target_include_directories("TunkioCLI" PRIVATE "../TunkioDLL/" "../TunkioLIB/")
+	target_link_libraries("TunkioCLI" LINK_PRIVATE TunkioAPI TunkioDEV)
 else()
-	file(GLOB TunkioCLISource "*.cpp" "Posix/*.cpp")
-endif()
-
-add_executable(TunkioCLI ${TunkioCLISource})
-target_precompile_headers(TunkioCLI PRIVATE "PCH.hpp")
-target_include_directories(TunkioCLI PRIVATE "../TunkioDLL/")
-
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	target_link_libraries(TunkioCLI LINK_PRIVATE TunkioDLL TunkioLIB stdc++fs)
-else()
-	target_link_libraries(TunkioCLI LINK_PRIVATE TunkioDLL TunkioLIB)
+	add_executable("tunkio-cli" "Main.cpp")
+	target_precompile_headers("tunkio-cli" PRIVATE "PCH.hpp")
+	target_include_directories("tunkio-cli" PRIVATE "../TunkioDLL/" "../TunkioLIB/")
+	target_link_libraries("tunkio-cli" LINK_PRIVATE tunkio-api tunkio-dev)
 endif()

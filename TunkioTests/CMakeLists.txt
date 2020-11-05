@@ -2,20 +2,27 @@
 
 file(GLOB TunkioTestsSource 
 	"*.cpp"
-	"../TunkioDLL/TunkioAPI.cpp"
-	"../TunkioDLL/TunkioFillGenerator.cpp"
+	"../TunkioDLL/*.cpp"
 	"../TunkioDLL/FillProviders/*.cpp"
-	"../TunkioDLL/TunkioTime.cpp")
+	"../TunkioLIB/*.cpp")
 
-add_executable(TunkioTests ${TunkioTestsSource})
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+	add_executable("TunkioTests" ${TunkioTestsSource})
+	target_include_directories("TunkioTests" PRIVATE "../TunkioDLL/" "../TunkioLIB/" "../googletest/googletest/include/")
+	target_precompile_headers("TunkioTests" PRIVATE "PCH.hpp")
+	target_link_libraries("TunkioTests" gtest)
+endif()
 
-target_precompile_headers(TunkioTests PRIVATE "PCH.hpp")
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	add_executable("tunkio-tests" ${TunkioTestsSource})
+	target_include_directories("tunkio-tests" PRIVATE "../TunkioDLL/" "../TunkioLIB/" "../googletest/googletest/include/")
+	target_precompile_headers("tunkio-tests" PRIVATE "PCH.hpp")
+	target_link_libraries("tunkio-tests" gtest stdc++fs)
+endif()
 
-target_include_directories(TunkioTests PRIVATE "../TunkioDLL/")
-target_include_directories(TunkioTests PRIVATE "../googletest/googletest/include/")
-
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest stdc++fs)
-else()
-	target_link_libraries(TunkioTests LINK_PRIVATE TunkioLIB gtest)
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	add_executable("tunkio-tests" ${TunkioTestsSource})
+	target_include_directories("tunkio-tests" PRIVATE "../TunkioDLL/" "../TunkioLIB/" "../googletest/googletest/include/")
+	target_precompile_headers("tunkio-tests" PRIVATE "PCH.hpp")
+	target_link_libraries("tunkio-tests" gtest)
 endif()

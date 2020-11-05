@@ -4,12 +4,7 @@
 #include "TunkioTime.hpp"
 #include "TunkioDataUnits.hpp"
 #include "TunkioMemory.hpp"
-
-#if defined(_WIN32)
-#include "Win32/TunkioWin32ChildProcess.hpp"
-#else
-#include "Posix/TunkioPosixChildProcess.hpp"
-#endif
+#include "TunkioDriveInfo.hpp"
 
 namespace Tunkio
 {
@@ -26,11 +21,11 @@ namespace Tunkio
 		g_keepRunning = false;
 	}
 
-	void PrintUsage(const std::filesystem::path& exe)
+	void PrintUsage(const std::string& exe)
 	{
 		std::cout << " Usage:" << std::endl << std::endl;
 #if defined(_WIN32)
-		std::cout << "  --path=\"P:\\Path\\To\\File or Drive\" (Required) " << std::endl;
+		std::cout << R"(  --path="P:\Path\To\File or Drive" (Required))" << std::endl;
 #else
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
@@ -41,51 +36,65 @@ namespace Tunkio
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32)
-		std::cout << "  " << exe.string() << " --path=\"C:\\SecretFile.txt\" --target=f --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=\"C:\\SecretDirectory\" --targetd --mode=r"<< std::endl;
-		std::cout << "  " << exe.string() << " --path=\\\\.\\PHYSICALDRIVE9 --target=D --mode=r" << std::endl;
+		std::cout << "  " << exe << R"( --path="C:\\SecretFile.txt" --target=f --mode=r)" << std::endl;
+		std::cout << "  " << exe << R"( --path="C:\\SecretDirectory" --target=d --mode=r)" << std::endl;
+		std::cout << "  " << exe << R"( --path=\\.\PHYSICALDRIVE9 --target=D --mode=r)" << std::endl;
 #else
-		std::cout << "  " << exe.string() << " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
-		std::cout << "  " << exe.string() << " --path=/dev/sdx --target= --target=D --mode=r" << std::endl;
+		std::cout << "  " << exe << " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
+		std::cout << "  " << exe << " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
+		std::cout << "  " << exe << " --path=/dev/sdx --target= --target=D --mode=r" << std::endl;
 #endif
 		std::cout << std::endl;
 
-#if defined(_WIN32)
-		Win32ChildProcess process(L"C:\\Windows\\System32\\wbem\\WMIC.exe", L"diskdrive list brief");
-#else
-		PosixChildProcess process("/bin/df", "-h");
-#endif
+		std::vector<Drive> drives = DriveInfo();
 
-		if (!process.Start())
+		if (drives.empty())
 		{
-			std::cerr << "Failed to start " << process.Executable() << " to list disk drives. Error code: " << process.ErrorCode() << std::endl;
-			return;
-		}
-
-		if (process.ExitCode() != 0)
-		{
-			std::cerr << "Listing your drives failed with " << process.Executable() << ". Exit code: " << process.ExitCode() << std::endl;
 			return;
 		}
 
 		std::cout << std::endl << " Here are your drives:" << std::endl << std::endl;
 
-		for (const std::string& line : process.StdOut())
+		std::cout.width(24);
+		std::cout << std::left << " Path:";
+
+		std::cout.width(38);
+		std::cout << "Description:";
+		
+		std::cout.width(15);
+		std::cout << "Partitions:";
+
+		std::cout << "Capacity:" << std::endl;
+
+		for (const auto& drive : drives)
 		{
-			std::cout << ' ' << line << std::endl;
+			std::cout << "  ";
+			std::cout.width(23);
+			std::cout << drive.Path;
+
+			std::cout.width(38);
+			std::cout << drive.Description;
+
+			std::cout.width(15);
+			std::cout << drive.Partitions;
+
+			std::cout << drive.Capacity << std::endl;
 		}
 	}
 
 	bool PrintArgumentsAndPrompt(const std::vector<std::string>& args)
 	{
-		const std::string joined = 
-			std::accumulate(args.cbegin(), args.cend(), std::string(), [](const std::string& accumulated, const std::string& value)
+		const auto accumulator = [](const std::string& accumulated, const std::string& value)
 		{
 			return value.empty() ? accumulated : accumulated + "\n  " + value;
-		});
+		};
 
-		std::cout << "Provided arguments: " << joined << std::endl << "Are you sure you want to continue? [y/n]" << std::endl;
+		const std::string joined =
+			std::accumulate(args.cbegin(), args.cend(), std::string(), accumulator);
+
+		std::cout << "Provided arguments: " << joined << std::endl;
+		std::cout << "Are you sure you want to continue? [y/n]" << std::endl;
+
 		const int prompt = getchar();
 		std::cout << std::endl;
 		return prompt == 'y' || prompt == 'Y';
@@ -124,7 +133,7 @@ namespace Tunkio
 		const DataUnit::Byte bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
 		const DataUnit::Byte bytesWrittenTotal(bytesWritten);
 
-		if (bytesWrittenTotal.Value() && elapsedSince.count())
+		if (bytesWrittenTotal.Bytes() && elapsedSince.count())
 		{
 			const DataUnit::Byte bytesLeft = g_bytesToWrite - bytesWritten;
 			std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
@@ -142,7 +151,7 @@ namespace Tunkio
 	void OnError(TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
 	{
 		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
-				
+
 		switch (stage)
 		{
 			case TunkioStage::Open:
@@ -161,7 +170,7 @@ namespace Tunkio
 				std::cerr << "removing file!";
 				break;
 		}
-			
+
 		if (bytesWritten)
 		{
 			std::cerr << " Bytes written: " << bytesWritten;
@@ -170,7 +179,7 @@ namespace Tunkio
 		std::cerr << std::endl;
 
 #ifdef WIN32
-		std::array<wchar_t, 0x400> buffer;
+		std::array<wchar_t, 0x400> buffer = {};
 		DWORD size = FormatMessageW(
 			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr,
@@ -219,7 +228,7 @@ namespace Tunkio
 		{
 			if (filler.empty())
 			{
-				std::cerr << "String argument needts to be at least one character!" << std::endl << std::endl;
+				std::cerr << "String argument needs to be at least one character!" << std::endl << std::endl;
 				return false;
 			}
 		}

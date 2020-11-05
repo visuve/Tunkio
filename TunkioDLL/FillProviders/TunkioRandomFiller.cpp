@@ -11,8 +11,7 @@ namespace Tunkio
 	};
 
 	RandomFiller::RandomFiller(DataUnit::Byte bytes) :
-		CharFiller(0x00, bytes),
-		m_size(bytes)
+		CharFiller(0x00, bytes)
 	{
 	}
 

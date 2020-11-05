@@ -17,7 +17,7 @@ public:
 private slots:
 	void onOpenFileDialog();
 	void onOpenDirectoryDialog();
-	void onOpenDiskDialog();
+	void onOpenDriveDialog();
 	void onAbout();
 
 private:

@@ -159,7 +159,7 @@
     </property>
     <addaction name="actionOpenFile"/>
     <addaction name="actionOpenDirectory"/>
-    <addaction name="actionOpenDisk"/>
+    <addaction name="actionOpenDrive"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -199,9 +199,9 @@
     <string>Open File</string>
    </property>
   </action>
-  <action name="actionOpenDisk">
+  <action name="actionOpenDrive">
    <property name="text">
-    <string>Open Disk</string>
+    <string>Open Drive</string>
    </property>
   </action>
  </widget>
