@@ -34,4 +34,4 @@ jobs:
 
     - name: Run unit tests
       run: |
-        ./out/TunkioTests/TunkioTests
+        ./out/TunkioTests/tunkio-tests
