@@ -1,8 +1,6 @@
 #include "../PCH.hpp"
 #include "../TunkioDriveInfo.hpp"
 
-#pragma comment(lib, "wbemuuid.lib")
-
 namespace Tunkio
 {
 	using Microsoft::WRL::ComPtr;
@@ -73,13 +71,14 @@ namespace Tunkio
 	public:
 		DiskDriveInfo()
 		{
-			m_result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+			// https://docs.microsoft.com/en-us/windows/win32/wmisdk/creating-a-wmi-application-using-c-
+			m_result = CoInitializeEx(nullptr, COINIT_SPEED_OVER_MEMORY | COINIT_MULTITHREADED);
 
-			if (FAILED(m_result))
+			if (FAILED(m_result) && m_result != RPC_E_CHANGED_MODE)
 			{
-				std::cerr << "CoInitializeEx failed: 0x" 
+				std::cerr << "CoInitializeEx failed: 0x"
 					<< std::hex << m_result << std::endl;
-				return ;
+				return;
 			}
 
 			m_result = CoInitializeSecurity(
@@ -87,24 +86,24 @@ namespace Tunkio
 				-1,
 				nullptr,
 				nullptr,
-				RPC_C_AUTHN_LEVEL_CONNECT,
+				RPC_C_AUTHN_LEVEL_DEFAULT,
 				RPC_C_IMP_LEVEL_IMPERSONATE,
 				nullptr,
 				EOAC_NONE,
 				0);
 
-			if (FAILED(m_result))
+			if (FAILED(m_result) && m_result != RPC_E_TOO_LATE)
 			{
-				std::cerr << "CoInitializeSecurity failed: 0x" 
+				std::cerr << "CoInitializeSecurity failed: 0x"
 					<< std::hex << m_result << std::endl;
 				return ;
 			}
 
-			m_result = CoCreateInstance(CLSID_WbemLocator, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&m_locator));
+			m_result = CoCreateInstance(CLSID_WbemLocator, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_locator));
 
 			if (FAILED(m_result))
 			{
-				std::cerr << "CoCreateInstance failed: 0x" 
+				std::cerr << "CoCreateInstance failed: 0x"
 					<< std::hex << m_result << std::endl;
 				return;
 			}
@@ -121,10 +120,36 @@ namespace Tunkio
 
 			if (FAILED(m_result))
 			{
-				std::cerr << "IWbemLocator::ConnectServer failed: 0x" 
+				std::cerr << "IWbemLocator::ConnectServer failed: 0x"
 					<< std::hex << m_result << std::endl;
 				return;
 			}
+
+			m_result = CoSetProxyBlanket(
+				m_service.Get(),
+				RPC_C_AUTHN_WINNT,
+				RPC_C_AUTHZ_NONE,
+				nullptr,
+				RPC_C_AUTHN_LEVEL_CALL,
+				RPC_C_IMP_LEVEL_IMPERSONATE,
+				nullptr,
+				EOAC_NONE
+			);
+
+			if (FAILED(m_result))
+			{
+				std::cerr << "CoSetProxyBlanket failed: 0x"
+					<< std::hex << m_result << std::endl;
+			}
+		}
+
+		~DiskDriveInfo()
+		{
+			m_service->Release();
+			m_locator->Release();
+
+			// TODO: a call to CoUninitialize should be ensured
+			// CoUninitialize();
 		}
 
 		// https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskdrive
@@ -146,7 +171,7 @@ namespace Tunkio
 
 			if (FAILED(m_result))
 			{
-				std::cerr << "IWbemServices::ExecQuery failed: 0x" 
+				std::cerr << "IWbemServices::ExecQuery failed: 0x"
 					<< std::hex << m_result << std::endl;
 				return {};
 			}
@@ -161,7 +186,7 @@ namespace Tunkio
 
 				if (FAILED(m_result))
 				{
-					std::cerr << "IEnumWbemClassObject::Next failed: 0x" 
+					std::cerr << "IEnumWbemClassObject::Next failed: 0x"
 						<< std::hex << m_result << std::endl;
 					return drives;
 				}
@@ -198,7 +223,7 @@ namespace Tunkio
 
 			if (FAILED(m_result) || comVariant->vt == VT_NULL)
 			{
-				std::wcerr << L"Fecthing " << name << L" failed. HRESULT: 0x" 
+				std::wcerr << L"Fecthing " << name << L" failed. HRESULT: 0x"
 					<< std::hex << m_result << std::endl;
 
 				return T();

@@ -1,6 +1,7 @@
 #include "MainWindow.hpp"
 #include "WipePassModel.hpp"
 #include "ProgressBarDelegate.hpp"
+#include "DriveSelectDialog.hpp"
 #include "ui_MainWindow.h"
 
 #include <QDebug>
@@ -105,7 +106,13 @@ void MainWindow::onOpenDirectoryDialog()
 
 void MainWindow::onOpenDriveDialog()
 {
+	DriveSelectDialog dialog(this);
 
+	if (dialog.exec() == QDialog::Accepted)
+	{
+		const QString drive = dialog.selectedDrive();
+		ui->lineEditSelectedPath->setText(drive);
+	}
 }
 
 void MainWindow::onAbout()
