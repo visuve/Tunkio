@@ -73,6 +73,7 @@ namespace Tunkio
 		{
 			// https://docs.microsoft.com/en-us/windows/win32/wmisdk/creating-a-wmi-application-using-c-
 			m_result = CoInitializeEx(nullptr, COINIT_SPEED_OVER_MEMORY | COINIT_MULTITHREADED);
+			m_uninitializeRequired = SUCCEEDED(m_result);
 
 			if (FAILED(m_result) && m_result != RPC_E_CHANGED_MODE)
 			{
@@ -148,8 +149,10 @@ namespace Tunkio
 			m_service->Release();
 			m_locator->Release();
 
-			// TODO: a call to CoUninitialize should be ensured
-			// CoUninitialize();
+			if (m_uninitializeRequired)
+			{
+				CoUninitialize();
+			}
 		}
 
 		// https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskdrive
@@ -259,6 +262,7 @@ namespace Tunkio
 			return std::any_cast<T>(result);
 		}
 
+		bool m_uninitializeRequired = false;
 		HRESULT m_result;
 		ComPtr<IWbemLocator> m_locator;
 		ComPtr<IWbemServices> m_service;
