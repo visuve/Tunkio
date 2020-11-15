@@ -17,7 +17,9 @@ jobs:
 
     - name: Install tools
       run: |
-        sudo apt install cppcheck build-essential cmake ninja-build qtbase5-dev
+        sudo apt --yes install cppcheck
+        sudo apt --yes install gcc cmake ninja-build
+        sudo apt --yes install libudev-dev qtbase5-dev
 
     - name: Static analysis
       run: |
