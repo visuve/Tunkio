@@ -7,7 +7,11 @@ namespace Tunkio
 	class StringFiller : public IFillProvider
 	{
 	public:
-		explicit StringFiller(const std::string& fillString, DataUnit::Bytes bytes = DataUnit::Mebibytes(1));
+		explicit StringFiller(
+			DataUnit::Bytes bytes,
+			const std::string& fillString,
+			bool verify);
+
 		~StringFiller();
 
 		uint8_t* Data() override;

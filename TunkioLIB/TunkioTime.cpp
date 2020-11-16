@@ -94,14 +94,6 @@ namespace Tunkio::Time
 	std::ostream& operator << (std::ostream& os, MicroSeconds us) { return os << us.count() << "us"; }
 	std::ostream& operator << (std::ostream& os, const Duration& x) { return os << x.H << ' ' << x.M << ' ' << x.S << ' ' << x.Ms << ' ' << x.Us; }
 
-	std::wostream& operator << (std::wostream& os, Days s) { return os << s.count() << L'd'; }
-	std::wostream& operator << (std::wostream& os, Hours s) { return os << s.count() << L'h'; }
-	std::wostream& operator << (std::wostream& os, Minutes s) { return os << s.count() << L'm'; }
-	std::wostream& operator << (std::wostream& os, Seconds s) { return os << s.count() << L's'; }
-	std::wostream& operator << (std::wostream& os, MilliSeconds ms) { return os << ms.count() << L"ms"; }
-	std::wostream& operator << (std::wostream& os, MicroSeconds us) { return os << us.count() << L"us"; }
-	std::wostream& operator << (std::wostream& os, const Duration& x) { return os << x.H << L' ' << x.M << L' ' << x.S << L' ' << x.Ms << L' ' << x.Us; }
-
 	std::string HumanReadable(const Duration& duration)
 	{
 		if (duration == Duration::Infinite())

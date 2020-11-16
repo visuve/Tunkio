@@ -7,7 +7,7 @@ namespace Tunkio
 	class RandomFiller : public CharFiller
 	{
 	public:
-		explicit RandomFiller(DataUnit::Bytes bytes = DataUnit::Mebibytes(1));
+		explicit RandomFiller(DataUnit::Bytes bytes, bool verify);
 		~RandomFiller();
 
 		uint8_t* Data() override;

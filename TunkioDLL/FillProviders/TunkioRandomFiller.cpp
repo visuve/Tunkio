@@ -10,8 +10,8 @@ namespace Tunkio
 		uint8_t u8[8];
 	};
 
-	RandomFiller::RandomFiller(DataUnit::Bytes bytes) :
-		CharFiller(0x00, bytes)
+	RandomFiller::RandomFiller(DataUnit::Bytes bytes, bool verify) :
+		CharFiller(bytes, 0x00, verify)
 	{
 	}
 

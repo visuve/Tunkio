@@ -3,8 +3,11 @@
 
 namespace Tunkio
 {
-	StringFiller::StringFiller(const std::string& fillString, DataUnit::Bytes bytes) :
-		IFillProvider(bytes),
+	StringFiller::StringFiller(
+		DataUnit::Bytes bytes,
+		const std::string& fillString,
+		bool verify) :
+		IFillProvider(bytes, verify),
 		m_fillString(fillString)
 	{
 	}
@@ -17,7 +20,7 @@ namespace Tunkio
 	{
 		if (m_fillData.empty())
 		{
-			while (m_fillData.size() < DataUnit::Mebibytes(1).Bytes())
+			while (m_fillData.size() < m_size.Bytes())
 			{
 				m_fillData += m_fillString;
 				m_fillData.append(1, '\0');

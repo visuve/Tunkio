@@ -7,8 +7,9 @@ namespace Tunkio
 	class IFillProvider
 	{
 	public:
-		constexpr explicit IFillProvider(DataUnit::Bytes bytes) :
-			m_size(bytes)
+		constexpr explicit IFillProvider(DataUnit::Bytes bytes, bool verify) :
+			m_size(bytes),
+			m_verify(verify)
 		{
 		}
 
@@ -19,5 +20,6 @@ namespace Tunkio
 
 	protected:
 		DataUnit::Bytes m_size;
+		bool m_verify;
 	};
 }

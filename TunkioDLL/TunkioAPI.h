@@ -79,22 +79,49 @@ extern "C"
 		int32_t Unused;
 	};
 
-	TUNKIO_EXPORT struct TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type);
+	TUNKIO_EXPORT struct TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(
+		const char* path,
+		TunkioTargetType type);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle*, TunkioFillType, const char* optional);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
+		struct TunkioHandle*,
+		TunkioFillType,
+		bool verify,
+		const char* optional);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(struct TunkioHandle*, TunkioStartedCallback*);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(struct TunkioHandle*, TunkioIterationStartedCallback*);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(struct TunkioHandle*, TunkioProgressCallback*);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(struct TunkioHandle*, TunkioErrorCallback*);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(struct TunkioHandle*, TunkioIterationCompleteCallback*);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(struct TunkioHandle*, TunkioCompletedCallback*);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(
+		struct TunkioHandle*,
+		TunkioStartedCallback*);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetVerifyAfterWipe(struct TunkioHandle*, bool remove);
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(struct TunkioHandle*, bool remove);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(
+		struct TunkioHandle*,
+		TunkioIterationStartedCallback*);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioRun(struct TunkioHandle*);
-	TUNKIO_EXPORT void TUNKIO_CALLING_CONVENTION TunkioFree(struct TunkioHandle*);
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
+		struct TunkioHandle*,
+		TunkioProgressCallback*);
+
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
+		struct TunkioHandle*,
+		TunkioErrorCallback*);
+
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
+		struct TunkioHandle*,
+		TunkioIterationCompleteCallback*);
+
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
+		struct TunkioHandle*,
+		TunkioCompletedCallback*);
+
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(
+		struct TunkioHandle*,
+		bool remove);
+
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioRun(
+		struct TunkioHandle*);
+
+	TUNKIO_EXPORT void TUNKIO_CALLING_CONVENTION TunkioFree(
+		struct TunkioHandle*);
 
 #if defined(__cplusplus)
 }

@@ -45,14 +45,6 @@ namespace Tunkio::Time
 	std::ostream& operator << (std::ostream& os, MicroSeconds us);
 	std::ostream& operator << (std::ostream& os, const Duration& x);
 
-	std::wostream& operator << (std::wostream& os, Days s);
-	std::wostream& operator << (std::wostream& os, Hours s);
-	std::wostream& operator << (std::wostream& os, Minutes s);
-	std::wostream& operator << (std::wostream& os, Seconds s);
-	std::wostream& operator << (std::wostream& os, MilliSeconds ms);
-	std::wostream& operator << (std::wostream& os, MicroSeconds us);
-	std::wostream& operator << (std::wostream& os, const Duration& x);
-
 	std::string HumanReadable(const Duration& duration);
 	std::string Timestamp(const std::chrono::system_clock::time_point& time = std::chrono::system_clock::now());
 	std::string TimestampUTC(const std::chrono::system_clock::time_point& time = std::chrono::system_clock::now());

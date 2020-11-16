@@ -3,8 +3,8 @@
 
 namespace Tunkio
 {
-	CharFiller::CharFiller(uint8_t byte, DataUnit::Bytes bytes) :
-		IFillProvider(bytes),
+	CharFiller::CharFiller(DataUnit::Bytes bytes, uint8_t byte, bool verify) :
+		IFillProvider(bytes, verify),
 		m_fillChar(byte)
 	{
 	}

@@ -7,7 +7,11 @@ namespace Tunkio
 	class CharFiller : public IFillProvider
 	{
 	public:
-		explicit CharFiller(uint8_t byte, DataUnit::Bytes bytes = DataUnit::Mebibytes(1));
+		explicit CharFiller(
+			DataUnit::Bytes bytes,
+			uint8_t byte,
+			bool verify);
+
 		virtual ~CharFiller();
 
 		uint8_t* Data() override;

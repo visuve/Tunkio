@@ -300,7 +300,7 @@ int main(int argc, char* argv[])
 	auto mode = Arguments.at("mode").Value<TunkioFillType>();
 	auto filler = Arguments.at("filler").Value<std::string>();
 
-	if (!TunkioAddWipeRound(tunkio.get(), mode, filler.c_str()) ||
+	if (!TunkioAddWipeRound(tunkio.get(), mode, false, filler.c_str()) ||
 		!TunkioSetStartedCallback(tunkio.get(), OnStarted) ||
 		!TunkioSetProgressCallback(tunkio.get(), OnProgress) ||
 		!TunkioSetCompletedCallback(tunkio.get(), OnCompleted) ||

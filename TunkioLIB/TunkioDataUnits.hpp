@@ -7,24 +7,24 @@
 namespace Tunkio::DataUnit
 {
 	template<uint64_t Ratio>
-	class DataUnit
+	class DataUnitBase
 	{
 	public:
-		constexpr DataUnit() = default;
+		constexpr DataUnitBase() = default;
 
-		constexpr DataUnit(uint64_t value) :
+		constexpr DataUnitBase(uint64_t value) :
 			m_bytes(value* Ratio)
 		{
 		}
 
 		template<uint64_t R>
-		constexpr DataUnit(const DataUnit<R>& other) :
+		constexpr DataUnitBase(const DataUnitBase<R>& other) :
 			m_bytes(other.Bytes())
 		{
 		}
 
 		template<uint64_t R>
-		DataUnit<Ratio>& operator = (const DataUnit<R>& other)
+		DataUnitBase<Ratio>& operator = (const DataUnitBase<R>& other)
 		{
 			m_bytes = other.Bytes();
 			return *this;
@@ -56,20 +56,20 @@ namespace Tunkio::DataUnit
 		}
 
 		template<uint64_t R>
-		constexpr bool operator == (const DataUnit<R>& unit) const
+		constexpr bool operator == (const DataUnitBase<R>& unit) const
 		{
 			return m_bytes == unit.Bytes();
 		}
 
 		template<uint64_t R>
-		DataUnit& operator + (const DataUnit<R>& other)
+		DataUnitBase& operator + (const DataUnitBase<R>& other)
 		{
 			m_bytes += other.Bytes();
 			return *this;
 		}
 
 		template<uint64_t R>
-		DataUnit& operator - (const DataUnit<R>& other)
+		DataUnitBase& operator - (const DataUnitBase<R>& other)
 		{
 			m_bytes -= other.Bytes();
 			return *this;
@@ -79,54 +79,16 @@ namespace Tunkio::DataUnit
 		uint64_t m_bytes = 0;
 	};
 
-	using Bytes = DataUnit<1>;
-	using Kibibytes = DataUnit<0x400>;
-	using Mebibytes = DataUnit<0x100000>;
-	using Gibibytes = DataUnit<0x40000000>;
-	using Tebibytes = DataUnit<0x10000000000>;
-	using Pebibytes = DataUnit<0x4000000000000>;
-	using Exbibytes = DataUnit<0x100000000000000>;
+	using Bytes = DataUnitBase<1>;
+	using Kibibytes = DataUnitBase<0x400>;
+	using Mebibytes = DataUnitBase<0x100000>;
+	using Gibibytes = DataUnitBase<0x40000000>;
+	using Tebibytes = DataUnitBase<0x10000000000>;
+	using Pebibytes = DataUnitBase<0x4000000000000>;
+	using Exbibytes = DataUnitBase<0x100000000000000>;
 
 	template<uint64_t Ratio>
-	std::ostream& operator << (std::ostream& os, const DataUnit<Ratio>& unit)
-	{
-		os << unit.Value() << ' ';
-
-		switch (Ratio)
-		{
-			case 0x100000000000000:
-				os << "exbibyte";
-				break;
-			case 0x4000000000000:
-				os << "pebibyte";
-				break;
-			case 0x10000000000:
-				os << "tebibyte";
-				break;
-			case 0x40000000:
-				os << "gibibyte";
-				break;
-			case 0x100000:
-				os << "mebibyte";
-				break;
-			case 0x400:
-				os << "kibibyte";
-				break;
-			default:
-				os << "byte";
-				break;
-		}
-
-		if (unit.Value() > 1)
-		{
-			os << 's';
-		}
-
-		return os;
-	}
-
-	template<uint64_t Ratio>
-	std::string HumanReadable(const DataUnit<Ratio>& unit)
+	std::string HumanReadable(const DataUnitBase<Ratio>& unit)
 	{
 		std::stringstream os;
 		os << std::setprecision(3) << std::fixed;
@@ -163,8 +125,16 @@ namespace Tunkio::DataUnit
 		return os.str();
 	}
 
-	template<uint64_t T>
-	std::string SpeedPerSecond(const DataUnit<T>& unit, const Time::MilliSeconds& time)
+	std::ostream& operator << (std::ostream& os, Bytes bs);
+	std::ostream& operator << (std::ostream& os, Kibibytes bs);
+	std::ostream& operator << (std::ostream& os, Mebibytes bs);
+	std::ostream& operator << (std::ostream& os, Gibibytes bs);
+	std::ostream& operator << (std::ostream& os, Tebibytes bs);
+	std::ostream& operator << (std::ostream& os, Pebibytes bs);
+	std::ostream& operator << (std::ostream& os, Exbibytes bs);
+
+	template<uint64_t Ratio>
+	std::string SpeedPerSecond(const DataUnitBase<Ratio>& unit, const Time::MilliSeconds& time)
 	{
 		const uint64_t millis = time.count();
 		const uint64_t bytes = unit.Bytes();
@@ -212,14 +182,17 @@ namespace Tunkio::DataUnit
 		return os.str();
 	}
 
-	template<uint64_t T>
-	std::string SpeedPerSecond(const DataUnit<T>& unit, const Time::Timer& timer)
+	template<uint64_t Ratio>
+	std::string SpeedPerSecond(const DataUnitBase<Ratio>& unit, const Time::Timer& timer)
 	{
 		return SpeedPerSecond(unit, timer.Elapsed<Time::MilliSeconds>());
 	}
 
-	template<uint64_t T>
-	Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Time::MilliSeconds& elapsed)
+	template<uint64_t Ratio>
+	Time::Duration TimeLeft(
+		const DataUnitBase<Ratio>& bytesLeft,
+		const DataUnitBase<Ratio>& bytesWritten,
+		const Time::MilliSeconds& elapsed)
 	{
 		const uint64_t bytesL = bytesLeft.Bytes();
 
@@ -247,8 +220,11 @@ namespace Tunkio::DataUnit
 		return Time::Duration(Tunkio::Time::MilliSeconds(uint64_t(millisLeft)));
 	}
 
-	template<uint64_t T>
-	Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::Timer& elapsed)
+	template<uint64_t Ratio>
+	Time::Duration TimeLeft(
+		const DataUnitBase<Ratio>& bytesLeft,
+		const DataUnitBase<Ratio>& bytesWritten,
+		const Tunkio::Time::Timer& elapsed)
 	{
 		return TimeLeft(bytesLeft, bytesWritten, elapsed.Elapsed<Time::MilliSeconds>());
 	}

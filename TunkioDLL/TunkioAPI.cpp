@@ -1,6 +1,7 @@
 #include "PCH.hpp"
 #include "TunkioAPI.h"
 #include "TunkioErrorCodes.hpp"
+#include "TunkioDataUnits.hpp"
 
 #include "Workloads/TunkioWorkload.hpp"
 #include "Workloads/TunkioFileWipe.hpp"
@@ -54,7 +55,11 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, Tunki
 	return nullptr;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle* handle, TunkioFillType round, const char* optional)
+bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
+	struct TunkioHandle* handle,
+	TunkioFillType round,
+	bool verify,
+	const char* optional)
 {
 	const auto instance = reinterpret_cast<Tunkio::IWorkload*>(handle);
 
@@ -63,14 +68,16 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle* handle, T
 		return false;
 	}
 
+	constexpr Tunkio::DataUnit::Mebibytes mebibyte(1);
+
 	switch (round)
 	{
 		case TunkioFillType::Zeroes:
-			instance->m_fillers.emplace(new Tunkio::CharFiller(0x00));
+			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, 0x00, verify));
 			return true;
 
 		case TunkioFillType::Ones:
-			instance->m_fillers.emplace(new Tunkio::CharFiller(0xFF));
+			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, 0xFF, verify));
 			return true;
 
 		case TunkioFillType::Character:
@@ -79,7 +86,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle* handle, T
 				return false;
 			}
 
-			instance->m_fillers.emplace(new Tunkio::CharFiller(optional[0]));
+			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, optional[0], verify));
 			return true;
 
 		case TunkioFillType::String:
@@ -88,11 +95,11 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle* handle, T
 				return false;
 			}
 
-			instance->m_fillers.emplace(new Tunkio::StringFiller(optional));
+			instance->m_fillers.emplace(new Tunkio::StringFiller(mebibyte, optional, verify));
 			return true;
 
 		case TunkioFillType::Random:
-			instance->m_fillers.emplace(new Tunkio::RandomFiller());
+			instance->m_fillers.emplace(new Tunkio::RandomFiller(mebibyte, verify));
 			return true;
 
 	}
@@ -100,39 +107,46 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(struct TunkioHandle* handle, T
 	return false;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(TunkioHandle* handle, TunkioStartedCallback* callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(
+	TunkioHandle* handle,
+	TunkioStartedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_startedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(TunkioHandle*, TunkioIterationStartedCallback*)
+bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(
+	TunkioHandle*,
+	TunkioIterationStartedCallback*)
 {
 	return false;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(TunkioHandle* handle, TunkioProgressCallback* callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
+	TunkioHandle* handle,
+	TunkioProgressCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_progressCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(TunkioHandle* handle, TunkioErrorCallback* callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
+	TunkioHandle* handle,
+	TunkioErrorCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_errorCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(TunkioHandle*, TunkioIterationCompleteCallback*)
+bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
+	TunkioHandle*,
+	TunkioIterationCompleteCallback*)
 {
 	return false;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(TunkioHandle* handle, TunkioCompletedCallback* callback)
+bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
+	TunkioHandle* handle,
+	TunkioCompletedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_completedCallback, callback);
-}
-
-bool TUNKIO_CALLING_CONVENTION TunkioSetVerifyAfterWipe(TunkioHandle* handle, bool verify)
-{
-	return Assign(handle, &Tunkio::IWorkload::m_verifyAfterWipe, verify);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)

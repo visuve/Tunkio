@@ -12,7 +12,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, ZeroFill)
 	{
-		CharFiller filler(0xAB, Kibibyte);
+		CharFiller filler(Kibibyte, 0xAB, false);
 
 		uint8_t* data = filler.Data();
 
@@ -24,7 +24,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, StringFill)
 	{
-		StringFiller filler("foobar", 14);
+		StringFiller filler(14, "foobar", false);
 
 		uint8_t* data = filler.Data();
 		uint8_t* iter = data;
@@ -37,14 +37,14 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, RandomFill)
 	{
-		RandomFiller filler(Kibibyte);
+		RandomFiller filler(Kibibyte, false);
 		auto data = filler.Data();
 		EXPECT_NE(data, nullptr);
 	}
 
 	TEST(TunkioFillTest, RandomFillIllustrateProblem)
 	{
-		RandomFiller filler(DataUnit::Bytes(10));
+		RandomFiller filler(DataUnit::Bytes(10), false);
 
 		auto data = filler.Data();
 		EXPECT_NE(data, nullptr);
