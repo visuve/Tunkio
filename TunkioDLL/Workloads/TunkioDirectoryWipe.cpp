@@ -1,12 +1,12 @@
-#include "../PCH.hpp"
+#include "../TunkioAPI-PCH.hpp"
 #include "TunkioDirectoryWipe.hpp"
 #include "../TunkioFile.hpp"
 #include "../FillProviders/TunkioFillProvider.hpp"
 
 namespace Tunkio
 {
-	DirectoryWipe::DirectoryWipe(const std::string& path) :
-		IWorkload(path)
+	DirectoryWipe::DirectoryWipe(void* context, const std::string& path) :
+		IWorkload(context, path)
 	{
 	}
 
@@ -25,13 +25,13 @@ namespace Tunkio
 
 			if (file.IsValid())
 			{
-				m_errorCallback(TunkioStage::Open, 0, 0, LastError);
+				OnError(TunkioStage::Open, 0, 0, LastError);
 				return false;
 			}
 
 			if (!file.Size().first)
 			{
-				m_errorCallback(TunkioStage::Size, 0, 0, LastError);
+				OnError(TunkioStage::Size, 0, 0, LastError);
 				return false;
 			}
 
@@ -49,7 +49,7 @@ namespace Tunkio
 
 		uint64_t totalBytesWritten = 0;
 
-		m_startedCallback(static_cast<uint16_t>(m_fillers.size()), totalBytesLeft);
+		OnStarted(static_cast<uint16_t>(m_fillers.size()), totalBytesLeft);
 
 		while (!m_fillers.empty())
 		{
@@ -70,11 +70,12 @@ namespace Tunkio
 
 					if (!result.first)
 					{
-						m_errorCallback(TunkioStage::Write, iteration, totalBytesWritten, LastError);
+						OnError(TunkioStage::Write, iteration, totalBytesWritten, LastError);
+
 						return false;
 					}
 
-					if (!m_progressCallback(iteration, totalBytesWritten))
+					if (!OnProgress(iteration, totalBytesWritten))
 					{
 						return true;
 					}
@@ -88,13 +89,13 @@ namespace Tunkio
 			{
 				if (!file.Remove())
 				{
-					m_errorCallback(TunkioStage::Remove, iteration, totalBytesWritten, LastError);
+					OnError(TunkioStage::Remove, iteration, totalBytesWritten, LastError);
 					return false;
 				}
 			}
 		}
 
-		m_completedCallback(iteration, totalBytesWritten);
+		OnCompleted(iteration, totalBytesWritten);
 		return true;
 	}
 }

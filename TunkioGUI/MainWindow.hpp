@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QMainWindow>
+#include "TunkioInstance.hpp"
+#include "WipePassModel.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,5 +23,8 @@ private slots:
 	void onAbout();
 
 private:
+	void attachCallbacks();
 	Ui::MainWindow* ui;
+	WipePassModel* m_model;
+	Tunkio::Instance m_tunkio;
 };

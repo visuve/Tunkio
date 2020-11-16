@@ -1,5 +1,5 @@
+#include "../TunkioLIB-PCH.hpp"
 #include "../TunkioDriveInfo.hpp"
-#include "../PCH.hpp"
 
 #include <libgeom.h>
 
@@ -84,7 +84,7 @@ namespace Tunkio
 			return;
 		}
 
-        if (drive.Path.compare(partitionObject->lg_name) != 0)
+		if (drive.Path.compare(partitionObject->lg_name) != 0)
 		{
 			return;
 		}
@@ -95,8 +95,6 @@ namespace Tunkio
 		{
 			++drive.Partitions;
 		}
-
-        drive.Path = "/dev/" + drive.Path; // Here be dragons...
 	}
 
 	std::vector<Drive> DriveInfo()
@@ -135,6 +133,16 @@ namespace Tunkio
 			for (Drive& drive : drives)
 			{
 				FillPartitionInfo(partitionObject, drive);
+			}
+		}
+
+		for (Drive& drive : drives)
+		{
+			const char* fullPath = g_device_path(drive.Path.c_str());
+
+			if (fullPath)
+			{
+				drive.Path = fullPath;
 			}
 		}
 

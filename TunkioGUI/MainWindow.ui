@@ -33,7 +33,7 @@
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
+       <enum>QAbstractItemView::NoSelection</enum>
       </property>
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
@@ -103,6 +103,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Verify</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonRemoveStep">
          <property name="text">
           <string>Remove</string>
@@ -150,7 +157,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

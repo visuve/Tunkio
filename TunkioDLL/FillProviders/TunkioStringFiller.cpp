@@ -1,4 +1,4 @@
-#include "../PCH.hpp"
+#include "../TunkioAPI-PCH.hpp"
 #include "TunkioStringFiller.hpp"
 
 namespace Tunkio
@@ -22,7 +22,7 @@ namespace Tunkio
 		{
 			while (m_fillData.size() < m_size.Bytes())
 			{
-				m_fillData += m_fillString;
+				m_fillData.append(m_fillString);
 				m_fillData.append(1, '\0');
 			}
 

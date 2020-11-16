@@ -9,7 +9,7 @@ else()
 endif()
 
 add_library(${TunkioDLL} SHARED ${TunkioDLLSource})
-target_precompile_headers(${TunkioDLL} PRIVATE "PCH.hpp")
+target_precompile_headers(${TunkioDLL} PRIVATE "TunkioAPI-PCH.hpp")
 set_source_files_properties("TunkioAPICompliance.c" PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 set_target_properties(${TunkioDLL} PROPERTIES PUBLIC_HEADER "TunkioAPI.h")
 target_include_directories(${TunkioDLL} PRIVATE "../TunkioLIB/")

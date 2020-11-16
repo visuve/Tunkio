@@ -8,7 +8,7 @@ namespace Tunkio
 	class DriveWipe : public FileWipe
 	{
 	public:
-		DriveWipe(const std::string& path);
+		DriveWipe(void* context, const std::string& path);
 		bool Run() override;
 	};
 }

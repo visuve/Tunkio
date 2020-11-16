@@ -1,5 +1,4 @@
 #include "MainWindow.hpp"
-#include "WipePassModel.hpp"
 #include "ProgressBarDelegate.hpp"
 #include "DriveSelectDialog.hpp"
 #include "ui_MainWindow.h"
@@ -15,6 +14,26 @@
 #include <QActionGroup>
 #include <QInputDialog>
 #include <QDir>
+
+QString toString(TunkioStage type)
+{
+	switch (type)
+	{
+		case TunkioStage::Open:
+			return "opening";
+		case TunkioStage::Size:
+			return "querying size";
+		case TunkioStage::Write:
+			return "writing";
+		case TunkioStage::Verify:
+			return "verifying";
+		case TunkioStage::Remove:
+			return "removing";
+	}
+
+	qCritical() << int(type) << " is out of bounds";
+	return "Unknown?";
+}
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
@@ -70,8 +89,17 @@ MainWindow::MainWindow(QWidget* parent) :
 		}
 	});
 
-	ui->tableViewWipePasses->setModel(new WipePassModel(this));
+	m_model = new WipePassModel(this);
+	ui->tableViewWipePasses->setModel(m_model);
 	ui->tableViewWipePasses->setItemDelegateForColumn(7, new ProgressBarDelegate(this));
+
+	connect(ui->pushButtonStart, &QPushButton::clicked, [this]()
+	{
+		TunkioHandle* handle = m_tunkio.Get();
+		Q_ASSERT(handle != nullptr);
+		TunkioRun(handle);
+		qDebug() << "FOO";
+	});
 }
 
 MainWindow::~MainWindow()
@@ -88,6 +116,10 @@ void MainWindow::onOpenFileDialog()
 	{
 		const QString file = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(file));
+		m_tunkio.Reset(
+			TunkioInitialize(m_model, file.toUtf8().constData(), TunkioTargetType::File));
+
+		attachCallbacks();
 	}
 }
 
@@ -101,6 +133,10 @@ void MainWindow::onOpenDirectoryDialog()
 	{
 		const QString directory = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(directory));
+		m_tunkio.Reset(
+			TunkioInitialize(m_model, directory.toUtf8().constData(), TunkioTargetType::Directory));
+
+		attachCallbacks();
 	}
 }
 
@@ -112,6 +148,10 @@ void MainWindow::onOpenDriveDialog()
 	{
 		const QString drive = dialog.selectedDrive();
 		ui->lineEditSelectedPath->setText(drive);
+		m_tunkio.Reset(
+			TunkioInitialize(m_model, drive.toUtf8().constData(), TunkioTargetType::Drive));
+
+		attachCallbacks();
 	}
 }
 
@@ -132,4 +172,76 @@ void MainWindow::onAbout()
 	text << "";
 
 	QMessageBox::about(this, "Tunkio", text.join('\n'));
+}
+
+void MainWindow::attachCallbacks()
+{
+	TunkioStartedCallback* started = [](
+		void* context,
+		uint16_t totalIterations,
+		uint64_t bytesToWritePerIteration)
+	{
+		auto model = static_cast<WipePassModel*>(context);
+		model->confirm(totalIterations, bytesToWritePerIteration);
+	};
+
+	TunkioIterationStartedCallback* iterationStarted = [](
+		void* context,
+		uint16_t currentIteration)
+	{
+		auto model = static_cast<WipePassModel*>(context);
+		model->setPassStarted(currentIteration);
+	};
+
+	TunkioProgressCallback* progress = [](
+		void* context,
+		uint16_t currentIteration,
+		uint64_t bytesWritten)
+	{
+		auto model = static_cast<WipePassModel*>(context);
+		model->setPassProgress(currentIteration, bytesWritten);
+		return true;
+	};
+
+	TunkioErrorCallback* error = [](
+		void* context,
+		TunkioStage stage,
+		uint16_t currentIteration,
+		uint64_t bytesWritten,
+		uint32_t errorCode)
+	{
+		auto model = static_cast<WipePassModel*>(context);
+		auto self = dynamic_cast<MainWindow*>(model->parent()->parent());
+
+		QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
+		message << QString("Pass: %1").arg(currentIteration);
+		message << QString("Bytes written: %1").arg(bytesWritten);
+		message << QString("Operating system error code: %1").arg(errorCode);
+
+		QMessageBox::critical(self, "Tunkio - An error occurred", message.join('\n'));
+	};
+
+	TunkioIterationCompletedCallback* iterationCompleted = [](
+		void* context,
+		uint16_t currentIteration)
+	{
+		auto model = static_cast<WipePassModel*>(context);
+		model->setPassFinished(currentIteration);
+	};
+
+	TunkioCompletedCallback* completed = [](
+		void* context,
+		uint16_t totalIterations,
+		uint64_t totalBytesWritten)
+	{
+		auto model = static_cast<WipePassModel*>(context);
+		model->wipeCompleted(totalIterations, totalBytesWritten);
+	};
+
+	TunkioSetStartedCallback(m_tunkio, started);
+	TunkioSetIterationStartedCallback(m_tunkio, iterationStarted);
+	TunkioSetProgressCallback(m_tunkio, progress);
+	TunkioSetErrorCallback(m_tunkio, error);
+	TunkioSetIterationCompletedCallback(m_tunkio, iterationCompleted);
+	TunkioSetCompletedCallback(m_tunkio, completed);
 }

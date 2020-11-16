@@ -41,23 +41,28 @@ extern "C"
 	} TunkioStage;
 
 	typedef void(TunkioStartedCallback)(
+		void* context,
 		uint16_t totalIterations,
 		uint64_t bytesToWritePerIteration);
 
 	typedef void(TunkioIterationStartedCallback)(
+		void* context,
 		uint16_t currentIteration);
 
 	typedef bool(TunkioProgressCallback)(
+		void* context,
 		uint16_t currentIteration,
 		uint64_t bytesWritten); // Return false to cancel
 
 	typedef void(TunkioErrorCallback)(
+		void* context,
 		TunkioStage stage,
 		uint16_t currentIteration,
 		uint64_t bytesWritten,
 		uint32_t errorCode);
 
-	typedef void(TunkioIterationCompleteCallback)(
+	typedef void(TunkioIterationCompletedCallback)(
+		void* context,
 		uint16_t currentIteration);
 
 	//typedef void(TunkioVerificationStarted)(
@@ -71,6 +76,7 @@ extern "C"
 	//	uint64_t bytesVerified);
 
 	typedef void(TunkioCompletedCallback)(
+		void* context,
 		uint16_t totalIterations,
 		uint64_t totalBytesWritten);
 
@@ -80,6 +86,7 @@ extern "C"
 	};
 
 	TUNKIO_EXPORT struct TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(
+		void* context,
 		const char* path,
 		TunkioTargetType type);
 
@@ -107,7 +114,7 @@ extern "C"
 
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
 		struct TunkioHandle*,
-		TunkioIterationCompleteCallback*);
+		TunkioIterationCompletedCallback*);
 
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
 		struct TunkioHandle*,

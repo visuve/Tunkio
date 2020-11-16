@@ -1,28 +1,26 @@
-#include "PCH.hpp"
-#include "TunkioAPI.h"
-#include "TunkioErrorCodes.hpp"
+#include "TunkioTests-PCH.hpp"
 
 namespace Tunkio
 {
 	int OnStartedCount, OnProgressCount, OnErrorCount, OnCompletedCount = 0;
 
-	void OnStarted(uint16_t, uint64_t)
+	void OnStarted(void*, uint16_t, uint64_t)
 	{
 		++OnStartedCount;
 	}
 
-	bool OnProgress(uint16_t, uint64_t)
+	bool OnProgress(void*, uint16_t, uint64_t)
 	{
 		++OnProgressCount;
 		return true;
 	}
 
-	void OnError(TunkioStage, uint16_t, uint64_t, uint32_t)
+	void OnError(void*, TunkioStage, uint16_t, uint64_t, uint32_t)
 	{
 		++OnErrorCount;
 	}
 
-	void OnCompleted(uint16_t, uint64_t)
+	void OnCompleted(void*, uint16_t, uint64_t)
 	{
 		++OnCompletedCount;
 	}
@@ -37,7 +35,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, CreateHandleFail)
 	{
-		TunkioHandle* handle = TunkioInitialize(nullptr, TunkioTargetType::File);
+		TunkioHandle* handle = TunkioInitialize(nullptr, nullptr, TunkioTargetType::File);
 		EXPECT_EQ(handle, nullptr);
 		TunkioFree(handle);
 
@@ -49,7 +47,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, CreateHandleSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Drive);
+		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Drive);
 		// EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
 		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
@@ -68,7 +66,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, WipeFileSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::File);
+		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::File);
 		//EXPECT_TRUE(TunkioAddRound(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
 		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
@@ -89,7 +87,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, WipeDirectorySuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Directory);
+		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Directory);
 		//EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
 		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
@@ -110,7 +108,7 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, WipeDeviceSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::Drive);
+		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Drive);
 		//EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
 		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));

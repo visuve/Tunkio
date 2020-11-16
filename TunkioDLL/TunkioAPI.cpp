@@ -1,4 +1,4 @@
-#include "PCH.hpp"
+#include "TunkioAPI-PCH.hpp"
 #include "TunkioAPI.h"
 #include "TunkioErrorCodes.hpp"
 #include "TunkioDataUnits.hpp"
@@ -35,7 +35,7 @@ inline bool IsInstanceOf(const TunkioHandle* handle)
 	return dynamic_cast<const Base*>(instance) != nullptr;
 }
 
-TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, TunkioTargetType type)
+TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(void* context, const char* path, TunkioTargetType type)
 {
 	if (!path)
 	{
@@ -45,11 +45,11 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(const char* path, Tunki
 	switch (type)
 	{
 		case TunkioTargetType::File:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(context, path));
 		case TunkioTargetType::Directory:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(context, path));
 		case TunkioTargetType::Drive:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(path));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(context, path));
 	}
 
 	return nullptr;
@@ -137,7 +137,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
 	TunkioHandle*,
-	TunkioIterationCompleteCallback*)
+	TunkioIterationCompletedCallback*)
 {
 	return false;
 }

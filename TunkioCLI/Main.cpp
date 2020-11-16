@@ -1,10 +1,4 @@
-#include "PCH.hpp"
-#include "TunkioArgs.hpp"
-#include "TunkioErrorCodes.hpp"
-#include "TunkioTime.hpp"
-#include "TunkioDataUnits.hpp"
-#include "TunkioMemory.hpp"
-#include "TunkioDriveInfo.hpp"
+#include "TunkioCLI-PCH.hpp"
 
 namespace Tunkio
 {
@@ -60,7 +54,7 @@ namespace Tunkio
 
 		std::cout.width(38);
 		std::cout << "Description:";
-		
+
 		std::cout.width(15);
 		std::cout << "Partitions:";
 
@@ -109,7 +103,7 @@ namespace Tunkio
 		{ "filler", Args::Argument(true, std::string()) },
 	};
 
-	void OnStarted(uint16_t, uint64_t bytesLeft)
+	void OnStarted(void*, uint16_t, uint64_t bytesLeft)
 	{
 		g_totalTimer.Reset();
 		g_currentTimer.Reset();
@@ -120,7 +114,7 @@ namespace Tunkio
 		std::cout << Time::Timestamp() << " Started!" << std::endl;
 	}
 
-	bool OnProgress(uint16_t, uint64_t bytesWritten)
+	bool OnProgress(void*, uint16_t, uint64_t bytesWritten)
 	{
 		if (!g_keepRunning)
 		{
@@ -148,7 +142,7 @@ namespace Tunkio
 		return g_keepRunning;
 	}
 
-	void OnError(TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
+	void OnError(void*, TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
 	{
 		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
 
@@ -198,7 +192,7 @@ namespace Tunkio
 		g_error = error;
 	}
 
-	void OnCompleted(uint16_t, uint64_t bytesWritten)
+	void OnCompleted(void*, uint16_t, uint64_t bytesWritten)
 	{
 		std::cout << Time::Timestamp() << " Finished. Bytes written: " << bytesWritten << std::endl;
 
@@ -287,9 +281,10 @@ int main(int argc, char* argv[])
 		return ErrorCode::UserCancelled;
 	}
 
-	const Tunkio::Memory::AutoHandle tunkio(TunkioInitialize(
+	Tunkio::Instance tunkio(
+		nullptr,
 		Arguments.at("path").Value<std::string>().c_str(),
-		Arguments.at("target").Value<TunkioTargetType>()));
+		Arguments.at("target").Value<TunkioTargetType>());
 
 	if (!tunkio)
 	{
@@ -300,18 +295,18 @@ int main(int argc, char* argv[])
 	auto mode = Arguments.at("mode").Value<TunkioFillType>();
 	auto filler = Arguments.at("filler").Value<std::string>();
 
-	if (!TunkioAddWipeRound(tunkio.get(), mode, false, filler.c_str()) ||
-		!TunkioSetStartedCallback(tunkio.get(), OnStarted) ||
-		!TunkioSetProgressCallback(tunkio.get(), OnProgress) ||
-		!TunkioSetCompletedCallback(tunkio.get(), OnCompleted) ||
-		!TunkioSetErrorCallback(tunkio.get(), OnError) ||
-		!TunkioSetRemoveAfterFill(tunkio.get(), Arguments.at("remove").Value<bool>()))
+	if (!TunkioAddWipeRound(tunkio, mode, false, filler.c_str()) ||
+		!TunkioSetStartedCallback(tunkio, OnStarted) ||
+		!TunkioSetProgressCallback(tunkio, OnProgress) ||
+		!TunkioSetCompletedCallback(tunkio, OnCompleted) ||
+		!TunkioSetErrorCallback(tunkio, OnError) ||
+		!TunkioSetRemoveAfterFill(tunkio, Arguments.at("remove").Value<bool>()))
 	{
 		std::cerr << "Failed to pass arguments!" << std::endl;
 		return ErrorCode::InvalidArgument;
 	}
 
-	if (!TunkioRun(tunkio.get()))
+	if (!TunkioRun(tunkio))
 	{
 		std::cerr << "Tunkio failed." << std::endl;
 	}

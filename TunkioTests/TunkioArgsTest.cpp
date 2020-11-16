@@ -1,6 +1,4 @@
-#include "PCH.hpp"
-#include "TunkioArgs.hpp"
-#include "TunkioAPI.h"
+#include "TunkioTests-PCH.hpp"
 
 namespace Tunkio::Args
 {

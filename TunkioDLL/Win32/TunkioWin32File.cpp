@@ -1,4 +1,4 @@
-#include "../PCH.hpp"
+#include "../TunkioAPI-PCH.hpp"
 #include "../TunkioFile.hpp"
 
 namespace Tunkio
@@ -100,7 +100,7 @@ namespace Tunkio
 		else
 		{
 			m_size = FileSize(m_handle);
-		}	
+		}
 	}
 
 	File::~File()

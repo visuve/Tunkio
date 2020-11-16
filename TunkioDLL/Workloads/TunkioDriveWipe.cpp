@@ -1,10 +1,10 @@
-#include "../PCH.hpp"
+#include "../TunkioAPI-PCH.hpp"
 #include "TunkioDriveWipe.hpp"
 
 namespace Tunkio
 {
-	DriveWipe::DriveWipe(const std::string& path) :
-		FileWipe(path)
+	DriveWipe::DriveWipe(void* context, const std::string& path) :
+		FileWipe(context, path)
 	{
 	}
 

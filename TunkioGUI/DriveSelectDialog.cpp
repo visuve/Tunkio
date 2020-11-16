@@ -35,22 +35,21 @@ public:
 		{
 			const size_t row = static_cast<size_t>(index.row());
 			Q_ASSERT(row <= m_drives.size());
+			const Tunkio::Drive& drive = m_drives[row];
 
 			switch (index.column())
 			{
 				case 0:
-					return QString::fromStdString(m_drives[row].Path);
+					return QString::fromStdString(drive.Path);
 				case 1:
-					return QString::fromStdString(m_drives[row].Description);
+					return QString::fromStdString(drive.Description);
 				case 2:
-					return m_drives[row].Partitions;
+					return drive.Partitions;
 				case 3:
-					// TODO: maybe this should be asked from qApp?
-					return QLocale().formattedDataSize(m_drives[row].Capacity);
+					return QLocale().formattedDataSize(drive.Capacity);
 			}
 
 			qCritical() << index << " is out of bounds";
-
 		}
 
 		return QVariant();

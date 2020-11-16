@@ -87,6 +87,14 @@ namespace Tunkio::DataUnit
 	using Pebibytes = DataUnitBase<0x4000000000000>;
 	using Exbibytes = DataUnitBase<0x100000000000000>;
 
+	std::ostream& operator << (std::ostream& os, Bytes bs);
+	std::ostream& operator << (std::ostream& os, Kibibytes bs);
+	std::ostream& operator << (std::ostream& os, Mebibytes bs);
+	std::ostream& operator << (std::ostream& os, Gibibytes bs);
+	std::ostream& operator << (std::ostream& os, Tebibytes bs);
+	std::ostream& operator << (std::ostream& os, Pebibytes bs);
+	std::ostream& operator << (std::ostream& os, Exbibytes bs);
+
 	template<uint64_t Ratio>
 	std::string HumanReadable(const DataUnitBase<Ratio>& unit)
 	{
@@ -124,14 +132,6 @@ namespace Tunkio::DataUnit
 
 		return os.str();
 	}
-
-	std::ostream& operator << (std::ostream& os, Bytes bs);
-	std::ostream& operator << (std::ostream& os, Kibibytes bs);
-	std::ostream& operator << (std::ostream& os, Mebibytes bs);
-	std::ostream& operator << (std::ostream& os, Gibibytes bs);
-	std::ostream& operator << (std::ostream& os, Tebibytes bs);
-	std::ostream& operator << (std::ostream& os, Pebibytes bs);
-	std::ostream& operator << (std::ostream& os, Exbibytes bs);
 
 	template<uint64_t Ratio>
 	std::string SpeedPerSecond(const DataUnitBase<Ratio>& unit, const Time::MilliSeconds& time)

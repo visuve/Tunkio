@@ -60,12 +60,6 @@ namespace Tunkio
 			return *this;
 		}
 
-		AutoHandle& operator = (const T& other)
-		{
-			std::swap(m_handle, other);
-			return *this;
-		}
-
 	protected:
 		T m_handle = NullValue;
 	};

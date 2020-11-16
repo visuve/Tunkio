@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <WbemCli.h>
 #include <wrl/client.h>
+#undef max
 #elif defined(__linux__)
 #include <linux/fs.h>
 #include <linux/hdreg.h>

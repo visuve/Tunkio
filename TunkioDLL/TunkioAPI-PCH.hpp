@@ -1,8 +1,8 @@
 #pragma once
 
 #if defined(_WIN32)
-#include <SDKDDKVer.h>
 #include <Windows.h>
+#undef max
 #elif defined(__linux__)
 #include <linux/fs.h>
 #else
@@ -22,7 +22,6 @@
 #include <cassert>
 #include <cstring>
 #include <filesystem>
-#include <iostream>
 #include <iomanip>
 #include <limits>
 #include <numeric>

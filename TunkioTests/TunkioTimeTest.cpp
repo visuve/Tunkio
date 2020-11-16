@@ -1,5 +1,4 @@
-#include "PCH.hpp"
-#include "TunkioTime.hpp"
+#include "TunkioTests-PCH.hpp"
 
 namespace Tunkio::Time
 {

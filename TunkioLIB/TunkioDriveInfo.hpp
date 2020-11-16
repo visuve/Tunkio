@@ -6,8 +6,8 @@ namespace Tunkio
 	{
 		std::string Path;
 		std::string Description;
-		uint32_t Partitions;
-		uint64_t Capacity;
+		uint32_t Partitions = 0;
+		uint64_t Capacity = 0;
 	};
 
 	std::vector<Drive> DriveInfo();
