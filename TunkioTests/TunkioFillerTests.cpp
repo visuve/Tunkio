@@ -8,7 +8,7 @@
 
 namespace Tunkio::Fill
 {
-	constexpr Tunkio::DataUnit::Mebibyte Kibibyte(1);
+	constexpr Tunkio::DataUnit::Kibibytes Kibibyte(1);
 
 	TEST(TunkioFillTest, ZeroFill)
 	{
@@ -44,7 +44,7 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, RandomFillIllustrateProblem)
 	{
-		RandomFiller filler(DataUnit::Byte(10));
+		RandomFiller filler(DataUnit::Bytes(10));
 
 		auto data = filler.Data();
 		EXPECT_NE(data, nullptr);

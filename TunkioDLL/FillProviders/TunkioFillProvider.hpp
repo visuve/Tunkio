@@ -7,7 +7,7 @@ namespace Tunkio
 	class IFillProvider
 	{
 	public:
-		constexpr explicit IFillProvider(DataUnit::Byte bytes) :
+		constexpr explicit IFillProvider(DataUnit::Bytes bytes) :
 			m_size(bytes)
 		{
 		}
@@ -18,6 +18,6 @@ namespace Tunkio
 		virtual uint64_t Size(uint64_t bytesLeft) = 0;
 
 	protected:
-		DataUnit::Byte m_size;
+		DataUnit::Bytes m_size;
 	};
 }

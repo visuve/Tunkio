@@ -79,13 +79,13 @@ namespace Tunkio::DataUnit
 		uint64_t m_bytes = 0;
 	};
 
-	using Byte = DataUnit<1>;
-	using Kibibyte = DataUnit<0x400>;
-	using Mebibyte = DataUnit<0x100000>;
-	using Gibibyte = DataUnit<0x40000000>;
-	using Tebibyte = DataUnit<0x10000000000>;
-	using Pebibyte = DataUnit<0x4000000000000>;
-	using Exbibyte = DataUnit<0x100000000000000>;
+	using Bytes = DataUnit<1>;
+	using Kibibytes = DataUnit<0x400>;
+	using Mebibytes = DataUnit<0x100000>;
+	using Gibibytes = DataUnit<0x40000000>;
+	using Tebibytes = DataUnit<0x10000000000>;
+	using Pebibytes = DataUnit<0x4000000000000>;
+	using Exbibytes = DataUnit<0x100000000000000>;
 
 	template<uint64_t Ratio>
 	std::ostream& operator << (std::ostream& os, const DataUnit<Ratio>& unit)
@@ -133,38 +133,38 @@ namespace Tunkio::DataUnit
 
 		if (unit.Bytes() >= 0x100000000000000)
 		{
-			os << Pebibyte(unit);
+			os << Pebibytes(unit);
 		}
 		else if (unit.Bytes() >= 0x4000000000000)
 		{
-			os << Pebibyte(unit);
+			os << Pebibytes(unit);
 		}
 		else if (unit.Bytes() >= 0x10000000000)
 		{
-			os << Tebibyte(unit);
+			os << Tebibytes(unit);
 		}
 		else if (unit.Bytes() >= 0x40000000)
 		{
-			os << Gibibyte(unit);
+			os << Gibibytes(unit);
 		}
 		else if (unit.Bytes() >= 0x100000)
 		{
-			os << Mebibyte(unit);
+			os << Mebibytes(unit);
 		}
 		else if (unit.Bytes() >= 0x400)
 		{
-			os << Kibibyte(unit);
+			os << Kibibytes(unit);
 		}
 		else
 		{
-			os << Byte(unit);
+			os << Bytes(unit);
 		}
 
 		return os.str();
 	}
 
 	template<uint64_t T>
-	std::string SpeedPerSecond(const DataUnit<T>& unit, const Tunkio::Time::MilliSeconds& time)
+	std::string SpeedPerSecond(const DataUnit<T>& unit, const Time::MilliSeconds& time)
 	{
 		const uint64_t millis = time.count();
 		const uint64_t bytes = unit.Bytes();
@@ -213,13 +213,13 @@ namespace Tunkio::DataUnit
 	}
 
 	template<uint64_t T>
-	std::string SpeedPerSecond(const DataUnit<T>& unit, const Tunkio::Time::Timer& timer)
+	std::string SpeedPerSecond(const DataUnit<T>& unit, const Time::Timer& timer)
 	{
 		return SpeedPerSecond(unit, timer.Elapsed<Time::MilliSeconds>());
 	}
 
 	template<uint64_t T>
-	Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Tunkio::Time::MilliSeconds& elapsed)
+	Time::Duration TimeLeft(const DataUnit<T>& bytesLeft, const DataUnit<T>& bytesWritten, const Time::MilliSeconds& elapsed)
 	{
 		const uint64_t bytesL = bytesLeft.Bytes();
 

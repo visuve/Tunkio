@@ -130,12 +130,12 @@ namespace Tunkio
 		// TODO: current speed sometimes shows incorrectly
 		const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
 		const auto elapsedTotal = g_totalTimer.Elapsed<Time::MilliSeconds>();
-		const DataUnit::Byte bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
-		const DataUnit::Byte bytesWrittenTotal(bytesWritten);
+		const DataUnit::Bytes bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
+		const DataUnit::Bytes bytesWrittenTotal(bytesWritten);
 
 		if (bytesWrittenTotal.Bytes() && elapsedSince.count())
 		{
-			const DataUnit::Byte bytesLeft = g_bytesToWrite - bytesWritten;
+			const DataUnit::Bytes bytesLeft = g_bytesToWrite - bytesWritten;
 			std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
 				<< " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
 				<< ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
@@ -202,7 +202,7 @@ namespace Tunkio
 	{
 		std::cout << Time::Timestamp() << " Finished. Bytes written: " << bytesWritten << std::endl;
 
-		const DataUnit::Byte bytes(bytesWritten);
+		const DataUnit::Bytes bytes(bytesWritten);
 		const auto elapsed = g_totalTimer.Elapsed<Time::MilliSeconds>();
 
 		if (bytes.Value() && elapsed.count())
