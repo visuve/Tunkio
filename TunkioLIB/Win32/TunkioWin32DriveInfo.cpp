@@ -97,10 +97,14 @@ namespace Tunkio
 			{
 				std::cerr << "CoInitializeSecurity failed: 0x"
 					<< std::hex << m_result << std::endl;
-				return ;
+				return;
 			}
 
-			m_result = CoCreateInstance(CLSID_WbemLocator, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_locator));
+			m_result = CoCreateInstance(
+				CLSID_WbemLocator,
+				nullptr,
+				CLSCTX_INPROC_SERVER,
+				IID_PPV_ARGS(&m_locator));
 
 			if (FAILED(m_result))
 			{
@@ -146,8 +150,8 @@ namespace Tunkio
 
 		~DiskDriveInfo()
 		{
-			m_service->Release();
-			m_locator->Release();
+			m_service.Reset();
+			m_locator.Reset();
 
 			if (m_uninitializeRequired)
 			{
