@@ -2,6 +2,10 @@
 
 #include "TunkioDataUnits.hpp"
 
+#if defined(_WIN32)
+#undef min
+#endif
+
 namespace Tunkio
 {
 	class IFillProvider
@@ -15,8 +19,11 @@ namespace Tunkio
 
 		virtual ~IFillProvider() = default;
 
-		virtual uint8_t* Data() = 0;
-		virtual uint64_t Size(uint64_t bytesLeft) = 0;
+		virtual const void* Data() = 0;
+		virtual uint64_t Size(uint64_t bytesLeft)
+		{
+			return std::min(bytesLeft, m_size.Bytes());
+		}
 
 	protected:
 		DataUnit::Bytes m_size;

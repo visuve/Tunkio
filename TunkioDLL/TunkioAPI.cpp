@@ -89,7 +89,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, optional[0], verify));
 			return true;
 
-		case TunkioFillType::String:
+		case TunkioFillType::Sentence:
 			if (!optional || !strlen(optional))
 			{
 				return false;
@@ -115,10 +115,10 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(
-	TunkioHandle*,
-	TunkioIterationStartedCallback*)
+	TunkioHandle* handle,
+	TunkioIterationStartedCallback* callback)
 {
-	return false;
+	return Assign(handle, &Tunkio::IWorkload::m_iterationStartedCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
@@ -128,18 +128,11 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
 	return Assign(handle, &Tunkio::IWorkload::m_progressCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
-	TunkioHandle* handle,
-	TunkioErrorCallback* callback)
-{
-	return Assign(handle, &Tunkio::IWorkload::m_errorCallback, callback);
-}
-
 bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
-	TunkioHandle*,
-	TunkioIterationCompletedCallback*)
+	TunkioHandle* handle,
+	TunkioIterationCompletedCallback* callback)
 {
-	return false;
+	return Assign(handle, &Tunkio::IWorkload::m_iterationCompletedCallback, callback);;
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
@@ -147,6 +140,13 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
 	TunkioCompletedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_completedCallback, callback);
+}
+
+bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
+	TunkioHandle* handle,
+	TunkioErrorCallback* callback)
+{
+	return Assign(handle, &Tunkio::IWorkload::m_errorCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)

@@ -20,6 +20,7 @@ private slots:
 	void onOpenFileDialog();
 	void onOpenDirectoryDialog();
 	void onOpenDriveDialog();
+	void addPass();
 	void onAbout();
 
 private:

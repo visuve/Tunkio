@@ -13,7 +13,7 @@ namespace Tunkio::Fill
 	{
 		CharFiller filler(Kibibyte, 0xAB, false);
 
-		uint8_t* data = filler.Data();
+		auto data = reinterpret_cast<const uint8_t*>(filler.Data());
 
 		for (size_t i = 0; i < Kibibyte.Bytes(); ++i)
 		{
@@ -25,12 +25,12 @@ namespace Tunkio::Fill
 	{
 		StringFiller filler(14, "foobar", false);
 
-		uint8_t* data = filler.Data();
-		uint8_t* iter = data;
+		auto data = reinterpret_cast<const char*>(filler.Data());
+		size_t iter = 0;
 
-		for (uint8_t c : "foobar\0foobar")
+		for (char c : "foobar\0foobar")
 		{
-			EXPECT_EQ(c, *iter++);
+			EXPECT_EQ(c, data[iter++]);
 		}
 	}
 
@@ -45,7 +45,7 @@ namespace Tunkio::Fill
 	{
 		RandomFiller filler(DataUnit::Bytes(10), false);
 
-		auto data = filler.Data();
+		auto data = reinterpret_cast<const uint8_t*>(filler.Data());
 		EXPECT_NE(data, nullptr);
 		EXPECT_EQ(data[8], 0); // Last two remain unrandomized, known issue ;<
 		EXPECT_EQ(data[9], 0);

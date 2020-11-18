@@ -17,7 +17,8 @@ public:
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-	bool confirm(uint16_t totalIterations, uint64_t bytesToWritePerIteration);
+	void addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
+	void wipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration);
 	void setPassStarted(uint16_t pass);
 	void setPassProgress(uint16_t pass, uint64_t bytesWritten);
 	void setPassFinished(uint16_t pass);

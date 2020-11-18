@@ -10,6 +10,6 @@ namespace Tunkio
 		explicit RandomFiller(DataUnit::Bytes bytes, bool verify);
 		~RandomFiller();
 
-		uint8_t* Data() override;
+		const void* Data() override;
 	};
 }

@@ -14,8 +14,7 @@ namespace Tunkio
 
 		~StringFiller();
 
-		uint8_t* Data() override;
-		uint64_t Size(uint64_t bytesLeft) override;
+		const void* Data() override;
 
 	private:
 		std::string m_fillString;

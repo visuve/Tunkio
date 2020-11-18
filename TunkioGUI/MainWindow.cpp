@@ -93,10 +93,13 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->tableViewWipePasses->setModel(m_model);
 	ui->tableViewWipePasses->setItemDelegateForColumn(7, new ProgressBarDelegate(this));
 
+	connect(ui->pushButtonAddStep, &QPushButton::clicked, this, &MainWindow::addPass);
+
 	connect(ui->pushButtonStart, &QPushButton::clicked, [this]()
 	{
 		TunkioHandle* handle = m_tunkio.Get();
 		Q_ASSERT(handle != nullptr);
+		attachCallbacks();
 		TunkioRun(handle);
 		qDebug() << "FOO";
 	});
@@ -118,8 +121,6 @@ void MainWindow::onOpenFileDialog()
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(file));
 		m_tunkio.Reset(
 			TunkioInitialize(m_model, file.toUtf8().constData(), TunkioTargetType::File));
-
-		attachCallbacks();
 	}
 }
 
@@ -135,8 +136,6 @@ void MainWindow::onOpenDirectoryDialog()
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(directory));
 		m_tunkio.Reset(
 			TunkioInitialize(m_model, directory.toUtf8().constData(), TunkioTargetType::Directory));
-
-		attachCallbacks();
 	}
 }
 
@@ -150,28 +149,56 @@ void MainWindow::onOpenDriveDialog()
 		ui->lineEditSelectedPath->setText(drive);
 		m_tunkio.Reset(
 			TunkioInitialize(m_model, drive.toUtf8().constData(), TunkioTargetType::Drive));
-
-		attachCallbacks();
 	}
 }
 
-void MainWindow::onAbout()
+void MainWindow::addPass()
 {
-	QStringList text;
-	text << "Tunkio - Data Erasure Tool version 0.1.";
-	text << "";
-	text << "Tunkio is yet another data erasure tool.";
-	text << "";
-	text << "With Tunkio, you can add passes to wipe the data according to your will,"
-		"hence fullfilling even the most obscure standards";
-	text << "";
-	text << "Tunkio is licenced under GPLv2.";
-	text << "";
-	text << "This GUI uses Qt version " + QString(qVersion()).append('.');
-	text << "See 'About Qt' for more details.";
-	text << "";
 
-	QMessageBox::about(this, "Tunkio", text.join('\n'));
+	Q_ASSERT(m_tunkio);
+
+	int index = ui->comboBoxStepType->currentIndex();
+	bool verify = ui->checkBoxVerify->isChecked();
+	QString fill = ui->lineEditFillValue->text();
+	const char* character = &fill.toStdString()[0];
+	const char* sentence = fill.toStdString().c_str();
+
+
+	switch (index)
+	{
+		case 0:
+			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Zeroes, verify, nullptr))
+			{
+				m_model->addPass(TunkioFillType::Zeroes, "0x00", verify);
+			}
+			return;
+		case 1:
+			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Ones, verify, nullptr))
+			{
+				m_model->addPass(TunkioFillType::Ones, "0xFF", verify);
+			}
+			return;
+		case 2:
+			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Random, verify, nullptr))
+			{
+				m_model->addPass(TunkioFillType::Random, "Random", verify);
+			}
+			return;
+		case 3:
+			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Character, verify, character))
+			{
+				m_model->addPass(TunkioFillType::Character, fill.at(0), verify);
+			}
+			return;
+		case 4:
+			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Character, verify, sentence))
+			{
+				m_model->addPass(TunkioFillType::Sentence, fill, verify);
+			}
+			return;
+	}
+
+	qCritical() << index << " is out of bounds";
 }
 
 void MainWindow::attachCallbacks()
@@ -181,14 +208,16 @@ void MainWindow::attachCallbacks()
 		uint16_t totalIterations,
 		uint64_t bytesToWritePerIteration)
 	{
+		qDebug() << "Wipe started: " << totalIterations << '/' << bytesToWritePerIteration;
 		auto model = static_cast<WipePassModel*>(context);
-		model->confirm(totalIterations, bytesToWritePerIteration);
+		model->wipeStarted(totalIterations, bytesToWritePerIteration);
 	};
 
 	TunkioIterationStartedCallback* iterationStarted = [](
 		void* context,
 		uint16_t currentIteration)
 	{
+		qDebug() << "Iteration started: " << currentIteration;
 		auto model = static_cast<WipePassModel*>(context);
 		model->setPassStarted(currentIteration);
 	};
@@ -198,6 +227,7 @@ void MainWindow::attachCallbacks()
 		uint16_t currentIteration,
 		uint64_t bytesWritten)
 	{
+		qDebug() << "Progress: " << currentIteration << '/' << bytesWritten;
 		auto model = static_cast<WipePassModel*>(context);
 		model->setPassProgress(currentIteration, bytesWritten);
 		return true;
@@ -225,6 +255,7 @@ void MainWindow::attachCallbacks()
 		void* context,
 		uint16_t currentIteration)
 	{
+		qDebug() << "Completed iteration: " << currentIteration;
 		auto model = static_cast<WipePassModel*>(context);
 		model->setPassFinished(currentIteration);
 	};
@@ -234,6 +265,7 @@ void MainWindow::attachCallbacks()
 		uint16_t totalIterations,
 		uint64_t totalBytesWritten)
 	{
+		qDebug() << "Completed Wipe: " << totalIterations << '/' << totalBytesWritten;
 		auto model = static_cast<WipePassModel*>(context);
 		model->wipeCompleted(totalIterations, totalBytesWritten);
 	};
@@ -244,4 +276,23 @@ void MainWindow::attachCallbacks()
 	TunkioSetErrorCallback(m_tunkio, error);
 	TunkioSetIterationCompletedCallback(m_tunkio, iterationCompleted);
 	TunkioSetCompletedCallback(m_tunkio, completed);
+}
+
+void MainWindow::onAbout()
+{
+	QStringList text;
+	text << "Tunkio - Data Erasure Tool version 0.1.";
+	text << "";
+	text << "Tunkio is yet another data erasure tool.";
+	text << "";
+	text << "With Tunkio, you can add passes to wipe the data according to your will,"
+		"hence fullfilling even the most obscure standards";
+	text << "";
+	text << "Tunkio is licenced under GPLv2.";
+	text << "";
+	text << "This GUI uses Qt version " + QString(qVersion()).append('.');
+	text << "See 'About Qt' for more details.";
+	text << "";
+
+	QMessageBox::about(this, "Tunkio", text.join('\n'));
 }

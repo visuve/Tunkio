@@ -27,14 +27,16 @@ namespace Tunkio
 		}
 
 		uint16_t iteration = 0;
-		uint64_t bytesLeft = file.Size().second;
-		uint64_t bytesWritten = 0;
+		uint64_t totalBytesWritten = 0;
 
-		OnStarted(static_cast<uint16_t>(m_fillers.size()), bytesLeft);
+		OnStarted(static_cast<uint16_t>(m_fillers.size()), file.Size().second);
 
 		while (!m_fillers.empty())
 		{
-			++iteration;
+			OnIterationStarted(++iteration);
+
+			uint64_t bytesWritten = 0;
+			uint64_t bytesLeft = file.Size().second;
 
 			std::shared_ptr<IFillProvider> filler = m_fillers.front();
 
@@ -48,7 +50,6 @@ namespace Tunkio
 				if (!result.first)
 				{
 					OnError(TunkioStage::Write, iteration, bytesWritten, LastError);
-
 					return false;
 				}
 
@@ -58,14 +59,17 @@ namespace Tunkio
 				}
 			}
 
+			totalBytesWritten += bytesWritten;
 			m_fillers.pop();
+
+			OnIterationCompleted(iteration);
 		}
 
-		OnCompleted(iteration, bytesWritten);
+		OnCompleted(iteration, totalBytesWritten);
 
 		if (m_removeAfterFill && !file.Remove())
 		{
-			OnError(TunkioStage::Remove, iteration, bytesWritten, LastError);
+			OnError(TunkioStage::Remove, iteration, totalBytesWritten, LastError);
 			return false;
 		}
 

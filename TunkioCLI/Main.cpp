@@ -100,7 +100,7 @@ namespace Tunkio
 		{ "target", Args::Argument(false, TunkioTargetType::File) },
 		{ "mode", Args::Argument(false, TunkioFillType::Zeroes) },
 		{ "remove", Args::Argument(false, false) },
-		{ "filler", Args::Argument(true, std::string()) },
+		{ "filler", Args::Argument(false, std::string()) },
 	};
 
 	void OnStarted(void*, uint16_t, uint64_t bytesLeft)
@@ -218,11 +218,11 @@ namespace Tunkio
 				return false;
 			}
 		}
-		else if (mode == TunkioFillType::String)
+		else if (mode == TunkioFillType::Sentence)
 		{
 			if (filler.empty())
 			{
-				std::cerr << "String argument needs to be at least one character!" << std::endl << std::endl;
+				std::cerr << "Sentence argument needs to be at least one character!" << std::endl << std::endl;
 				return false;
 			}
 		}

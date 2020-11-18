@@ -78,7 +78,7 @@ namespace Tunkio
 		return m_size;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const uint8_t* data, const uint64_t size) const
+	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const
 	{
 		ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(size));
 

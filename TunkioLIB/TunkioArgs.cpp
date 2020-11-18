@@ -94,12 +94,12 @@ namespace Tunkio::Args
 			case static_cast<uint8_t>(TunkioFillType::Character) :
 			{
 				result = TunkioFillType::Character;
-				return false;
+				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::String) :
+			case static_cast<uint8_t>(TunkioFillType::Sentence) :
 			{
-				result = TunkioFillType::String;
-				return false;
+				result = TunkioFillType::Sentence;
+				return true;
 			}
 			case static_cast<uint8_t>(TunkioFillType::Random) :
 			{

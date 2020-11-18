@@ -53,9 +53,10 @@ namespace Tunkio
 
 		while (!m_fillers.empty())
 		{
-			++iteration;
+			OnIterationStarted(++iteration);
 
 			std::shared_ptr<IFillProvider> filler = m_fillers.front();
+			uint64_t bytesWritten = 0;
 
 			for (File& file : files)
 			{
@@ -65,22 +66,24 @@ namespace Tunkio
 				{
 					const auto result = file.Write(filler->Data(), filler->Size(bytesLeft));
 
-					totalBytesWritten += result.second;
+					bytesWritten += result.second;
 					bytesLeft -= result.second;
 
 					if (!result.first)
 					{
-						OnError(TunkioStage::Write, iteration, totalBytesWritten, LastError);
-
+						OnError(TunkioStage::Write, iteration, bytesWritten, LastError);
 						return false;
 					}
 
-					if (!OnProgress(iteration, totalBytesWritten))
+					if (!OnProgress(iteration, bytesWritten))
 					{
 						return true;
 					}
 				}
 			}
+
+			totalBytesWritten += bytesWritten;
+			OnIterationCompleted(iteration);
 		}
 
 		if (m_removeAfterFill)

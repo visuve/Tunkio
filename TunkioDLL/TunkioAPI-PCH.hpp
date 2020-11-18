@@ -2,6 +2,7 @@
 
 #if defined(_WIN32)
 #include <Windows.h>
+#undef min
 #undef max
 #elif defined(__linux__)
 #include <linux/fs.h>

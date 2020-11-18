@@ -19,7 +19,7 @@ namespace Tunkio
 	{
 	}
 
-	uint8_t* RandomFiller::Data()
+	const void* RandomFiller::Data()
 	{
 		if (m_fillData.empty())
 		{

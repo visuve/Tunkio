@@ -15,7 +15,7 @@ namespace Tunkio
 
 		virtual ~IWorkload()
 		{
-			assert(m_fillers.empty());
+			// assert(m_fillers.empty()); // Untrue if errors have occurred
 		}
 
 		virtual bool Run() = 0;
@@ -24,8 +24,10 @@ namespace Tunkio
 
 		// TODO: add setters :S
 		TunkioStartedCallback* m_startedCallback = nullptr;
+		TunkioIterationStartedCallback* m_iterationStartedCallback = nullptr;
 		TunkioProgressCallback* m_progressCallback = nullptr;
 		TunkioErrorCallback* m_errorCallback = nullptr;
+		TunkioIterationCompletedCallback* m_iterationCompletedCallback = nullptr;
 		TunkioCompletedCallback* m_completedCallback = nullptr;
 
 		bool m_verifyAfterWipe = false;
@@ -43,6 +45,16 @@ namespace Tunkio
 			m_startedCallback(m_context, totalIterations, bytesToWritePerIteration);
 		}
 
+		inline void OnIterationStarted(uint16_t currentIteration)
+		{
+			if (!m_iterationStartedCallback)
+			{
+				return;
+			}
+
+			m_iterationStartedCallback(m_context, currentIteration);
+		}
+
 		inline bool OnProgress(
 			uint16_t currentIteration,
 			uint64_t bytesWritten)
@@ -53,6 +65,28 @@ namespace Tunkio
 			}
 
 			return m_progressCallback(m_context, currentIteration, bytesWritten);
+		}
+
+		inline void OnIterationCompleted(uint16_t currentIteration)
+		{
+			if (!m_iterationCompletedCallback)
+			{
+				return;
+			}
+
+			m_iterationCompletedCallback(m_context, currentIteration);
+		}
+
+		inline void OnCompleted(
+			uint16_t totalIterations,
+			uint64_t totalBytesWritten)
+		{
+			if (!m_completedCallback)
+			{
+				return;
+			}
+
+			m_completedCallback(m_context, totalIterations, totalBytesWritten);
 		}
 
 		inline void OnError(
@@ -67,18 +101,6 @@ namespace Tunkio
 			}
 
 			m_errorCallback(m_context, stage, currentIteration, bytesWritten, errorCode);
-		}
-
-		inline void OnCompleted(
-			uint16_t totalIterations,
-			uint64_t totalBytesWritten)
-		{
-			if (!m_completedCallback)
-			{
-				return;
-			}
-
-			m_completedCallback(m_context, totalIterations, totalBytesWritten);
 		}
 
 	private:

@@ -27,7 +27,7 @@ extern "C"
 		Zeroes = '0',
 		Ones = '1',
 		Character = 'c',
-		String = 's',
+		Sentence = 's',
 		Random = 'r'
 	} TunkioFillType;
 
@@ -54,13 +54,6 @@ extern "C"
 		uint16_t currentIteration,
 		uint64_t bytesWritten); // Return false to cancel
 
-	typedef void(TunkioErrorCallback)(
-		void* context,
-		TunkioStage stage,
-		uint16_t currentIteration,
-		uint64_t bytesWritten,
-		uint32_t errorCode);
-
 	typedef void(TunkioIterationCompletedCallback)(
 		void* context,
 		uint16_t currentIteration);
@@ -79,6 +72,13 @@ extern "C"
 		void* context,
 		uint16_t totalIterations,
 		uint64_t totalBytesWritten);
+
+	typedef void(TunkioErrorCallback)(
+		void* context,
+		TunkioStage stage,
+		uint16_t currentIteration,
+		uint64_t bytesWritten,
+		uint32_t errorCode);
 
 	struct TunkioHandle
 	{
@@ -108,10 +108,6 @@ extern "C"
 		struct TunkioHandle*,
 		TunkioProgressCallback*);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
-		struct TunkioHandle*,
-		TunkioErrorCallback*);
-
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
 		struct TunkioHandle*,
 		TunkioIterationCompletedCallback*);
@@ -119,6 +115,10 @@ extern "C"
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
 		struct TunkioHandle*,
 		TunkioCompletedCallback*);
+
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
+		struct TunkioHandle*,
+		TunkioErrorCallback*);
 
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(
 		struct TunkioHandle*,

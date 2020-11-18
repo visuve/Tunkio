@@ -7,9 +7,9 @@ namespace Tunkio
 	{
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering
 		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		constexpr uint32_t ShareMode = FILE_SHARE_READ;
-		constexpr uint32_t CreationFlags = 
-			FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+		constexpr uint32_t ShareMode = 0;
+		constexpr uint32_t CreationFlags = 0;
+			// FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
 		return CreateFileA(
 			path.c_str(),
@@ -24,23 +24,6 @@ namespace Tunkio
 	constexpr bool IsValidHandle(const HANDLE handle)
 	{
 		return handle != nullptr && handle != INVALID_HANDLE_VALUE;
-	}
-
-	std::pair<bool, uint64_t> FileSize(const HANDLE handle)
-	{
-		if (!IsValidHandle(handle))
-		{
-			return { false, 0 };
-		}
-
-		LARGE_INTEGER fileSize = { };
-
-		if (!GetFileSizeEx(handle, &fileSize))
-		{
-			return { false, fileSize.QuadPart };
-		}
-
-		return { true, fileSize.QuadPart };
 	}
 
 	uint64_t Bytes(const DISK_GEOMETRY& diskGeo)
@@ -93,13 +76,27 @@ namespace Tunkio
 			return;
 		}
 
-		if (GetFileType(m_handle) == FILE_TYPE_DISK)
+		BY_HANDLE_FILE_INFORMATION info = {};
+
+		if (!GetFileInformationByHandle(m_handle, &info))
+		{
+			return;
+		}
+
+		if (info.dwFileAttributes & FILE_ATTRIBUTE_DEVICE)
 		{
 			m_size = DiskSize(m_handle);
 		}
-		else
+
+		if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ||
+			info.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE ||
+			info.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ||
+			info.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
 		{
-			m_size = FileSize(m_handle);
+			m_size.first = true;
+			m_size.second = info.nFileSizeHigh;
+			m_size.second <<= 32;
+			m_size.second |= info.nFileSizeLow;
 		}
 	}
 
@@ -122,7 +119,7 @@ namespace Tunkio
 		return m_size;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const uint8_t* data, const uint64_t size) const
+	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const
 	{
 		DWORD bytesWritten = 0;
 

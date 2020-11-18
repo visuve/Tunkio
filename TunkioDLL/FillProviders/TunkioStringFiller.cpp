@@ -16,7 +16,7 @@ namespace Tunkio
 	{
 	}
 
-	uint8_t* StringFiller::Data()
+	const void* StringFiller::Data()
 	{
 		if (m_fillData.empty())
 		{
@@ -29,16 +29,6 @@ namespace Tunkio
 			m_fillString.clear(); // Not needed anymore
 		}
 
-		return reinterpret_cast<uint8_t*>(m_fillData.data());
-	}
-
-	uint64_t StringFiller::Size(uint64_t bytesLeft)
-	{
-		if (m_fillData.size() > bytesLeft)
-		{
-			return bytesLeft;
-		}
-
-		return m_fillData.size();
+		return m_fillData.data();
 	}
 }

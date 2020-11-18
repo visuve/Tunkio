@@ -14,7 +14,7 @@ namespace Tunkio
 		m_fillData.clear();
 	}
 
-	uint8_t* CharFiller::Data()
+	const void* CharFiller::Data()
 	{
 		if (m_fillData.empty())
 		{
@@ -22,15 +22,5 @@ namespace Tunkio
 		}
 
 		return m_fillData.data();
-	}
-
-	uint64_t CharFiller::Size(uint64_t bytesLeft)
-	{
-		if (m_fillData.size() > bytesLeft)
-		{
-			return bytesLeft;
-		}
-
-		return m_fillData.size();
 	}
 }

@@ -12,8 +12,8 @@ QString toString(TunkioFillType type)
 			return "Ones";
 		case TunkioFillType::Character:
 			return "Character";
-		case TunkioFillType::String:
-			return "String";
+		case TunkioFillType::Sentence:
+			return "Sentence";
 		case TunkioFillType::Random:
 			return "Random";
 	}
@@ -25,18 +25,6 @@ QString toString(TunkioFillType type)
 WipePassModel::WipePassModel(QObject* parent) :
 	QAbstractTableModel(parent)
 {
-	Pass pass
-	{
-		TunkioFillType::Zeroes,
-		"0x00",
-		false,
-		0xFFFFFFF,
-		0xFFFFFFFF,
-		QTime().currentTime().addMSecs(-1000),
-		QTime()
-	};
-
-	m_passes.append(pass);
 }
 
 WipePassModel::~WipePassModel()
@@ -71,20 +59,41 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 			case 2:
 				return pass.verify ? "Yes" : "No";
 			case 3:
+			{
+				if (!pass.start.isValid())
+				{
+					break;
+				}
+
 				return QLocale().formattedDataSize(pass.bytesWritten);
+			}
 			case 4:
 			{
-				int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
-				return QLocale().formattedDataSize(bytesLeft);
+				if (!pass.start.isValid())
+				{
+					break;
+				}
+
+				return QLocale().formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
 			}
 			case 5:
 			{
+				if (!pass.start.isValid())
+				{
+					break;
+				}
+
 				int64_t secondsTaken = pass.start.secsTo(QTime::currentTime());
 				int64_t bytesPerSecond = pass.bytesWritten / secondsTaken;
 				return QLocale().formattedDataSize(bytesPerSecond).append("/s");
 			}
 			case 6:
 			{
+				if (!pass.start.isValid())
+				{
+					break;
+				}
+
 				int64_t secondsTaken = pass.start.secsTo(QTime::currentTime());
 				int64_t bytesPerSecond = pass.bytesWritten / secondsTaken;
 				int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
@@ -95,11 +104,18 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 				return timeLeft.toString(Qt::ISODate);
 			}
 			case 7:
+			{
+				if (!pass.start.isValid())
+				{
+					break;
+				}
+
 				return double(pass.bytesWritten) / double(pass.bytesToWrite) * 100;
+			}
+
+			default:
+				qCritical() << index << " is out of bounds";
 		}
-
-		qCritical() << index << " is out of bounds";
-
 	}
 
 	return QVariant();
@@ -170,7 +186,21 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 	return QVariant();
 }
 
-bool WipePassModel::confirm(uint16_t totalIterations, uint64_t bytesToWritePerIteration)
+void WipePassModel::addPass(TunkioFillType fillType, const QString& fillValue, bool verify)
+{
+	int row = static_cast<int>(m_passes.size());
+	beginInsertRows(QModelIndex(), row, row);
+
+	Pass pass = {};
+	pass.fillType = fillType;
+	pass.fillValue = fillValue;
+	pass.verify = verify;
+	m_passes.append(pass);
+
+	endInsertRows();
+}
+
+void WipePassModel::wipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration)
 {
 	Q_ASSERT(totalIterations == m_passes.size());
 
@@ -178,31 +208,43 @@ bool WipePassModel::confirm(uint16_t totalIterations, uint64_t bytesToWritePerIt
 	{
 		pass.bytesToWrite = bytesToWritePerIteration;
 	}
-
-	return true; // TODO: ask the user
 }
 
 
 void WipePassModel::setPassStarted(uint16_t pass)
 {
 	Q_ASSERT(pass <= m_passes.size());
-	m_passes[pass].start = QTime::currentTime();
+	int row = pass - 1;
+
+	m_passes[row].start = QTime::currentTime();
+
+	auto tl = index(row, 3);
+	auto br = index(row, 7);
+	emit dataChanged(tl, br, { Qt::DisplayRole });
 }
 
 void WipePassModel::setPassProgress(uint16_t pass, uint64_t bytesWritten)
 {
 	Q_ASSERT(pass <= m_passes.size());
-	m_passes[pass].bytesWritten = bytesWritten;
+	int row = pass - 1;
 
-	auto tl = index(pass, 3);
-	auto br = index(pass, 7);
+	m_passes[row].bytesWritten = bytesWritten;
+
+	auto tl = index(row, 3);
+	auto br = index(row, 7);
 	emit dataChanged(tl, br, { Qt::DisplayRole });
 }
 
 void WipePassModel::setPassFinished(uint16_t pass)
 {
 	Q_ASSERT(pass <= m_passes.size());
-	m_passes[pass].finish = QTime::currentTime();
+	int row = pass - 1;
+
+	m_passes[row].finish = QTime::currentTime();
+
+	auto tl = index(row, 3);
+	auto br = index(row, 7);
+	emit dataChanged(tl, br, { Qt::DisplayRole });
 }
 
 void WipePassModel::wipeCompleted(uint16_t, uint64_t)

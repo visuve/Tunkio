@@ -14,8 +14,7 @@ namespace Tunkio
 
 		virtual ~CharFiller();
 
-		uint8_t* Data() override;
-		uint64_t Size(uint64_t bytesLeft) override;
+		const void* Data() override;
 
 	protected:
 		uint8_t m_fillChar;
