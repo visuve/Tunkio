@@ -186,7 +186,7 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 	return QVariant();
 }
 
-void WipePassModel::addPass(TunkioFillType fillType, const QString& fillValue, bool verify)
+void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify)
 {
 	int row = static_cast<int>(m_passes.size());
 	beginInsertRows(QModelIndex(), row, row);
@@ -200,7 +200,7 @@ void WipePassModel::addPass(TunkioFillType fillType, const QString& fillValue, b
 	endInsertRows();
 }
 
-void WipePassModel::wipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration)
+void WipePassModel::onWipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration)
 {
 	Q_ASSERT(totalIterations == m_passes.size());
 
@@ -211,7 +211,7 @@ void WipePassModel::wipeStarted(uint16_t totalIterations, uint64_t bytesToWriteP
 }
 
 
-void WipePassModel::setPassStarted(uint16_t pass)
+void WipePassModel::onPassStarted(uint16_t pass)
 {
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
@@ -223,7 +223,7 @@ void WipePassModel::setPassStarted(uint16_t pass)
 	emit dataChanged(tl, br, { Qt::DisplayRole });
 }
 
-void WipePassModel::setPassProgress(uint16_t pass, uint64_t bytesWritten)
+void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 {
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
@@ -235,7 +235,7 @@ void WipePassModel::setPassProgress(uint16_t pass, uint64_t bytesWritten)
 	emit dataChanged(tl, br, { Qt::DisplayRole });
 }
 
-void WipePassModel::setPassFinished(uint16_t pass)
+void WipePassModel::onPassFinished(uint16_t pass)
 {
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
@@ -247,7 +247,7 @@ void WipePassModel::setPassFinished(uint16_t pass)
 	emit dataChanged(tl, br, { Qt::DisplayRole });
 }
 
-void WipePassModel::wipeCompleted(uint16_t, uint64_t)
+void WipePassModel::onWipeCompleted(uint16_t, uint64_t)
 {
 	// TODO: show stats
 }

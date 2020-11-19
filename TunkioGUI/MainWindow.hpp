@@ -1,8 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
-#include "TunkioInstance.hpp"
+#include <memory>
 #include "WipePassModel.hpp"
+#include "TunkioRunner.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,10 +23,11 @@ private slots:
 	void onOpenDriveDialog();
 	void addPass();
 	void onAbout();
+	void onError(TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
 	void attachCallbacks();
 	Ui::MainWindow* ui;
 	WipePassModel* m_model;
-	Tunkio::Instance m_tunkio;
+	std::shared_ptr<TunkioRunner> m_tunkio;
 };

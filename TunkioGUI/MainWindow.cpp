@@ -95,18 +95,23 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->pushButtonAddStep, &QPushButton::clicked, this, &MainWindow::addPass);
 
+	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
+	connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
+	connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
+	connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
+	connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
+	connect(m_tunkio.get(), &TunkioRunner::errorOccurred, this, &MainWindow::onError);
+
 	connect(ui->pushButtonStart, &QPushButton::clicked, [this]()
 	{
-		TunkioHandle* handle = m_tunkio.Get();
-		Q_ASSERT(handle != nullptr);
-		attachCallbacks();
-		TunkioRun(handle);
-		qDebug() << "FOO";
+		Q_ASSERT(m_tunkio);
+		m_tunkio->start();
 	});
 }
 
 MainWindow::~MainWindow()
 {
+	m_tunkio = nullptr;
 	delete ui;
 }
 
@@ -119,8 +124,7 @@ void MainWindow::onOpenFileDialog()
 	{
 		const QString file = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(file));
-		m_tunkio.Reset(
-			TunkioInitialize(m_model, file.toUtf8().constData(), TunkioTargetType::File));
+		m_tunkio = std::make_shared<TunkioRunner>(file, TunkioTargetType::File);
 	}
 }
 
@@ -134,8 +138,7 @@ void MainWindow::onOpenDirectoryDialog()
 	{
 		const QString directory = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(directory));
-		m_tunkio.Reset(
-			TunkioInitialize(m_model, directory.toUtf8().constData(), TunkioTargetType::Directory));
+		m_tunkio = std::make_shared<TunkioRunner>(directory, TunkioTargetType::Directory);
 	}
 }
 
@@ -147,135 +150,52 @@ void MainWindow::onOpenDriveDialog()
 	{
 		const QString drive = dialog.selectedDrive();
 		ui->lineEditSelectedPath->setText(drive);
-		m_tunkio.Reset(
-			TunkioInitialize(m_model, drive.toUtf8().constData(), TunkioTargetType::Drive));
+		m_tunkio = std::make_shared<TunkioRunner>(drive, TunkioTargetType::Drive);
 	}
 }
 
 void MainWindow::addPass()
 {
-
-	Q_ASSERT(m_tunkio);
-
 	int index = ui->comboBoxStepType->currentIndex();
 	bool verify = ui->checkBoxVerify->isChecked();
 	QString fill = ui->lineEditFillValue->text();
-	const char* character = &fill.toStdString()[0];
-	const char* sentence = fill.toStdString().c_str();
-
 
 	switch (index)
 	{
 		case 0:
-			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Zeroes, verify, nullptr))
+			if (m_tunkio->addPass(TunkioFillType::Zeroes, QString(), verify))
 			{
-				m_model->addPass(TunkioFillType::Zeroes, "0x00", verify);
+				m_model->onPassAdded(TunkioFillType::Zeroes, "0x00", verify);
 			}
+
 			return;
 		case 1:
-			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Ones, verify, nullptr))
+			if (m_tunkio->addPass(TunkioFillType::Ones, QString(), verify))
 			{
-				m_model->addPass(TunkioFillType::Ones, "0xFF", verify);
+				m_model->onPassAdded(TunkioFillType::Ones, "0xFF", verify);
 			}
 			return;
 		case 2:
-			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Random, verify, nullptr))
+			if (m_tunkio->addPass(TunkioFillType::Random, QString(), verify))
 			{
-				m_model->addPass(TunkioFillType::Random, "Random", verify);
+				m_model->onPassAdded(TunkioFillType::Random, "Random", verify);
 			}
 			return;
 		case 3:
-			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Character, verify, character))
+			if (m_tunkio->addPass(TunkioFillType::Character, fill, verify))
 			{
-				m_model->addPass(TunkioFillType::Character, fill.at(0), verify);
+				m_model->onPassAdded(TunkioFillType::Character, fill.at(0), verify);
 			}
 			return;
 		case 4:
-			if (TunkioAddWipeRound(m_tunkio, TunkioFillType::Character, verify, sentence))
+			if (m_tunkio->addPass(TunkioFillType::Character, fill, verify))
 			{
-				m_model->addPass(TunkioFillType::Sentence, fill, verify);
+				m_model->onPassAdded(TunkioFillType::Sentence, fill, verify);
 			}
 			return;
 	}
 
 	qCritical() << index << " is out of bounds";
-}
-
-void MainWindow::attachCallbacks()
-{
-	TunkioStartedCallback* started = [](
-		void* context,
-		uint16_t totalIterations,
-		uint64_t bytesToWritePerIteration)
-	{
-		qDebug() << "Wipe started: " << totalIterations << '/' << bytesToWritePerIteration;
-		auto model = static_cast<WipePassModel*>(context);
-		model->wipeStarted(totalIterations, bytesToWritePerIteration);
-	};
-
-	TunkioIterationStartedCallback* iterationStarted = [](
-		void* context,
-		uint16_t currentIteration)
-	{
-		qDebug() << "Iteration started: " << currentIteration;
-		auto model = static_cast<WipePassModel*>(context);
-		model->setPassStarted(currentIteration);
-	};
-
-	TunkioProgressCallback* progress = [](
-		void* context,
-		uint16_t currentIteration,
-		uint64_t bytesWritten)
-	{
-		qDebug() << "Progress: " << currentIteration << '/' << bytesWritten;
-		auto model = static_cast<WipePassModel*>(context);
-		model->setPassProgress(currentIteration, bytesWritten);
-		return true;
-	};
-
-	TunkioErrorCallback* error = [](
-		void* context,
-		TunkioStage stage,
-		uint16_t currentIteration,
-		uint64_t bytesWritten,
-		uint32_t errorCode)
-	{
-		auto model = static_cast<WipePassModel*>(context);
-		auto self = dynamic_cast<MainWindow*>(model->parent()->parent());
-
-		QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
-		message << QString("Pass: %1").arg(currentIteration);
-		message << QString("Bytes written: %1").arg(bytesWritten);
-		message << QString("Operating system error code: %1").arg(errorCode);
-
-		QMessageBox::critical(self, "Tunkio - An error occurred", message.join('\n'));
-	};
-
-	TunkioIterationCompletedCallback* iterationCompleted = [](
-		void* context,
-		uint16_t currentIteration)
-	{
-		qDebug() << "Completed iteration: " << currentIteration;
-		auto model = static_cast<WipePassModel*>(context);
-		model->setPassFinished(currentIteration);
-	};
-
-	TunkioCompletedCallback* completed = [](
-		void* context,
-		uint16_t totalIterations,
-		uint64_t totalBytesWritten)
-	{
-		qDebug() << "Completed Wipe: " << totalIterations << '/' << totalBytesWritten;
-		auto model = static_cast<WipePassModel*>(context);
-		model->wipeCompleted(totalIterations, totalBytesWritten);
-	};
-
-	TunkioSetStartedCallback(m_tunkio, started);
-	TunkioSetIterationStartedCallback(m_tunkio, iterationStarted);
-	TunkioSetProgressCallback(m_tunkio, progress);
-	TunkioSetErrorCallback(m_tunkio, error);
-	TunkioSetIterationCompletedCallback(m_tunkio, iterationCompleted);
-	TunkioSetCompletedCallback(m_tunkio, completed);
 }
 
 void MainWindow::onAbout()
@@ -295,4 +215,14 @@ void MainWindow::onAbout()
 	text << "";
 
 	QMessageBox::about(this, "Tunkio", text.join('\n'));
+}
+
+void MainWindow::onError(TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode)
+{
+	QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
+	message << QString("Pass: %1").arg(currentIteration);
+	message << QString("Bytes written: %1").arg(bytesWritten);
+	message << QString("Operating system error code: %1").arg(errorCode);
+
+	QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
 }

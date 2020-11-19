@@ -17,12 +17,13 @@ public:
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-	void addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
-	void wipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration);
-	void setPassStarted(uint16_t pass);
-	void setPassProgress(uint16_t pass, uint64_t bytesWritten);
-	void setPassFinished(uint16_t pass);
-	void wipeCompleted(uint16_t totalIterations, uint64_t totalBytesWritten);
+public slots:
+	void onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify);
+	void onWipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration);
+	void onPassStarted(uint16_t pass);
+	void onPassProgressed(uint16_t pass, uint64_t bytesWritten);
+	void onPassFinished(uint16_t pass);
+	void onWipeCompleted(uint16_t totalIterations, uint64_t totalBytesWritten);
 
 private:
 
