@@ -85,11 +85,13 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 
 				int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
 
-				if (milliSecondsTaken && pass.bytesWritten)
+				if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
 				{
-					int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-					return QLocale().formattedDataSize(bytesPerSecond).append("/s");
+					break;
 				}
+
+				int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+				return QLocale().formattedDataSize(bytesPerSecond).append("/s");
 			}
 			case 6:
 			{
@@ -100,16 +102,18 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 
 				int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
 
-				if (milliSecondsTaken && pass.bytesWritten)
+				if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
 				{
-					int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-					int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
-					int64_t secondsLeft = bytesLeft / bytesPerSecond;
-
-					QTime timeLeft(0, 0, 0);
-					timeLeft = timeLeft.addSecs(secondsLeft);
-					return timeLeft.toString(Qt::ISODate);
+					break;
 				}
+
+				int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+				int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
+				int64_t secondsLeft = bytesLeft / bytesPerSecond;
+
+				QTime timeLeft(0, 0, 0);
+				timeLeft = timeLeft.addSecs(secondsLeft);
+				return timeLeft.toString(Qt::ISODate);
 			}
 			case 7:
 			{

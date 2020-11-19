@@ -1,6 +1,6 @@
 # Tunkio
 
-- Wipes files or unallocated volumes
+- Wipes files, folders or drives
 - Originally written during the small hours of a boring night, since improved a lot
 - Does not yet even try to be secure, done simply out of curiosity
 
@@ -21,19 +21,16 @@
 
 ## Submodules
 
-- Nana C++
-	- https://github.com/cnjinhao/nana
-		- Used in GUI
 - Google Test
 	- https://github.com/google/googletest
 		- Used for unit tests
+	- ``git submodule update --init``
+
+## Getting started
+
+- ``apt install qt5-default``
 
 ## Tools
 
 - Visual Studio >= 2019 or GCC >= 8.3.0 or Clang >= 7.0.1
 - CMake >= 3.17
-
-## TODO:
-
-- Testing
-	- Add other than "happy path" unit tests
