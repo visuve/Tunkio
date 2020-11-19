@@ -83,9 +83,13 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				int64_t secondsTaken = pass.start.secsTo(QTime::currentTime());
-				int64_t bytesPerSecond = pass.bytesWritten / secondsTaken;
-				return QLocale().formattedDataSize(bytesPerSecond).append("/s");
+				int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
+
+				if (milliSecondsTaken && pass.bytesWritten)
+				{
+					int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+					return QLocale().formattedDataSize(bytesPerSecond).append("/s");
+				}
 			}
 			case 6:
 			{
@@ -94,20 +98,34 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				int64_t secondsTaken = pass.start.secsTo(QTime::currentTime());
-				int64_t bytesPerSecond = pass.bytesWritten / secondsTaken;
-				int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
-				int64_t secondsLeft = bytesLeft / bytesPerSecond;
+				int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
 
-				QTime timeLeft(0, 0, 0);
-				timeLeft = timeLeft.addSecs(secondsLeft);
-				return timeLeft.toString(Qt::ISODate);
+				if (milliSecondsTaken && pass.bytesWritten)
+				{
+					int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+					int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
+					int64_t secondsLeft = bytesLeft / bytesPerSecond;
+
+					QTime timeLeft(0, 0, 0);
+					timeLeft = timeLeft.addSecs(secondsLeft);
+					return timeLeft.toString(Qt::ISODate);
+				}
 			}
 			case 7:
 			{
 				if (!pass.start.isValid())
 				{
 					break;
+				}
+
+				if (pass.bytesWritten <= 0)
+				{
+					return 0;
+				}
+
+				if (pass.bytesToWrite <= 0)
+				{
+					return 100;
 				}
 
 				return double(pass.bytesWritten) / double(pass.bytesToWrite) * 100;
@@ -188,6 +206,8 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 
 void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	int row = static_cast<int>(m_passes.size());
 	beginInsertRows(QModelIndex(), row, row);
 
@@ -202,12 +222,16 @@ void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValu
 
 void WipePassModel::onWipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	Q_ASSERT(totalIterations == m_passes.size());
 
 	for (Pass& pass : m_passes)
 	{
 		pass.bytesToWrite = bytesToWritePerIteration;
 	}
+
+	qDebug() << "Wipe started:" << totalIterations << '/' << bytesToWritePerIteration;
 }
 
 
@@ -221,10 +245,16 @@ void WipePassModel::onPassStarted(uint16_t pass)
 	auto tl = index(row, 3);
 	auto br = index(row, 7);
 	emit dataChanged(tl, br, { Qt::DisplayRole });
+
+	qDebug() << "Pass started:" << pass << "row:" << row;
 }
 
 void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 {
+	qDebug() << "HITLERILLA OLI SAAB";
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
 
@@ -233,10 +263,14 @@ void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 	auto tl = index(row, 3);
 	auto br = index(row, 7);
 	emit dataChanged(tl, br, { Qt::DisplayRole });
+
+	qDebug() << "Progress:" << pass << '/' << bytesWritten << "row:" << row;
 }
 
 void WipePassModel::onPassFinished(uint16_t pass)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
 
@@ -245,9 +279,13 @@ void WipePassModel::onPassFinished(uint16_t pass)
 	auto tl = index(row, 3);
 	auto br = index(row, 7);
 	emit dataChanged(tl, br, { Qt::DisplayRole });
+
+	qDebug() << "Pass finished:" << pass << "row:" << row;
 }
 
-void WipePassModel::onWipeCompleted(uint16_t, uint64_t)
+void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
 {
-	// TODO: show stats
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	qDebug() << "Wipe finished:" << pass << '/' << totalBytesWritten;
 }

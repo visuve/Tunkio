@@ -2,6 +2,9 @@
 
 #include <QAbstractTableModel>
 #include <QTime>
+
+#include <mutex>
+
 #include "TunkioAPI.h"
 
 class WipePassModel : public QAbstractTableModel
@@ -39,4 +42,5 @@ private:
 	};
 
 	QList<Pass> m_passes;
+	std::mutex m_mutex;
 };

@@ -95,16 +95,55 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->pushButtonAddStep, &QPushButton::clicked, this, &MainWindow::addPass);
 
-	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
-	connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
-	connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
-	connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
-	connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
-	connect(m_tunkio.get(), &TunkioRunner::errorOccurred, this, &MainWindow::onError);
-
 	connect(ui->pushButtonStart, &QPushButton::clicked, [this]()
 	{
-		Q_ASSERT(m_tunkio);
+		Q_ASSERT(m_tunkio.get());
+		Q_ASSERT(m_model);
+
+		// connect(m_tunkio.get(), &QThread::finished, m_tunkio.get(), &QObject::deleteLater);
+
+		// I do not know what the fuck is going on, i.e. why the connections work _ONLY_ like this
+		connect(m_tunkio.get(), &TunkioRunner::wipeStarted, [this](uint16_t totalIterations, uint64_t bytesToWritePerIteration)
+		{
+			qDebug() << "wipeStarted";
+			m_model->onWipeStarted(totalIterations, bytesToWritePerIteration);
+		});
+
+		connect(m_tunkio.get(), &TunkioRunner::passStarted, [this](uint16_t pass)
+		{
+			qDebug() << "passStarted";
+			m_model->onPassStarted(pass);
+		});
+
+		connect(m_tunkio.get(), &TunkioRunner::passProgressed, [this](uint16_t pass, uint64_t bytesWritten)
+		{
+			qDebug() << "passProgressed";
+			m_model->onPassProgressed(pass, bytesWritten);
+		});
+
+		connect(m_tunkio.get(), &TunkioRunner::passFinished, [this](uint16_t pass)
+		{
+			qDebug() << "passFinished";
+			m_model->onPassFinished(pass);
+		});
+
+		connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, [this](uint16_t passes, uint64_t totalBytesWritten)
+		{
+			qDebug() << "wipeCompleted";
+			m_model->onWipeCompleted(passes, totalBytesWritten);
+		});
+
+		// connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
+		// connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
+		// connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
+		// connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
+		// connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
+
+		connect(m_tunkio.get(), &TunkioRunner::errorOccurred, [this](TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode)
+		{
+			onError(stage, currentIteration, bytesWritten, errorCode);
+		});
+
 		m_tunkio->start();
 	});
 }
@@ -156,6 +195,8 @@ void MainWindow::onOpenDriveDialog()
 
 void MainWindow::addPass()
 {
+	Q_ASSERT(m_tunkio.get());
+
 	int index = ui->comboBoxStepType->currentIndex();
 	bool verify = ui->checkBoxVerify->isChecked();
 	QString fill = ui->lineEditFillValue->text();

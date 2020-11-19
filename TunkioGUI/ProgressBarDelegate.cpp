@@ -18,7 +18,20 @@ void ProgressBarDelegate::paint(
 	progressBar.minimum = 0;
 	progressBar.maximum = 100;
 	progressBar.progress = progress;
-	progressBar.text = QString::number(progress, 'g', 2);
+
+	if (progress <= 0.00)
+	{
+		progressBar.text = "0%";
+	}
+	else if (progress >= 100.00)
+	{
+		progressBar.text = "100%";
+	}
+	else
+	{
+		progressBar.text = QString::number(progress, 'g', 2) + '%';
+	}
+
 	progressBar.textVisible = true;
 	
 	QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBar, painter);
