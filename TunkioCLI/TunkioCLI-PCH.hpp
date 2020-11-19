@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cassert>
@@ -14,10 +13,10 @@
 #include <string>
 #include <vector>
 
-#include "TunkioAPI.h"
-#include "TunkioArgs.hpp"
-#include "TunkioErrorCodes.hpp"
-#include "TunkioTime.hpp"
-#include "TunkioDataUnits.hpp"
-#include "TunkioInstance.hpp"
-#include "TunkioDriveInfo.hpp"
+#include "../TunkioDLL/TunkioAPI.h"
+#include "../TunkioLIB/TunkioArgs.hpp"
+#include "../TunkioLIB/TunkioDataUnits.hpp"
+#include "../TunkioLIB/TunkioDriveInfo.hpp"
+#include "../TunkioLIB/TunkioErrorCodes.hpp"
+#include "../TunkioLIB/TunkioInstance.hpp"
+#include "../TunkioLIB/TunkioTime.hpp"

@@ -4,6 +4,7 @@
 
 #if defined(_WIN32)
 #undef min
+#undef max
 #endif
 
 namespace Tunkio
@@ -20,7 +21,7 @@ namespace Tunkio
 		virtual ~IFillProvider() = default;
 
 		virtual const void* Data() = 0;
-		virtual uint64_t Size(uint64_t bytesLeft)
+		virtual uint64_t Size(uint64_t bytesLeft) const
 		{
 			return std::min(bytesLeft, m_size.Bytes());
 		}

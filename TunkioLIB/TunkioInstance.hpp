@@ -1,17 +1,20 @@
 #pragma once
 
 #include "../TunkioDLL/TunkioAPI.h"
-#include "TunkioAutoHandle.hpp"
 
 namespace Tunkio
 {
-	class Instance : public AutoHandle<TunkioHandle*, nullptr, nullptr, TunkioFree>
+	class Instance
 	{
 	public:
-		Instance();
+		Instance() = default;
 		explicit Instance(void* context, const char* path, TunkioTargetType type);
+		~Instance();
 
 		TunkioHandle* Get() const;
 		operator TunkioHandle* ();
+
+	private:
+		TunkioHandle* m_handle = nullptr;
 	};
 }

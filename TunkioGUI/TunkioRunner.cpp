@@ -44,7 +44,7 @@ void TunkioRunner::attachCallbacks()
 		uint64_t bytesToWritePerIteration)
 	{
 		qDebug() << "TunkioStartedCallback: " << totalIterations << '/' << bytesToWritePerIteration;
-		auto self = static_cast<decltype(this)>(context);
+		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeStarted(totalIterations, bytesToWritePerIteration);
 	};
@@ -54,7 +54,7 @@ void TunkioRunner::attachCallbacks()
 		uint16_t currentIteration)
 	{
 		qDebug() << "TunkioIterationStartedCallback: " << currentIteration;
-		auto self = static_cast<decltype(this)>(context);
+		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passStarted(currentIteration);
 	};
@@ -65,7 +65,7 @@ void TunkioRunner::attachCallbacks()
 		uint64_t bytesWritten)
 	{
 		qDebug() << "TunkioProgressCallback: " << currentIteration << '/' << bytesWritten;
-		auto self = static_cast<decltype(this)>(context);
+		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 
 		emit self->passProgressed(currentIteration, bytesWritten);
@@ -78,7 +78,7 @@ void TunkioRunner::attachCallbacks()
 		uint16_t currentIteration)
 	{
 		qDebug() << "TunkioIterationCompletedCallback: " << currentIteration;
-		auto self = static_cast<decltype(this)>(context);
+		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passFinished(currentIteration);
 	};
@@ -89,7 +89,7 @@ void TunkioRunner::attachCallbacks()
 		uint64_t totalBytesWritten)
 	{
 		qDebug() << "TunkioCompletedCallback: " << totalIterations << '/' << totalBytesWritten;
-		auto self = static_cast<decltype(this)>(context);
+		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeCompleted(totalIterations, totalBytesWritten);
 	};
@@ -104,7 +104,7 @@ void TunkioRunner::attachCallbacks()
 		qDebug() << "TunkioErrorCallback: "
 			<< stage << '/' << currentIteration << '/' << bytesWritten << '/' << errorCode;
 
-		auto self = static_cast<decltype(this)>(context);
+		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->errorOccurred(stage, currentIteration, bytesWritten, errorCode);
 	};
@@ -120,6 +120,7 @@ void TunkioRunner::attachCallbacks()
 void TunkioRunner::run()
 {
 	qDebug() << "Started!";
+	Q_ASSERT(m_tunkio);
 	qDebug() << TunkioRun(m_tunkio);
 	qDebug() << "Finished!";
 }

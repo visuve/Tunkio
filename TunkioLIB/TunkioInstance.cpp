@@ -3,14 +3,17 @@
 
 namespace Tunkio
 {
-	Instance::Instance() :
-		AutoHandle()
+	Instance::Instance(void* context, const char* path, TunkioTargetType type) :
+		m_handle(TunkioInitialize(context, path, type))
 	{
 	}
 
-	Instance::Instance(void* context, const char* path, TunkioTargetType type) :
-		AutoHandle(TunkioInitialize(context, path, type))
+	Instance::~Instance()
 	{
+		if (m_handle)
+		{
+			TunkioFree(m_handle);
+		}
 	}
 
 	TunkioHandle* Instance::Get() const

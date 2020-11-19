@@ -1,10 +1,12 @@
 #include "DriveSelectDialog.hpp"
 #include "ui_DriveSelectDialog.h"
-#include "TunkioDriveInfo.hpp"
+
 #include <QDebug>
 #include <QLocale>
 #include <QMessageBox>
 #include <QPushButton>
+
+#include "../TunkioLIB/TunkioDriveInfo.hpp"
 
 class DriveSelectModel : public QAbstractTableModel
 {

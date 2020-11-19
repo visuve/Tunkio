@@ -8,15 +8,15 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-	file(GLOB TunkioLIBSource "*.cpp" "Posix/*.cpp" "Linux/*.cpp")
+	file(GLOB TunkioLIBSource "*.cpp" "Linux/*.cpp")
 	add_library("tunkio-dev" STATIC  ${TunkioLIBSource}) # -> libtunkio-dev.a
 	target_precompile_headers("tunkio-dev" PRIVATE "TunkioLIB-PCH.hpp")
 	target_link_libraries("tunkio-dev" udev stdc++fs)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-	file(GLOB TunkioLIBSource "*.cpp" "Posix/*.cpp" "BSD/*.cpp")
+	file(GLOB TunkioLIBSource "*.cpp" "BSD/*.cpp")
 	add_library("tunkio-dev" STATIC  ${TunkioLIBSource}) # -> libtunkio-dev.a
-	# target_precompile_headers("tunkio-dev" PRIVATE "TunkioLIB-PCH.hpp")
+	target_precompile_headers("tunkio-dev" PRIVATE "TunkioLIB-PCH.hpp")
 	target_link_libraries("tunkio-dev" geom)
 endif()

@@ -1,9 +1,5 @@
 #pragma once
 
-#if defined(_WIN32)
-#undef max
-#endif
-
 namespace Tunkio::Time
 {
 	using Days = std::chrono::duration<uint64_t, std::ratio<86400, 1>>;

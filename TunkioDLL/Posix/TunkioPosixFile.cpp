@@ -3,6 +3,12 @@
 
 namespace Tunkio
 {
+#if defined(__linux__)
+	constexpr unsigned long int DiskSizeRequest = BLKGETSIZE64;
+#else
+	constexpr unsigned long int DiskSizeRequest = DIOCGMEDIASIZE;
+#endif
+
 	// https://linux.die.net/man/2/open
 	constexpr uint32_t OpenFlags = O_WRONLY | O_DIRECT | O_SYNC;
 
@@ -15,11 +21,7 @@ namespace Tunkio
 
 		uint64_t size = 0;
 
-#if defined(__linux__)
-		if (ioctl(fileDescriptor, BLKGETSIZE64, &size) != 0)
-#else
-		if (ioctl(fileDescriptor, DIOCGMEDIASIZE, &size) != 0)
-#endif
+		if (ioctl(fileDescriptor, DiskSizeRequest, &size) != 0)
 		{
 			return { false, size };
 		}

@@ -1,6 +1,10 @@
 #include "../TunkioLIB-PCH.hpp"
 #include "../TunkioDriveInfo.hpp"
 
+#include <Windows.h>
+#include <WbemCli.h>
+#include <wrl/client.h>
+
 namespace Tunkio
 {
 	using Microsoft::WRL::ComPtr;

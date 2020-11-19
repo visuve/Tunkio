@@ -8,8 +8,8 @@ namespace Tunkio
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering
 		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		constexpr uint32_t ShareMode = 0;
-		constexpr uint32_t CreationFlags = 0;
-			// FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+		constexpr uint32_t CreationFlags =
+			FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
 		return CreateFileA(
 			path.c_str(),

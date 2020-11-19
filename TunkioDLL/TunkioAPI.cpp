@@ -1,7 +1,5 @@
 #include "TunkioAPI-PCH.hpp"
 #include "TunkioAPI.h"
-#include "TunkioErrorCodes.hpp"
-#include "TunkioDataUnits.hpp"
 
 #include "Workloads/TunkioWorkload.hpp"
 #include "Workloads/TunkioFileWipe.hpp"
@@ -12,6 +10,9 @@
 #include "FillProviders/TunkioCharFiller.hpp"
 #include "FillProviders/TunkioStringFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
+
+#include "TunkioErrorCodes.hpp"
+#include "TunkioDataUnits.hpp"
 
 template <typename T>
 bool Assign(TunkioHandle* handle, T(Tunkio::IWorkload::* field), T value)

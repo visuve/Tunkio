@@ -25,8 +25,6 @@ namespace Tunkio
 				m_fillData.append(m_fillString);
 				m_fillData.append(1, '\0');
 			}
-
-			m_fillString.clear(); // Not needed anymore
 		}
 
 		return m_fillData.data();

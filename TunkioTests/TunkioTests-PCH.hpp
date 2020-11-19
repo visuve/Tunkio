@@ -13,9 +13,9 @@
 #include <string>
 #include <vector>
 
-#include "TunkioAPI.h"
-#include "TunkioArgs.hpp"
-#include "TunkioDataUnits.hpp"
-#include "TunkioErrorCodes.hpp"
-#include "TunkioTime.hpp"
+#include "../TunkioDLL/TunkioAPI.h"
+#include "../TunkioLIB/TunkioArgs.hpp"
+#include "../TunkioLIB/TunkioDataUnits.hpp"
+#include "../TunkioLIB/TunkioErrorCodes.hpp"
+#include "../TunkioLIB/TunkioTime.hpp"
 
