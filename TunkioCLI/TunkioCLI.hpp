@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../TunkioDLL/TunkioAPI.h"
+#include "../TunkioAPI/TunkioAPI.h"
 
 namespace Tunkio
 {

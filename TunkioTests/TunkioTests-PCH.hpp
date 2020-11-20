@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "../TunkioDLL/TunkioAPI.h"
+#include "../TunkioAPI/TunkioAPI.h"
 #include "../TunkioLIB/TunkioArgs.hpp"
 #include "../TunkioLIB/TunkioDataUnits.hpp"
 #include "../TunkioLIB/TunkioErrorCodes.hpp"

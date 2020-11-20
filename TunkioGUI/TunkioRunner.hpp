@@ -5,7 +5,7 @@
 
 #include <atomic>
 
-#include "../TunkioDLL/TunkioAPI.h"
+#include "../TunkioAPI/TunkioAPI.h"
 
 class TunkioRunner : public QThread
 {

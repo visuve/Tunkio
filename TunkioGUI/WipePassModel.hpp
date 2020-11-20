@@ -5,7 +5,7 @@
 
 #include <mutex>
 
-#include "../TunkioDLL/TunkioAPI.h"
+#include "../TunkioAPI/TunkioAPI.h"
 
 class WipePassModel : public QAbstractTableModel
 {

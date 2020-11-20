@@ -12,7 +12,7 @@ else()
 endif()
 
 add_subdirectory("TunkioLIB")
-add_subdirectory("TunkioDLL")
+add_subdirectory("TunkioAPI")
 add_subdirectory("TunkioCLI")
 add_subdirectory("TunkioGUI")
 add_subdirectory("TunkioTests")
