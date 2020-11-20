@@ -23,40 +23,40 @@ namespace Tunkio
 		std::queue<std::shared_ptr<IFillProvider>> m_fillers;
 
 		// TODO: add setters :S
-		TunkioStartedCallback* m_startedCallback = nullptr;
-		TunkioIterationStartedCallback* m_iterationStartedCallback = nullptr;
+		TunkioWipeStartedCallback* m_startedCallback = nullptr;
+		TunkioPassStartedCallback* m_passStartedCallback = nullptr;
 		TunkioProgressCallback* m_progressCallback = nullptr;
 		TunkioErrorCallback* m_errorCallback = nullptr;
-		TunkioIterationCompletedCallback* m_iterationCompletedCallback = nullptr;
+		TunkioPassCompletedCallback* m_passCompletedCallback = nullptr;
 		TunkioCompletedCallback* m_completedCallback = nullptr;
 
 		bool m_verifyAfterWipe = false;
 		bool m_removeAfterFill = false;
 
-		inline void OnStarted(
-			uint16_t totalIterations,
-			uint64_t bytesToWritePerIteration)
+		inline void OnWipeStarted(
+			uint16_t passes,
+			uint64_t bytesToWritePerPass)
 		{
 			if (!m_startedCallback)
 			{
 				return;
 			}
 
-			m_startedCallback(m_context, totalIterations, bytesToWritePerIteration);
+			m_startedCallback(m_context, passes, bytesToWritePerPass);
 		}
 
-		inline void OnIterationStarted(uint16_t currentIteration)
+		inline void OnPassStarted(uint16_t pass)
 		{
-			if (!m_iterationStartedCallback)
+			if (!m_passStartedCallback)
 			{
 				return;
 			}
 
-			m_iterationStartedCallback(m_context, currentIteration);
+			m_passStartedCallback(m_context, pass);
 		}
 
 		inline bool OnProgress(
-			uint16_t currentIteration,
+			uint16_t pass,
 			uint64_t bytesWritten)
 		{
 			if (!m_progressCallback)
@@ -64,21 +64,21 @@ namespace Tunkio
 				return true;
 			}
 
-			return m_progressCallback(m_context, currentIteration, bytesWritten);
+			return m_progressCallback(m_context, pass, bytesWritten);
 		}
 
-		inline void OnIterationCompleted(uint16_t currentIteration)
+		inline void OnPassCompleted(uint16_t pass)
 		{
-			if (!m_iterationCompletedCallback)
+			if (!m_passCompletedCallback)
 			{
 				return;
 			}
 
-			m_iterationCompletedCallback(m_context, currentIteration);
+			m_passCompletedCallback(m_context, pass);
 		}
 
 		inline void OnCompleted(
-			uint16_t totalIterations,
+			uint16_t passes,
 			uint64_t totalBytesWritten)
 		{
 			if (!m_completedCallback)
@@ -86,12 +86,12 @@ namespace Tunkio
 				return;
 			}
 
-			m_completedCallback(m_context, totalIterations, totalBytesWritten);
+			m_completedCallback(m_context, passes, totalBytesWritten);
 		}
 
-		inline void OnError(
+		inline void OnWipeError(
 			TunkioStage stage,
-			uint16_t currentIteration,
+			uint16_t pass,
 			uint64_t bytesWritten,
 			uint32_t errorCode)
 		{
@@ -100,7 +100,7 @@ namespace Tunkio
 				return;
 			}
 
-			m_errorCallback(m_context, stage, currentIteration, bytesWritten, errorCode);
+			m_errorCallback(m_context, stage, pass, bytesWritten, errorCode);
 		}
 
 	private:

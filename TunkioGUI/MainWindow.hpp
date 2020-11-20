@@ -23,7 +23,7 @@ private slots:
 	void onOpenDriveDialog();
 	void addPass();
 	void onAbout();
-	void onError(TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode);
+	void onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
 	void attachCallbacks();

@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget* parent) :
 		QMessageBox::aboutQt(this, "Tunkio");
 	});
 
-	connect(ui->comboBoxStepType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this](int index)
+	connect(ui->comboBoxFillType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this](int index)
 	{
 		switch (index)
 		{
@@ -93,7 +93,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->tableViewWipePasses->setModel(m_model);
 	ui->tableViewWipePasses->setItemDelegateForColumn(7, new ProgressBarDelegate(this));
 
-	connect(ui->pushButtonAddStep, &QPushButton::clicked, this, &MainWindow::addPass);
+	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
 
 	connect(ui->pushButtonStart, &QPushButton::clicked, [this]()
 	{
@@ -103,10 +103,10 @@ MainWindow::MainWindow(QWidget* parent) :
 		// connect(m_tunkio.get(), &QThread::finished, m_tunkio.get(), &QObject::deleteLater);
 
 		// I do not know what the fuck is going on, i.e. why the connections work _ONLY_ like this
-		connect(m_tunkio.get(), &TunkioRunner::wipeStarted, [this](uint16_t totalIterations, uint64_t bytesToWritePerIteration)
+		connect(m_tunkio.get(), &TunkioRunner::wipeStarted, [this](uint16_t passes, uint64_t bytesToWritePerPass)
 		{
 			qDebug() << "wipeStarted";
-			m_model->onWipeStarted(totalIterations, bytesToWritePerIteration);
+			m_model->onWipeStarted(passes, bytesToWritePerPass);
 		});
 
 		connect(m_tunkio.get(), &TunkioRunner::passStarted, [this](uint16_t pass)
@@ -139,9 +139,9 @@ MainWindow::MainWindow(QWidget* parent) :
 		// connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
 		// connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
 
-		connect(m_tunkio.get(), &TunkioRunner::errorOccurred, [this](TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode)
+		connect(m_tunkio.get(), &TunkioRunner::errorOccurred, [this](TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 		{
-			onError(stage, currentIteration, bytesWritten, errorCode);
+			onError(stage, pass, bytesWritten, errorCode);
 		});
 
 		m_tunkio->start();
@@ -197,7 +197,7 @@ void MainWindow::addPass()
 {
 	Q_ASSERT(m_tunkio.get());
 
-	int index = ui->comboBoxStepType->currentIndex();
+	int index = ui->comboBoxFillType->currentIndex();
 	bool verify = ui->checkBoxVerify->isChecked();
 	QString fill = ui->lineEditFillValue->text();
 
@@ -258,10 +258,10 @@ void MainWindow::onAbout()
 	QMessageBox::about(this, "Tunkio", text.join('\n'));
 }
 
-void MainWindow::onError(TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode)
+void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 {
 	QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
-	message << QString("Pass: %1").arg(currentIteration);
+	message << QString("Pass: %1").arg(pass);
 	message << QString("Bytes written: %1").arg(bytesWritten);
 	message << QString("Operating system error code: %1").arg(errorCode);
 

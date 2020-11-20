@@ -4,7 +4,7 @@ namespace Tunkio
 {
 	int OnStartedCount, OnProgressCount, OnErrorCount, OnCompletedCount = 0;
 
-	void OnStarted(void*, uint16_t, uint64_t)
+	void OnWipeStarted(void*, uint16_t, uint64_t)
 	{
 		++OnStartedCount;
 	}
@@ -15,7 +15,7 @@ namespace Tunkio
 		return true;
 	}
 
-	void OnError(void*, TunkioStage, uint16_t, uint64_t, uint32_t)
+	void OnWipeError(void*, TunkioStage, uint16_t, uint64_t, uint32_t)
 	{
 		++OnErrorCount;
 	}
@@ -50,10 +50,10 @@ namespace Tunkio
 		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Drive);
 		// EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
+		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
 		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
-		EXPECT_TRUE(TunkioSetCompletedCallback(handle, OnCompleted));
+		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
+		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
 
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
@@ -69,10 +69,10 @@ namespace Tunkio
 		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::File);
 		//EXPECT_TRUE(TunkioAddRound(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
+		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
 		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
-		EXPECT_TRUE(TunkioSetCompletedCallback(handle, OnCompleted));
+		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
+		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
 
 		EXPECT_NE(handle, nullptr);
 		EXPECT_TRUE(TunkioRun(handle));
@@ -90,10 +90,10 @@ namespace Tunkio
 		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Directory);
 		//EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
+		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
 		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
-		EXPECT_TRUE(TunkioSetCompletedCallback(handle, OnCompleted));
+		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
+		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
 
 		EXPECT_NE(handle, nullptr);
 		EXPECT_TRUE(TunkioRun(handle));
@@ -111,10 +111,10 @@ namespace Tunkio
 		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Drive);
 		//EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
 		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetStartedCallback(handle, OnStarted));
+		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
 		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
-		EXPECT_TRUE(TunkioSetCompletedCallback(handle, OnCompleted));
+		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
+		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
 
 		EXPECT_NE(handle, nullptr);
 		EXPECT_TRUE(TunkioRun(handle));

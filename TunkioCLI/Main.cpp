@@ -1,18 +1,14 @@
 #include "TunkioCLI-PCH.hpp"
+#include "TunkioCLI.hpp"
 
 namespace Tunkio
 {
-	Time::Timer g_totalTimer;
-	Time::Timer g_currentTimer;
-	uint32_t g_error = ErrorCode::Success;
-	uint64_t g_bytesToWrite = 0;
-	uint64_t g_bytesWrittenLastTime = 0;
-	std::atomic<bool> g_keepRunning = true;
+	CLI g_cli;
 
 	void SignalHandler(int signal)
 	{
 		std::cout << "Got signal: " << signal << std::endl;
-		g_keepRunning = false;
+		g_cli.Stop();
 	}
 
 	void PrintUsage(const std::string& exe)
@@ -99,111 +95,10 @@ namespace Tunkio
 		{ "path", Args::Argument(true, std::string()) },
 		{ "target", Args::Argument(false, TunkioTargetType::File) },
 		{ "mode", Args::Argument(false, TunkioFillType::Zeroes) },
-		{ "remove", Args::Argument(false, false) },
 		{ "filler", Args::Argument(false, std::string()) },
+		{ "verify", Args::Argument(false, false) },
+		{ "remove", Args::Argument(false, false) }
 	};
-
-	void OnStarted(void*, uint16_t, uint64_t bytesLeft)
-	{
-		g_totalTimer.Reset();
-		g_currentTimer.Reset();
-		g_error = ErrorCode::Success;
-		g_bytesToWrite = bytesLeft;
-		g_bytesWrittenLastTime = 0;
-
-		std::cout << Time::Timestamp() << " Started!" << std::endl;
-	}
-
-	bool OnProgress(void*, uint16_t, uint64_t bytesWritten)
-	{
-		if (!g_keepRunning)
-		{
-			return false;
-		}
-
-		// TODO: current speed sometimes shows incorrectly
-		const auto elapsedSince = g_currentTimer.Elapsed<Time::MilliSeconds>();
-		const auto elapsedTotal = g_totalTimer.Elapsed<Time::MilliSeconds>();
-		const DataUnit::Bytes bytesWrittenSince(bytesWritten - g_bytesWrittenLastTime);
-		const DataUnit::Bytes bytesWrittenTotal(bytesWritten);
-
-		if (bytesWrittenTotal.Bytes() && elapsedSince.count())
-		{
-			const DataUnit::Bytes bytesLeft = g_bytesToWrite - bytesWritten;
-			std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
-				<< " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
-				<< ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
-				<< ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, g_totalTimer))
-				<< std::endl;
-		}
-
-		g_currentTimer.Reset();
-		g_bytesWrittenLastTime = bytesWritten;
-		return g_keepRunning;
-	}
-
-	void OnError(void*, TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
-	{
-		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
-
-		switch (stage)
-		{
-			case TunkioStage::Open:
-				std::cerr << "opening!";
-				break;
-			case TunkioStage::Size:
-				std::cerr << "querying size!";
-				break;
-			case TunkioStage::Write:
-				std::cerr << "writing!";
-				break;
-			case TunkioStage::Verify:
-				std::cerr << "verifying!";
-				break;
-			case TunkioStage::Remove:
-				std::cerr << "removing file!";
-				break;
-		}
-
-		if (bytesWritten)
-		{
-			std::cerr << " Bytes written: " << bytesWritten;
-		}
-
-		std::cerr << std::endl;
-
-#ifdef WIN32
-		std::array<wchar_t, 0x400> buffer = {};
-		DWORD size = FormatMessageW(
-			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			buffer.data(),
-			static_cast<DWORD>(buffer.size()),
-			nullptr);
-
-		if (size > 2)
-		{
-			std::wcerr << L"Detailed description: " << std::wstring(buffer.data(), size - 2) << std::endl; // Trim excess /r/n
-		}
-#endif
-
-		g_error = error;
-	}
-
-	void OnCompleted(void*, uint16_t, uint64_t bytesWritten)
-	{
-		std::cout << Time::Timestamp() << " Finished. Bytes written: " << bytesWritten << std::endl;
-
-		const DataUnit::Bytes bytes(bytesWritten);
-		const auto elapsed = g_totalTimer.Elapsed<Time::MilliSeconds>();
-
-		if (bytes.Value() && elapsed.count())
-		{
-			std::cout << "Average speed: " << DataUnit::SpeedPerSecond(bytes, elapsed) << std::endl;
-		}
-	}
 
 	bool CheckArguments()
 	{
@@ -255,61 +150,52 @@ int main(int argc, char* argv[])
 		return ErrorCode::InvalidArgument;
 	}
 
-	const std::vector<std::string> args({ argv + 1, argv + argc });
-
 	if (std::signal(SIGINT, Tunkio::SignalHandler) == SIG_ERR)
 	{
 		std::cerr << "Cannot attach CTRL+C interrupt handler!" << std::endl;
 		return ErrorCode::Generic;
 	}
 
-	if (!Args::ParseVector(Arguments, args))
+	// TODO: merge these into one
 	{
-		std::cerr << "Invalid arguments!" << std::endl << std::endl;
-		PrintUsage(argv[0]);
-		return ErrorCode::InvalidArgument;
+		const std::vector<std::string> args({ argv + 1, argv + argc });
+
+		if (!Args::ParseVector(Arguments, args))
+		{
+			std::cerr << "Invalid arguments!" << std::endl << std::endl;
+			PrintUsage(argv[0]);
+			return ErrorCode::InvalidArgument;
+		}
+
+		if (!CheckArguments())
+		{
+			PrintUsage(argv[0]);
+			return ErrorCode::InvalidArgument;
+		}
+
+		if (!PrintArgumentsAndPrompt(args))
+		{
+			return ErrorCode::UserCancelled;
+		}
 	}
 
-	if (!CheckArguments())
+	if (!g_cli.Initialize(
+		Arguments.at("path").Value<std::string>(),
+		Arguments.at("target").Value<TunkioTargetType>(),
+		Arguments.at("mode").Value<TunkioFillType>(),
+		Arguments.at("filler").Value<std::string>(),
+		Arguments.at("remove").Value<bool>(),
+		Arguments.at("verify").Value<bool>()))
 	{
-		PrintUsage(argv[0]);
-		return ErrorCode::InvalidArgument;
+		std::cerr << "Tunkio failed to initialize." << std::endl;
+		return ErrorCode::Generic;
 	}
 
-	if (!PrintArgumentsAndPrompt(args))
-	{
-		return ErrorCode::UserCancelled;
-	}
-
-	Tunkio::Instance tunkio(
-		nullptr,
-		Arguments.at("path").Value<std::string>().c_str(),
-		Arguments.at("target").Value<TunkioTargetType>());
-
-	if (!tunkio)
-	{
-		std::cerr << "Failed to create TunkioHandle!" << std::endl;
-		return ErrorCode::InvalidArgument;
-	}
-
-	auto mode = Arguments.at("mode").Value<TunkioFillType>();
-	auto filler = Arguments.at("filler").Value<std::string>();
-
-	if (!TunkioAddWipeRound(tunkio, mode, false, filler.c_str()) ||
-		!TunkioSetStartedCallback(tunkio, OnStarted) ||
-		!TunkioSetProgressCallback(tunkio, OnProgress) ||
-		!TunkioSetCompletedCallback(tunkio, OnCompleted) ||
-		!TunkioSetErrorCallback(tunkio, OnError) ||
-		!TunkioSetRemoveAfterFill(tunkio, Arguments.at("remove").Value<bool>()))
-	{
-		std::cerr << "Failed to pass arguments!" << std::endl;
-		return ErrorCode::InvalidArgument;
-	}
-
-	if (!TunkioRun(tunkio))
+	if (!g_cli.Run())
 	{
 		std::cerr << "Tunkio failed." << std::endl;
+		return g_cli.Error();
 	}
 
-	return g_error;
+	return ErrorCode::Success;
 }

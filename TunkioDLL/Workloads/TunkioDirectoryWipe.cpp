@@ -25,13 +25,13 @@ namespace Tunkio
 
 			if (file.IsValid())
 			{
-				OnError(TunkioStage::Open, 0, 0, LastError);
+				OnWipeError(TunkioStage::Open, 0, 0, LastError);
 				return false;
 			}
 
 			if (!file.Size().first)
 			{
-				OnError(TunkioStage::Size, 0, 0, LastError);
+				OnWipeError(TunkioStage::Size, 0, 0, LastError);
 				return false;
 			}
 
@@ -43,17 +43,17 @@ namespace Tunkio
 			return sum + file.Size().second;
 		};
 
-		uint16_t iteration = 0;
+		uint16_t passes = 0;
 		const uint64_t totalBytesLeft =
 			std::accumulate(files.cbegin(), files.cend(), uint64_t(0), sum);
 
 		uint64_t totalBytesWritten = 0;
 
-		OnStarted(static_cast<uint16_t>(m_fillers.size()), totalBytesLeft);
+		OnWipeStarted(static_cast<uint16_t>(m_fillers.size()), totalBytesLeft);
 
 		while (!m_fillers.empty())
 		{
-			OnIterationStarted(++iteration);
+			OnPassStarted(++passes);
 
 			std::shared_ptr<IFillProvider> filler = m_fillers.front();
 			uint64_t bytesWritten = 0;
@@ -71,11 +71,11 @@ namespace Tunkio
 
 					if (!result.first)
 					{
-						OnError(TunkioStage::Write, iteration, bytesWritten, LastError);
+						OnWipeError(TunkioStage::Write, passes, bytesWritten, LastError);
 						return false;
 					}
 
-					if (!OnProgress(iteration, bytesWritten))
+					if (!OnProgress(passes, bytesWritten))
 					{
 						return true;
 					}
@@ -83,7 +83,7 @@ namespace Tunkio
 			}
 
 			totalBytesWritten += bytesWritten;
-			OnIterationCompleted(iteration);
+			OnPassCompleted(passes);
 		}
 
 		if (m_removeAfterFill)
@@ -92,13 +92,13 @@ namespace Tunkio
 			{
 				if (!file.Remove())
 				{
-					OnError(TunkioStage::Remove, iteration, totalBytesWritten, LastError);
+					OnWipeError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
 					return false;
 				}
 			}
 		}
 
-		OnCompleted(iteration, totalBytesWritten);
+		OnCompleted(passes, totalBytesWritten);
 		return true;
 	}
 }

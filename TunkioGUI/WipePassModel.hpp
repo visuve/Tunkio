@@ -22,11 +22,11 @@ public:
 
 public slots:
 	void onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify);
-	void onWipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration);
+	void onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
 	void onPassStarted(uint16_t pass);
 	void onPassProgressed(uint16_t pass, uint64_t bytesWritten);
 	void onPassFinished(uint16_t pass);
-	void onWipeCompleted(uint16_t totalIterations, uint64_t totalBytesWritten);
+	void onWipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
 
 private:
 

@@ -40,23 +40,23 @@ extern "C"
 		Remove = 'R'
 	} TunkioStage;
 
-	typedef void(TunkioStartedCallback)(
+	typedef void(TunkioWipeStartedCallback)(
 		void* context,
-		uint16_t totalIterations,
-		uint64_t bytesToWritePerIteration);
+		uint16_t passes,
+		uint64_t bytesToWritePerPass);
 
-	typedef void(TunkioIterationStartedCallback)(
+	typedef void(TunkioPassStartedCallback)(
 		void* context,
-		uint16_t currentIteration);
+		uint16_t pass);
 
 	typedef bool(TunkioProgressCallback)(
 		void* context,
-		uint16_t currentIteration,
+		uint16_t pass,
 		uint64_t bytesWritten); // Return false to cancel
 
-	typedef void(TunkioIterationCompletedCallback)(
+	typedef void(TunkioPassCompletedCallback)(
 		void* context,
-		uint16_t currentIteration);
+		uint16_t pass);
 
 	//typedef void(TunkioVerificationStarted)(
 	//	uint64_t bytesToVerify);
@@ -70,13 +70,13 @@ extern "C"
 
 	typedef void(TunkioCompletedCallback)(
 		void* context,
-		uint16_t totalIterations,
+		uint16_t passes,
 		uint64_t totalBytesWritten);
 
 	typedef void(TunkioErrorCallback)(
 		void* context,
 		TunkioStage stage,
-		uint16_t currentIteration,
+		uint16_t pass,
 		uint64_t bytesWritten,
 		uint32_t errorCode);
 
@@ -96,23 +96,23 @@ extern "C"
 		bool verify,
 		const char* optional);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetWipeStartedCallback(
 		struct TunkioHandle*,
-		TunkioStartedCallback*);
+		TunkioWipeStartedCallback*);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetPassStartedCallback(
 		struct TunkioHandle*,
-		TunkioIterationStartedCallback*);
+		TunkioPassStartedCallback*);
 
 	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
 		struct TunkioHandle*,
 		TunkioProgressCallback*);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetPassCompletedCallback(
 		struct TunkioHandle*,
-		TunkioIterationCompletedCallback*);
+		TunkioPassCompletedCallback*);
 
-	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
+	TUNKIO_EXPORT bool TUNKIO_CALLING_CONVENTION TunkioSetWipeCompletedCallback(
 		struct TunkioHandle*,
 		TunkioCompletedCallback*);
 

@@ -18,5 +18,4 @@
 #include "../TunkioLIB/TunkioDataUnits.hpp"
 #include "../TunkioLIB/TunkioDriveInfo.hpp"
 #include "../TunkioLIB/TunkioErrorCodes.hpp"
-#include "../TunkioLIB/TunkioInstance.hpp"
 #include "../TunkioLIB/TunkioTime.hpp"

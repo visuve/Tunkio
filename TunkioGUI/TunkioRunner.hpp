@@ -6,7 +6,6 @@
 #include <atomic>
 
 #include "../TunkioDLL/TunkioAPI.h"
-#include "../TunkioLIB/TunkioInstance.hpp"
 
 class TunkioRunner : public QThread
 {
@@ -19,18 +18,18 @@ public:
 	std::atomic<bool> keepRunning = true;
 
 signals:
-	void wipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration);
+	void wipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
 	void passStarted(uint16_t pass);
 	void passProgressed(uint16_t pass, uint64_t bytesWritten);
 	void passFinished(uint16_t pass);
-	void wipeCompleted(uint16_t totalIterations, uint64_t totalBytesWritten);
-	void errorOccurred(TunkioStage stage, uint16_t currentIteration, uint64_t bytesWritten, uint32_t errorCode);
+	void wipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
+	void errorOccurred(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
 	void attachCallbacks();
 	void run() override;
 	QString m_path;
 	TunkioTargetType m_type;
-	Tunkio::Instance m_tunkio;
+	TunkioHandle* m_tunkio = nullptr;
 };
 

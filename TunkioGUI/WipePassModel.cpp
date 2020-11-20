@@ -224,18 +224,18 @@ void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValu
 	endInsertRows();
 }
 
-void WipePassModel::onWipeStarted(uint16_t totalIterations, uint64_t bytesToWritePerIteration)
+void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	Q_ASSERT(totalIterations == m_passes.size());
+	Q_ASSERT(passes == m_passes.size());
 
 	for (Pass& pass : m_passes)
 	{
-		pass.bytesToWrite = bytesToWritePerIteration;
+		pass.bytesToWrite = bytesToWritePerPass;
 	}
 
-	qDebug() << "Wipe started:" << totalIterations << '/' << bytesToWritePerIteration;
+	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
 }
 
 
@@ -255,8 +255,6 @@ void WipePassModel::onPassStarted(uint16_t pass)
 
 void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 {
-	qDebug() << "HITLERILLA OLI SAAB";
-
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	Q_ASSERT(pass <= m_passes.size());

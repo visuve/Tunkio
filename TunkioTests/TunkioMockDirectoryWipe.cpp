@@ -10,7 +10,7 @@ namespace Tunkio
 
 	bool DirectoryWipe::Run()
 	{
-		OnStarted(1, 1);
+		OnWipeStarted(1, 1);
 		OnProgress(1, 1);
 		OnCompleted(1, 1);
 		return true;

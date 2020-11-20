@@ -108,18 +108,18 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 	return false;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetStartedCallback(
+bool TUNKIO_CALLING_CONVENTION TunkioSetWipeStartedCallback(
 	TunkioHandle* handle,
-	TunkioStartedCallback* callback)
+	TunkioWipeStartedCallback* callback)
 {
 	return Assign(handle, &Tunkio::IWorkload::m_startedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetIterationStartedCallback(
+bool TUNKIO_CALLING_CONVENTION TunkioSetPassStartedCallback(
 	TunkioHandle* handle,
-	TunkioIterationStartedCallback* callback)
+	TunkioPassStartedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_iterationStartedCallback, callback);
+	return Assign(handle, &Tunkio::IWorkload::m_passStartedCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
@@ -129,14 +129,14 @@ bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
 	return Assign(handle, &Tunkio::IWorkload::m_progressCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetIterationCompletedCallback(
+bool TUNKIO_CALLING_CONVENTION TunkioSetPassCompletedCallback(
 	TunkioHandle* handle,
-	TunkioIterationCompletedCallback* callback)
+	TunkioPassCompletedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_iterationCompletedCallback, callback);;
+	return Assign(handle, &Tunkio::IWorkload::m_passCompletedCallback, callback);;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetCompletedCallback(
+bool TUNKIO_CALLING_CONVENTION TunkioSetWipeCompletedCallback(
 	TunkioHandle* handle,
 	TunkioCompletedCallback* callback)
 {
