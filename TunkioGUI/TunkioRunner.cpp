@@ -50,8 +50,7 @@ void TunkioRunner::attachCallbacks()
 		return;
 	}
 
-
-	TunkioWipeStartedCallback* wipeStarted = [](
+	TunkioSetWipeStartedCallback(m_tunkio, [](
 		void* context,
 		uint16_t passes,
 		uint64_t bytesToWritePerPass)
@@ -60,9 +59,9 @@ void TunkioRunner::attachCallbacks()
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeStarted(passes, bytesToWritePerPass);
-	};
+	});
 
-	TunkioPassStartedCallback* passStarted = [](
+	TunkioSetPassStartedCallback(m_tunkio, [](
 		void* context,
 		uint16_t pass)
 	{
@@ -70,9 +69,9 @@ void TunkioRunner::attachCallbacks()
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passStarted(pass);
-	};
+	});
 
-	TunkioProgressCallback* progress = [](
+	TunkioSetProgressCallback(m_tunkio, [](
 		void* context,
 		uint16_t pass,
 		uint64_t bytesWritten)
@@ -83,9 +82,9 @@ void TunkioRunner::attachCallbacks()
 
 		emit self->passProgressed(pass, bytesWritten);
 		return self->keepRunning.load();
-	};
+	});
 
-	TunkioPassCompletedCallback* passCompleted = [](
+	TunkioSetPassCompletedCallback(m_tunkio, [](
 		void* context,
 		uint16_t pass)
 	{
@@ -93,9 +92,9 @@ void TunkioRunner::attachCallbacks()
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passFinished(pass);
-	};
+	});
 
-	TunkioCompletedCallback* wipeCompleted = [](
+	TunkioSetWipeCompletedCallback(m_tunkio, [](
 		void* context,
 		uint16_t passes,
 		uint64_t totalBytesWritten)
@@ -104,9 +103,9 @@ void TunkioRunner::attachCallbacks()
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeCompleted(passes, totalBytesWritten);
-	};
+	});
 
-	TunkioErrorCallback* error = [](
+	TunkioSetErrorCallback(m_tunkio, [](
 		void* context,
 		TunkioStage stage,
 		uint16_t pass,
@@ -119,14 +118,7 @@ void TunkioRunner::attachCallbacks()
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->errorOccurred(stage, pass, bytesWritten, errorCode);
-	};
-
-	qDebug() << TunkioSetWipeStartedCallback(m_tunkio, wipeStarted);
-	qDebug() << TunkioSetPassStartedCallback(m_tunkio, passStarted);
-	qDebug() << TunkioSetProgressCallback(m_tunkio, progress);
-	qDebug() << TunkioSetPassCompletedCallback(m_tunkio, passCompleted);
-	qDebug() << TunkioSetWipeCompletedCallback(m_tunkio, wipeCompleted);
-	qDebug() << TunkioSetErrorCallback(m_tunkio, error);
+	});
 }
 
 void TunkioRunner::run()

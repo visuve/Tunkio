@@ -184,30 +184,25 @@ namespace Tunkio
 		switch (stage)
 		{
 			case TunkioStage::Open:
-				std::cerr << "opening!";
+				std::cerr << "opening";
 				break;
 			case TunkioStage::Size:
-				std::cerr << "querying size!";
+				std::cerr << "querying size";
 				break;
 			case TunkioStage::Write:
-				std::cerr << "writing!";
+				std::cerr << "writing";
 				break;
 			case TunkioStage::Verify:
-				std::cerr << "verifying!";
+				std::cerr << "verifying";
 				break;
 			case TunkioStage::Remove:
-				std::cerr << "removing file!";
+				std::cerr << "removing file";
 				break;
 		}
 
-		if (bytesWritten)
-		{
-			std::cerr << " Bytes written: " << bytesWritten;
-		}
+		std::cerr << "! Bytes written: " << bytesWritten << '.' << std::endl;
 
-		std::cerr << std::endl;
-
-#ifdef WIN32
+#if defined(_WIN32)
 		std::array<wchar_t, 0x400> buffer = {};
 		DWORD size = FormatMessageW(
 			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -220,10 +215,10 @@ namespace Tunkio
 
 		if (size > 2)
 		{
-			std::wcerr << L"Detailed description: " << std::wstring(buffer.data(), size - 2) << std::endl; // Trim excess /r/n
+			std::wcerr << L"Detailed description: ";
+			std::wcerr.write(buffer.data(), size - 2) << std::endl; // Trim excess /r/n
 		}
 #endif
-
 		m_error = error;
 	}
 

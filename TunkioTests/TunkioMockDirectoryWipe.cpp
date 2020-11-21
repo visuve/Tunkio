@@ -11,7 +11,15 @@ namespace Tunkio
 	bool DirectoryWipe::Run()
 	{
 		OnWipeStarted(1, 1);
-		OnProgress(1, 1);
+
+		while (!m_fillers.empty())
+		{
+			m_fillers.pop();
+			OnPassStarted(1);
+			OnProgress(1, 1);
+			OnPassCompleted(1);
+		}
+
 		OnCompleted(1, 1);
 		return true;
 	}

@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QTime>
 
-QString toString(TunkioFillType type)
+QString fillTypeToString(TunkioFillType type)
 {
 	switch (type)
 	{
@@ -20,6 +20,52 @@ QString toString(TunkioFillType type)
 
 	qCritical() << int(type) << " is out of bounds";
 	return "Unknown?";
+}
+
+QVariant speedToString(const WipePassModel::Pass& pass)
+{
+	int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
+
+	if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
+	{
+		return QVariant();
+	}
+
+	int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+	return QLocale().formattedDataSize(bytesPerSecond).append("/s");
+}
+
+QVariant timeLeft(const WipePassModel::Pass& pass)
+{
+	int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
+
+	if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
+	{
+		return QVariant();
+	}
+
+	int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+	int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
+	int64_t secondsLeft = bytesLeft / bytesPerSecond;
+
+	QTime timeLeft(0, 0, 0);
+	timeLeft = timeLeft.addSecs(secondsLeft);
+	return timeLeft.toString(Qt::ISODate);
+}
+
+double progressPercent(const WipePassModel::Pass& pass)
+{
+	if (pass.bytesWritten <= 0)
+	{
+		return 0;
+	}
+
+	if (pass.bytesToWrite <= 0)
+	{
+		return 100;
+	}
+
+	return double(pass.bytesWritten) / double(pass.bytesToWrite) * 100;
 }
 
 WipePassModel::WipePassModel(QObject* parent) :
@@ -53,7 +99,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 		switch (index.column())
 		{
 			case 0:
-				return toString(pass.fillType);
+				return fillTypeToString(pass.fillType);
 			case 1:
 				return pass.fillValue;
 			case 2:
@@ -83,15 +129,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
-
-				if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
-				{
-					break;
-				}
-
-				int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-				return QLocale().formattedDataSize(bytesPerSecond).append("/s");
+				return speedToString(pass);
 			}
 			case 6:
 			{
@@ -100,20 +138,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
-
-				if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
-				{
-					break;
-				}
-
-				int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-				int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
-				int64_t secondsLeft = bytesLeft / bytesPerSecond;
-
-				QTime timeLeft(0, 0, 0);
-				timeLeft = timeLeft.addSecs(secondsLeft);
-				return timeLeft.toString(Qt::ISODate);
+				return timeLeft(pass);
 			}
 			case 7:
 			{
@@ -122,17 +147,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				if (pass.bytesWritten <= 0)
-				{
-					return 0;
-				}
-
-				if (pass.bytesToWrite <= 0)
-				{
-					return 100;
-				}
-
-				return double(pass.bytesWritten) / double(pass.bytesToWrite) * 100;
+				return progressPercent(pass);
 			}
 
 			default:

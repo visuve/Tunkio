@@ -11,7 +11,6 @@
 #include "FillProviders/TunkioStringFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
 
-#include "TunkioErrorCodes.hpp"
 #include "TunkioDataUnits.hpp"
 
 template <typename T>

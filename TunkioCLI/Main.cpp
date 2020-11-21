@@ -1,5 +1,6 @@
 #include "TunkioCLI-PCH.hpp"
 #include "TunkioCLI.hpp"
+#include "TunkioErrorCodes.hpp"
 
 namespace Tunkio
 {

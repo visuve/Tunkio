@@ -2,128 +2,118 @@
 
 namespace Tunkio
 {
-	int OnStartedCount, OnProgressCount, OnErrorCount, OnCompletedCount = 0;
-
-	void OnWipeStarted(void*, uint16_t, uint64_t)
+	struct Counters
 	{
-		++OnStartedCount;
+		int OnWipeStartedCount = 0;
+		int OnPassStartedCount = 0;
+		int OnProgressCount = 0;
+		int OnPassCompletedCount = 0;
+		int OnWipeCompletedCount = 0;
+		int OnErrorCount = 0;
+	};
+
+	void OnWipeStarted(void* context, uint16_t, uint64_t)
+	{
+		reinterpret_cast<Counters*>(context)->OnWipeStartedCount++;
 	}
 
-	bool OnProgress(void*, uint16_t, uint64_t)
+	void OnPassStarted(void* context, uint16_t)
 	{
-		++OnProgressCount;
+		reinterpret_cast<Counters*>(context)->OnPassStartedCount++;
+	}
+
+	bool OnProgress(void* context, uint16_t, uint64_t)
+	{
+		reinterpret_cast<Counters*>(context)->OnProgressCount++;
 		return true;
 	}
 
-	void OnWipeError(void*, TunkioStage, uint16_t, uint64_t, uint32_t)
+	void OnPassCompleted(void* context, uint16_t)
 	{
-		++OnErrorCount;
+		reinterpret_cast<Counters*>(context)->OnPassCompletedCount++;
 	}
 
-	void OnCompleted(void*, uint16_t, uint64_t)
+	void OnWipeCompleted(void* context, uint16_t, uint64_t)
 	{
-		++OnCompletedCount;
+		reinterpret_cast<Counters*>(context)->OnWipeCompletedCount++;
 	}
 
-	void ResetCounters()
+	void OnError(void* context, TunkioStage, uint16_t, uint64_t, uint32_t)
 	{
-		OnStartedCount = 0;
-		OnProgressCount = 0;
-		OnErrorCount = 0;
-		OnCompletedCount = 0;
+		reinterpret_cast<Counters*>(context)->OnErrorCount++;
 	}
 
 	TEST(TunkioAPITest, CreateHandleFail)
 	{
-		TunkioHandle* handle = TunkioInitialize(nullptr, nullptr, TunkioTargetType::File);
+		Counters counters;
+		TunkioHandle* handle = TunkioInitialize(&counters, nullptr, TunkioTargetType::File);
 		EXPECT_EQ(handle, nullptr);
+
+		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::Character, false, "xxx"));
+		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::Sentence, false, nullptr));
+
 		TunkioFree(handle);
 
-		EXPECT_EQ(OnStartedCount, 0);
-		EXPECT_EQ(OnProgressCount, 0);
-		EXPECT_EQ(OnErrorCount, 0);
-		EXPECT_EQ(OnCompletedCount, 0);
+		EXPECT_EQ(counters.OnWipeStartedCount, 0);
+		EXPECT_EQ(counters.OnPassStartedCount, 0);
+		EXPECT_EQ(counters.OnProgressCount, 0);
+		EXPECT_EQ(counters.OnPassCompletedCount, 0);
+		EXPECT_EQ(counters.OnWipeCompletedCount, 0);
+		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
 
 	TEST(TunkioAPITest, CreateHandleSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Drive);
-		// EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
-		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
-		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
-		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
-
+		Counters counters;
+		TunkioHandle* handle = TunkioInitialize(&counters, "foobar", TunkioTargetType::File);
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
 
-		EXPECT_EQ(OnStartedCount, 0);
-		EXPECT_EQ(OnProgressCount, 0);
-		EXPECT_EQ(OnErrorCount, 0);
-		EXPECT_EQ(OnCompletedCount, 0);
+		EXPECT_EQ(counters.OnWipeStartedCount, 0);
+		EXPECT_EQ(counters.OnPassStartedCount, 0);
+		EXPECT_EQ(counters.OnProgressCount, 0);
+		EXPECT_EQ(counters.OnPassCompletedCount, 0);
+		EXPECT_EQ(counters.OnWipeCompletedCount, 0);
+		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
 
-	TEST(TunkioAPITest, WipeFileSuccess)
+	TEST(TunkioAPITest, WipeSuccess)
 	{
-		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::File);
-		//EXPECT_TRUE(TunkioAddRound(handle, TunkioFillType::Random));
-		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
-		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
-		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
+		for (TunkioTargetType type : {
+			TunkioTargetType::File,
+			TunkioTargetType::Directory,
+			TunkioTargetType::Drive })
+		{
+			Counters counters;
+			TunkioHandle* handle = TunkioInitialize(&counters, "foobar", type);
+			EXPECT_NE(handle, nullptr);
 
-		EXPECT_NE(handle, nullptr);
-		EXPECT_TRUE(TunkioRun(handle));
-		TunkioFree(handle);
+			EXPECT_EQ(counters.OnWipeStartedCount, 0);
+			EXPECT_EQ(counters.OnPassStartedCount, 0);
+			EXPECT_EQ(counters.OnProgressCount, 0);
+			EXPECT_EQ(counters.OnPassCompletedCount, 0);
+			EXPECT_EQ(counters.OnWipeCompletedCount, 0);
+			EXPECT_EQ(counters.OnErrorCount, 0);
 
-		EXPECT_EQ(OnStartedCount, 1);
-		EXPECT_EQ(OnProgressCount, 1);
-		EXPECT_EQ(OnErrorCount, 0);
-		EXPECT_EQ(OnCompletedCount, 1);
-		ResetCounters();
-	}
+			EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
+			EXPECT_TRUE(TunkioSetPassStartedCallback(handle, OnPassStarted));
+			EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
+			EXPECT_TRUE(TunkioSetPassCompletedCallback(handle, OnPassCompleted));
+			EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnWipeCompleted));
+			EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
 
-	TEST(TunkioAPITest, WipeDirectorySuccess)
-	{
-		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Directory);
-		//EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
-		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
-		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
-		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::Character, false, "x"));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::Sentence, false, "xyz"));
 
-		EXPECT_NE(handle, nullptr);
-		EXPECT_TRUE(TunkioRun(handle));
-		TunkioFree(handle);
+			EXPECT_TRUE(TunkioRun(handle));
+			TunkioFree(handle);
 
-		EXPECT_EQ(OnStartedCount, 1);
-		EXPECT_EQ(OnProgressCount, 1);
-		EXPECT_EQ(OnErrorCount, 0);
-		EXPECT_EQ(OnCompletedCount, 1);
-		ResetCounters();
-	}
-
-	TEST(TunkioAPITest, WipeDeviceSuccess)
-	{
-		TunkioHandle* handle = TunkioInitialize(nullptr, "foobar", TunkioTargetType::Drive);
-		//EXPECT_TRUE(TunkioSetFillMode(handle, TunkioFillType::Random));
-		EXPECT_TRUE(TunkioSetRemoveAfterFill(handle, false));
-		EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
-		EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-		EXPECT_TRUE(TunkioSetErrorCallback(handle, OnWipeError));
-		EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnCompleted));
-
-		EXPECT_NE(handle, nullptr);
-		EXPECT_TRUE(TunkioRun(handle));
-		TunkioFree(handle);
-
-		EXPECT_EQ(OnStartedCount, 1);
-		EXPECT_EQ(OnProgressCount, 1);
-		EXPECT_EQ(OnErrorCount, 0);
-		EXPECT_EQ(OnCompletedCount, 1);
-		ResetCounters();
+			EXPECT_EQ(counters.OnWipeStartedCount, 1);
+			EXPECT_EQ(counters.OnPassStartedCount, 2);
+			EXPECT_EQ(counters.OnProgressCount, 2);
+			EXPECT_EQ(counters.OnPassCompletedCount, 2);
+			EXPECT_EQ(counters.OnWipeCompletedCount, 1);
+			EXPECT_EQ(counters.OnErrorCount, 0);
+		}
 	}
 }
