@@ -1,6 +1,7 @@
 #include "MainWindow.hpp"
 #include "ProgressBarDelegate.hpp"
 #include "DriveSelectDialog.hpp"
+#include "TextEditorDialog.hpp"
 #include "ui_MainWindow.h"
 
 #include <QDebug>
@@ -88,6 +89,8 @@ MainWindow::MainWindow(QWidget* parent) :
 				return;
 		}
 	});
+
+	ui->lineEditFillValue->installEventFilter(new TextEditorDialog());
 
 	m_model = new WipePassModel(this);
 	ui->tableViewWipePasses->setModel(m_model);
