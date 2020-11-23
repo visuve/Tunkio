@@ -1,6 +1,6 @@
+#include "TunkioGUI-PCH.hpp"
 #include "TextEditorDialog.hpp"
 #include "ui_TextEditorDialog.h"
-#include <QDebug>
 
 TextEditorDialog::TextEditorDialog(QWidget *parent) :
 	QDialog(parent),

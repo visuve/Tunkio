@@ -1,11 +1,5 @@
+#include "TunkioGUI-PCH.hpp"
 #include "MainWindow.hpp"
-
-#include <QApplication>
-#include <QDebug>
-#include <QTime>
-#include <QScreen>
-
-#include <iostream>
 
 char qtMesssageTypeToChar(QtMsgType type)
 {

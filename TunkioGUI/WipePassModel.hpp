@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QAbstractTableModel>
-#include <QTime>
-
 #include "../TunkioAPI/TunkioAPI.h"
 
 class WipePassModel : public QAbstractTableModel

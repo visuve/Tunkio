@@ -1,6 +1,5 @@
+#include "TunkioGUI-PCH.hpp"
 #include "WipePassModel.hpp"
-#include <QDebug>
-#include <QTime>
 
 QString fillTypeToString(TunkioFillType type)
 {

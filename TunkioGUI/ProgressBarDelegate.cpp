@@ -1,5 +1,5 @@
+#include "TunkioGUI-PCH.hpp"
 #include "ProgressBarDelegate.hpp"
-#include <QApplication>
 
 ProgressBarDelegate::ProgressBarDelegate(QObject* parent) :
 	QStyledItemDelegate(parent)

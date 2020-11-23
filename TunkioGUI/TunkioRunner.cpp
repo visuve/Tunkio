@@ -1,6 +1,5 @@
+#include "TunkioGUI-PCH.hpp"
 #include "TunkioRunner.hpp"
-#include <QDebug>
-#include <atomic>
 
 TunkioRunner::TunkioRunner(QString path, TunkioTargetType type, QObject* parent) :
 	QThread(parent),

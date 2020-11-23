@@ -1,10 +1,5 @@
 #pragma once
 
-#include <QThread>
-#include <QObject>
-
-#include <atomic>
-
 #include "../TunkioAPI/TunkioAPI.h"
 
 class TunkioRunner : public QThread

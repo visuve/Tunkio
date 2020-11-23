@@ -1,20 +1,9 @@
+#include "TunkioGUI-PCH.hpp"
 #include "MainWindow.hpp"
 #include "ProgressBarDelegate.hpp"
 #include "DriveSelectDialog.hpp"
 #include "TextEditorDialog.hpp"
 #include "ui_MainWindow.h"
-
-#include <QDebug>
-#include <QTreeWidgetItem>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QDesktopServices>
-#include <QTime>
-#include <QMapIterator>
-#include <QDir>
-#include <QActionGroup>
-#include <QInputDialog>
-#include <QDir>
 
 QString toString(TunkioStage type)
 {
