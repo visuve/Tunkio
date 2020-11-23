@@ -45,7 +45,7 @@ namespace Tunkio
 				const auto result = file.Write(filler->Data(), filler->Size(bytesLeft));
 
 				bytesWritten += result.second;
-				bytesLeft -= result.second;
+				bytesLeft -= std::min(result.second, bytesLeft);
 
 				if (!result.first)
 				{

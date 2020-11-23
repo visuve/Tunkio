@@ -11,7 +11,7 @@ namespace Tunkio
 	}
 
 	FileFiller::FileFiller(DataUnit::Bytes bytes, const std::filesystem::path& path, bool verify) :
-		SentenceFiller(bytes, ReadContents(path), verify)
+		SentenceFiller(bytes, ReadContents(path), "\0", verify)
 	{
 	}
 

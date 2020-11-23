@@ -89,7 +89,7 @@ namespace Tunkio
 			return { false, 0 };
 		}
 
-		return { true, static_cast<uint64_t>(result) };
+		return { fsync(m_fileDescriptor) == 0, static_cast<uint64_t>(result) };
 	}
 
 	bool File::Remove()

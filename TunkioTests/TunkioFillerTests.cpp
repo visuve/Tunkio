@@ -47,6 +47,19 @@ namespace Tunkio::Fill
 
 			EXPECT_EQ(14, strlen(data));
 		}
+		{
+			SentenceFiller filler(26, "foobar\tbarfoo\n", false);
+
+			auto data = reinterpret_cast<const char*>(filler.Data());
+			size_t iter = 0;
+
+			for (char c : "foobar\tbarfoo\nfoobar\tbarfoo")
+			{
+				EXPECT_EQ(c, data[iter++]);
+			}
+
+			EXPECT_EQ(27, strlen(data));
+		}
 	}
 
 	TEST(TunkioFillTest, RandomFill)

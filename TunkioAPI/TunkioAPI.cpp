@@ -69,7 +69,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 		return false;
 	}
 
-	constexpr Tunkio::DataUnit::Kibibytes bufferSize(1);
+	constexpr Tunkio::DataUnit::Mebibytes bufferSize(1);
 
 	switch (round)
 	{

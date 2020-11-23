@@ -23,6 +23,17 @@ namespace Tunkio
 	{
 	}
 
+	SentenceFiller::SentenceFiller(
+		DataUnit::Bytes bytes,
+		const std::string& fillString,
+		const std::string& padding,
+		bool verify) :
+		IFillProvider(bytes, verify),
+		m_fillString(fillString),
+		m_padding(padding)
+	{
+	}
+
 	SentenceFiller::~SentenceFiller()
 	{
 	}
@@ -31,32 +42,35 @@ namespace Tunkio
 	{
 		if (m_fillData.empty())
 		{
-			std::string padding;
-
-			ReplaceAll(m_fillString, "\\f", "\f");
-			ReplaceAll(m_fillString, "\\n", "\n");
-			ReplaceAll(m_fillString, "\\r", "\r");
-			ReplaceAll(m_fillString, "\\t", "\t");
-			ReplaceAll(m_fillString, "\\v", "\v");
-
-			const size_t paddingStart = m_fillString.find_first_of("\f\n\r\t\v");
-
-			if (paddingStart != std::string::npos)
+			if (m_padding.empty())
 			{
-				padding = m_fillString.substr(paddingStart, m_fillString.size());
-				m_fillString.erase(paddingStart, m_fillString.size());
-			}
-			else
-			{
-				padding.append(1, '\0');
+				ReplaceAll(m_fillString, "\\f", "\f");
+				ReplaceAll(m_fillString, "\\n", "\n");
+				ReplaceAll(m_fillString, "\\r", "\r");
+				ReplaceAll(m_fillString, "\\t", "\t");
+				ReplaceAll(m_fillString, "\\v", "\v");
+
+				const size_t paddingStart = m_fillString.find_last_not_of("\f\n\r\t\v") + 1;
+
+				if (paddingStart < m_fillString.size())
+				{
+					m_padding = m_fillString.substr(paddingStart, m_fillString.size());
+					m_fillString.erase(paddingStart, m_fillString.size());
+				}
+				else
+				{
+					m_padding.append(1, '\0');
+				}
 			}
 
 			while (m_fillData.size() < m_size.Bytes())
 			{
 				m_fillData.append(m_fillString);
 
-				if (m_fillData.size() + m_fillString.size() < m_size.Bytes())
-					m_fillData.append(padding);
+				if (m_fillData.size() < m_size.Bytes())
+				{
+					m_fillData.append(m_padding);
+				}
 			}
 		}
 

@@ -129,7 +129,7 @@ namespace Tunkio
 			return { false, bytesWritten };
 		}
 
-		return { true, bytesWritten };
+		return { FlushFileBuffers(m_handle), bytesWritten };
 	}
 
 	bool File::Remove()
