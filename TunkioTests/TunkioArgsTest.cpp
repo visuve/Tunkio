@@ -5,8 +5,8 @@ namespace Tunkio::Args
 	std::map<std::string, Argument> Arguments =
 	{
 		{ "path", Argument(true, std::string()) },
-		{ "target", Argument(false, TunkioTargetType::File) },
-		{ "mode", Argument(false, TunkioFillType::Zeroes) },
+		{ "target", Argument(false, TunkioTargetType::FileWipe) },
+		{ "mode", Argument(false, TunkioFillType::ZeroFill) },
 		{ "remove", Argument(false, false) },
 	};
 
@@ -31,8 +31,8 @@ namespace Tunkio::Args
 		EXPECT_TRUE(ParseVector(Arguments, { "--path=x", "--target=D", "--mode=1", "--remove=y" }));
 
 		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
-		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Drive);
-		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::Ones);
+		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::DriveWipe);
+		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::OneFill);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}
 
@@ -49,8 +49,8 @@ namespace Tunkio::Args
 		EXPECT_TRUE(ParseVector(Arguments, { "--mode=1", "--path=x", "--target=D", }));
 
 		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
-		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::Drive);
-		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::Ones);
+		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::DriveWipe);
+		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::OneFill);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}
 
@@ -67,21 +67,6 @@ namespace Tunkio::Args
 		EXPECT_FALSE(ParseVector(Arguments, { "a b c", "d e f" }));
 	}
 
-	TEST(TunkioArgsTest, ParseString)
-	{
-		EXPECT_TRUE(ParseString(Arguments, "--path=xyz --target=d --mode=0"));
-
-		EXPECT_TRUE(ParseString(Arguments, "--path=\"foo/foo bar/bar/\" --target=d --mode=0"));
-		EXPECT_TRUE(ParseString(Arguments, "--path=\"foo bar/foo/bar\" --target=d --mode=0"));
-		EXPECT_TRUE(ParseString(Arguments, "--path=\"foo/bar/foo bar\" --target=d --mode=0"));
-
-		EXPECT_TRUE(ParseString(Arguments, " --path=\"foo/bar/foo bar\" --target=d --mode=0"));
-		EXPECT_TRUE(ParseString(Arguments, "--path=\"foo/bar/foo bar\" --target=d --mode=0"));
-		EXPECT_TRUE(ParseString(Arguments, " --path=\"foo/bar/foo bar\"  --target=d --mode=0"));
-
-		EXPECT_FALSE(ParseString(Arguments, "\" BARBABABA"));
-	}
-
 #ifndef __clang__
 	TEST(TunkioArgsTest, ParseUnsupportedTypes)
 	{
@@ -90,7 +75,7 @@ namespace Tunkio::Args
 			{ "x", Argument(0, uint64_t()) },
 		};
 
-		EXPECT_FALSE(ParseString(unsupported, "--x=555"));
+		EXPECT_FALSE(ParseVector(unsupported, { "--x=555" }));
 	}
 #endif
 }

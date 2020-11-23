@@ -6,7 +6,7 @@ project("Tunkio")
 add_subdirectory("googletest")
 
 if(MSVC)
-	add_compile_options(/W4 /WX)
+	add_compile_options(/W4 /WX /MP)
 else()
 	add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()

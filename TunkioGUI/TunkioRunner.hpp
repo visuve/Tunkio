@@ -15,6 +15,7 @@ public:
 	~TunkioRunner();
 
 	bool addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
+
 	std::atomic<bool> keepRunning = true;
 
 signals:

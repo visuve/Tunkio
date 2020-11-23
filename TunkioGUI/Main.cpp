@@ -98,6 +98,13 @@ void resizeToScreen(MainWindow& window)
 int main(int argc, char* argv[])
 {
 	qInstallMessageHandler(tunkioLogMessageHandler);
+	qRegisterMetaType<uint8_t>("uint8_t");
+	qRegisterMetaType<uint16_t>("uint16_t");
+	qRegisterMetaType<uint32_t>("uint32_t");
+	qRegisterMetaType<uint64_t>("uint64_t");
+	qRegisterMetaType<TunkioTargetType>("TunkioTargetType");
+	qRegisterMetaType<TunkioFillType>("TunkioFillType");
+	qRegisterMetaType<TunkioStage>("TunkioStage");
 
 	QApplication application(argc, argv);
 	MainWindow window;

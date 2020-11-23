@@ -17,18 +17,19 @@ extern "C"
 #endif
 	typedef enum
 	{
-		File = 'f',
-		Directory = 'd',
-		Drive = 'D'
+		FileWipe = 'f',
+		DirectoryWipe = 'd',
+		DriveWipe = 'D'
 	} TunkioTargetType;
 
 	typedef enum
 	{
-		Zeroes = '0',
-		Ones = '1',
-		Character = 'c',
-		Sentence = 's',
-		Random = 'r'
+		ZeroFill = '0',
+		OneFill = '1',
+		CharacterFill = 'c',
+		SentenceFill = 's',
+		FileFill = 'f',
+		RandomFill = 'r',
 	} TunkioFillType;
 
 	typedef enum

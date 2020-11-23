@@ -1,4 +1,4 @@
-#include "TunkioLIB-PCH.hpp"
+#include "TunkioCLI-PCH.hpp"
 #include "TunkioArgs.hpp"
 
 namespace Tunkio::Args
@@ -57,19 +57,19 @@ namespace Tunkio::Args
 	{
 		switch (c)
 		{
-			case static_cast<uint8_t>(TunkioTargetType::File) :
+			case static_cast<uint8_t>(TunkioTargetType::FileWipe) :
 			{
-				result = TunkioTargetType::File;
+				result = TunkioTargetType::FileWipe;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioTargetType::Directory) :
+			case static_cast<uint8_t>(TunkioTargetType::DirectoryWipe) :
 			{
-				result = TunkioTargetType::Directory;
+				result = TunkioTargetType::DirectoryWipe;
 				return true;
 			}
-			case  static_cast<uint8_t>(TunkioTargetType::Drive) :
+			case  static_cast<uint8_t>(TunkioTargetType::DriveWipe) :
 			{
-				result = TunkioTargetType::Drive;
+				result = TunkioTargetType::DriveWipe;
 				return true;
 			}
 		}
@@ -81,29 +81,34 @@ namespace Tunkio::Args
 	{
 		switch (c)
 		{
-			case static_cast<uint8_t>(TunkioFillType::Zeroes) :
+			case static_cast<uint8_t>(TunkioFillType::ZeroFill) :
 			{
-				result = TunkioFillType::Zeroes;
+				result = TunkioFillType::ZeroFill;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::Ones) :
+			case static_cast<uint8_t>(TunkioFillType::OneFill) :
 			{
-				result = TunkioFillType::Ones;
+				result = TunkioFillType::OneFill;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::Character) :
+			case static_cast<uint8_t>(TunkioFillType::CharacterFill) :
 			{
-				result = TunkioFillType::Character;
+				result = TunkioFillType::CharacterFill;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::Sentence) :
+			case static_cast<uint8_t>(TunkioFillType::SentenceFill) :
 			{
-				result = TunkioFillType::Sentence;
+				result = TunkioFillType::SentenceFill;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::Random) :
+			case static_cast<uint8_t>(TunkioFillType::FileFill) :
 			{
-				result = TunkioFillType::Random;
+				result = TunkioFillType::FileFill;
+				return true;
+			}
+			case static_cast<uint8_t>(TunkioFillType::RandomFill) :
+			{
+				result = TunkioFillType::RandomFill;
 				return true;
 			}
 		}
@@ -131,7 +136,7 @@ namespace Tunkio::Args
 		for (auto& kvp : arguments)
 		{
 			const std::string argumentKey = "--" + kvp.first + '=';
-			const std::regex argumentRegex(argumentKey + "(\"[^\"]+\"|[^\\s\"]+)");
+			const std::regex argumentRegex(argumentKey + "(.+)");
 			bool found = false;
 
 			for (const std::string& rawArgument : rawArguments)
@@ -154,35 +159,6 @@ namespace Tunkio::Args
 			}
 
 			if (kvp.second.Required && !found)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool ParseString(std::map<std::string, Argument>& arguments, const std::string& rawArguments)
-	{
-		for (auto& kvp : arguments)
-		{
-			const std::string argumentKey = "--" + kvp.first + '=';
-			const std::regex argumentRegex(argumentKey + "(\"[^\"]+\"|[^\\s\"]+)");
-			std::smatch matches;
-
-			if (!std::regex_search(rawArguments, matches, argumentRegex))
-			{
-				if (kvp.second.Required)
-				{
-					return false;
-				}
-
-				continue;
-			}
-
-			const std::string rawArgumentValue = matches.str(1);
-
-			if (!kvp.second.Parse(rawArgumentValue))
 			{
 				return false;
 			}

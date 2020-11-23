@@ -8,7 +8,8 @@
 
 #include "FillProviders/TunkioFillProvider.hpp"
 #include "FillProviders/TunkioCharFiller.hpp"
-#include "FillProviders/TunkioStringFiller.hpp"
+#include "FillProviders/TunkioSentenceFiller.hpp"
+#include "FillProviders/TunkioFileFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
 
 #include "TunkioDataUnits.hpp"
@@ -44,11 +45,11 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(void* context, const ch
 
 	switch (type)
 	{
-		case TunkioTargetType::File:
+		case TunkioTargetType::FileWipe:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(context, path));
-		case TunkioTargetType::Directory:
+		case TunkioTargetType::DirectoryWipe:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(context, path));
-		case TunkioTargetType::Drive:
+		case TunkioTargetType::DriveWipe:
 			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(context, path));
 	}
 
@@ -68,38 +69,54 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 		return false;
 	}
 
-	constexpr Tunkio::DataUnit::Mebibytes mebibyte(1);
+	constexpr Tunkio::DataUnit::Kibibytes bufferSize(1);
 
 	switch (round)
 	{
-		case TunkioFillType::Zeroes:
-			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, 0x00, verify));
+		case TunkioFillType::ZeroFill:
+			instance->m_fillers.emplace(new Tunkio::CharFiller(bufferSize, 0x00, verify));
 			return true;
 
-		case TunkioFillType::Ones:
-			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, 0xFF, verify));
+		case TunkioFillType::OneFill:
+			instance->m_fillers.emplace(new Tunkio::CharFiller(bufferSize, 0xFF, verify));
 			return true;
 
-		case TunkioFillType::Character:
+		case TunkioFillType::CharacterFill:
 			if (!optional || strlen(optional) != 1)
 			{
 				return false;
 			}
 
-			instance->m_fillers.emplace(new Tunkio::CharFiller(mebibyte, optional[0], verify));
+			instance->m_fillers.emplace(new Tunkio::CharFiller(bufferSize, optional[0], verify));
 			return true;
 
-		case TunkioFillType::Sentence:
+		case TunkioFillType::SentenceFill:
 			if (!optional || !strlen(optional))
 			{
 				return false;
 			}
 
-			instance->m_fillers.emplace(new Tunkio::StringFiller(mebibyte, optional, verify));
+			instance->m_fillers.emplace(new Tunkio::SentenceFiller(bufferSize, optional, verify));
 			return true;
 
-		case TunkioFillType::Random:
-			instance->m_fillers.emplace(new Tunkio::RandomFiller(mebibyte, verify));
+		case TunkioFillType::FileFill:
+			if (!optional || !strlen(optional))
+			{
+				return false;
+			}
+			{
+				auto fileFiller = std::make_shared<Tunkio::FileFiller>(bufferSize, optional, verify);
+
+				if (fileFiller->HasContent())
+				{
+					instance->m_fillers.emplace(fileFiller);
+					return true;
+				}
+			}
+			return false;
+
+		case TunkioFillType::RandomFill:
+			instance->m_fillers.emplace(new Tunkio::RandomFiller(bufferSize, verify));
 			return true;
 
 	}

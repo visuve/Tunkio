@@ -15,7 +15,6 @@ TunkioRunner::~TunkioRunner()
 {
 	qDebug() << "Destroying...";
 	keepRunning = false;
-	requestInterruption();
 	wait();
 
 	if (m_tunkio)
@@ -33,9 +32,9 @@ bool TunkioRunner::addPass(TunkioFillType fillType, const QString &fillValue, bo
 
 	switch (fillType)
 	{
-		case TunkioFillType::Character:
+		case TunkioFillType::CharacterFill:
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, sentence.c_str());
-		case TunkioFillType::Sentence:
+		case TunkioFillType::SentenceFill:
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, character);
 		default:
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, nullptr);
@@ -81,7 +80,7 @@ void TunkioRunner::attachCallbacks()
 		Q_ASSERT(self);
 
 		emit self->passProgressed(pass, bytesWritten);
-		return self->keepRunning.load();
+		return self->keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
 	});
 
 	TunkioSetPassCompletedCallback(m_tunkio, [](

@@ -3,8 +3,6 @@
 #include <QAbstractTableModel>
 #include <QTime>
 
-#include <mutex>
-
 #include "../TunkioAPI/TunkioAPI.h"
 
 class WipePassModel : public QAbstractTableModel
@@ -28,7 +26,7 @@ public:
 		uint64_t bytesWritten;
 		uint64_t bytesToWrite;
 		QTime start;
-		QTime finish;
+		QTime time;
 	};
 
 public slots:
@@ -40,6 +38,7 @@ public slots:
 	void onWipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
 
 private:
+	void updateRow(int row);
+
 	QList<Pass> m_passes;
-	std::mutex m_mutex;
 };

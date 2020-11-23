@@ -1,6 +1,7 @@
 #include "TunkioCLI-PCH.hpp"
 #include "TunkioCLI.hpp"
 #include "TunkioErrorCodes.hpp"
+#include "TunkioArgs.hpp"
 
 namespace Tunkio
 {
@@ -12,7 +13,7 @@ namespace Tunkio
 		g_cli.Stop();
 	}
 
-	void PrintUsage(const std::string& exe)
+	void PrintUsage(const std::filesystem::path& exe)
 	{
 		std::cout << " Usage:" << std::endl << std::endl;
 #if defined(_WIN32)
@@ -20,15 +21,16 @@ namespace Tunkio
 #else
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
-		std::cout << "  --target=[f|d|D] where f=file, d=directory, D=drive (Optional) " << std::endl;
-		std::cout << "  --mode=[0|1|r|c|s] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random, c=character, s=string. Note: with option 'c' or 's' you need to provide filler argument. (Optional) " << std::endl;
-		std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory (Optional)" << std::endl;
-		std::cout << "  --filler=[character|string] required when --mode=c or --mode=s" << std::endl;
+		std::cout << "  --target=[f|d|D] where f=file, d=directory, D=drive " << std::endl;
+		std::cout << "  --mode=[0|1|r|c|s|f] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random, c=character, s=sentence, f=filepath."
+			<< " Note: with option 'c', 's' or 'f' you need to provide filler argument." << std::endl;
+		std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory. Default=no" << std::endl;
+		std::cout << "  --filler=[character|string|filepath] required when --mode is c, s or f." << std::endl;
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32)
-		std::cout << "  " << exe << R"( --path="C:\\SecretFile.txt" --target=f --mode=r)" << std::endl;
-		std::cout << "  " << exe << R"( --path="C:\\SecretDirectory" --target=d --mode=r)" << std::endl;
+		std::cout << "  " << exe << R"( --path="C:\\Users\\You\\SecretFile.txt" --target=f --mode=r)" << std::endl;
+		std::cout << "  " << exe << R"( --path="C:\\Users\\You\\SecretDirectory" --target=d --mode=r)" << std::endl;
 		std::cout << "  " << exe << R"( --path=\\.\PHYSICALDRIVE9 --target=D --mode=r)" << std::endl;
 #else
 		std::cout << "  " << exe << " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
@@ -94,8 +96,8 @@ namespace Tunkio
 	std::map<std::string, Args::Argument> Arguments =
 	{
 		{ "path", Args::Argument(true, std::string()) },
-		{ "target", Args::Argument(false, TunkioTargetType::File) },
-		{ "mode", Args::Argument(false, TunkioFillType::Zeroes) },
+		{ "target", Args::Argument(false, TunkioTargetType::FileWipe) },
+		{ "mode", Args::Argument(false, TunkioFillType::ZeroFill) },
 		{ "filler", Args::Argument(false, std::string()) },
 		{ "verify", Args::Argument(false, false) },
 		{ "remove", Args::Argument(false, false) }
@@ -106,7 +108,7 @@ namespace Tunkio
 		auto mode = Arguments.at("mode").Value<TunkioFillType>();
 		auto filler = Arguments.at("filler").Value<std::string>();
 
-		if (mode == TunkioFillType::Character)
+		if (mode == TunkioFillType::CharacterFill)
 		{
 			if (filler.size() != 1)
 			{
@@ -114,7 +116,7 @@ namespace Tunkio
 				return false;
 			}
 		}
-		else if (mode == TunkioFillType::Sentence)
+		else if (mode == TunkioFillType::SentenceFill)
 		{
 			if (filler.empty())
 			{
@@ -122,9 +124,17 @@ namespace Tunkio
 				return false;
 			}
 		}
+		else if (mode == TunkioFillType::FileFill)
+		{
+			if (!std::filesystem::exists(filler))
+			{
+				std::cerr << "Please use a valid path with file fill!" << std::endl << std::endl;
+				return false;
+			}
+		}
 		else if (!filler.empty())
 		{
-			std::cerr << "Filler argument can only be used with --mode=c or --mode=s!" << std::endl << std::endl;
+			std::cerr << "Filler argument can only be used with modes c, s or f!" << std::endl << std::endl;
 			return false;
 		}
 

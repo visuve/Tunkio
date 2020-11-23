@@ -46,11 +46,11 @@ namespace Tunkio
 	TEST(TunkioAPITest, CreateHandleFail)
 	{
 		Counters counters;
-		TunkioHandle* handle = TunkioInitialize(&counters, nullptr, TunkioTargetType::File);
+		TunkioHandle* handle = TunkioInitialize(&counters, nullptr, TunkioTargetType::FileWipe);
 		EXPECT_EQ(handle, nullptr);
 
-		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::Character, false, "xxx"));
-		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::Sentence, false, nullptr));
+		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::CharacterFill, false, "xxx"));
+		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::SentenceFill, false, nullptr));
 
 		TunkioFree(handle);
 
@@ -65,7 +65,7 @@ namespace Tunkio
 	TEST(TunkioAPITest, CreateHandleSuccess)
 	{
 		Counters counters;
-		TunkioHandle* handle = TunkioInitialize(&counters, "foobar", TunkioTargetType::File);
+		TunkioHandle* handle = TunkioInitialize(&counters, "foobar", TunkioTargetType::FileWipe);
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
 
@@ -80,9 +80,9 @@ namespace Tunkio
 	TEST(TunkioAPITest, WipeSuccess)
 	{
 		for (TunkioTargetType type : {
-			TunkioTargetType::File,
-			TunkioTargetType::Directory,
-			TunkioTargetType::Drive })
+			TunkioTargetType::FileWipe,
+			TunkioTargetType::DirectoryWipe,
+			TunkioTargetType::DriveWipe })
 		{
 			Counters counters;
 			TunkioHandle* handle = TunkioInitialize(&counters, "foobar", type);
@@ -102,8 +102,8 @@ namespace Tunkio
 			EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnWipeCompleted));
 			EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
 
-			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::Character, false, "x"));
-			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::Sentence, false, "xyz"));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::CharacterFill, false, "x"));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::SentenceFill, false, "xyz"));
 
 			EXPECT_TRUE(TunkioRun(handle));
 			TunkioFree(handle);

@@ -63,32 +63,11 @@ MainWindow::MainWindow(QWidget* parent) :
 		QMessageBox::aboutQt(this, "Tunkio");
 	});
 
-	connect(ui->comboBoxFillType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this](int index)
-	{
-		switch (index)
-		{
-			case 0:
-				ui->lineEditFillValue->setEnabled(false);
-				ui->lineEditFillValue->setText("0x00");
-				return;
-			case 1:
-				ui->lineEditFillValue->setEnabled(false);
-				ui->lineEditFillValue->setText("0xFF");
-				return;
-			case 2:
-				ui->lineEditFillValue->setEnabled(false);
-				ui->lineEditFillValue->setText("A PRNG engine will be used.");
-				return;
-			case 3:
-				ui->lineEditFillValue->setEnabled(true);
-				ui->lineEditFillValue->setText("?");
-				return;
-			case 4:
-				ui->lineEditFillValue->setEnabled(true);
-				ui->lineEditFillValue->setText("Please enter a sentence here.");
-				return;
-		}
-	});
+	connect(
+		ui->comboBoxFillType,
+		static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		this,
+		&MainWindow::onFillTypeSelectionChanged);
 
 	ui->lineEditFillValue->installEventFilter(new TextEditorDialog());
 
@@ -97,58 +76,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->tableViewWipePasses->setItemDelegateForColumn(7, new ProgressBarDelegate(this));
 
 	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
-
-	connect(ui->pushButtonStart, &QPushButton::clicked, [this]()
-	{
-		Q_ASSERT(m_tunkio.get());
-		Q_ASSERT(m_model);
-
-		// connect(m_tunkio.get(), &QThread::finished, m_tunkio.get(), &QObject::deleteLater);
-
-		// I do not know what the fuck is going on, i.e. why the connections work _ONLY_ like this
-		connect(m_tunkio.get(), &TunkioRunner::wipeStarted, [this](uint16_t passes, uint64_t bytesToWritePerPass)
-		{
-			qDebug() << "wipeStarted";
-			m_model->onWipeStarted(passes, bytesToWritePerPass);
-		});
-
-		connect(m_tunkio.get(), &TunkioRunner::passStarted, [this](uint16_t pass)
-		{
-			qDebug() << "passStarted";
-			m_model->onPassStarted(pass);
-		});
-
-		connect(m_tunkio.get(), &TunkioRunner::passProgressed, [this](uint16_t pass, uint64_t bytesWritten)
-		{
-			qDebug() << "passProgressed";
-			m_model->onPassProgressed(pass, bytesWritten);
-		});
-
-		connect(m_tunkio.get(), &TunkioRunner::passFinished, [this](uint16_t pass)
-		{
-			qDebug() << "passFinished";
-			m_model->onPassFinished(pass);
-		});
-
-		connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, [this](uint16_t passes, uint64_t totalBytesWritten)
-		{
-			qDebug() << "wipeCompleted";
-			m_model->onWipeCompleted(passes, totalBytesWritten);
-		});
-
-		// connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
-		// connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
-		// connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
-		// connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
-		// connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
-
-		connect(m_tunkio.get(), &TunkioRunner::errorOccurred, [this](TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
-		{
-			onError(stage, pass, bytesWritten, errorCode);
-		});
-
-		m_tunkio->start();
-	});
+	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startWipe);
 }
 
 MainWindow::~MainWindow()
@@ -166,7 +94,7 @@ void MainWindow::onOpenFileDialog()
 	{
 		const QString file = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(file));
-		m_tunkio = std::make_shared<TunkioRunner>(file, TunkioTargetType::File);
+		m_tunkio = std::make_shared<TunkioRunner>(file, TunkioTargetType::FileWipe);
 	}
 }
 
@@ -180,7 +108,7 @@ void MainWindow::onOpenDirectoryDialog()
 	{
 		const QString directory = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(directory));
-		m_tunkio = std::make_shared<TunkioRunner>(directory, TunkioTargetType::Directory);
+		m_tunkio = std::make_shared<TunkioRunner>(directory, TunkioTargetType::DirectoryWipe);
 	}
 }
 
@@ -192,8 +120,41 @@ void MainWindow::onOpenDriveDialog()
 	{
 		const QString drive = dialog.selectedDrive();
 		ui->lineEditSelectedPath->setText(drive);
-		m_tunkio = std::make_shared<TunkioRunner>(drive, TunkioTargetType::Drive);
+		m_tunkio = std::make_shared<TunkioRunner>(drive, TunkioTargetType::DriveWipe);
 	}
+}
+
+void MainWindow::onFillTypeSelectionChanged(int index)
+{
+	switch (index)
+	{
+		case 0:
+			ui->lineEditFillValue->setEnabled(false);
+			ui->lineEditFillValue->setText("0x00");
+			return;
+		case 1:
+			ui->lineEditFillValue->setEnabled(false);
+			ui->lineEditFillValue->setText("0xFF");
+			return;
+		case 2:
+			ui->lineEditFillValue->setEnabled(true);
+			ui->lineEditFillValue->setText("?");
+			return;
+		case 3:
+			ui->lineEditFillValue->setEnabled(true);
+			ui->lineEditFillValue->setText("Please enter a sentence here.");
+			return;
+		case 4:
+			ui->lineEditFillValue->setEnabled(true);
+			ui->lineEditFillValue->setText("Please enter a path to a file here.");
+			return;
+		case 5:
+			ui->lineEditFillValue->setEnabled(false);
+			ui->lineEditFillValue->setText("A PRNG engine will be used.");
+			return;
+	}
+
+	qCritical() << index << " is out of bounds";
 }
 
 void MainWindow::addPass()
@@ -206,35 +167,67 @@ void MainWindow::addPass()
 
 	switch (index)
 	{
+		// TODO: clean up this temporary mess and change the functionality so,
+		// that passes can be added to the GUI at any time, but they are added to Tunkio
+		// just before start
 		case 0:
-			if (m_tunkio->addPass(TunkioFillType::Zeroes, QString(), verify))
+			if (m_tunkio->addPass(TunkioFillType::ZeroFill, QString(), verify))
 			{
-				m_model->onPassAdded(TunkioFillType::Zeroes, "0x00", verify);
+				m_model->onPassAdded(TunkioFillType::ZeroFill, "0x00", verify);
 			}
-
+			else
+			{
+				qWarning() << "Failed to add pass";
+			}
 			return;
 		case 1:
-			if (m_tunkio->addPass(TunkioFillType::Ones, QString(), verify))
+			if (m_tunkio->addPass(TunkioFillType::OneFill, QString(), verify))
 			{
-				m_model->onPassAdded(TunkioFillType::Ones, "0xFF", verify);
+				m_model->onPassAdded(TunkioFillType::OneFill, "0xFF", verify);
+			}
+			else
+			{
+				qWarning() << "Failed to add pass";
 			}
 			return;
 		case 2:
-			if (m_tunkio->addPass(TunkioFillType::Random, QString(), verify))
+			if (m_tunkio->addPass(TunkioFillType::CharacterFill, fill, verify))
 			{
-				m_model->onPassAdded(TunkioFillType::Random, "Random", verify);
+				m_model->onPassAdded(TunkioFillType::CharacterFill, fill.at(0), verify);
+			}
+			else
+			{
+				qWarning() << "Failed to add pass";
 			}
 			return;
 		case 3:
-			if (m_tunkio->addPass(TunkioFillType::Character, fill, verify))
+			if (m_tunkio->addPass(TunkioFillType::SentenceFill, fill, verify))
 			{
-				m_model->onPassAdded(TunkioFillType::Character, fill.at(0), verify);
+				m_model->onPassAdded(TunkioFillType::SentenceFill, fill, verify);
+			}
+			else
+			{
+				qWarning() << "Failed to add pass";
 			}
 			return;
 		case 4:
-			if (m_tunkio->addPass(TunkioFillType::Character, fill, verify))
+			if (m_tunkio->addPass(TunkioFillType::FileFill, fill, verify))
 			{
-				m_model->onPassAdded(TunkioFillType::Sentence, fill, verify);
+				m_model->onPassAdded(TunkioFillType::FileFill, fill, verify);
+			}
+			else
+			{
+				qWarning() << "Failed to add pass";
+			}
+			return;
+		case 5:
+			if (m_tunkio->addPass(TunkioFillType::RandomFill, QString(), verify))
+			{
+				m_model->onPassAdded(TunkioFillType::RandomFill, "Random", verify);
+			}
+			else
+			{
+				qWarning() << "Failed to add pass";
 			}
 			return;
 	}
@@ -269,4 +262,18 @@ void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten
 	message << QString("Operating system error code: %1").arg(errorCode);
 
 	QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
+}
+
+void MainWindow::startWipe()
+{
+	Q_ASSERT(m_tunkio.get());
+
+	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
+	connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
+	connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
+	connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
+	connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
+	connect(m_tunkio.get(), &TunkioRunner::errorOccurred, this, &MainWindow::onError);
+
+	m_tunkio->start();
 }

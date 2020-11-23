@@ -43,6 +43,7 @@ namespace Tunkio::Args
 	bool ModeFromChar(char c, Argument::Variant& result);
 	bool BoolFromChar(char c, Argument::Variant& result);
 
-	bool ParseVector(std::map<std::string, Argument>& arguments, const std::vector<std::string>& rawArgs);
-	bool ParseString(std::map<std::string, Argument>& arguments, const std::string& rawArgs);
+	bool ParseVector(
+		std::map<std::string, Argument>& arguments,
+		const std::vector<std::string>& rawArgs);
 }

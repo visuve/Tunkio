@@ -24,12 +24,13 @@ private slots:
 	void onOpenFileDialog();
 	void onOpenDirectoryDialog();
 	void onOpenDriveDialog();
+	void onFillTypeSelectionChanged(int index);
 	void addPass();
 	void onAbout();
 	void onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
+	void startWipe();
 
 private:
-	void attachCallbacks();
 	Ui::MainWindow* ui;
 	WipePassModel* m_model;
 	std::shared_ptr<TunkioRunner> m_tunkio;

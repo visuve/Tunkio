@@ -6,15 +6,17 @@ QString fillTypeToString(TunkioFillType type)
 {
 	switch (type)
 	{
-		case TunkioFillType::Zeroes:
+		case TunkioFillType::ZeroFill:
 			return "Zeroes";
-		case TunkioFillType::Ones:
+		case TunkioFillType::OneFill:
 			return "Ones";
-		case TunkioFillType::Character:
+		case TunkioFillType::CharacterFill:
 			return "Character";
-		case TunkioFillType::Sentence:
+		case TunkioFillType::SentenceFill:
 			return "Sentence";
-		case TunkioFillType::Random:
+		case TunkioFillType::FileFill:
+			return "File";
+		case TunkioFillType::RandomFill:
 			return "Random";
 	}
 
@@ -24,7 +26,7 @@ QString fillTypeToString(TunkioFillType type)
 
 QVariant speedToString(const WipePassModel::Pass& pass)
 {
-	int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
+	int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
 
 	if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
 	{
@@ -37,7 +39,7 @@ QVariant speedToString(const WipePassModel::Pass& pass)
 
 QVariant timeLeft(const WipePassModel::Pass& pass)
 {
-	int64_t milliSecondsTaken = pass.start.msecsTo(QTime::currentTime());
+	int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
 
 	if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
 	{
@@ -225,8 +227,6 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 
 void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	int row = static_cast<int>(m_passes.size());
 	beginInsertRows(QModelIndex(), row, row);
 
@@ -241,8 +241,6 @@ void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValu
 
 void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	Q_ASSERT(passes == m_passes.size());
 
 	for (Pass& pass : m_passes)
@@ -260,49 +258,45 @@ void WipePassModel::onPassStarted(uint16_t pass)
 	int row = pass - 1;
 
 	m_passes[row].start = QTime::currentTime();
-
-	auto tl = index(row, 3);
-	auto br = index(row, 7);
-	emit dataChanged(tl, br, { Qt::DisplayRole });
+	updateRow(row);
 
 	qDebug() << "Pass started:" << pass << "row:" << row;
 }
 
 void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
 
 	m_passes[row].bytesWritten = bytesWritten;
-
-	auto tl = index(row, 3);
-	auto br = index(row, 7);
-	emit dataChanged(tl, br, { Qt::DisplayRole });
+	m_passes[row].time = QTime::currentTime();
+	updateRow(row);
 
 	qDebug() << "Progress:" << pass << '/' << bytesWritten << "row:" << row;
 }
 
 void WipePassModel::onPassFinished(uint16_t pass)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
 
-	m_passes[row].finish = QTime::currentTime();
-
-	auto tl = index(row, 3);
-	auto br = index(row, 7);
-	emit dataChanged(tl, br, { Qt::DisplayRole });
+	m_passes[row].time = QTime::currentTime();
+	updateRow(row);
 
 	qDebug() << "Pass finished:" << pass << "row:" << row;
 }
 
 void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
+	Q_ASSERT(pass <= m_passes.size());
 	qDebug() << "Wipe finished:" << pass << '/' << totalBytesWritten;
+
+	// TODO: show stats!
+}
+
+void WipePassModel::updateRow(int row)
+{
+	const QModelIndex topLeft = index(row, 3);
+	const QModelIndex bottomRight = index(row, 7);
+	emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole });
 }

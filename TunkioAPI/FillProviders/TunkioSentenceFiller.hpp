@@ -4,19 +4,19 @@
 
 namespace Tunkio
 {
-	class StringFiller : public IFillProvider
+	class SentenceFiller : public IFillProvider
 	{
 	public:
-		explicit StringFiller(
+		explicit SentenceFiller(
 			DataUnit::Bytes bytes,
 			const std::string& fillString,
 			bool verify);
 
-		~StringFiller();
+		virtual ~SentenceFiller();
 
 		const void* Data() override;
 
-	private:
+	protected:
 		std::string m_fillString;
 		std::string m_fillData;
 	};

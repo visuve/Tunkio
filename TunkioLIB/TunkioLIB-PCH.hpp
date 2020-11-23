@@ -5,8 +5,8 @@
 #undef max
 #endif
 
-#include <algorithm>
 #include <any>
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <chrono>

@@ -86,6 +86,7 @@ namespace Tunkio
 		if (info.dwFileAttributes & FILE_ATTRIBUTE_DEVICE)
 		{
 			m_size = DiskSize(m_handle);
+			return;
 		}
 
 		if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ||

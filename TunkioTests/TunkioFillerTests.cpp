@@ -2,7 +2,7 @@
 
 #include "FillProviders/TunkioFillProvider.hpp"
 #include "FillProviders/TunkioCharFiller.hpp"
-#include "FillProviders/TunkioStringFiller.hpp"
+#include "FillProviders/TunkioSentenceFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
 
 namespace Tunkio::Fill
@@ -23,14 +23,29 @@ namespace Tunkio::Fill
 
 	TEST(TunkioFillTest, StringFill)
 	{
-		StringFiller filler(14, "foobar", false);
-
-		auto data = reinterpret_cast<const char*>(filler.Data());
-		size_t iter = 0;
-
-		for (char c : "foobar\0foobar")
 		{
-			EXPECT_EQ(c, data[iter++]);
+			SentenceFiller filler(13, "foobar", false);
+
+			auto data = reinterpret_cast<const char*>(filler.Data());
+			size_t iter = 0;
+
+			for (char c : "foobar\0foobar")
+			{
+				EXPECT_EQ(c, data[iter++]);
+			}
+		}
+		{
+			SentenceFiller filler(14, "foobar\r\n", false);
+
+			auto data = reinterpret_cast<const char*>(filler.Data());
+			size_t iter = 0;
+
+			for (char c : "foobar\r\nfoobar")
+			{
+				EXPECT_EQ(c, data[iter++]);
+			}
+
+			EXPECT_EQ(14, strlen(data));
 		}
 	}
 
