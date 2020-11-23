@@ -1,0 +1,32 @@
+name: Tunkio GCC
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@master
+
+    - name: Install tools
+      run: |
+        sudo apt --yes install gcc cmake ninja-build
+        sudo apt --yes install libudev-dev qtbase5-dev
+
+    - name: Build
+      run: |
+        mkdir out
+        cd out
+        cmake ..
+        make
+
+    - name: Run unit tests
+      run: |
+        ./out/TunkioTests/tunkio-tests

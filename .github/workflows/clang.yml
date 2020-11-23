@@ -1,4 +1,4 @@
-name: Tunkio CI
+name: Tunkio Clang
 
 on:
   push:
@@ -17,18 +17,15 @@ jobs:
 
     - name: Install tools
       run: |
-        sudo apt --yes install cppcheck
-        sudo apt --yes install gcc cmake ninja-build
+        sudo apt --yes install clang cmake ninja-build
         sudo apt --yes install libudev-dev qtbase5-dev
-
-    - name: Static analysis
-      run: |
-        cppcheck --project=Tunkio.cppcheck
 
     - name: Build
       run: |
         mkdir out
         cd out
+        export CC=/usr/bin/clang
+        export CXX=/usr/bin/clang++
         cmake ..
         make
 
