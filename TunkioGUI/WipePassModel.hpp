@@ -2,6 +2,11 @@
 
 #include "../TunkioAPI/TunkioAPI.h"
 
+namespace Ui
+{
+	QString fillTypeToString(TunkioFillType type);
+}
+
 class WipePassModel : public QAbstractTableModel
 {
 	Q_OBJECT
@@ -26,8 +31,13 @@ public:
 		QTime time;
 	};
 
+	bool isEmpty() const;
+	const QList<Pass>& passes() const;
+
 public slots:
-	void onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify);
+	void addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
+	void removePass(int row);
+
 	void onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
 	void onPassStarted(uint16_t pass);
 	void onPassProgressed(uint16_t pass, uint64_t bytesWritten);
@@ -36,6 +46,5 @@ public slots:
 
 private:
 	void updateRow(int row);
-
 	QList<Pass> m_passes;
 };

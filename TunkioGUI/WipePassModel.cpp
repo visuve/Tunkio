@@ -1,7 +1,7 @@
 #include "TunkioGUI-PCH.hpp"
 #include "WipePassModel.hpp"
 
-QString fillTypeToString(TunkioFillType type)
+QString Ui::fillTypeToString(TunkioFillType type)
 {
 	switch (type)
 	{
@@ -100,7 +100,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 		switch (index.column())
 		{
 			case 0:
-				return fillTypeToString(pass.fillType);
+				return Ui::fillTypeToString(pass.fillType);
 			case 1:
 				return pass.fillValue;
 			case 2:
@@ -224,7 +224,7 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 	return QVariant();
 }
 
-void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValue, bool verify)
+void WipePassModel::addPass(TunkioFillType fillType, const QString& fillValue, bool verify)
 {
 	int row = static_cast<int>(m_passes.size());
 	beginInsertRows(QModelIndex(), row, row);
@@ -236,6 +236,24 @@ void WipePassModel::onPassAdded(TunkioFillType fillType, const QString& fillValu
 	m_passes.append(pass);
 
 	endInsertRows();
+}
+
+bool WipePassModel::isEmpty() const
+{
+	return m_passes.isEmpty();
+}
+
+const QList<WipePassModel::Pass>& WipePassModel::passes() const
+{
+	return m_passes;
+}
+
+void WipePassModel::removePass(int row)
+{
+	Q_ASSERT(row < m_passes.size());
+	beginRemoveRows(QModelIndex(), row, row);
+	m_passes.removeAt(row);
+	endRemoveRows();
 }
 
 void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)

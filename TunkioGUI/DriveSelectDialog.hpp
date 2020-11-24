@@ -1,11 +1,9 @@
 #pragma once
 
-QT_BEGIN_NAMESPACE
 namespace Ui
 {
 	class DriveSelectDialog;
 }
-QT_END_NAMESPACE
 
 class DriveSelectDialog : public QDialog
 {

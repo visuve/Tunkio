@@ -65,12 +65,30 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->tableViewWipePasses->setItemDelegateForColumn(7, new ProgressBarDelegate(this));
 
 	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
+	connect(ui->pushButtonRemovePass, &QPushButton::clicked, this, &MainWindow::removePass);
 	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startWipe);
+
+	connect(
+		ui->tableViewWipePasses->selectionModel(),
+		&QItemSelectionModel::selectionChanged,
+		[this](const QItemSelection& selected, const QItemSelection&)
+	{
+		ui->pushButtonRemovePass->setEnabled(!selected.isEmpty());
+	});
+
+	const auto enableStartButton = [this]()
+	{
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
+	};
+
+	connect(m_model, &QAbstractItemModel::rowsInserted, enableStartButton);
+	connect(m_model, &QAbstractItemModel::rowsRemoved, enableStartButton);
+	// TODO: attach enableStartButton when m_tunkio is initialized
 }
 
 MainWindow::~MainWindow()
 {
-	m_tunkio = nullptr;
+	m_tunkio.reset();
 	delete ui;
 }
 
@@ -118,28 +136,34 @@ void MainWindow::onFillTypeSelectionChanged(int index)
 	switch (index)
 	{
 		case 0:
-			ui->lineEditFillValue->setEnabled(false);
+			ui->lineEditFillValue->setReadOnly(true);
+			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("0x00");
 			return;
 		case 1:
-			ui->lineEditFillValue->setEnabled(false);
-			ui->lineEditFillValue->setText("0xFF");
+			ui->lineEditFillValue->setReadOnly(true);
+			ui->lineEditFillValue->setInputMask("");
+			ui->lineEditFillValue->setText("0xff");
 			return;
 		case 2:
-			ui->lineEditFillValue->setEnabled(true);
-			ui->lineEditFillValue->setText("?");
+			ui->lineEditFillValue->setReadOnly(false);
+			ui->lineEditFillValue->setInputMask("\\0\\xHH");
+			ui->lineEditFillValue->setText("0x58");
 			return;
 		case 3:
-			ui->lineEditFillValue->setEnabled(true);
+			ui->lineEditFillValue->setReadOnly(false);
+			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("Please enter a sentence here.");
 			return;
 		case 4:
-			ui->lineEditFillValue->setEnabled(true);
+			ui->lineEditFillValue->setReadOnly(false);
+			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("Please enter a path to a file here.");
 			return;
 		case 5:
-			ui->lineEditFillValue->setEnabled(false);
-			ui->lineEditFillValue->setText("A PRNG engine will be used.");
+			ui->lineEditFillValue->setReadOnly(true);
+			ui->lineEditFillValue->setInputMask("");
+			ui->lineEditFillValue->setText("Using MT19937 PRNG.");
 			return;
 	}
 
@@ -148,80 +172,38 @@ void MainWindow::onFillTypeSelectionChanged(int index)
 
 void MainWindow::addPass()
 {
-	Q_ASSERT(m_tunkio.get());
-
 	int index = ui->comboBoxFillType->currentIndex();
 	bool verify = ui->checkBoxVerify->isChecked();
 	QString fill = ui->lineEditFillValue->text();
 
 	switch (index)
 	{
-		// TODO: clean up this temporary mess and change the functionality so,
-		// that passes can be added to the GUI at any time, but they are added to Tunkio
-		// just before start
 		case 0:
-			if (m_tunkio->addPass(TunkioFillType::ZeroFill, QString(), verify))
-			{
-				m_model->onPassAdded(TunkioFillType::ZeroFill, "0x00", verify);
-			}
-			else
-			{
-				qWarning() << "Failed to add pass";
-			}
-			return;
+			return m_model->addPass(TunkioFillType::ZeroFill, fill, verify);
 		case 1:
-			if (m_tunkio->addPass(TunkioFillType::OneFill, QString(), verify))
-			{
-				m_model->onPassAdded(TunkioFillType::OneFill, "0xFF", verify);
-			}
-			else
-			{
-				qWarning() << "Failed to add pass";
-			}
-			return;
+			return m_model->addPass(TunkioFillType::OneFill, fill, verify);
 		case 2:
-			if (m_tunkio->addPass(TunkioFillType::CharacterFill, fill, verify))
-			{
-				m_model->onPassAdded(TunkioFillType::CharacterFill, fill.at(0), verify);
-			}
-			else
-			{
-				qWarning() << "Failed to add pass";
-			}
-			return;
+			return m_model->addPass(TunkioFillType::CharacterFill, fill, verify);
 		case 3:
-			if (m_tunkio->addPass(TunkioFillType::SentenceFill, fill, verify))
-			{
-				m_model->onPassAdded(TunkioFillType::SentenceFill, fill, verify);
-			}
-			else
-			{
-				qWarning() << "Failed to add pass";
-			}
-			return;
+			return m_model->addPass(TunkioFillType::SentenceFill, fill, verify);
 		case 4:
-			if (m_tunkio->addPass(TunkioFillType::FileFill, fill, verify))
-			{
-				m_model->onPassAdded(TunkioFillType::FileFill, fill, verify);
-			}
-			else
-			{
-				qWarning() << "Failed to add pass";
-			}
-			return;
+			return m_model->addPass(TunkioFillType::FileFill, fill, verify);
 		case 5:
-			if (m_tunkio->addPass(TunkioFillType::RandomFill, QString(), verify))
-			{
-				m_model->onPassAdded(TunkioFillType::RandomFill, "Random", verify);
-			}
-			else
-			{
-				qWarning() << "Failed to add pass";
-			}
-			return;
+			return m_model->addPass(TunkioFillType::RandomFill, fill, verify);
+		default:
+			qCritical() << index << " is out of bounds";
+			break;
 	}
+}
 
-	qCritical() << index << " is out of bounds";
+void MainWindow::removePass()
+{
+	Q_ASSERT(!m_model->isEmpty());
+
+	for (const QModelIndex& selected : ui->tableViewWipePasses->selectionModel()->selectedRows())
+	{
+		m_model->removePass(selected.row());
+	}
 }
 
 void MainWindow::onAbout()
@@ -256,7 +238,26 @@ void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten
 void MainWindow::startWipe()
 {
 	Q_ASSERT(m_tunkio.get());
+	Q_ASSERT(!m_tunkio->isRunning());
+	Q_ASSERT(!m_model->isEmpty());
 
+	for (const WipePassModel::Pass& pass : m_model->passes())
+	{
+		if (!m_tunkio->addPass(pass.fillType, pass.fillValue, pass.verify))
+		{
+			QStringList message = { "Failed to add pass!" };
+			message << QString("Pass type: %1").arg(Ui::fillTypeToString(pass.fillType));
+			message << QString("Fill value: %1").arg(pass.fillValue.chopped(9));
+
+			QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
+			return;
+		}
+	}
+
+	ui->pushButtonStart->setEnabled(false);
+	const auto enableOnFinish = std::bind(&QPushButton::setEnabled, ui->pushButtonStart, true);
+
+	connect(m_tunkio.get(), &TunkioRunner::finished, enableOnFinish);
 	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
 	connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
 	connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);

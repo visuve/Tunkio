@@ -22,7 +22,11 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QLineEdit" name="lineEditSelectedPath"/>
+        <widget class="QLineEdit" name="lineEditSelectedPath">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -33,7 +37,7 @@
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="selectionMode">
-       <enum>QAbstractItemView::NoSelection</enum>
+       <enum>QAbstractItemView::SingleSelection</enum>
       </property>
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
@@ -100,10 +104,13 @@
        <item>
         <widget class="QLineEdit" name="lineEditFillValue">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>0x00</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -116,6 +123,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonRemovePass">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Remove</string>
          </property>
@@ -139,6 +149,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QPushButton" name="pushButtonCancel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Cancel</string>
          </property>
@@ -146,6 +159,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonStart">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Start</string>
          </property>

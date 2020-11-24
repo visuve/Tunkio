@@ -26,18 +26,35 @@ TunkioRunner::~TunkioRunner()
 
 bool TunkioRunner::addPass(TunkioFillType fillType, const QString &fillValue, bool verify)
 {
+	Q_ASSERT(m_tunkio);
+
 	const std::string sentence = fillValue.toStdString();
-	const char* character = &sentence[0];
 
 	switch (fillType)
 	{
-		case TunkioFillType::CharacterFill:
-			return TunkioAddWipeRound(m_tunkio, fillType, verify, sentence.c_str());
-		case TunkioFillType::SentenceFill:
-			return TunkioAddWipeRound(m_tunkio, fillType, verify, character);
-		default:
+
+		case TunkioFillType::ZeroFill:
+		case TunkioFillType::OneFill:
+		case TunkioFillType::RandomFill:
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, nullptr);
+		case TunkioFillType::CharacterFill:
+		{
+			bool castOk = false;
+			char character[] = { static_cast<char>(fillValue.toShort(&castOk, 16)), '\0' };
+
+			if (castOk)
+			{
+				return TunkioAddWipeRound(m_tunkio, fillType, verify, character);
+			}
+
+			return false;
+		}
+		case TunkioFillType::SentenceFill:
+		case TunkioFillType::FileFill:
+			return TunkioAddWipeRound(m_tunkio, fillType, verify, sentence.c_str());
 	}
+
+	return false;
 }
 
 void TunkioRunner::attachCallbacks()
@@ -117,6 +134,8 @@ void TunkioRunner::attachCallbacks()
 		Q_ASSERT(self);
 		emit self->errorOccurred(stage, pass, bytesWritten, errorCode);
 	});
+
+	// TODO: check callback setter return values
 }
 
 void TunkioRunner::run()
