@@ -9,7 +9,29 @@ namespace Tunkio::Fill
 {
 	constexpr Tunkio::DataUnit::Kibibytes Kibibyte(1);
 
-	TEST(TunkioFillTest, ZeroFill)
+	class DummyFiller : public IFillProvider
+	{
+	public:
+		DummyFiller() :
+			IFillProvider(Kibibyte, false)
+		{
+		}
+
+		const void* Data() override
+		{
+			return nullptr;
+		}
+	};
+
+	TEST(TunkioFillTest, DummyFill)
+	{
+		EXPECT_EQ(DummyFiller().Size(1024), 1024);
+		EXPECT_EQ(DummyFiller().Size(1023), 1024);
+		EXPECT_EQ(DummyFiller().Size(512), 512);
+		EXPECT_EQ(DummyFiller().Size(511), 512);
+	}
+
+	TEST(TunkioFillTest, ZeroFiller)
 	{
 		CharFiller filler(Kibibyte, 0xAB, false);
 
@@ -21,7 +43,7 @@ namespace Tunkio::Fill
 		}
 	}
 
-	TEST(TunkioFillTest, StringFill)
+	TEST(TunkioFillTest, StringFiller)
 	{
 		{
 			SentenceFiller filler(13, "foobar", false);
@@ -35,34 +57,21 @@ namespace Tunkio::Fill
 			}
 		}
 		{
-			SentenceFiller filler(14, "foobar\r\n", false);
+			SentenceFiller filler(13, "foobar\\n", false);
 
 			auto data = reinterpret_cast<const char*>(filler.Data());
 			size_t iter = 0;
 
-			for (char c : "foobar\r\nfoobar")
+			for (char c : "foobar\nfoobar")
 			{
 				EXPECT_EQ(c, data[iter++]);
 			}
 
-			EXPECT_EQ(14, strlen(data));
-		}
-		{
-			SentenceFiller filler(26, "foobar\tbarfoo\n", false);
-
-			auto data = reinterpret_cast<const char*>(filler.Data());
-			size_t iter = 0;
-
-			for (char c : "foobar\tbarfoo\nfoobar\tbarfoo")
-			{
-				EXPECT_EQ(c, data[iter++]);
-			}
-
-			EXPECT_EQ(27, strlen(data));
+			EXPECT_EQ(13, strlen(data));
 		}
 	}
 
-	TEST(TunkioFillTest, RandomFill)
+	TEST(TunkioFillTest, RandomFiller)
 	{
 		RandomFiller filler(Kibibyte, false);
 		auto data = filler.Data();

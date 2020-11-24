@@ -1,11 +1,10 @@
 #pragma once
 
-#include "TunkioSentenceFiller.hpp"
-#include <filesystem>
+#include "TunkioFillProvider.hpp"
 
 namespace Tunkio
 {
-	class FileFiller : public SentenceFiller
+	class FileFiller : public IFillProvider
 	{
 	public:
 		explicit FileFiller(
@@ -14,5 +13,10 @@ namespace Tunkio
 			bool verify);
 
 		bool HasContent();
+		const void* Data() override;
+
+	private:
+		std::vector<uint8_t> m_fileContent;
+		std::vector<uint8_t> m_fillData;
 	};
 }
