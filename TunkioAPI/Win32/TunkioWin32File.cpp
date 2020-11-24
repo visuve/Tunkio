@@ -3,15 +3,16 @@
 
 namespace Tunkio
 {
-	HANDLE Open(const std::string& path)
+	HANDLE Open(const std::filesystem::path& path)
 	{
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering
+		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-caching
 		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		constexpr uint32_t ShareMode = 0;
 		constexpr uint32_t CreationFlags =
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
-		return CreateFileA(
+		return CreateFileW(
 			path.c_str(),
 			DesiredAccess,
 			ShareMode,
@@ -46,9 +47,9 @@ namespace Tunkio
 			return { false, 0 };
 		}
 
-		unsigned long bytesReturned = 0;
+		DWORD bytesReturned = 0;
 		DISK_GEOMETRY diskGeo = { };
-		constexpr uint32_t diskGeoSize = sizeof(DISK_GEOMETRY);
+		constexpr uint32_t DiskGeoSize = sizeof(DISK_GEOMETRY);
 
 		if (!DeviceIoControl(
 			handle,
@@ -56,18 +57,19 @@ namespace Tunkio
 			nullptr,
 			0,
 			&diskGeo,
-			diskGeoSize,
+			DiskGeoSize,
 			&bytesReturned,
 			nullptr))
 		{
-			return { false, Bytes(diskGeo) };
+			return { false, 0 };
 		}
 
-		return { bytesReturned == sizeof(DISK_GEOMETRY), Bytes(diskGeo) };
+		assert(bytesReturned == DiskGeoSize);
+
+		return { true, Bytes(diskGeo) };
 	}
 
-
-	File::File(const std::string& path) :
+	File::File(const std::filesystem::path& path) :
 		Path(path),
 		m_handle(Open(path))
 	{
@@ -80,16 +82,19 @@ namespace Tunkio
 
 		if (!GetFileInformationByHandle(m_handle, &info))
 		{
-			return;
+			if (GetLastError() == ERROR_INVALID_FUNCTION && GetFileType(m_handle) == FILE_TYPE_DISK)
+			{
+				// This is just a guess, but I cannot come up a better way
+				info.dwFileAttributes = FILE_ATTRIBUTE_DEVICE;
+			}
 		}
 
 		if (info.dwFileAttributes & FILE_ATTRIBUTE_DEVICE)
 		{
+			m_isDevice = true;
 			m_size = DiskSize(m_handle);
-			return;
 		}
-
-		if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ||
+		else if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ||
 			info.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE ||
 			info.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ||
 			info.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
@@ -129,15 +134,20 @@ namespace Tunkio
 			return { false, bytesWritten };
 		}
 
+		if (m_isDevice)
+		{
+			return { true, bytesWritten };
+		}
+
 		return { FlushFileBuffers(m_handle), bytesWritten };
 	}
 
 	bool File::Remove()
 	{
-		if (IsValid() && CloseHandle(m_handle))
+		if (!m_isDevice && IsValid() && CloseHandle(m_handle))
 		{
 			m_handle = nullptr;
-			return DeleteFileA(Path.c_str());
+			return DeleteFileW(Path.c_str());
 		}
 
 		return false;

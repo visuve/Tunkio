@@ -3,7 +3,7 @@
 
 namespace Tunkio
 {
-	DriveWipe::DriveWipe(void* context, const std::string& path) :
+	DriveWipe::DriveWipe(void* context, const std::filesystem::path& path) :
 		FileWipe(context, path)
 	{
 	}

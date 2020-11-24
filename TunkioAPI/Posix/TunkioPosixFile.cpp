@@ -10,7 +10,7 @@ namespace Tunkio
 #endif
 
 	// https://linux.die.net/man/2/open
-	constexpr uint32_t OpenFlags = O_WRONLY | O_DIRECT | O_SYNC;
+	constexpr uint32_t OpenFlags = O_RDWR | O_DIRECT | O_SYNC;
 
 	std::pair<bool, uint64_t> DiskSize(const int fileDescriptor)
 	{
@@ -29,7 +29,7 @@ namespace Tunkio
 		return { true, size };
 	}
 
-	File::File(const std::string& path) :
+	File::File(const std::filesystem::path& path) :
 		Path(path),
 		m_fileDescriptor(open(path.c_str(), OpenFlags))
 	{
@@ -53,6 +53,7 @@ namespace Tunkio
 #endif
 		if ((buffer.st_mode & S_IFMT) == S_IFBLK)
 		{
+			m_isDevice = true;
 			m_size = DiskSize(m_fileDescriptor);
 		}
 		else
@@ -82,11 +83,16 @@ namespace Tunkio
 
 	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const
 	{
-		ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(size));
+		const ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(size));
 
 		if (result == -1)
 		{
 			return { false, 0 };
+		}
+
+		if (m_isDevice)
+		{
+			return { true, static_cast<uint64_t>(result) };
 		}
 
 		return { fsync(m_fileDescriptor) == 0, static_cast<uint64_t>(result) };
@@ -94,7 +100,7 @@ namespace Tunkio
 
 	bool File::Remove()
 	{
-		if (IsValid() && close(m_fileDescriptor))
+		if (!m_isDevice && IsValid() && close(m_fileDescriptor))
 		{
 			m_fileDescriptor = -1;
 			return remove(Path.c_str()) == 0;

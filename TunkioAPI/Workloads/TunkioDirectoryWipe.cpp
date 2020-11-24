@@ -5,7 +5,7 @@
 
 namespace Tunkio
 {
-	DirectoryWipe::DirectoryWipe(void* context, const std::string& path) :
+	DirectoryWipe::DirectoryWipe(void* context, const std::filesystem::path& path) :
 		IWorkload(context, path)
 	{
 	}

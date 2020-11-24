@@ -8,7 +8,7 @@ namespace Tunkio
 	class FileWipe : public IWorkload
 	{
 	public:
-		FileWipe(void* context, const std::string& path);
+		FileWipe(void* context, const std::filesystem::path& path);
 		bool Run() override;
 	};
 }

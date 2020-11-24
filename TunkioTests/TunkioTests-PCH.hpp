@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <array>
+#include <filesystem>
 #include <functional>
 #include <chrono>
 #include <iomanip>

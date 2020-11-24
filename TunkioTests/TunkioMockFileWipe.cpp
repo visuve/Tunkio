@@ -3,7 +3,7 @@
 
 namespace Tunkio
 {
-	FileWipe::FileWipe(void* context, const std::string& path) :
+	FileWipe::FileWipe(void* context, const std::filesystem::path& path) :
 		IWorkload(context, path)
 	{
 	}

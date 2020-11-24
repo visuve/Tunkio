@@ -5,9 +5,9 @@ namespace Tunkio
 	class File
 	{
 	public:
-		const std::string Path;
+		const std::filesystem::path Path;
 
-		explicit File(const std::string& path);
+		explicit File(const std::filesystem::path& path);
 		~File();
 
 		bool IsValid() const;
@@ -17,6 +17,7 @@ namespace Tunkio
 
 	private:
 		std::pair<bool, uint64_t> m_size;
+		bool m_isDevice = false;
 
 #ifdef WIN32
 		HANDLE m_handle = INVALID_HANDLE_VALUE;

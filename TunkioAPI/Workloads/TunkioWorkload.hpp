@@ -7,7 +7,7 @@ namespace Tunkio
 	class IWorkload
 	{
 	public:
-		IWorkload(void* context, const std::string& path) :
+		IWorkload(void* context, const std::filesystem::path& path) :
 			m_context(context),
 			m_path(path)
 		{
@@ -15,7 +15,6 @@ namespace Tunkio
 
 		virtual ~IWorkload()
 		{
-			// assert(m_fillers.empty()); // Untrue if errors have occurred
 		}
 
 		virtual bool Run() = 0;
@@ -106,6 +105,6 @@ namespace Tunkio
 	private:
 		void* m_context = nullptr;
 	protected:
-		const std::string m_path;
+		const std::filesystem::path m_path;
 	};
 }
