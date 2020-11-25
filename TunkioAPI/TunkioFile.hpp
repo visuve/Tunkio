@@ -17,10 +17,11 @@ namespace Tunkio
 
 	private:
 		std::pair<bool, uint64_t> m_size;
+
 		bool m_isDevice = false;
 
-#ifdef WIN32
-		HANDLE m_handle = INVALID_HANDLE_VALUE;
+#if defined(_WIN32)
+		void* m_handle = reinterpret_cast<void*>(-1);
 #else
 		int m_fileDescriptor = -1;
 #endif

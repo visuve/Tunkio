@@ -29,6 +29,7 @@
 #include <memory>
 #include <queue>
 #include <random>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>

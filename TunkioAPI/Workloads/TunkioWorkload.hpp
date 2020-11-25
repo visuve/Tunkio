@@ -31,6 +31,11 @@ namespace Tunkio
 		uint16_t FillerCount() const;
 		bool HasFillers() const;
 
+		DataUnit::Bytes ChunkSize() const
+		{
+			return DataUnit::Mebibytes(1);
+		}
+
 	protected:
 		std::shared_ptr<IFillProvider> TakeFiller();
 

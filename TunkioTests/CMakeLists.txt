@@ -2,9 +2,9 @@
 
 file(GLOB TunkioTestsSource
 	"*.cpp"
-	"../TunkioAPI/*.cpp"
+	"../TunkioAPI/TunkioAPI.cpp"
 	"../TunkioAPI/FillProviders/*.cpp"
-	"../TunkioAPI/Workloads/TunkioWorkload.cpp"
+	"../TunkioAPI/Workloads/*.cpp"
 	"../TunkioLIB/*.cpp"
 	"../TunkioCLI/TunkioArgs.cpp")
 

@@ -1,6 +1,6 @@
 #include "../TunkioAPI-PCH.hpp"
 #include "TunkioDirectoryWipe.hpp"
-#include "../TunkioFile.hpp"
+#include "../TunkioDirectory.hpp"
 #include "../FillProviders/TunkioFillProvider.hpp"
 
 namespace Tunkio
@@ -15,44 +15,28 @@ namespace Tunkio
 
 	bool DirectoryWipe::Run()
 	{
-		std::vector<File> files;
+		Directory directory(m_path);
 
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(m_path))
+		std::pair<bool, std::vector<File>>& files = directory.Files();
+
+		if (!files.first)
 		{
-			if (!entry.is_regular_file())
-			{
-				continue;
-			}
-
-			const File file(entry.path().string());
-
-			if (file.IsValid())
-			{
-				OnError(TunkioStage::Open, 0, 0, LastError);
-				return false;
-			}
-
-			if (!file.Size().first)
-			{
-				OnError(TunkioStage::Size, 0, 0, LastError);
-				return false;
-			}
-
-			files.emplace_back(file);
+			OnError(TunkioStage::Open, 0, 0, LastError);
+			return false;
 		}
 
-		const auto sum = [](uint64_t sum, const File& file)
+		std::pair<bool, uint64_t> directorySize = directory.Size();
+
+		if (!directorySize.first)
 		{
-			return sum + file.Size().second;
-		};
+			OnError(TunkioStage::Size, 0, 0, LastError);
+			return false;
+		}
 
 		uint16_t passes = 0;
-		const uint64_t totalBytesLeft =
-			std::accumulate(files.cbegin(), files.cend(), uint64_t(0), sum);
-
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), totalBytesLeft);
+		OnWipeStarted(FillerCount(), directorySize.second);
 
 		while (HasFillers())
 		{
@@ -61,7 +45,7 @@ namespace Tunkio
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 			uint64_t bytesWritten = 0;
 
-			for (File& file : files)
+			for (File& file : files.second)
 			{
 				uint64_t bytesLeft = file.Size().second;
 
@@ -89,16 +73,10 @@ namespace Tunkio
 			OnPassCompleted(passes);
 		}
 
-		if (m_removeAfterWipe)
+		if (m_removeAfterWipe && !directory.RemoveAll())
 		{
-			for (File& file : files)
-			{
-				if (!file.Remove())
-				{
-					OnError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
-					return false;
-				}
-			}
+			OnError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
+			return false;
 		}
 
 		OnWipeCompleted(passes, totalBytesWritten);

@@ -71,16 +71,16 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 		return false;
 	}
 
-	constexpr Tunkio::DataUnit::Mebibytes bufferSize(1);
+	auto chunkSize = instance->ChunkSize();
 
 	switch (round)
 	{
 		case TunkioFillType::ZeroFill:
-			instance->AddFiller(new Tunkio::CharFiller(bufferSize, 0x00, verify));
+			instance->AddFiller(new Tunkio::CharFiller(chunkSize, 0x00, verify));
 			return true;
 
 		case TunkioFillType::OneFill:
-			instance->AddFiller(new Tunkio::CharFiller(bufferSize, 0xFF, verify));
+			instance->AddFiller(new Tunkio::CharFiller(chunkSize, 0xFF, verify));
 			return true;
 
 		case TunkioFillType::CharacterFill:
@@ -89,7 +89,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::CharFiller(bufferSize, optional[0], verify));
+			instance->AddFiller(new Tunkio::CharFiller(chunkSize, optional[0], verify));
 			return true;
 
 		case TunkioFillType::SentenceFill:
@@ -98,7 +98,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::SentenceFiller(bufferSize, optional, verify));
+			instance->AddFiller(new Tunkio::SentenceFiller(chunkSize, optional, verify));
 			return true;
 
 		case TunkioFillType::FileFill:
@@ -107,7 +107,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 			{
-				auto fileFiller = std::make_shared<Tunkio::FileFiller>(bufferSize, optional, verify);
+				auto fileFiller = std::make_shared<Tunkio::FileFiller>(chunkSize, optional, verify);
 
 				if (fileFiller->HasContent())
 				{
@@ -118,7 +118,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 			return false;
 
 		case TunkioFillType::RandomFill:
-			instance->AddFiller(new Tunkio::RandomFiller(bufferSize, verify));
+			instance->AddFiller(new Tunkio::RandomFiller(chunkSize, verify));
 			return true;
 
 	}
