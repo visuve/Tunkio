@@ -27,7 +27,7 @@ namespace Tunkio
 		void OnPassStarted(uint16_t pass);
 		bool OnProgress(uint16_t pass, uint64_t bytesWritten);
 		void OnPassCompleted(uint16_t pass);
-		void OnWipeError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t error);
+		void OnError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t error);
 		void OnWipeCompleted(uint16_t passes, uint64_t bytesWritten);
 
 	private:

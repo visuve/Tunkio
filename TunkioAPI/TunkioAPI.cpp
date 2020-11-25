@@ -15,42 +15,44 @@
 #include "TunkioDataUnits.hpp"
 
 template <typename T>
-bool Assign(TunkioHandle* handle, T(Tunkio::IWorkload::* field), T value)
+void Set(TunkioHandle* handle, void(Tunkio::IWorkload::*setter)(T), T value)
 {
+	assert(handle);
+	assert(setter);
+	assert(value);
+
 	const auto instance = reinterpret_cast<Tunkio::IWorkload*>(handle);
 
-	if (!instance)
+	if (instance)
 	{
-		return false;
+		(instance->*setter)(value);
 	}
-
-	instance->*field = value;
-
-	return true;
 }
 
-template<typename Base>
-inline bool IsInstanceOf(const TunkioHandle* handle)
-{
-	auto instance = reinterpret_cast<const Tunkio::IWorkload*>(handle);
-	return dynamic_cast<const Base*>(instance) != nullptr;
-}
-
-TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(void* context, const char* path, TunkioTargetType type)
+TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(
+	const char* path,
+	TunkioTargetType type,
+	bool removeAfterWipe,
+	void* context)
 {
 	if (!path)
 	{
 		return nullptr;
 	}
 
+	// TODO: here we need to check the physical sector size to find the optimal buffer size
+
 	switch (type)
 	{
 		case TunkioTargetType::FileWipe:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(context, path));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path, removeAfterWipe, context));
 		case TunkioTargetType::DirectoryWipe:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(context, path));
+			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path, removeAfterWipe, context));
 		case TunkioTargetType::DriveWipe:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(context, path));
+			if (!removeAfterWipe)
+			{
+				return reinterpret_cast<TunkioHandle*>(new Tunkio::DriveWipe(path, context));
+			}
 	}
 
 	return nullptr;
@@ -74,11 +76,11 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 	switch (round)
 	{
 		case TunkioFillType::ZeroFill:
-			instance->m_fillers.emplace(new Tunkio::CharFiller(bufferSize, 0x00, verify));
+			instance->AddFiller(new Tunkio::CharFiller(bufferSize, 0x00, verify));
 			return true;
 
 		case TunkioFillType::OneFill:
-			instance->m_fillers.emplace(new Tunkio::CharFiller(bufferSize, 0xFF, verify));
+			instance->AddFiller(new Tunkio::CharFiller(bufferSize, 0xFF, verify));
 			return true;
 
 		case TunkioFillType::CharacterFill:
@@ -87,7 +89,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->m_fillers.emplace(new Tunkio::CharFiller(bufferSize, optional[0], verify));
+			instance->AddFiller(new Tunkio::CharFiller(bufferSize, optional[0], verify));
 			return true;
 
 		case TunkioFillType::SentenceFill:
@@ -96,7 +98,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->m_fillers.emplace(new Tunkio::SentenceFiller(bufferSize, optional, verify));
+			instance->AddFiller(new Tunkio::SentenceFiller(bufferSize, optional, verify));
 			return true;
 
 		case TunkioFillType::FileFill:
@@ -109,14 +111,14 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 
 				if (fileFiller->HasContent())
 				{
-					instance->m_fillers.emplace(fileFiller);
+					instance->AddFiller(fileFiller);
 					return true;
 				}
 			}
 			return false;
 
 		case TunkioFillType::RandomFill:
-			instance->m_fillers.emplace(new Tunkio::RandomFiller(bufferSize, verify));
+			instance->AddFiller(new Tunkio::RandomFiller(bufferSize, verify));
 			return true;
 
 	}
@@ -124,56 +126,46 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 	return false;
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetWipeStartedCallback(
+void TUNKIO_CALLING_CONVENTION TunkioSetWipeStartedCallback(
 	TunkioHandle* handle,
 	TunkioWipeStartedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_startedCallback, callback);
+	Set(handle, &Tunkio::IWorkload::SetWipeStartedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetPassStartedCallback(
+void TUNKIO_CALLING_CONVENTION TunkioSetPassStartedCallback(
 	TunkioHandle* handle,
 	TunkioPassStartedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_passStartedCallback, callback);
+	Set(handle, &Tunkio::IWorkload::SetPassStartedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
+void TUNKIO_CALLING_CONVENTION TunkioSetProgressCallback(
 	TunkioHandle* handle,
 	TunkioProgressCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_progressCallback, callback);
+	Set(handle, &Tunkio::IWorkload::SetProgressCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetPassCompletedCallback(
+void TUNKIO_CALLING_CONVENTION TunkioSetPassCompletedCallback(
 	TunkioHandle* handle,
 	TunkioPassCompletedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_passCompletedCallback, callback);;
+	Set(handle, &Tunkio::IWorkload::SetPassCompletedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetWipeCompletedCallback(
+void TUNKIO_CALLING_CONVENTION TunkioSetWipeCompletedCallback(
 	TunkioHandle* handle,
-	TunkioCompletedCallback* callback)
+	TunkioWipeCompletedCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_completedCallback, callback);
+	Set(handle, &Tunkio::IWorkload::SetWipeCompletedCallback, callback);
 }
 
-bool TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
+void TUNKIO_CALLING_CONVENTION TunkioSetErrorCallback(
 	TunkioHandle* handle,
 	TunkioErrorCallback* callback)
 {
-	return Assign(handle, &Tunkio::IWorkload::m_errorCallback, callback);
-}
-
-bool TUNKIO_CALLING_CONVENTION TunkioSetRemoveAfterFill(TunkioHandle* handle, bool remove)
-{
-	if (IsInstanceOf<Tunkio::DriveWipe>(handle) && remove)
-	{
-		return false; // Devices cannot be deleted
-	}
-
-	return Assign(handle, &Tunkio::IWorkload::m_removeAfterFill, remove);
+	Set(handle, &Tunkio::IWorkload::SetErrorCallback, callback);
 }
 
 bool TUNKIO_CALLING_CONVENTION TunkioRun(TunkioHandle* handle)

@@ -21,7 +21,7 @@ namespace Tunkio
 		bool verify,
 		bool remove)
 	{
-		m_handle = TunkioInitialize(this, path.c_str(), targetType);
+		m_handle = TunkioInitialize(path.c_str(), targetType, remove, this);
 
 		if (!m_handle)
 		{
@@ -29,89 +29,59 @@ namespace Tunkio
 			return false;
 		}
 
-		if (!TunkioSetWipeStartedCallback(m_handle, [](
+		TunkioSetWipeStartedCallback(m_handle, [](
 			void* context,
 			uint16_t passes,
 			uint64_t bytesToWritePerPass)
-			{
-				auto self = reinterpret_cast<CLI*>(context);
-				self->OnWipeStarted(passes, bytesToWritePerPass);
-			}))
 		{
-			std::cerr << "TunkioSetWipeStartedCallback failed!" << std::endl;
-			return false;
-		}
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnWipeStarted(passes, bytesToWritePerPass);
+		});
 
-		if (!TunkioSetPassStartedCallback(m_handle, [](
+		TunkioSetPassStartedCallback(m_handle, [](
 			void* context,
 			uint16_t pass)
-			{
-				auto self = reinterpret_cast<CLI*>(context);
-				self->OnPassStarted(pass);
-			}))
 		{
-			std::cerr << "TunkioSetPassStartedCallback failed!" << std::endl;
-			return false;
-		}
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnPassStarted(pass);
+		});
 
-		if (!TunkioSetProgressCallback(m_handle, [](
+		TunkioSetProgressCallback(m_handle, [](
 			void* context,
 			uint16_t pass,
 			uint64_t bytesWritten)
-			{
-				auto self = reinterpret_cast<CLI*>(context);
-				return self->OnProgress(pass, bytesWritten);
-			}))
 		{
-			std::cerr << "TunkioSetProgressCallback failed!" << std::endl;
-			return false;
-		}
+			auto self = reinterpret_cast<CLI*>(context);
+			return self->OnProgress(pass, bytesWritten);
+		});
 
-		if (!TunkioSetPassCompletedCallback(m_handle, [](
+		TunkioSetPassCompletedCallback(m_handle, [](
 			void* context,
 			uint16_t pass)
-			{
-				auto self = reinterpret_cast<CLI*>(context);
-				self->OnPassCompleted(pass);
-			}))
 		{
-			std::cerr << "TunkioSetPassCompletedCallback failed!" << std::endl;
-			return false;
-		}
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnPassCompleted(pass);
+		});
 
-		if (!TunkioSetWipeCompletedCallback(m_handle, [](
+		TunkioSetWipeCompletedCallback(m_handle, [](
 			void* context,
 			uint16_t passes,
 			uint64_t totalBytesWritten)
-			{
-				auto self = reinterpret_cast<CLI*>(context);
-				self->OnWipeCompleted(passes, totalBytesWritten);
-			}))
 		{
-			std::cerr << "TunkioSetWipeCompletedCallback failed!" << std::endl;
-			return false;
-		}
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnWipeCompleted(passes, totalBytesWritten);
+		});
 
-		if (!TunkioSetErrorCallback(m_handle, [](
+		TunkioSetErrorCallback(m_handle, [](
 			void* context,
 			TunkioStage stage,
 			uint16_t pass,
 			uint64_t bytesWritten,
 			uint32_t error)
-			{
-				auto self = reinterpret_cast<CLI*>(context);
-				self->OnWipeError(stage, pass, bytesWritten, error);
-			}))
 		{
-			std::cerr << "TunkioSetWipeCompletedCallback failed!" << std::endl;
-			return false;
-		}
-
-		if (!TunkioSetRemoveAfterFill(m_handle, remove))
-		{
-			std::cerr << "TunkioSetRemoveAfterFill failed!" << std::endl;
-			return false;
-		}
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnError(stage, pass, bytesWritten, error);
+		});
 
 		return TunkioAddWipeRound(m_handle, fillType, verify, filler.c_str());
 	}
@@ -177,7 +147,7 @@ namespace Tunkio
 	{
 	}
 
-	void CLI::OnWipeError(TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
+	void CLI::OnError(TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
 	{
 		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
 

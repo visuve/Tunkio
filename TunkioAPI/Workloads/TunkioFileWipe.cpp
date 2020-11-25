@@ -5,8 +5,11 @@
 
 namespace Tunkio
 {
-	FileWipe::FileWipe(void* context, const std::filesystem::path& path) :
-		IWorkload(context, path)
+	FileWipe::FileWipe(
+		const std::filesystem::path& path,
+		bool removeAfterWipe,
+		void* context) :
+		IWorkload(path, removeAfterWipe, context)
 	{
 	}
 
@@ -16,29 +19,29 @@ namespace Tunkio
 
 		if (!file.IsValid())
 		{
-			OnWipeError(TunkioStage::Open, 0, 0, LastError);
+			OnError(TunkioStage::Open, 0, 0, LastError);
 			return false;
 		}
 
 		if (!file.Size().first)
 		{
-			OnWipeError(TunkioStage::Size, 0, 0, LastError);
+			OnError(TunkioStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(static_cast<uint16_t>(m_fillers.size()), file.Size().second);
+		OnWipeStarted(FillerCount(), file.Size().second);
 
-		while (!m_fillers.empty())
+		while (HasFillers())
 		{
 			OnPassStarted(++passes);
 
 			uint64_t bytesWritten = 0;
 			uint64_t bytesLeft = file.Size().second;
 
-			std::shared_ptr<IFillProvider> filler = m_fillers.front();
+			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
 			while (bytesLeft)
 			{
@@ -49,7 +52,7 @@ namespace Tunkio
 
 				if (!result.first)
 				{
-					OnWipeError(TunkioStage::Write, passes, bytesWritten, LastError);
+					OnError(TunkioStage::Write, passes, bytesWritten, LastError);
 					return false;
 				}
 
@@ -60,16 +63,15 @@ namespace Tunkio
 			}
 
 			totalBytesWritten += bytesWritten;
-			m_fillers.pop();
 
 			OnPassCompleted(passes);
 		}
 
-		OnCompleted(passes, totalBytesWritten);
+		OnWipeCompleted(passes, totalBytesWritten);
 
-		if (m_removeAfterFill && !file.Remove())
+		if (m_removeAfterWipe && !file.Remove())
 		{
-			OnWipeError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
+			OnError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
 			return false;
 		}
 

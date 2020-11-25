@@ -46,7 +46,7 @@ namespace Tunkio
 	TEST(TunkioAPITest, CreateHandleFail)
 	{
 		Counters counters;
-		TunkioHandle* handle = TunkioInitialize(&counters, nullptr, TunkioTargetType::FileWipe);
+		TunkioHandle* handle = TunkioInitialize(nullptr, TunkioTargetType::FileWipe, false, &counters);
 		EXPECT_EQ(handle, nullptr);
 
 		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::CharacterFill, false, "xxx"));
@@ -62,10 +62,16 @@ namespace Tunkio
 		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
 
+	TEST(TunkioAPITest, CreateHandleFailDriveWipe)
+	{
+		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::DriveWipe, true, nullptr);
+		EXPECT_EQ(handle, nullptr);
+	}
+
 	TEST(TunkioAPITest, CreateHandleSuccess)
 	{
 		Counters counters;
-		TunkioHandle* handle = TunkioInitialize(&counters, "foobar", TunkioTargetType::FileWipe);
+		TunkioHandle* handle = TunkioInitialize("foobar", TunkioTargetType::FileWipe, false, &counters);
 		EXPECT_NE(handle, nullptr);
 		TunkioFree(handle);
 
@@ -85,7 +91,7 @@ namespace Tunkio
 			TunkioTargetType::DriveWipe })
 		{
 			Counters counters;
-			TunkioHandle* handle = TunkioInitialize(&counters, "foobar", type);
+			TunkioHandle* handle = TunkioInitialize("foobar", type, false, &counters);
 			EXPECT_NE(handle, nullptr);
 
 			EXPECT_EQ(counters.OnWipeStartedCount, 0);
@@ -95,13 +101,15 @@ namespace Tunkio
 			EXPECT_EQ(counters.OnWipeCompletedCount, 0);
 			EXPECT_EQ(counters.OnErrorCount, 0);
 
-			EXPECT_TRUE(TunkioSetWipeStartedCallback(handle, OnWipeStarted));
-			EXPECT_TRUE(TunkioSetPassStartedCallback(handle, OnPassStarted));
-			EXPECT_TRUE(TunkioSetProgressCallback(handle, OnProgress));
-			EXPECT_TRUE(TunkioSetPassCompletedCallback(handle, OnPassCompleted));
-			EXPECT_TRUE(TunkioSetWipeCompletedCallback(handle, OnWipeCompleted));
-			EXPECT_TRUE(TunkioSetErrorCallback(handle, OnError));
+			TunkioSetWipeStartedCallback(handle, OnWipeStarted);
+			TunkioSetPassStartedCallback(handle, OnPassStarted);
+			TunkioSetProgressCallback(handle, OnProgress);
+			TunkioSetPassCompletedCallback(handle, OnPassCompleted);
+			TunkioSetWipeCompletedCallback(handle, OnWipeCompleted);
+			TunkioSetErrorCallback(handle, OnError);
 
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::OneFill, false, nullptr));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::ZeroFill, false, nullptr));
 			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::CharacterFill, false, "x"));
 			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::SentenceFill, false, "xyz"));
 
@@ -109,9 +117,9 @@ namespace Tunkio
 			TunkioFree(handle);
 
 			EXPECT_EQ(counters.OnWipeStartedCount, 1);
-			EXPECT_EQ(counters.OnPassStartedCount, 2);
-			EXPECT_EQ(counters.OnProgressCount, 2);
-			EXPECT_EQ(counters.OnPassCompletedCount, 2);
+			EXPECT_EQ(counters.OnPassStartedCount, 4);
+			EXPECT_EQ(counters.OnProgressCount, 4);
+			EXPECT_EQ(counters.OnPassCompletedCount, 4);
 			EXPECT_EQ(counters.OnWipeCompletedCount, 1);
 			EXPECT_EQ(counters.OnErrorCount, 0);
 		}

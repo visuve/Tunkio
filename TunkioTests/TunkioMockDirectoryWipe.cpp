@@ -3,8 +3,11 @@
 
 namespace Tunkio
 {
-	DirectoryWipe::DirectoryWipe(void* context, const std::filesystem::path& path) :
-		IWorkload(context, path)
+	DirectoryWipe::DirectoryWipe(
+		const std::filesystem::path& path,
+		bool removeAfterWipe,
+		void* context) :
+		IWorkload(path, removeAfterWipe, context)
 	{
 	}
 
@@ -12,15 +15,15 @@ namespace Tunkio
 	{
 		OnWipeStarted(1, 1);
 
-		while (!m_fillers.empty())
+		while (HasFillers())
 		{
-			m_fillers.pop();
+			TakeFiller();
 			OnPassStarted(1);
 			OnProgress(1, 1);
 			OnPassCompleted(1);
 		}
 
-		OnCompleted(1, 1);
+		OnWipeCompleted(1, 1);
 		return true;
 	}
 }

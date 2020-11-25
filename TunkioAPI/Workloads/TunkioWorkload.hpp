@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../TunkioAPI.h"
 #include "../FillProviders/TunkioFillProvider.hpp"
 
 namespace Tunkio
@@ -7,104 +8,51 @@ namespace Tunkio
 	class IWorkload
 	{
 	public:
-		IWorkload(void* context, const std::filesystem::path& path) :
-			m_context(context),
-			m_path(path)
-		{
-		}
-
-		virtual ~IWorkload()
-		{
-		}
+		IWorkload(const std::filesystem::path& path, bool removeAfterWipe, void* context);
+		virtual ~IWorkload();
 
 		virtual bool Run() = 0;
 
-		std::queue<std::shared_ptr<IFillProvider>> m_fillers;
+		void SetWipeStartedCallback(TunkioWipeStartedCallback* callback);
+		void SetPassStartedCallback(TunkioPassStartedCallback* callback);
+		void SetProgressCallback(TunkioProgressCallback* callback);
+		void SetPassCompletedCallback(TunkioPassCompletedCallback* callback);
+		void SetWipeCompletedCallback(TunkioWipeCompletedCallback* callback);
+		void SetErrorCallback(TunkioErrorCallback* callback);
 
-		// TODO: add setters :S
-		TunkioWipeStartedCallback* m_startedCallback = nullptr;
-		TunkioPassStartedCallback* m_passStartedCallback = nullptr;
-		TunkioProgressCallback* m_progressCallback = nullptr;
-		TunkioErrorCallback* m_errorCallback = nullptr;
-		TunkioPassCompletedCallback* m_passCompletedCallback = nullptr;
-		TunkioCompletedCallback* m_completedCallback = nullptr;
+		bool VerifyPass = false;
 
-		bool m_verifyAfterWipe = false;
-		bool m_removeAfterFill = false;
-
-		inline void OnWipeStarted(
-			uint16_t passes,
-			uint64_t bytesToWritePerPass)
+		template <typename T>
+		void AddFiller(T&& provider)
 		{
-			if (!m_startedCallback)
-			{
-				return;
-			}
-
-			m_startedCallback(m_context, passes, bytesToWritePerPass);
+			m_fillers.emplace(provider);
 		}
 
-		inline void OnPassStarted(uint16_t pass)
-		{
-			if (!m_passStartedCallback)
-			{
-				return;
-			}
+		uint16_t FillerCount() const;
+		bool HasFillers() const;
 
-			m_passStartedCallback(m_context, pass);
-		}
+	protected:
+		std::shared_ptr<IFillProvider> TakeFiller();
 
-		inline bool OnProgress(
-			uint16_t pass,
-			uint64_t bytesWritten)
-		{
-			if (!m_progressCallback)
-			{
-				return true;
-			}
+		void OnWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
+		void OnPassStarted(uint16_t pass);
+		bool OnProgress(uint16_t pass, uint64_t bytesWritten);
+		void OnPassCompleted(uint16_t pass);
+		void OnWipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
+		void OnError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
-			return m_progressCallback(m_context, pass, bytesWritten);
-		}
-
-		inline void OnPassCompleted(uint16_t pass)
-		{
-			if (!m_passCompletedCallback)
-			{
-				return;
-			}
-
-			m_passCompletedCallback(m_context, pass);
-		}
-
-		inline void OnCompleted(
-			uint16_t passes,
-			uint64_t totalBytesWritten)
-		{
-			if (!m_completedCallback)
-			{
-				return;
-			}
-
-			m_completedCallback(m_context, passes, totalBytesWritten);
-		}
-
-		inline void OnWipeError(
-			TunkioStage stage,
-			uint16_t pass,
-			uint64_t bytesWritten,
-			uint32_t errorCode)
-		{
-			if (!m_errorCallback)
-			{
-				return;
-			}
-
-			m_errorCallback(m_context, stage, pass, bytesWritten, errorCode);
-		}
+		const std::filesystem::path m_path;
+		const bool m_removeAfterWipe = false;
 
 	private:
+		TunkioWipeStartedCallback* m_wipeStartedCallback = nullptr;
+		TunkioPassStartedCallback* m_passStartedCallback = nullptr;
+		TunkioProgressCallback* m_progressCallback = nullptr;
+		TunkioPassCompletedCallback* m_passCompletedCallback = nullptr;
+		TunkioWipeCompletedCallback* m_wipeCompletedCallback = nullptr;
+		TunkioErrorCallback* m_errorCallback = nullptr;
+
 		void* m_context = nullptr;
-	protected:
-		const std::filesystem::path m_path;
+		std::queue<std::shared_ptr<IFillProvider>> m_fillers;
 	};
 }

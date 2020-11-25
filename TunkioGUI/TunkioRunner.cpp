@@ -5,7 +5,7 @@ TunkioRunner::TunkioRunner(QString path, TunkioTargetType type, QObject* parent)
 	QThread(parent),
 	m_path(path),
 	m_type(type),
-	m_tunkio(TunkioInitialize(this, m_path.toUtf8().constData(), m_type))
+	m_tunkio(TunkioInitialize(m_path.toUtf8().constData(), m_type, false, this))
 {
 	attachCallbacks();
 }
@@ -114,7 +114,7 @@ void TunkioRunner::attachCallbacks()
 		uint16_t passes,
 		uint64_t totalBytesWritten)
 	{
-		qDebug() << "TunkioCompletedCallback: " << passes << '/' << totalBytesWritten;
+		qDebug() << "TunkioWipeCompletedCallback: " << passes << '/' << totalBytesWritten;
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeCompleted(passes, totalBytesWritten);
@@ -134,8 +134,6 @@ void TunkioRunner::attachCallbacks()
 		Q_ASSERT(self);
 		emit self->errorOccurred(stage, pass, bytesWritten, errorCode);
 	});
-
-	// TODO: check callback setter return values
 }
 
 void TunkioRunner::run()

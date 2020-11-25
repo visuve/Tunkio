@@ -4,6 +4,7 @@ file(GLOB TunkioTestsSource
 	"*.cpp"
 	"../TunkioAPI/*.cpp"
 	"../TunkioAPI/FillProviders/*.cpp"
+	"../TunkioAPI/Workloads/TunkioWorkload.cpp"
 	"../TunkioLIB/*.cpp"
 	"../TunkioCLI/TunkioArgs.cpp")
 
