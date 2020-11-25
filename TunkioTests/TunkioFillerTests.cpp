@@ -43,31 +43,16 @@ namespace Tunkio::Fill
 		}
 	}
 
-	TEST(TunkioFillTest, StringFiller)
+	TEST(TunkioFillTest, SentenceFiller)
 	{
+		SentenceFiller filler(13, "foobar\n", false);
+
+		auto data = reinterpret_cast<const char*>(filler.Data());
+		size_t iter = 0;
+
+		for (char c : "foobar\nfoobar\n")
 		{
-			SentenceFiller filler(13, "foobar", false);
-
-			auto data = reinterpret_cast<const char*>(filler.Data());
-			size_t iter = 0;
-
-			for (char c : "foobar\0foobar")
-			{
-				EXPECT_EQ(c, data[iter++]);
-			}
-		}
-		{
-			SentenceFiller filler(13, "foobar\\n", false);
-
-			auto data = reinterpret_cast<const char*>(filler.Data());
-			size_t iter = 0;
-
-			for (char c : "foobar\nfoobar")
-			{
-				EXPECT_EQ(c, data[iter++]);
-			}
-
-			EXPECT_EQ(13, strlen(data));
+			EXPECT_EQ(c, data[iter++]);
 		}
 	}
 
