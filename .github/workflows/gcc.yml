@@ -1,4 +1,4 @@
-name: Tunkio GCC
+name: GCC
 
 on:
   push:
@@ -19,14 +19,18 @@ jobs:
       run: |
         sudo apt --yes install gcc cmake ninja-build
         sudo apt --yes install libudev-dev qtbase5-dev
+        sudo apt --yes install valgrind
 
     - name: Build
       run: |
         mkdir out
         cd out
+        export CC=/usr/bin/gcc
+        export CXX=/usr/bin/g++
         cmake ..
         make
 
     - name: Run unit tests
       run: |
-        ./out/TunkioTests/tunkio-tests
+        cd out/TunkioTests
+        valgrind --leak-check=yes ./tunkio-tests

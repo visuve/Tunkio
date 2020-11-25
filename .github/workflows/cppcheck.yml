@@ -1,4 +1,4 @@
-name: Tunkio Cppcheck
+name: Cppcheck
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Tunkio Clang
+name: Clang
 
 on:
   push:
@@ -19,6 +19,7 @@ jobs:
       run: |
         sudo apt --yes install clang cmake ninja-build
         sudo apt --yes install libudev-dev qtbase5-dev
+        sudo apt --yes install valgrind
 
     - name: Build
       run: |
@@ -31,4 +32,5 @@ jobs:
 
     - name: Run unit tests
       run: |
-        ./out/TunkioTests/tunkio-tests
+        cd out/TunkioTests
+        valgrind --leak-check=yes ./tunkio-tests
