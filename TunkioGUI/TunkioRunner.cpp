@@ -32,7 +32,6 @@ bool TunkioRunner::addPass(TunkioFillType fillType, const QString &fillValue, bo
 
 	switch (fillType)
 	{
-
 		case TunkioFillType::ZeroFill:
 		case TunkioFillType::OneFill:
 		case TunkioFillType::RandomFill:
@@ -140,6 +139,12 @@ void TunkioRunner::run()
 {
 	qDebug() << "Started!";
 	Q_ASSERT(m_tunkio);
-	qDebug() << TunkioRun(m_tunkio);
+
+	if (!TunkioRun(m_tunkio))
+	{
+		qDebug() << "Failed!";
+		return;
+	}
+
 	qDebug() << "Finished!";
 }

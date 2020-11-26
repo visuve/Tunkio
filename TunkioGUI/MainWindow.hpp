@@ -24,8 +24,9 @@ private slots:
 	void addPass();
 	void removePass();
 	void onAbout();
-	void onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 	void startWipe();
+	void onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
+	void onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten);
 
 private:
 	Ui::MainWindow* ui;

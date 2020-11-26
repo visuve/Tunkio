@@ -163,7 +163,7 @@ void MainWindow::onFillTypeSelectionChanged(int index)
 		case 5:
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
-			ui->lineEditFillValue->setText("Using MT19937 PRNG.");
+			ui->lineEditFillValue->setText("MT19937 PRNG.");
 			return;
 	}
 
@@ -225,16 +225,6 @@ void MainWindow::onAbout()
 	QMessageBox::about(this, "Tunkio", text.join('\n'));
 }
 
-void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
-{
-	QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
-	message << QString("Pass: %1").arg(pass);
-	message << QString("Bytes written: %1").arg(bytesWritten);
-	message << QString("Operating system error code: %1").arg(errorCode);
-
-	QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
-}
-
 void MainWindow::startWipe()
 {
 	Q_ASSERT(m_tunkio.get());
@@ -255,15 +245,34 @@ void MainWindow::startWipe()
 	}
 
 	ui->pushButtonStart->setEnabled(false);
-	const auto enableOnFinish = std::bind(&QPushButton::setEnabled, ui->pushButtonStart, true);
+	ui->pushButtonCancel->setEnabled(true);
 
-	connect(m_tunkio.get(), &TunkioRunner::finished, enableOnFinish);
 	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
 	connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
 	connect(m_tunkio.get(), &TunkioRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
 	connect(m_tunkio.get(), &TunkioRunner::passFinished, m_model, &WipePassModel::onPassFinished);
 	connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
+	connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, this, &MainWindow::onWipeCompleted);
 	connect(m_tunkio.get(), &TunkioRunner::errorOccurred, this, &MainWindow::onError);
 
 	m_tunkio->start();
+}
+
+void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
+{
+	QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
+	message << QString("Pass: %1").arg(pass);
+	message << QString("Bytes written: %1").arg(bytesWritten);
+	message << QString("Operating system error code: %1").arg(errorCode);
+
+	QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
+
+	ui->pushButtonStart->setEnabled(true);
+	ui->pushButtonCancel->setEnabled(false);
+}
+
+void MainWindow::onWipeCompleted(uint16_t, uint64_t)
+{
+	ui->pushButtonStart->setEnabled(true);
+	ui->pushButtonCancel->setEnabled(false);
 }
