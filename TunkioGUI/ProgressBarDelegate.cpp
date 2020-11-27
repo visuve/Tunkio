@@ -23,7 +23,7 @@ void ProgressBarDelegate::paint(
 	{
 		progressBar.text = "0%";
 	}
-	else if (progress >= 100.00)
+	else if (progress >= 99.99)
 	{
 		progressBar.text = "100%";
 	}
