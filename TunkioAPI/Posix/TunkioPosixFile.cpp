@@ -90,9 +90,19 @@ namespace Tunkio
 		return true;
 	}
 
-	std::pair<bool, uint64_t> File::Size() const
+	std::pair<bool, uint64_t> File::ActualSize() const
 	{
-		return m_size;
+		return m_actualSize;
+	}
+
+	std::pair<bool, uint64_t> File::AllocationSize() const
+	{
+		return m_allocationSize;
+	}
+
+	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	{
+		return m_optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const
