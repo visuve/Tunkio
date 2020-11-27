@@ -84,8 +84,8 @@ void resizeToScreen(MainWindow& window)
 	}
 	else
 	{
-		QRect screenGeometry = screen->geometry();
-		window.resize(screenGeometry.width() / 2, screenGeometry.height() / 2);
+		const QRect screenGeometry = screen->geometry();
+		window.resize(screenGeometry.width() / 2, screenGeometry.height() / 3);
 	}
 }
 

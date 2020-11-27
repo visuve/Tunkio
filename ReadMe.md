@@ -1,23 +1,23 @@
 # Tunkio
 
 - Wipes files, folders or drives
-- Originally written during the small hours of a boring night, since improved a lot
-- Does not yet even try to be secure, done simply out of curiosity
+- Originally written during the small hours of a boring night
+	- Since then it has bloated a bit
 
 ## Folders
 
 - ``TunkioLIB/``
-	- Tunkio Static Library, contains various C++ wrappers for e.g. measuring time, getting process output, etc.
-- ``TunkioDLL/``
+	- Tunkio Static Library, contains shared stuff between GUI & CLI.
+- ``TunkioAPI/``
 	- Tunkio Shared Library, contains all the actual wiping logic and nothing else
 	- C-compatible interface
 	- Depengs on ``TunkioLIB``
 - ``TunkioCLI/``
 	- Tunkio Command Line Interface, shows nice progress output etc.
-	- Depends on ``TunkioDLL`` & ``TunkioLIB``
+	- Depends on ``TunkioAPI`` & ``TunkioLIB``
 - ``TunkioGUI/``
 	- Tunkio Graphical User Interface, a simple dialog to show progress
-	- Depends on ``TunkioDLL`` & ``TunkioLIB``
+	- Depends on ``TunkioAPI`` & ``TunkioLIB``
 
 ## Submodules
 
@@ -32,5 +32,16 @@
 
 ## Tools
 
-- Visual Studio >= 2019 or GCC >= 8.3.0 or Clang >= 7.0.1
-- CMake >= 3.17
+- Visual Studio >= 2019 or GCC >= 9.3 or Clang >= 10.0
+- CMake >= 3.16
+
+## Developer TODO
+
+- The GUI is still somewhat flaky
+- Open browse menu from clicking file fill path
+- Verifications
+	- Char-by-char for charfiller
+	- Sentence-by-sentece for file & sentence fillers
+	- SHA-256 for random
+- Preset "recipes", i.e:
+	- https://en.wikipedia.org/wiki/Data_erasure#Standards
