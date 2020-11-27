@@ -14,6 +14,21 @@
 
 #include "TunkioDataUnits.hpp"
 
+constexpr size_t Length(const char* str)
+{
+	char* ptr = const_cast<char*>(str);
+
+	if (ptr)
+	{
+		while (*ptr)
+		{
+			ptr++;
+		}
+	}
+
+	return (ptr - str);
+}
+
 template <typename T>
 void Set(TunkioHandle* handle, void(Tunkio::IWorkload::*setter)(T), T value)
 {
@@ -84,7 +99,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 			return true;
 
 		case TunkioFillType::CharacterFill:
-			if (!optional || strlen(optional) != 1)
+			if (Length(optional) != 1)
 			{
 				return false;
 			}
@@ -93,7 +108,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 			return true;
 
 		case TunkioFillType::SentenceFill:
-			if (!optional || !strlen(optional))
+			if (Length(optional) < 1)
 			{
 				return false;
 			}
@@ -102,7 +117,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 			return true;
 
 		case TunkioFillType::FileFill:
-			if (!optional || !strlen(optional))
+			if (Length(optional) < 1)
 			{
 				return false;
 			}
