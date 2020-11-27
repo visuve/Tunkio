@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	m_model = new WipePassModel(this);
 	ui->tableViewWipePasses->setModel(m_model);
-	ui->tableViewWipePasses->setItemDelegateForColumn(7, new ProgressBarDelegate(this));
+	ui->tableViewWipePasses->setItemDelegateForColumn(8, new ProgressBarDelegate(this));
 
 	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
 	connect(ui->pushButtonRemovePass, &QPushButton::clicked, this, &MainWindow::removePass);

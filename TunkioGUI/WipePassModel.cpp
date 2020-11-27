@@ -1,6 +1,11 @@
 #include "TunkioGUI-PCH.hpp"
 #include "WipePassModel.hpp"
 
+namespace
+{
+	QLocale g_locale;
+}
+
 QString Ui::fillTypeToString(TunkioFillType type)
 {
 	switch (type)
@@ -33,7 +38,21 @@ QVariant speedToString(const WipePassModel::Pass& pass)
 	}
 
 	int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-	return QLocale().formattedDataSize(bytesPerSecond).append("/s");
+	return g_locale.formattedDataSize(bytesPerSecond).append("/s");
+}
+
+QVariant timeTaken(const WipePassModel::Pass& pass)
+{
+	int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
+
+	if (milliSecondsTaken <= 0)
+	{
+		return QVariant();
+	}
+
+	QTime timeLeft(0, 0, 0);
+	timeLeft = timeLeft.addMSecs(milliSecondsTaken);
+	return timeLeft.toString(Qt::ISODate);
 }
 
 QVariant timeLeft(const WipePassModel::Pass& pass)
@@ -86,7 +105,7 @@ int WipePassModel::rowCount(const QModelIndex& /*parent*/) const
 
 int WipePassModel::columnCount(const QModelIndex&) const
 {
-	return 8;
+	return 9;
 }
 
 QVariant WipePassModel::data(const QModelIndex& index, int role) const
@@ -112,7 +131,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return QLocale().formattedDataSize(pass.bytesWritten);
+				return g_locale.formattedDataSize(pass.bytesWritten);
 			}
 			case 4:
 			{
@@ -121,7 +140,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return QLocale().formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
+				return g_locale.formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
 			}
 			case 5:
 			{
@@ -130,7 +149,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return speedToString(pass);
+				return timeTaken(pass);
 			}
 			case 6:
 			{
@@ -142,6 +161,15 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 				return timeLeft(pass);
 			}
 			case 7:
+			{
+				if (!pass.start.isValid())
+				{
+					break;
+				}
+
+				return speedToString(pass);
+			}
+			case 8:
 			{
 				if (!pass.start.isValid())
 				{
@@ -201,14 +229,16 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 				case 2:
 					return "Verify";
 				case 3:
-					return "Written";
+					return "Bytes Written";
 				case 4:
-					return "Left";
+					return "Bytes Left";
 				case 5:
-					return "Speed";
+					return "Time Taken";
 				case 6:
 					return "Time Left";
 				case 7:
+					return "Speed";
+				case 8:
 					return "Progress";
 			}
 
@@ -310,6 +340,6 @@ void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
 void WipePassModel::updateRow(int row)
 {
 	const QModelIndex topLeft = index(row, 3);
-	const QModelIndex bottomRight = index(row, 7);
+	const QModelIndex bottomRight = index(row, 8);
 	emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole });
 }
