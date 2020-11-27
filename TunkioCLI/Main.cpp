@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (!g_cli.Initialize(
-		Arguments.at("path").Value<std::string>(),
+		Arguments.at("path").Value<std::filesystem::path>(),
 		Arguments.at("target").Value<TunkioTargetType>(),
 		Arguments.at("mode").Value<TunkioFillType>(),
 		Arguments.at("filler").Value<std::string>(),
