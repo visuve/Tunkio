@@ -22,14 +22,14 @@ namespace Tunkio
 				return;
 			}
 
-			if (!file.Size().first)
+			if (!file.AllocationSize().first)
 			{
 				m_size.first = false;
 				return;
 			}
 
 			m_files.second.emplace_back(file);
-			m_size.second += file.Size().second;
+			m_size.second += file.AllocationSize().second;
 		}
 
 		m_files.first = true;

@@ -47,11 +47,13 @@ namespace Tunkio
 
 			for (File& file : files.second)
 			{
-				uint64_t bytesLeft = file.Size().second;
+				uint64_t bytesLeft = file.AllocationSize().second;
 
 				while (bytesLeft)
 				{
-					const auto result = file.Write(filler->Data(), filler->Size(bytesLeft));
+					const uint64_t size = std::min(bytesLeft, file.OptimalWriteSize().second);
+					const void* data = filler->Data(size);
+					const auto result = file.Write(data, size);
 
 					bytesWritten += result.second;
 					bytesLeft -= std::min(result.second, bytesLeft);

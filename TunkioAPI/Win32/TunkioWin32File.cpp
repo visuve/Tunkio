@@ -22,11 +22,6 @@ namespace Tunkio
 			nullptr);
 	}
 
-	constexpr bool IsValidHandle(const HANDLE handle)
-	{
-		return handle != nullptr && handle != INVALID_HANDLE_VALUE;
-	}
-
 	uint64_t Bytes(const DISK_GEOMETRY& diskGeo)
 	{
 		assert(diskGeo.Cylinders.QuadPart);
@@ -40,13 +35,51 @@ namespace Tunkio
 			diskGeo.BytesPerSector;
 	}
 
-	std::pair<bool, uint64_t> DiskSize(const HANDLE handle)
+	std::pair<bool, uint64_t> OptimalWriteSizeByHandle(const HANDLE handle)
 	{
-		if (!IsValidHandle(handle))
+		FILE_STORAGE_INFO storageInfo = {};
+
+		if (!GetFileInformationByHandleEx(
+			handle,
+			FILE_INFO_BY_HANDLE_CLASS::FileStorageInfo,
+			&storageInfo,
+			sizeof(FILE_STORAGE_INFO)))
 		{
 			return { false, 0 };
 		}
 
+		uint64_t performanceSize = storageInfo.PhysicalBytesPerSectorForPerformance;
+
+		if (performanceSize % 512 != 0)
+		{
+			return { false, performanceSize };
+		}
+
+		// This formula is somewhat ripped from my arse. It's loosely based on my guess about this old article:
+		// https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc938632(v=technet.10)
+		// I bet that with modern NVME drives, 64KB still creates overhead.
+		return { true, (performanceSize / 512) * 0x10000 };
+	}
+
+	std::pair<bool, uint64_t> AllocationSizeByHandle(const HANDLE handle)
+	{
+		FILE_STANDARD_INFO standardInfo = {};
+
+		if (!GetFileInformationByHandleEx(
+			handle,
+			FILE_INFO_BY_HANDLE_CLASS::FileStandardInfo,
+			&standardInfo,
+			sizeof(FILE_STANDARD_INFO)))
+		{
+			return { false, 0 };
+		}
+
+		return { true, standardInfo.AllocationSize.QuadPart };
+
+	}
+
+	std::pair<bool, uint64_t> DiskSizeByHandle(const HANDLE handle)
+	{
 		DWORD bytesReturned = 0;
 		DISK_GEOMETRY diskGeo = { };
 		constexpr uint32_t DiskGeoSize = sizeof(DISK_GEOMETRY);
@@ -78,37 +111,53 @@ namespace Tunkio
 			return;
 		}
 
-		BY_HANDLE_FILE_INFORMATION info = {};
+		BY_HANDLE_FILE_INFORMATION fileInfo = {};
 
-		if (!GetFileInformationByHandle(m_handle, &info))
+		if (!GetFileInformationByHandle(m_handle, &fileInfo))
 		{
-			if (GetLastError() == ERROR_INVALID_FUNCTION && GetFileType(m_handle) == FILE_TYPE_DISK)
+			if (GetLastError() == ERROR_INVALID_FUNCTION &&
+				GetFileType(m_handle) == FILE_TYPE_DISK)
 			{
 				// This is just a guess, but I cannot come up a better way
-				info.dwFileAttributes = FILE_ATTRIBUTE_DEVICE;
+				fileInfo.dwFileAttributes = FILE_ATTRIBUTE_DEVICE;
 			}
 		}
 
-		if (info.dwFileAttributes & FILE_ATTRIBUTE_DEVICE)
+		if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DEVICE)
 		{
 			m_isDevice = true;
-			m_size = DiskSize(m_handle);
+			m_actualSize = DiskSizeByHandle(m_handle);
 		}
-		else if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ||
-			info.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE ||
-			info.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ||
-			info.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
+		else if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN ||
+			fileInfo.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE ||
+			fileInfo.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ||
+			fileInfo.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
 		{
-			m_size.first = true;
-			m_size.second = info.nFileSizeHigh;
-			m_size.second <<= 32;
-			m_size.second |= info.nFileSizeLow;
+			m_actualSize.first = true;
+			m_actualSize.second = fileInfo.nFileSizeHigh;
+			m_actualSize.second <<= 32;
+			m_actualSize.second |= fileInfo.nFileSizeLow;
+		}
+		else
+		{
+			return;
+		}
+
+		m_optimalWriteSize = OptimalWriteSizeByHandle(m_handle);
+		m_allocationSize = AllocationSizeByHandle(m_handle);
+
+		if (m_allocationSize.second % 512 != 0)
+		{
+			// Something is horribly wrong
+			m_actualSize.first = false;
+			m_allocationSize.first = false;
+			m_optimalWriteSize.first = false;
 		}
 	}
 
 	File::~File()
 	{
-		if (m_handle)
+		if (IsValid())
 		{
 			CloseHandle(m_handle);
 			m_handle = nullptr;
@@ -117,12 +166,40 @@ namespace Tunkio
 
 	bool File::IsValid() const
 	{
-		return IsValidHandle(m_handle);
+		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
 	}
 
-	std::pair<bool, uint64_t> File::Size() const
+	bool File::Unmount() const
 	{
-		return m_size;
+		if (!DeviceIoControl(
+			m_handle,
+			IOCTL_DISK_DELETE_DRIVE_LAYOUT,
+			nullptr,
+			0,
+			nullptr,
+			0,
+			nullptr,
+			nullptr))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	std::pair<bool, uint64_t> File::ActualSize() const
+	{
+		return m_actualSize;
+	}
+
+	std::pair<bool, uint64_t> File::AllocationSize() const
+	{
+		return m_allocationSize;
+	}
+
+	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	{
+		return m_optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <functional>
 #include <chrono>
+#include <cuchar>
 #include <iomanip>
 #include <queue>
 #include <random>

@@ -9,9 +9,9 @@ public:
 	TunkioRunner(QString path, TunkioTargetType type, QObject* parent = nullptr);
 	~TunkioRunner();
 
+public slots:
 	bool addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
-
-	std::atomic<bool> keepRunning = true;
+	void stop();
 
 signals:
 	void wipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
@@ -22,6 +22,7 @@ signals:
 	void errorOccurred(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
+	std::atomic<bool> m_keepRunning;
 	void attachCallbacks();
 	void run() override;
 	QString m_path;

@@ -255,6 +255,8 @@ void MainWindow::startWipe()
 	connect(m_tunkio.get(), &TunkioRunner::wipeCompleted, this, &MainWindow::onWipeCompleted);
 	connect(m_tunkio.get(), &TunkioRunner::errorOccurred, this, &MainWindow::onError);
 
+	connect(ui->pushButtonCancel, &QPushButton::clicked, m_tunkio.get(), &TunkioRunner::stop);
+
 	m_tunkio->start();
 }
 

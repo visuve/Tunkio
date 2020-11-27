@@ -288,8 +288,6 @@ void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 	m_passes[row].bytesWritten = bytesWritten;
 	m_passes[row].time = QTime::currentTime();
 	updateRow(row);
-
-	qDebug() << "Progress:" << pass << '/' << bytesWritten << "row:" << row;
 }
 
 void WipePassModel::onPassFinished(uint16_t pass)
@@ -307,8 +305,6 @@ void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
 {
 	Q_ASSERT(pass <= m_passes.size());
 	qDebug() << "Wipe finished:" << pass << '/' << totalBytesWritten;
-
-	// TODO: show stats!
 }
 
 void WipePassModel::updateRow(int row)

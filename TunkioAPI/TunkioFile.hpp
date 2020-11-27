@@ -11,12 +11,17 @@ namespace Tunkio
 		~File();
 
 		bool IsValid() const;
-		std::pair<bool, uint64_t> Size() const;
+		bool Unmount() const;
+		std::pair<bool, uint64_t> ActualSize() const;
+		std::pair<bool, uint64_t> AllocationSize() const;
+		std::pair<bool, uint64_t> OptimalWriteSize() const;
 		std::pair<bool, uint64_t> Write(const void* data, const uint64_t size) const;
 		bool Remove();
 
 	private:
-		std::pair<bool, uint64_t> m_size;
+		std::pair<bool, uint64_t> m_actualSize;
+		std::pair<bool, uint64_t> m_allocationSize;
+		std::pair<bool, uint64_t> m_optimalWriteSize;
 
 		bool m_isDevice = false;
 

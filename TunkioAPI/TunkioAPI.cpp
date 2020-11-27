@@ -55,14 +55,16 @@ TunkioHandle* TUNKIO_CALLING_CONVENTION TunkioInitialize(
 		return nullptr;
 	}
 
-	// TODO: here we need to check the physical sector size to find the optimal buffer size
-
 	switch (type)
 	{
 		case TunkioTargetType::FileWipe:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::FileWipe(path, removeAfterWipe, context));
+			return reinterpret_cast<TunkioHandle*>(
+				new Tunkio::FileWipe(path, removeAfterWipe, context));
+
 		case TunkioTargetType::DirectoryWipe:
-			return reinterpret_cast<TunkioHandle*>(new Tunkio::DirectoryWipe(path, removeAfterWipe, context));
+			return reinterpret_cast<TunkioHandle*>(
+				new Tunkio::DirectoryWipe(path, removeAfterWipe, context));
+
 		case TunkioTargetType::DriveWipe:
 			if (!removeAfterWipe)
 			{
@@ -86,16 +88,14 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 		return false;
 	}
 
-	auto chunkSize = instance->ChunkSize();
-
 	switch (round)
 	{
 		case TunkioFillType::ZeroFill:
-			instance->AddFiller(new Tunkio::CharFiller(chunkSize, 0x00, verify));
+			instance->AddFiller(new Tunkio::CharFiller(0x00, verify));
 			return true;
 
 		case TunkioFillType::OneFill:
-			instance->AddFiller(new Tunkio::CharFiller(chunkSize, 0xFF, verify));
+			instance->AddFiller(new Tunkio::CharFiller(0xFF, verify));
 			return true;
 
 		case TunkioFillType::CharacterFill:
@@ -104,7 +104,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::CharFiller(chunkSize, optional[0], verify));
+			instance->AddFiller(new Tunkio::CharFiller(optional[0], verify));
 			return true;
 
 		case TunkioFillType::SentenceFill:
@@ -113,7 +113,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::SentenceFiller(chunkSize, optional, verify));
+			instance->AddFiller(new Tunkio::SentenceFiller(optional, verify));
 			return true;
 
 		case TunkioFillType::FileFill:
@@ -122,7 +122,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 			{
-				auto fileFiller = std::make_shared<Tunkio::FileFiller>(chunkSize, optional, verify);
+				auto fileFiller = std::make_shared<Tunkio::FileFiller>(optional, verify);
 
 				if (fileFiller->HasContent())
 				{
@@ -133,7 +133,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 			return false;
 
 		case TunkioFillType::RandomFill:
-			instance->AddFiller(new Tunkio::RandomFiller(chunkSize, verify));
+			instance->AddFiller(new Tunkio::RandomFiller(verify));
 			return true;
 
 	}

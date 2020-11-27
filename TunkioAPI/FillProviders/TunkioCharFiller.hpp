@@ -7,17 +7,13 @@ namespace Tunkio
 	class CharFiller : public IFillProvider
 	{
 	public:
-		explicit CharFiller(
-			DataUnit::Bytes bytes,
-			uint8_t byte,
-			bool verify);
-
+		explicit CharFiller(char8_t byte, bool verify);
 		virtual ~CharFiller();
 
-		const void* Data() override;
+		const void* Data(uint64_t bytes) override;
 
 	protected:
-		uint8_t m_fillChar;
-		std::vector<uint8_t> m_fillData;
+		char8_t m_fillChar;
+		std::vector<char8_t> m_fillData;
 	};
 }

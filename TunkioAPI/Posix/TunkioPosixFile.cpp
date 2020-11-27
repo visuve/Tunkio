@@ -12,16 +12,11 @@ namespace Tunkio
 	// https://linux.die.net/man/2/open
 	constexpr uint32_t OpenFlags = O_RDWR | O_DIRECT | O_SYNC;
 
-	std::pair<bool, uint64_t> DiskSize(const int fileDescriptor)
+	std::pair<bool, uint64_t> DiskSizeByDescriptor(const int descriptor)
 	{
-		if (!fileDescriptor)
-		{
-			return { false, 0 };
-		}
-
 		uint64_t size = 0;
 
-		if (ioctl(fileDescriptor, DiskSizeRequest, &size) != 0)
+		if (ioctl(descriptor, DiskSizeRequest, &size) != 0)
 		{
 			return { false, size };
 		}
@@ -54,11 +49,24 @@ namespace Tunkio
 		if ((buffer.st_mode & S_IFMT) == S_IFBLK)
 		{
 			m_isDevice = true;
-			m_size = DiskSize(m_fileDescriptor);
+			m_actualSize = DiskSizeByDescriptor(m_fileDescriptor);
 		}
 		else
 		{
-			m_size = { true, buffer.st_size };
+			m_actualSize = { true, buffer.st_size };
+		}
+
+		m_allocationSize = { true, buffer.st_blocks * 512 };
+
+		// See notes in TunkioWin32File.cpp
+		m_optimalWriteSize = { buffer.st_blksize % 512 != 0, (buffer.st_blksize / 512) * 0x10000 };
+
+		if (m_allocationSize.second % 512 != 0)
+		{
+			// Something is horribly wrong
+			m_actualSize.first = false;
+			m_allocationSize.first = false;
+			m_optimalWriteSize.first = false;
 		}
 	}
 
@@ -74,6 +82,12 @@ namespace Tunkio
 	bool File::IsValid() const
 	{
 		return m_fileDescriptor > 0;
+	}
+
+	bool File::Unmount() const
+	{
+		// TODO!
+		return true;
 	}
 
 	std::pair<bool, uint64_t> File::Size() const

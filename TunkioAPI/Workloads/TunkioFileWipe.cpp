@@ -23,7 +23,7 @@ namespace Tunkio
 			return false;
 		}
 
-		if (!file.Size().first)
+		if (!file.AllocationSize().first)
 		{
 			OnError(TunkioStage::Size, 0, 0, LastError);
 			return false;
@@ -32,23 +32,25 @@ namespace Tunkio
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), file.Size().second);
+		OnWipeStarted(FillerCount(), file.AllocationSize().second);
 
 		while (HasFillers())
 		{
 			OnPassStarted(++passes);
 
 			uint64_t bytesWritten = 0;
-			uint64_t bytesLeft = file.Size().second;
+			uint64_t bytesLeft = file.AllocationSize().second;
 
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
 			while (bytesLeft)
 			{
-				const auto result = file.Write(filler->Data(), filler->Size(bytesLeft));
+				const uint64_t size = std::min(bytesLeft, file.OptimalWriteSize().second);
+				const void* data = filler->Data(size);
+				const auto result = file.Write(data, size);
 
 				bytesWritten += result.second;
-				bytesLeft -= std::min(result.second, bytesLeft);
+				bytesLeft -= result.second;
 
 				if (!result.first)
 				{

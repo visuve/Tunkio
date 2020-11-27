@@ -7,14 +7,10 @@ namespace Tunkio
 	class SentenceFiller : public IFillProvider
 	{
 	public:
-		explicit SentenceFiller(
-			DataUnit::Bytes bytes,
-			const std::string& fillString,
-			bool verify);
-
+		explicit SentenceFiller(const std::string& fillString, bool verify);
 		virtual ~SentenceFiller();
 
-		const void* Data() override;
+		const void* Data(uint64_t bytes) override;
 
 	protected:
 		std::string m_fillString;

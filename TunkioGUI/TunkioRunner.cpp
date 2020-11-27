@@ -13,7 +13,8 @@ TunkioRunner::TunkioRunner(QString path, TunkioTargetType type, QObject* parent)
 TunkioRunner::~TunkioRunner()
 {
 	qDebug() << "Destroying...";
-	keepRunning = false;
+
+	m_keepRunning = false;
 	wait();
 
 	if (m_tunkio)
@@ -56,6 +57,11 @@ bool TunkioRunner::addPass(TunkioFillType fillType, const QString &fillValue, bo
 	return false;
 }
 
+void TunkioRunner::stop()
+{
+	m_keepRunning = false;
+}
+
 void TunkioRunner::attachCallbacks()
 {
 	if (!m_tunkio)
@@ -69,7 +75,6 @@ void TunkioRunner::attachCallbacks()
 		uint16_t passes,
 		uint64_t bytesToWritePerPass)
 	{
-		qDebug() << "TunkioWipeStartedCallback: " << passes << '/' << bytesToWritePerPass;
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeStarted(passes, bytesToWritePerPass);
@@ -79,7 +84,6 @@ void TunkioRunner::attachCallbacks()
 		void* context,
 		uint16_t pass)
 	{
-		qDebug() << "TunkioPassStartedCallback: " << pass;
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passStarted(pass);
@@ -90,19 +94,16 @@ void TunkioRunner::attachCallbacks()
 		uint16_t pass,
 		uint64_t bytesWritten)
 	{
-		qDebug() << "TunkioProgressCallback: " << pass << '/' << bytesWritten;
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
-
 		emit self->passProgressed(pass, bytesWritten);
-		return self->keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
+		return self->m_keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
 	});
 
 	TunkioSetPassCompletedCallback(m_tunkio, [](
 		void* context,
 		uint16_t pass)
 	{
-		qDebug() << "TunkioPassCompletedCallback: " << pass;
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passFinished(pass);
@@ -113,7 +114,6 @@ void TunkioRunner::attachCallbacks()
 		uint16_t passes,
 		uint64_t totalBytesWritten)
 	{
-		qDebug() << "TunkioWipeCompletedCallback: " << passes << '/' << totalBytesWritten;
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->wipeCompleted(passes, totalBytesWritten);
@@ -126,9 +126,6 @@ void TunkioRunner::attachCallbacks()
 		uint64_t bytesWritten,
 		uint32_t errorCode)
 	{
-		qDebug() << "TunkioErrorCallback: "
-			<< stage << '/' << pass << '/' << bytesWritten << '/' << errorCode;
-
 		auto self = static_cast<TunkioRunner*>(context);
 		Q_ASSERT(self);
 		emit self->errorOccurred(stage, pass, bytesWritten, errorCode);
@@ -140,11 +137,13 @@ void TunkioRunner::run()
 	qDebug() << "Started!";
 	Q_ASSERT(m_tunkio);
 
+	m_keepRunning = true;
+
 	if (!TunkioRun(m_tunkio))
 	{
 		qDebug() << "Failed!";
 		return;
 	}
 
-	qDebug() << "Finished!";
+	qDebug() << (m_keepRunning ? "Finished!" : "Canceled.");
 }

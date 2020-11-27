@@ -3,8 +3,8 @@
 
 namespace Tunkio
 {
-	CharFiller::CharFiller(DataUnit::Bytes bytes, uint8_t byte, bool verify) :
-		IFillProvider(bytes, verify),
+	CharFiller::CharFiller(char8_t byte, bool verify) :
+		IFillProvider(verify),
 		m_fillChar(byte)
 	{
 	}
@@ -14,11 +14,11 @@ namespace Tunkio
 		m_fillData.clear();
 	}
 
-	const void* CharFiller::Data()
+	const void* CharFiller::Data(uint64_t bytes)
 	{
-		if (m_fillData.empty())
+		if (m_fillData.size() != bytes)
 		{
-			m_fillData.resize(m_size.Bytes(), m_fillChar);
+			m_fillData.resize(bytes, m_fillChar);
 		}
 
 		return m_fillData.data();

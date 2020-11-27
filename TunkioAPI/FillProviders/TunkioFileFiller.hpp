@@ -7,16 +7,15 @@ namespace Tunkio
 	class FileFiller : public IFillProvider
 	{
 	public:
-		explicit FileFiller(
-			DataUnit::Bytes bytes,
-			const std::filesystem::path& path,
-			bool verify);
+		explicit FileFiller(const std::vector<char8_t>& content, bool verify);
+		explicit FileFiller(const std::filesystem::path& path, bool verify);
+		~FileFiller();
 
 		bool HasContent();
-		const void* Data() override;
+		const void* Data(uint64_t bytes) override;
 
 	private:
-		std::vector<uint8_t> m_fileContent;
-		std::vector<uint8_t> m_fillData;
+		std::vector<char8_t> m_fileContent;
+		std::vector<char8_t> m_fillData;
 	};
 }

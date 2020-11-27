@@ -4,10 +4,9 @@
 namespace Tunkio
 {
 	SentenceFiller::SentenceFiller(
-		DataUnit::Bytes bytes,
 		const std::string& fillString,
 		bool verify) :
-		IFillProvider(bytes, verify),
+		IFillProvider(verify),
 		m_fillString(fillString)
 	{
 	}
@@ -16,13 +15,16 @@ namespace Tunkio
 	{
 	}
 
-	const void* SentenceFiller::Data()
+	const void* SentenceFiller::Data(uint64_t bytes)
 	{
-		if (m_fillData.empty())
+		if (m_fillData.size() != bytes)
 		{
-			while (m_fillData.size() < m_size.Bytes())
+			m_fillData.resize(bytes);
+
+			for (size_t i = 0; i < bytes; ++i)
 			{
-				m_fillData.append(m_fillString);
+				size_t mod = i % m_fillString.size();
+				m_fillData[i] = m_fillString[mod];
 			}
 		}
 

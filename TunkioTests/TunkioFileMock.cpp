@@ -25,7 +25,22 @@ namespace Tunkio
 		return true;
 	}
 
-	std::pair<bool, uint64_t> File::Size() const
+	bool File::Unmount() const
+	{
+		return true;
+	}
+
+	std::pair<bool, uint64_t> File::ActualSize() const
+	{
+		return { true, 1 };
+	}
+
+	std::pair<bool, uint64_t> File::AllocationSize() const
+	{
+		return { true, 1 };
+	}
+
+	std::pair<bool, uint64_t> File::OptimalWriteSize() const
 	{
 		return { true, 1 };
 	}

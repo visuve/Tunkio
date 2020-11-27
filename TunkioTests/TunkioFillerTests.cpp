@@ -4,72 +4,79 @@
 #include "FillProviders/TunkioCharFiller.hpp"
 #include "FillProviders/TunkioSentenceFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
+#include "FillProviders/TunkioFileFiller.hpp"
 
 namespace Tunkio::Fill
 {
-	constexpr Tunkio::DataUnit::Kibibytes Kibibyte(1);
-
-	class DummyFiller : public IFillProvider
+	TEST(TunkioFillTest, CharFiller)
 	{
-	public:
-		DummyFiller() :
-			IFillProvider(Kibibyte, false)
-		{
-		}
-
-		const void* Data() override
-		{
-			return nullptr;
-		}
-	};
-
-	TEST(TunkioFillTest, DummyFill)
-	{
-		EXPECT_EQ(DummyFiller().Size(1024), 1024);
-		EXPECT_EQ(DummyFiller().Size(1023), 1024);
-		EXPECT_EQ(DummyFiller().Size(512), 512);
-		EXPECT_EQ(DummyFiller().Size(511), 512);
-	}
-
-	TEST(TunkioFillTest, ZeroFiller)
-	{
-		CharFiller filler(Kibibyte, 0xAB, false);
-
-		auto data = reinterpret_cast<const uint8_t*>(filler.Data());
-
-		for (size_t i = 0; i < Kibibyte.Bytes(); ++i)
-		{
-			EXPECT_EQ(data[i], 0xAB);
-		}
+		CharFiller filler(u8'X', false);
+		auto data = filler.Data(3);
+		EXPECT_EQ(memcmp(data, u8"XXX", 3), 0);
 	}
 
 	TEST(TunkioFillTest, SentenceFiller)
 	{
-		SentenceFiller filler(13, "foobar\n", false);
-
-		auto data = reinterpret_cast<const char*>(filler.Data());
-		size_t iter = 0;
-
-		for (char c : "foobar\nfoobar\n")
 		{
-			EXPECT_EQ(c, data[iter++]);
+			SentenceFiller filler("foobar\n", false);
+			const void* data = filler.Data(3);
+			EXPECT_EQ(memcmp(data, "foo", 3), 0);
+		}
+		{
+			SentenceFiller filler("foobar\n", false);
+			const void* data = filler.Data(14);
+			EXPECT_EQ(memcmp(data, "foobar\nfoobar\n", 14), 0);
+		}
+		{
+			SentenceFiller filler("foobar\n", false);
+			const void* data = filler.Data(15);
+			EXPECT_EQ(memcmp(data, "foobar\nfoobar\nf", 15), 0);
 		}
 	}
 
-	TEST(TunkioFillTest, RandomFiller)
+	TEST(TunkioFillTest, FileFiller)
 	{
-		RandomFiller filler(Kibibyte, false);
-		auto data = filler.Data();
+		const char8_t* str = u8"foobar\n";
+		std::vector<char8_t> fileContent = { str, str + 7 };
+
+		{
+			FileFiller filler(fileContent, false);
+			const auto data = reinterpret_cast<const char8_t*>(filler.Data(3));
+			EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
+		}
+		{
+			FileFiller filler(fileContent, false);
+			const auto data = reinterpret_cast<const char8_t*>(filler.Data(14));
+			EXPECT_EQ(memcmp(data, u8"foobar\nfoobar\n", 14), 0);
+		}
+		{
+			FileFiller filler(fileContent, false);
+			const auto data = reinterpret_cast<const char8_t*>(filler.Data(15));
+			EXPECT_EQ(memcmp(data, u8"foobar\nfoobar\nf", 15), 0);
+		}
+	}
+
+	TEST(TunkioFillTest, RandomFillByte)
+	{
+		RandomFiller filler(false);
+		auto data = filler.Data(1);
 		EXPECT_NE(data, nullptr);
 	}
 
-	TEST(TunkioFillTest, RandomFillIllustrateProblem)
+	TEST(TunkioFillTest, RandomFillNotDivisibleByEight)
 	{
-		RandomFiller filler(DataUnit::Bytes(10), false);
+		RandomFiller filler(false);
 
-		auto data = reinterpret_cast<const uint8_t*>(filler.Data());
-		EXPECT_NE(data, nullptr);
-		EXPECT_EQ(data[8], 0); // Last two remain unrandomized, known issue ;<
-		EXPECT_EQ(data[9], 0);
+		auto data = reinterpret_cast<const char8_t*>(filler.Data(10));
+		std::vector<char8_t> data1 = { data, data + 10 };
+
+		data = reinterpret_cast<const char8_t*>(filler.Data(10));
+		std::vector<char8_t> data2 = { data, data + 10 };
+
+		EXPECT_NE(memcmp(data1.data(), data2.data(), 10), 0);
+
+		// This might hold true, as the data is not divisible by 8
+		//EXPECT_TRUE(data1[8] == data2[8]);
+		//EXPECT_TRUE(data1[9] == data2[9]);
 	}
 }
