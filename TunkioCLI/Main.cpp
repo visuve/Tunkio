@@ -1,7 +1,7 @@
 #include "TunkioCLI-PCH.hpp"
 #include "TunkioCLI.hpp"
 #include "TunkioErrorCodes.hpp"
-#include "TunkioArgs.hpp"
+#include "TunkioArguments.hpp"
 
 namespace Tunkio
 {
@@ -22,20 +22,33 @@ namespace Tunkio
 		std::cout << "  --path=/path/to/file_or_device (Required)" << std::endl;
 #endif
 		std::cout << "  --target=[f|d|D] where f=file, d=directory, D=drive " << std::endl;
-		std::cout << "  --mode=[0|1|r|c|s|f] where overwrite mode 0=fill with zeros, 1=fill with ones, r=random, c=character, s=sentence, f=filepath."
+
+		std::cout << "  --mode=[0|1|r|c|s|f] where "
+			<< "0=fill with zeros, 1=fill with ones, r=random, c=character, s=sentence, f=filepath."
 			<< " Note: with option 'c', 's' or 'f' you need to provide filler argument." << std::endl;
-		std::cout << "  --remove=[y|n] remove on exit y=yes, n=no. Applies only to file or directory. Default=no" << std::endl;
-		std::cout << "  --filler=[character|string|filepath] required when --mode is c, s or f." << std::endl;
+
+		std::cout << "  --remove=[y|n] remove after wipe "
+			<< "y=yes, n=no. Applies only to file or directory. Default=no" << std::endl;
+
+		std::cout << "  --filler=[character|string|filepath] "
+			<< "required when --mode is c, s or f." << std::endl;
+
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32)
-		std::cout << "  " << exe << R"( --path="C:\\Users\\You\\SecretFile.txt" --target=f --mode=r)" << std::endl;
-		std::cout << "  " << exe << R"( --path="C:\\Users\\You\\SecretDirectory" --target=d --mode=r)" << std::endl;
-		std::cout << "  " << exe << R"( --path=\\.\PHYSICALDRIVE9 --target=D --mode=r)" << std::endl;
+		std::cout << "  " << exe.filename()
+			<< R"( --path="C:\\Users\\You\\SecretFile.txt" --target=f --mode=r)" << std::endl;
+		std::cout << "  " << exe.filename()
+			<< R"( --path="C:\\Users\\You\\SecretDirectory" --target=d --mode=r)" << std::endl;
+		std::cout << "  " << exe.filename()
+			<< R"( --path=\\.\PHYSICALDRIVE9 --target=D --mode=r)" << std::endl;
 #else
-		std::cout << "  " << exe << " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
-		std::cout << "  " << exe << " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
-		std::cout << "  " << exe << " --path=/dev/sdx --target= --target=D --mode=r" << std::endl;
+		std::cout << "  " << exe.filename()
+			<< " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
+		std::cout << "  " << exe.filename()
+			<< " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
+		std::cout << "  " << exe.filename()
+			<< " --path=/dev/sdx --target= --target=D --mode=r" << std::endl;
 #endif
 		std::cout << std::endl;
 
@@ -93,14 +106,14 @@ namespace Tunkio
 		return prompt == 'y' || prompt == 'Y';
 	}
 
-	std::map<std::string, Args::Argument> Arguments =
+	std::map<std::string, Argument> Arguments =
 	{
-		{ "path", Args::Argument(true, std::string()) },
-		{ "target", Args::Argument(false, TunkioTargetType::FileWipe) },
-		{ "mode", Args::Argument(false, TunkioFillType::ZeroFill) },
-		{ "filler", Args::Argument(false, std::string()) },
-		{ "verify", Args::Argument(false, false) },
-		{ "remove", Args::Argument(false, false) }
+		{ "path", Argument(true, std::filesystem::path()) },
+		{ "target", Argument(false, TunkioTargetType::FileWipe) },
+		{ "mode", Argument(false, TunkioFillType::ZeroFill) },
+		{ "filler", Argument(false, std::string()) },
+		{ "verify", Argument(false, false) },
+		{ "remove", Argument(false, false) }
 	};
 
 	bool CheckArguments()
@@ -161,7 +174,7 @@ int main(int argc, char* argv[])
 		return ErrorCode::InvalidArgument;
 	}
 
-	if (std::signal(SIGINT, Tunkio::SignalHandler) == SIG_ERR)
+	if (std::signal(SIGINT, SignalHandler) == SIG_ERR)
 	{
 		std::cerr << "Cannot attach CTRL+C interrupt handler!" << std::endl;
 		return ErrorCode::Generic;
@@ -171,7 +184,7 @@ int main(int argc, char* argv[])
 	{
 		const std::vector<std::string> args({ argv + 1, argv + argc });
 
-		if (!Args::ParseVector(Arguments, args))
+		if (!ParseVector(Arguments, args))
 		{
 			std::cerr << "Invalid arguments!" << std::endl << std::endl;
 			PrintUsage(argv[0]);

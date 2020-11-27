@@ -5,13 +5,14 @@
 #include <typeindex>
 #include <variant>
 
-namespace Tunkio::Args
+namespace Tunkio
 {
 	class Argument
 	{
 	public:
 		using Variant = std::variant<
 			std::string,
+			std::filesystem::path,
 			TunkioTargetType,
 			TunkioFillType,
 			bool>;
@@ -24,7 +25,7 @@ namespace Tunkio::Args
 		{
 		}
 
-		bool Parse(const std::string& value);
+		bool Parse(std::string_view value);
 
 		template <class T>
 		const T& Value() const

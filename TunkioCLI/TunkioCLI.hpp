@@ -12,7 +12,7 @@ namespace Tunkio
 		~CLI();
 
 		bool Initialize(
-			const std::string& path,
+			const std::filesystem::path& path,
 			TunkioTargetType targetType,
 			TunkioFillType fillType,
 			const std::string& filler,

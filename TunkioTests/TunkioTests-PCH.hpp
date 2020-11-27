@@ -17,5 +17,5 @@
 #include "../TunkioAPI/TunkioAPI.h"
 #include "../TunkioLIB/TunkioDataUnits.hpp"
 #include "../TunkioLIB/TunkioTime.hpp"
-#include "../TunkioCLI/TunkioArgs.hpp"
+#include "../TunkioCLI/TunkioArguments.hpp"
 

@@ -6,7 +6,7 @@ file(GLOB TunkioTestsSource
 	"../TunkioAPI/FillProviders/*.cpp"
 	"../TunkioAPI/Workloads/*.cpp"
 	"../TunkioLIB/*.cpp"
-	"../TunkioCLI/TunkioArgs.cpp")
+	"../TunkioCLI/TunkioArguments.cpp")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	add_executable("TunkioTests" ${TunkioTestsSource})

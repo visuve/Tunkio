@@ -14,14 +14,14 @@ namespace Tunkio
 	}
 
 	bool CLI::Initialize(
-		const std::string& path,
+		const std::filesystem::path& path,
 		TunkioTargetType targetType,
 		TunkioFillType fillType,
 		const std::string& filler,
 		bool verify,
 		bool remove)
 	{
-		m_handle = TunkioInitialize(path.c_str(), targetType, remove, this);
+		m_handle = TunkioInitialize(path.string().c_str(), targetType, remove, this);
 
 		if (!m_handle)
 		{

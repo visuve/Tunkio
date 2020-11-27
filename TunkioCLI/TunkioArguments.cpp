@@ -1,18 +1,24 @@
 #include "TunkioCLI-PCH.hpp"
-#include "TunkioArgs.hpp"
+#include "TunkioArguments.hpp"
 
-namespace Tunkio::Args
+namespace Tunkio
 {
-	bool Argument::Parse(const std::string& value)
+	bool Argument::Parse(std::string_view value)
 	{
 		if (value.empty())
 		{
 			return false;
 		}
 
+		if (Type == typeid(std::filesystem::path))
+		{
+			m_value = std::filesystem::path(value);
+			return true;
+		}
+
 		if (Type == typeid(std::string))
 		{
-			m_value = value;
+			m_value = std::string(value);
 			return true;
 		}
 
@@ -131,24 +137,23 @@ namespace Tunkio::Args
 		return false;
 	}
 
-	bool ParseVector(std::map<std::string, Argument>& arguments, const std::vector<std::string>& rawArguments)
+	bool ParseVector(
+		std::map<std::string, Argument>& arguments,
+		const std::vector<std::string>& rawArguments)
 	{
 		for (auto& kvp : arguments)
 		{
 			const std::string argumentKey = "--" + kvp.first + '=';
-			const std::regex argumentRegex(argumentKey + "(.+)");
 			bool found = false;
 
-			for (const std::string& rawArgument : rawArguments)
+			for (std::string_view rawArgument : rawArguments)
 			{
-				std::smatch matches;
-
-				if (!std::regex_match(rawArgument, matches, argumentRegex))
+				if (!rawArgument.starts_with(argumentKey))
 				{
 					continue;
 				}
 
-				const std::string rawArgumentValue = matches.str(1);
+				std::string_view rawArgumentValue = rawArgument.substr(argumentKey.size());
 
 				if (!kvp.second.Parse(rawArgumentValue))
 				{

@@ -1,74 +1,130 @@
 #include "TunkioTests-PCH.hpp"
 
-namespace Tunkio::Args
+namespace Tunkio
 {
-	std::map<std::string, Argument> Arguments =
+	class TunkioArgsTest : public ::testing::Test
 	{
-		{ "path", Argument(true, std::string()) },
-		{ "target", Argument(false, TunkioTargetType::FileWipe) },
-		{ "mode", Argument(false, TunkioFillType::ZeroFill) },
-		{ "remove", Argument(false, false) },
+	public:
+		std::map<std::string, Argument> Arguments;
+
+		virtual void SetUp() override
+		{
+			Arguments =
+			{
+				{ "path", Argument(true, std::filesystem::path()) },
+				{ "target", Argument(true, TunkioTargetType::FileWipe) },
+				{ "mode", Argument(false, TunkioFillType::ZeroFill) },
+				{ "filler", Argument(false, std::string()) },
+				{ "verify", Argument(false, false) },
+				{ "remove", Argument(false, false) }
+			};
+		}
 	};
 
-	TEST(TunkioArgsTest, ParseRequiredSuccess)
+	TEST_F(TunkioArgsTest, ParseRequiredSuccess)
 	{
-		EXPECT_TRUE(ParseVector(Arguments, { "--path=xyz" }));
-		EXPECT_TRUE(ParseVector(Arguments, { "--path=x" }));
+		EXPECT_TRUE(ParseVector(Arguments, { "--path=xyz", "--target=d" }));
 
-		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
+		EXPECT_EQ(
+			Arguments.at("path").Value<std::filesystem::path>(),
+			std::filesystem::path("xyz"));
+
+		EXPECT_EQ(
+			Arguments.at("target").Value<TunkioTargetType>(),
+			TunkioTargetType::DirectoryWipe);
 	}
 
-	TEST(TunkioArgsTest, ParseRequiredFailure)
+	TEST_F(TunkioArgsTest, ParseRequiredFailure)
 	{
 		EXPECT_FALSE(ParseVector(Arguments, { "--path=" }));
 		EXPECT_FALSE(ParseVector(Arguments, { "--path" }));
+		EXPECT_FALSE(ParseVector(Arguments, { "--target" }));
+		EXPECT_FALSE(ParseVector(Arguments, { "--target=" }));
+		EXPECT_FALSE(ParseVector(Arguments, { "--path=x", "--target" }));
+		EXPECT_FALSE(ParseVector(Arguments, { "--path=x", "--target=" }));
+		EXPECT_FALSE(ParseVector(Arguments, { "--path=x", "--target=x" }));
 	}
 
-	TEST(TunkioArgsTest, ParseOptionalSuccess)
+	TEST_F(TunkioArgsTest, ParseOptionalSuccess)
 	{
-		EXPECT_TRUE(ParseVector(Arguments, { "--path=xyz", "--target=d", "--mode=0" }));
-		EXPECT_TRUE(ParseVector(Arguments, { "--path=x", "--target=D", "--mode=1" }));
-		EXPECT_TRUE(ParseVector(Arguments, { "--path=x", "--target=D", "--mode=1", "--remove=y" }));
+		EXPECT_TRUE(ParseVector(Arguments,
+		{
+			"--path=xyz",
+			"--target=d",
+			"--mode=1",
+			"--filler=foobar",
+			"--verify=y",
+			"--remove=y"
+		}));
 
-		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
-		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::DriveWipe);
+		EXPECT_EQ(
+			Arguments.at("path").Value<std::filesystem::path>(),
+			std::filesystem::path("xyz"));
+
+		EXPECT_EQ(
+			Arguments.at("target").Value<TunkioTargetType>(),
+			TunkioTargetType::DirectoryWipe);
+
 		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::OneFill);
+		EXPECT_STREQ(Arguments.at("filler").Value<std::string>().c_str(), "foobar");
+		EXPECT_EQ(Arguments.at("verify").Value<bool>(), true);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
 	}
 
-	TEST(TunkioArgsTest, ParseOptionalFailure)
+	TEST_F(TunkioArgsTest, ParseAbnormalOrderSuccess)
 	{
-		EXPECT_FALSE(ParseVector(Arguments, { "--path=xyz", "--target=x", "--mode=0" }));
-		EXPECT_FALSE(ParseVector(Arguments, { "--path=x", "--target=m", "--mode=z" }));
-		EXPECT_FALSE(ParseVector(Arguments, { "--path=xyz", "--target=m", "--mode=rofl" }));
+		EXPECT_TRUE(ParseVector(Arguments,
+		{
+			"--target=D",
+			"--mode=r",
+			"--remove=n",
+			"--filler=bar foo\nfoo bar",
+			"--verify=y",
+			"--path=zyx"
+		}));
+
+		EXPECT_EQ(
+			Arguments.at("path").Value<std::filesystem::path>(),
+			std::filesystem::path("zyx"));
+
+		EXPECT_EQ(
+			Arguments.at("target").Value<TunkioTargetType>(),
+			TunkioTargetType::DriveWipe);
+
+		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::RandomFill);
+		EXPECT_STREQ(Arguments.at("filler").Value<std::string>().c_str(), "bar foo\nfoo bar");
+		EXPECT_EQ(Arguments.at("verify").Value<bool>(), true);
+		EXPECT_EQ(Arguments.at("remove").Value<bool>(), false);
 	}
 
-	TEST(TunkioArgsTest, ParseAbnormalOrderSuccess)
+	TEST_F(TunkioArgsTest, ParseUtterNonsense)
 	{
-		EXPECT_TRUE(ParseVector(Arguments, { "--mode=0",  "--target=d", "--path=xyz" }));
-		EXPECT_TRUE(ParseVector(Arguments, { "--mode=1", "--path=x", "--target=D", }));
+		EXPECT_FALSE(ParseVector(Arguments,
+		{
+			"--target=barfoo",
+			"--mode=foobar",
+			"--remove=z",
+			"--filler=\0\0\0",
+			"--verify=",
+			"--path=\0"
+		}));
 
-		EXPECT_STREQ(Arguments.at("path").Value<std::string>().c_str(), "x");
-		EXPECT_EQ(Arguments.at("target").Value<TunkioTargetType>(), TunkioTargetType::DriveWipe);
-		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::OneFill);
-		EXPECT_EQ(Arguments.at("remove").Value<bool>(), true);
-	}
+		EXPECT_EQ(
+			Arguments.at("path").Value<std::filesystem::path>(),
+			std::filesystem::path());
 
-	TEST(TunkioArgsTest, ParseAbnormalOrderFailure)
-	{
-		EXPECT_FALSE(ParseVector(Arguments, { "--mode=0",  "--target=a", "--path=" }));
-		EXPECT_FALSE(ParseVector(Arguments, { "--mode=a", "--path=x", "--target=0", }));
-	}
+		EXPECT_EQ(
+			Arguments.at("target").Value<TunkioTargetType>(),
+			TunkioTargetType::FileWipe);
 
-	TEST(TunkioArgsTest, ParseUtterNonsense)
-	{
-		EXPECT_FALSE(ParseVector(Arguments, { "--path=\0", " ", "\0" }));
-		EXPECT_FALSE(ParseVector(Arguments, { "a", "b", "c" }));
-		EXPECT_FALSE(ParseVector(Arguments, { "a b c", "d e f" }));
+		EXPECT_EQ(Arguments.at("mode").Value<TunkioFillType>(), TunkioFillType::ZeroFill);
+		EXPECT_TRUE(Arguments.at("filler").Value<std::string>().empty());
+		EXPECT_EQ(Arguments.at("verify").Value<bool>(), false);
+		EXPECT_EQ(Arguments.at("remove").Value<bool>(), false);
 	}
 
 #ifndef __clang__
-	TEST(TunkioArgsTest, ParseUnsupportedTypes)
+	TEST_F(TunkioArgsTest, ParseUnsupportedTypes)
 	{
 		std::map<std::string, Argument> unsupported =
 		{
