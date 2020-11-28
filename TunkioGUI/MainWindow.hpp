@@ -2,6 +2,7 @@
 
 #include "WipePassModel.hpp"
 #include "TunkioRunner.hpp"
+#include "TextEditorDialog.hpp"
 
 namespace Ui
 {
@@ -29,7 +30,9 @@ private slots:
 	void onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten);
 
 private:
-	Ui::MainWindow* ui;
-	WipePassModel* m_model;
+	Ui::MainWindow* ui = nullptr;
+	WipePassModel* m_model = nullptr;
+	TextEditorDialog* m_textEditDialog = nullptr;
 	std::shared_ptr<TunkioRunner> m_tunkio;
+	QString m_sentence = "Please enter some text here.";
 };

@@ -2,7 +2,7 @@
 #include "TextEditorDialog.hpp"
 #include "ui_TextEditorDialog.h"
 
-TextEditorDialog::TextEditorDialog(QWidget *parent) :
+TextEditorDialog::TextEditorDialog(QLineEdit* parent) :
 	QDialog(parent),
 	ui(new Ui::TextEditorDialog)
 {
@@ -16,10 +16,24 @@ TextEditorDialog::~TextEditorDialog()
 
 bool TextEditorDialog::eventFilter(QObject* watched, QEvent* event)
 {
-	if (event->type() == QEvent::MouseButtonDblClick)
+	switch (event->type())
 	{
-		qDebug() << "HI!";
+		case QEvent::MouseButtonDblClick:
+			setText(dynamic_cast<QLineEdit*>(parent())->text());
+			this->show();
+			return true;
 	}
 
 	return QObject::eventFilter(watched, event);
+}
+
+QString TextEditorDialog::text()
+{
+	return ui->plainTextEdit->toPlainText();
+}
+
+void TextEditorDialog::setText(const QString& text)
+{
+	ui->plainTextEdit->clear();
+	ui->plainTextEdit->insertPlainText(text); // Moves the cursor in the end
 }

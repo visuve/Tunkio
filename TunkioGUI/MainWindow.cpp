@@ -2,7 +2,6 @@
 #include "MainWindow.hpp"
 #include "ProgressBarDelegate.hpp"
 #include "DriveSelectDialog.hpp"
-#include "TextEditorDialog.hpp"
 #include "ui_MainWindow.h"
 
 QString toString(TunkioStage type)
@@ -58,8 +57,6 @@ MainWindow::MainWindow(QWidget* parent) :
 		this,
 		&MainWindow::onFillTypeSelectionChanged);
 
-	ui->lineEditFillValue->installEventFilter(new TextEditorDialog());
-
 	m_model = new WipePassModel(this);
 	ui->tableViewWipePasses->setModel(m_model);
 	ui->tableViewWipePasses->setItemDelegateForColumn(8, new ProgressBarDelegate(this));
@@ -84,6 +81,19 @@ MainWindow::MainWindow(QWidget* parent) :
 	connect(m_model, &QAbstractItemModel::rowsInserted, enableStartButton);
 	connect(m_model, &QAbstractItemModel::rowsRemoved, enableStartButton);
 	// TODO: attach enableStartButton when m_tunkio is initialized
+
+	m_textEditDialog = new TextEditorDialog(ui->lineEditFillValue);
+
+	connect(ui->lineEditFillValue, &QLineEdit::textChanged, [&](const QString& text)
+	{
+		m_sentence = text;
+	});
+
+	connect(m_textEditDialog, &TextEditorDialog::accepted, [this]()
+	{
+		m_sentence = m_textEditDialog->text();
+		ui->lineEditFillValue->setText(m_sentence);
+	});
 }
 
 MainWindow::~MainWindow()
@@ -139,31 +149,37 @@ void MainWindow::onFillTypeSelectionChanged(int index)
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("0x00");
+			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 1:
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("0xff");
+			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 2:
 			ui->lineEditFillValue->setReadOnly(false);
-			ui->lineEditFillValue->setInputMask("\\0\\xHH");
-			ui->lineEditFillValue->setText("0x58");
+			ui->lineEditFillValue->setInputMask("X");
+			ui->lineEditFillValue->setText("T");
+			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 3:
 			ui->lineEditFillValue->setReadOnly(false);
 			ui->lineEditFillValue->setInputMask("");
-			ui->lineEditFillValue->setText("Please enter a sentence here.");
+			ui->lineEditFillValue->setText(m_sentence);
+			ui->lineEditFillValue->installEventFilter(m_textEditDialog);
 			return;
 		case 4:
 			ui->lineEditFillValue->setReadOnly(false);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("Please enter a path to a file here.");
+			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 5:
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("MT19937 PRNG.");
+			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 	}
 
