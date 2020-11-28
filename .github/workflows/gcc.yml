@@ -27,7 +27,7 @@ jobs:
         cd out
         export CC=/usr/bin/gcc
         export CXX=/usr/bin/g++
-        cmake ..
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
         make
 
     - name: Run unit tests

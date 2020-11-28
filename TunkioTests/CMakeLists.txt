@@ -2,6 +2,7 @@
 
 file(GLOB TunkioTestsSource
 	"*.cpp"
+	"TestListeners/*.cpp"
 	"../TunkioAPI/TunkioAPI.cpp"
 	"../TunkioAPI/FillProviders/*.cpp"
 	"../TunkioAPI/Workloads/*.cpp"
@@ -9,6 +10,8 @@ file(GLOB TunkioTestsSource
 	"../TunkioCLI/TunkioArguments.cpp")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+	list(APPEND TunkioTestsSource "TestListeners/Win32/TunkioWin32MemoryLeakListener.cpp")
+
 	add_executable("TunkioTests" ${TunkioTestsSource})
 	target_include_directories("TunkioTests" PRIVATE
 		"../TunkioAPI/" "../TunkioLIB/" "../TunkioCLI/" "../googletest/googletest/include/")

@@ -85,10 +85,14 @@ namespace Tunkio
 
 	TEST(TunkioAPITest, WipeSuccess)
 	{
-		for (TunkioTargetType type : {
+		constexpr TunkioTargetType Types[] =
+		{
 			TunkioTargetType::FileWipe,
 			TunkioTargetType::DirectoryWipe,
-			TunkioTargetType::DriveWipe })
+			TunkioTargetType::DriveWipe
+		};
+
+		for (TunkioTargetType type : Types)
 		{
 			Counters counters;
 			TunkioHandle* handle = TunkioInitialize("foobar", type, false, &counters);

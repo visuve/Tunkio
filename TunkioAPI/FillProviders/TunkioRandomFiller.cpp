@@ -23,8 +23,7 @@ namespace Tunkio
 	{
 		thread_local std::random_device device;
 		thread_local std::default_random_engine engine(device());
-		thread_local std::uniform_int_distribution<uint64_t>
-			distribution(0, std::numeric_limits<uint64_t>::max());
+		thread_local std::uniform_int_distribution<uint64_t> distribution;
 
 		if (m_fillData.size() != bytes)
 		{
