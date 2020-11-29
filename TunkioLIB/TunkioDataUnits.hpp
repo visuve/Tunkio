@@ -101,34 +101,34 @@ namespace Tunkio::DataUnit
 		std::stringstream os;
 		os << std::setprecision(3) << std::fixed;
 
-		if (unit.Bytes() >= 0x100000000000000)
+		const int exponent = static_cast<int>(std::log(unit.Bytes()) / std::log(1024));
+
+		switch (exponent)
 		{
-			os << Pebibytes(unit);
+			case 0:
+				os << Bytes(unit);
+				break;
+			case 1:
+				os << Kibibytes(unit);
+				break;
+			case 2:
+				os << Mebibytes(unit);
+				break;
+			case 3:
+				os << Gibibytes(unit);
+				break;
+			case 4:
+				os << Tebibytes(unit);
+				break;
+			case 5:
+				os << Pebibytes(unit);
+				break;
+			case 6:
+				os << Exbibytes(unit);
+				break;
 		}
-		else if (unit.Bytes() >= 0x4000000000000)
-		{
-			os << Pebibytes(unit);
-		}
-		else if (unit.Bytes() >= 0x10000000000)
-		{
-			os << Tebibytes(unit);
-		}
-		else if (unit.Bytes() >= 0x40000000)
-		{
-			os << Gibibytes(unit);
-		}
-		else if (unit.Bytes() >= 0x100000)
-		{
-			os << Mebibytes(unit);
-		}
-		else if (unit.Bytes() >= 0x400)
-		{
-			os << Kibibytes(unit);
-		}
-		else
-		{
-			os << Bytes(unit);
-		}
+
+		assert(exponent >= 0 && exponent <= 6);
 
 		return os.str();
 	}
@@ -146,38 +146,38 @@ namespace Tunkio::DataUnit
 
 		const double elapsedSeconds = double(millis) / 1000.0f;
 		const double bytesPerSecond = double(bytes) / elapsedSeconds;
+		const int exponent = static_cast<int>(std::log(bytesPerSecond) / std::log(1024));
+		const double rounded = bytesPerSecond / std::pow(1024, exponent);
 
 		std::stringstream os;
-		os << std::setprecision(3) << std::fixed;
+		os << std::setprecision(3) << std::fixed << rounded;
 
-		if (bytesPerSecond >= 0x100000000000000)
+		switch (exponent)
 		{
-			os << bytesPerSecond / 0x100000000000000 << " exbibytes/s";
+			case 0:
+				os << " bytes/s";
+				break;
+			case 1:
+				os << " kibibytes/s";
+				break;
+			case 2:
+				os << " mebibytes/s";
+				break;
+			case 3:
+				os << " gibibytes/s";
+				break;
+			case 4:
+				os << " tebibytes/s";
+				break;
+			case 5:
+				os << " pebibytes/s";
+				break;
+			case 6:
+				os << " exbibytes/s";
+				break;
 		}
-		else if (bytesPerSecond >= 0x4000000000000)
-		{
-			os << bytesPerSecond / 0x4000000000000 << " pebibytes/s";
-		}
-		else if (bytesPerSecond >= 0x10000000000)
-		{
-			os << bytesPerSecond / 0x10000000000 << " tebibytes/s";
-		}
-		else if (bytesPerSecond >= 0x40000000)
-		{
-			os << bytesPerSecond / 0x40000000 << " gibibytes/s";
-		}
-		else if (bytesPerSecond >= 0x100000)
-		{
-			os << bytesPerSecond / 0x100000 << " mebibytes/s";
-		}
-		else if (bytesPerSecond >= 0x400)
-		{
-			os << bytesPerSecond / 0x400 << " kibibytes/s";
-		}
-		else
-		{
-			os << bytesPerSecond << " bytes/s";
-		}
+
+		assert(exponent >= 0 && exponent <= 6);
 
 		return os.str();
 	}
@@ -194,15 +194,16 @@ namespace Tunkio::DataUnit
 		const DataUnitBase<Ratio>& bytesWritten,
 		const Time::MilliSeconds& elapsed)
 	{
-		const uint64_t bytesL = bytesLeft.Bytes();
+		const uint64_t left = bytesLeft.Bytes();
 
-		if (bytesL == 0)
+		if (left == 0)
 		{
 			return Time::Duration::None();
 		}
-		const uint64_t bytesW = bytesWritten.Bytes();
 
-		if (bytesW == 0)
+		const uint64_t written = bytesWritten.Bytes();
+
+		if (written == 0)
 		{
 			return Time::Duration::Infinite();
 		}
@@ -214,8 +215,8 @@ namespace Tunkio::DataUnit
 			return Time::Duration::None();
 		}
 
-		const double bytesPerMilliSecond = double(bytesW) / double(millis);
-		const double millisLeft = double(bytesL) / bytesPerMilliSecond;
+		const double bytesPerMilliSecond = double(written) / double(millis);
+		const double millisLeft = double(left) / bytesPerMilliSecond;
 
 		return Time::Duration(Tunkio::Time::MilliSeconds(uint64_t(millisLeft)));
 	}
