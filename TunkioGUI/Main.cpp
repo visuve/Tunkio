@@ -25,8 +25,8 @@ std::ostream& qtMessageTypeToStreamType(QtMsgType type)
 	switch (type)
 	{
 		case QtDebugMsg:
-		case QtInfoMsg:
 			return std::cout;
+		case QtInfoMsg:
 		case QtWarningMsg:
 			return std::clog;
 		case QtCriticalMsg:
@@ -39,7 +39,7 @@ std::ostream& qtMessageTypeToStreamType(QtMsgType type)
 
 void tunkioLogMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
 {
-	const QString time = QTime::currentTime().toString();
+	const QString time = QTime::currentTime().toString(Qt::DateFormat::ISODateWithMs);
 
 	if (context.function && !message.isEmpty())
 	{

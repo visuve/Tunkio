@@ -64,6 +64,11 @@ namespace Tunkio
 				}
 			}
 
+			if (!file.Flush())
+			{
+				OnError(TunkioStage::Write, passes, bytesWritten, LastError);
+			}
+
 			if (!file.Rewind())
 			{
 				OnError(TunkioStage::Rewind, passes, bytesWritten, LastError);

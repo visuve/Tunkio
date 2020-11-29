@@ -3,6 +3,9 @@
 
 namespace Ui
 {
+	const QTime ZeroTime(0, 0, 0, 0);
+	const QLocale SystemLocale = QLocale::system();
+
 	QString fillTypeToString(TunkioFillType type)
 	{
 		switch (type)
@@ -27,12 +30,12 @@ namespace Ui
 
 	QVariant bytesWritten(const WipePassModel::Pass& pass)
 	{
-		return QLocale::system().formattedDataSize(pass.bytesWritten);
+		return SystemLocale.formattedDataSize(pass.bytesWritten);
 	}
 
 	QVariant bytesLeft(const WipePassModel::Pass& pass)
 	{
-		return QLocale::system().formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
+		return SystemLocale.formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
 	}
 
 	QVariant speedToString(const WipePassModel::Pass& pass)
@@ -45,7 +48,7 @@ namespace Ui
 		}
 
 		int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-		return QLocale::system().formattedDataSize(bytesPerSecond).append("/s");
+		return SystemLocale.formattedDataSize(bytesPerSecond).append("/s");
 	}
 
 	QVariant timeTaken(const WipePassModel::Pass& pass)
@@ -57,9 +60,8 @@ namespace Ui
 			return QVariant();
 		}
 
-		QTime timeLeft(0, 0, 0);
-		timeLeft = timeLeft.addMSecs(milliSecondsTaken);
-		return timeLeft.toString(Qt::ISODate);
+		QTime timeLeft = ZeroTime.addMSecs(milliSecondsTaken);
+		return SystemLocale.toString(timeLeft, QLocale::LongFormat);
 	}
 
 	QVariant timeLeft(const WipePassModel::Pass& pass)
@@ -75,9 +77,8 @@ namespace Ui
 		int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
 		int64_t secondsLeft = bytesLeft / bytesPerSecond;
 
-		QTime timeLeft(0, 0, 0);
-		timeLeft = timeLeft.addSecs(secondsLeft);
-		return timeLeft.toString(Qt::ISODate);
+		QTime timeLeft = ZeroTime.addSecs(secondsLeft);
+		return SystemLocale.toString(timeLeft, QLocale::LongFormat);
 	}
 
 	float progressPercent(const WipePassModel::Pass& pass)
@@ -368,5 +369,4 @@ void WipePassModel::updateRow(uint16_t pass)
 	const QModelIndex topLeft = index(row, 3);
 	const QModelIndex bottomRight = index(row, 8);
 	emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole });
-	QApplication::processEvents();
 }

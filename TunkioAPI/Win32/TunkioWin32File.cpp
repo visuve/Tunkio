@@ -211,12 +211,12 @@ namespace Tunkio
 			return { false, bytesWritten };
 		}
 
-		if (m_isDevice)
-		{
-			return { true, bytesWritten };
-		}
+		return { true, bytesWritten };
+	}
 
-		return { FlushFileBuffers(m_handle), bytesWritten };
+	bool File::Flush()
+	{
+		return FlushFileBuffers(m_handle);
 	}
 
 	bool File::Rewind()

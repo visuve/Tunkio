@@ -114,12 +114,12 @@ namespace Tunkio
 			return { false, 0 };
 		}
 
-		if (m_isDevice)
-		{
-			return { true, static_cast<uint64_t>(result) };
-		}
+		return { true, static_cast<uint64_t>(result) };
+	}
 
-		return { fsync(m_fileDescriptor) == 0, static_cast<uint64_t>(result) };
+	bool File::Flush()
+	{
+		return fsync(m_fileDescriptor) == 0;
 	}
 
 	bool File::Rewind()

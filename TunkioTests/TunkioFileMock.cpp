@@ -53,6 +53,11 @@ namespace Tunkio
 		return { data, size };
 	}
 
+	bool File::Flush()
+	{
+		return true;
+	}
+
 	bool File::Rewind()
 	{
 		return true;
