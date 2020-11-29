@@ -21,6 +21,8 @@
 #include <QThread>
 #include <QTime>
 
+#include <array>
 #include <atomic>
 #include <iostream>
 #include <memory>
+#include <random>

@@ -22,7 +22,7 @@ namespace Tunkio
 	const void* RandomFiller::Data(uint64_t bytes)
 	{
 		thread_local std::random_device device;
-		thread_local std::default_random_engine engine(device());
+		thread_local std::mt19937_64 engine(device());
 		thread_local std::uniform_int_distribution<uint64_t> distribution;
 
 		if (m_fillData.size() != bytes)

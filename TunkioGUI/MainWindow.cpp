@@ -114,50 +114,67 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->actionPeter_Gutmann_s_Algorithm, &QAction::triggered, [this]()
 	{
-		m_model->clearPasses();
-		m_model->addPass(TunkioFillType::RandomFill, false);
-		m_model->addPass(TunkioFillType::RandomFill, false);
-		m_model->addPass(TunkioFillType::RandomFill, false);
-		m_model->addPass(TunkioFillType::RandomFill, false);
+		thread_local std::random_device device;
+		thread_local std::mt19937_64 engine(device());
 
-		// TODO: the order of these need to be randomized
+		do
 		{
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
+			m_model->clearPasses();
 
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x92\x49\x24");
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x49\x24\x92");
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x24\x92\x49");
+			std::array<std::pair<TunkioFillType, QByteArray>, 35> gutmannsRecipe =
+			{
+				std::make_pair(TunkioFillType::RandomFill, QByteArray()),
+				{ TunkioFillType::RandomFill, {} },
+				{ TunkioFillType::RandomFill, {} },
+				{ TunkioFillType::RandomFill, {} },
 
-			m_model->addPass(TunkioFillType::ZeroFill, false);
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x11");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x22");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x33");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x44");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x66");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x77");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x88");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\x99");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\xBB");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\xCC");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\xDD");
-			m_model->addPass(TunkioFillType::CharacterFill, false, "\xEE");
-			m_model->addPass(TunkioFillType::OneFill, false);
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x92\x49\x24");
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x49\x24\x92");
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x24\x92\x49");
+				{ TunkioFillType::CharacterFill, "\x55" },
+				{ TunkioFillType::CharacterFill, "\xAA" },
+				{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
+				{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
+				{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
+				{ TunkioFillType::ZeroFill, {} },
+				{ TunkioFillType::CharacterFill, "\x11" },
+				{ TunkioFillType::CharacterFill, "\x22" },
+				{ TunkioFillType::CharacterFill, "\x33" },
+				{ TunkioFillType::CharacterFill, "\x44" },
+				{ TunkioFillType::CharacterFill, "\x55" },
+				{ TunkioFillType::CharacterFill, "\x66" },
+				{ TunkioFillType::CharacterFill, "\x77" },
+				{ TunkioFillType::CharacterFill, "\x88" },
+				{ TunkioFillType::CharacterFill, "\x99" },
+				{ TunkioFillType::CharacterFill, "\xAA" },
+				{ TunkioFillType::CharacterFill, "\xBB" },
+				{ TunkioFillType::CharacterFill, "\xCC" },
+				{ TunkioFillType::CharacterFill, "\xDD" },
+				{ TunkioFillType::CharacterFill, "\xEE" },
+				{ TunkioFillType::OneFill, {} },
+				{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
+				{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
+				{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
+				{ TunkioFillType::SentenceFill, "\x6D\xB6\xDB" },
+				{ TunkioFillType::SentenceFill, "\xB6\xDB\x6D" },
+				{ TunkioFillType::SentenceFill, "\xDB\x6D\xB6" },
 
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\x6D\xB6\xDB");
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\xB6\xDB\x6D");
-			m_model->addPass(TunkioFillType::SentenceFill, false, "\xDB\x6D\xB6");
-		}
+				{ TunkioFillType::RandomFill, {} },
+				{ TunkioFillType::RandomFill, {} },
+				{ TunkioFillType::RandomFill, {} },
+				{ TunkioFillType::RandomFill, {} },
+			};
 
-		m_model->addPass(TunkioFillType::RandomFill, false);
-		m_model->addPass(TunkioFillType::RandomFill, false);
-		m_model->addPass(TunkioFillType::RandomFill, false);
-		m_model->addPass(TunkioFillType::RandomFill, false);
+			std::shuffle(gutmannsRecipe.begin() + 4, gutmannsRecipe.end() - 4, engine);
+
+			for (const auto& [type, value] : gutmannsRecipe)
+			{
+				m_model->addPass(type, false, value);
+			}
+
+		} while (QMessageBox::question(
+			this,
+			"Tunkio - Shuffle",
+			"Gutmann's method requires random order of some of the passes.\n"
+			"Click retry to shuffle, OK to accept.",
+			QMessageBox::Ok | QMessageBox::Retry) == QMessageBox::Retry);
 	});
 
 
