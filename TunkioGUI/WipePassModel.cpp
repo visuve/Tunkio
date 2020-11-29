@@ -33,6 +33,19 @@ namespace Ui
 		return "Unknown?";
 	}
 
+	QVariant fillValue(const WipePassModel::Pass& pass)
+	{
+		switch (pass.fillType)
+		{
+			case TunkioFillType::FileFill:
+				return QString(pass.fillValue);
+			case TunkioFillType::RandomFill:
+				return "Random";
+			default:
+				return pass.fillValue.toHex(' ');
+		}
+	}
+
 	QVariant bytesWritten(const WipePassModel::Pass& pass)
 	{
 		return SystemLocale.formattedDataSize(pass.bytesWritten);
@@ -135,7 +148,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 			case 0:
 				return Ui::fillTypeToString(pass.fillType);
 			case 1:
-				return pass.fillValue;
+				return Ui::fillValue(pass);
 			case 2:
 				return pass.verify ? "Yes" : "No";
 			case 3:
@@ -214,7 +227,7 @@ bool WipePassModel::setData(const QModelIndex& index, const QVariant& value, int
 				pass.fillType = static_cast<TunkioFillType>(value.toInt());
 				return true;
 			case 1:
-				pass.fillValue = value.toString();
+				pass.fillValue = value.toByteArray();
 				return true;
 			case 2:
 				pass.verify = value.toBool();
@@ -267,17 +280,46 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 	return QVariant();
 }
 
-void WipePassModel::addPass(TunkioFillType fillType, const QString& fillValue, bool verify)
+void WipePassModel::addPass(TunkioFillType fillType, bool verify, const QByteArray& fillValue)
 {
 	int row = static_cast<int>(m_passes.size());
 	beginInsertRows(QModelIndex(), row, row);
 
 	Pass pass = {};
 	pass.fillType = fillType;
-	pass.fillValue = fillValue;
+
+	switch (fillType)
+	{
+		case ZeroFill:
+		{
+			Q_ASSERT(fillValue.isEmpty());
+			pass.fillValue = QByteArray("\x00", 1);
+			break;
+		}
+		case OneFill:
+		{
+			Q_ASSERT(fillValue.isEmpty());
+			pass.fillValue = QByteArray("\xFF", 1);
+			break;
+		}
+		case CharacterFill:
+		{
+			Q_ASSERT(fillValue.size() == 1);
+			pass.fillValue = fillValue;
+			break;
+		}
+		case RandomFill:
+		{
+			Q_ASSERT(fillValue.isEmpty());
+			break;
+		}
+		default:
+			pass.fillValue = fillValue;
+			break;
+	}
+	
 	pass.verify = verify;
 	m_passes.append(pass);
-
 	endInsertRows();
 }
 

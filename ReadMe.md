@@ -37,12 +37,12 @@
 
 ## Developer TODO
 
-- The GUI is still somewhat flaky
+- The GUI is still somewhat flaky:
+	- The GUI is not always updated when onProgress is emitted
 	- The code needs cleaning up too
-- Add a clear button to GUI
+- Complement fill option
+	Complements the disk contents
 - Verifications
 	- Char-by-char for charfiller
 	- Sentence-by-sentece for file & sentence fillers
 	- SHA-256 for random
-- Preset "recipes", i.e:
-	- https://en.wikipedia.org/wiki/Data_erasure#Standards

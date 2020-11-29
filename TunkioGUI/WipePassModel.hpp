@@ -23,7 +23,7 @@ public:
 	struct Pass
 	{
 		TunkioFillType fillType;
-		QString fillValue;
+		QByteArray fillValue;
 		bool verify;
 		uint64_t bytesWritten;
 		uint64_t bytesToWrite;
@@ -37,7 +37,7 @@ public:
 	void clearPasses();
 
 public slots:
-	void addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
+	void addPass(TunkioFillType fillType, bool verify, const QByteArray& fillValue = {});
 	void removePass(int row);
 
 	void onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);

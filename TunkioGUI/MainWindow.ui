@@ -188,7 +188,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -208,7 +208,23 @@
     <addaction name="actionAbout"/>
     <addaction name="actionLicenses"/>
    </widget>
+   <widget class="QMenu" name="menuPresets">
+    <property name="title">
+     <string>Presets</string>
+    </property>
+    <addaction name="actionNIST_SP_800_88_Rev_1"/>
+    <addaction name="actionBritish_HMG_Infosec_Standard_5_Baseline_Standard"/>
+    <addaction name="actionBritish_HMG_Infosec_Standard_5_Enhanced_Standard"/>
+    <addaction name="actionCommunications_Security_Establishment_Canada_ITSG_06"/>
+    <addaction name="actionGerman_Federal_Office_for_Information_Security"/>
+    <addaction name="actionU_S_DoD_Unclassified_Computer_Hard_Drive_Disposition"/>
+    <addaction name="actionBruce_Schneier_s_Algorithm"/>
+    <addaction name="actionPeter_Gutmann_s_Algorithm"/>
+    <addaction name="actionU_S_Air_Force_System_Security_Instruction_5020"/>
+    <addaction name="actionU_S_Navy_Staff_Office_Publication_NAVSO_P_5239_26"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuPresets"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -240,6 +256,56 @@
   <action name="actionOpenDrive">
    <property name="text">
     <string>Open Drive</string>
+   </property>
+  </action>
+  <action name="actionNIST_SP_800_88_Rev_1">
+   <property name="text">
+    <string>NIST SP-800-88 Rev. 1 [Recommended]</string>
+   </property>
+  </action>
+  <action name="actionBritish_HMG_Infosec_Standard_5_Enhanced_Standard">
+   <property name="text">
+    <string>British HMG Infosec Standard 5, Enhanced Standard</string>
+   </property>
+  </action>
+  <action name="actionBritish_HMG_Infosec_Standard_5_Baseline_Standard">
+   <property name="text">
+    <string>British HMG Infosec Standard 5, Baseline Standard</string>
+   </property>
+  </action>
+  <action name="actionCommunications_Security_Establishment_Canada_ITSG_06">
+   <property name="text">
+    <string>Communications Security Establishment Canada ITSG-06</string>
+   </property>
+  </action>
+  <action name="actionGerman_Federal_Office_for_Information_Security">
+   <property name="text">
+    <string>German Federal Office for Information Security</string>
+   </property>
+  </action>
+  <action name="actionU_S_DoD_Unclassified_Computer_Hard_Drive_Disposition">
+   <property name="text">
+    <string>U.S. DoD Unclassified Computer Hard Drive Disposition</string>
+   </property>
+  </action>
+  <action name="actionBruce_Schneier_s_Algorithm">
+   <property name="text">
+    <string>Bruce Schneier's Algorithm</string>
+   </property>
+  </action>
+  <action name="actionPeter_Gutmann_s_Algorithm">
+   <property name="text">
+    <string>Peter Gutmann's Algorithm</string>
+   </property>
+  </action>
+  <action name="actionU_S_Air_Force_System_Security_Instruction_5020">
+   <property name="text">
+    <string>U.S. Air Force System Security Instruction 5020</string>
+   </property>
+  </action>
+  <action name="actionU_S_Navy_Staff_Office_Publication_NAVSO_P_5239_26">
+   <property name="text">
+    <string>U.S. Navy Staff Office Publication NAVSO P-5239-26</string>
    </property>
   </action>
  </widget>

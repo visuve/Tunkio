@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget* parent) :
 {
 	ui->setupUi(this);
 
+	// ui->menuFile->setIcon(QApplication::style()->standardIcon(QStyle::SP_ComputerIcon));
+	// ui->menuPresets->setIcon(QApplication::style()->standardIcon(QStyle::SP_MediaPlay));
+
 	ui->actionOpenFile->setIcon(QApplication::style()->standardIcon(QStyle::SP_FileIcon));
 	connect(ui->actionOpenFile, &QAction::triggered, this, &MainWindow::onOpenFileDialog);
 
@@ -53,6 +56,111 @@ MainWindow::MainWindow(QWidget* parent) :
 		QMessageBox::aboutQt(this, "Tunkio");
 	});
 
+	connect(ui->actionNIST_SP_800_88_Rev_1, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::ZeroFill, false);
+	});
+
+	connect(ui->actionBritish_HMG_Infosec_Standard_5_Baseline_Standard, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::RandomFill, true);
+	});
+
+	connect(ui->actionBritish_HMG_Infosec_Standard_5_Enhanced_Standard, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::OneFill, false);
+		m_model->addPass(TunkioFillType::ZeroFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, true);
+	});
+
+	connect(ui->actionCommunications_Security_Establishment_Canada_ITSG_06, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::ZeroFill, false);
+		m_model->addPass(TunkioFillType::OneFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+	});
+
+	connect(ui->actionGerman_Federal_Office_for_Information_Security, &QAction::triggered, [this]()
+	{
+		QMessageBox::critical(
+			this,
+			"Tunkio - Not implemented yet!",
+			"This feature is not yet implemented");
+	});
+
+	connect(ui->actionU_S_DoD_Unclassified_Computer_Hard_Drive_Disposition, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
+		m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
+		m_model->addPass(TunkioFillType::RandomFill,  false);
+	});
+
+	connect(ui->actionBruce_Schneier_s_Algorithm, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::OneFill, false);
+		m_model->addPass(TunkioFillType::ZeroFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+	});
+
+	connect(ui->actionPeter_Gutmann_s_Algorithm, &QAction::triggered, [this]()
+	{
+		m_model->clearPasses();
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+
+		// TODO: the order of these need to be randomized
+		{
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
+
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x92\x49\x24");
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x49\x24\x92");
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x24\x92\x49");
+
+			m_model->addPass(TunkioFillType::ZeroFill, false);
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x11");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x22");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x33");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x44");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x66");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x77");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x88");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\x99");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\xBB");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\xCC");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\xDD");
+			m_model->addPass(TunkioFillType::CharacterFill, false, "\xEE");
+			m_model->addPass(TunkioFillType::OneFill, false);
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x92\x49\x24");
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x49\x24\x92");
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x24\x92\x49");
+
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\x6D\xB6\xDB");
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\xB6\xDB\x6D");
+			m_model->addPass(TunkioFillType::SentenceFill, false, "\xDB\x6D\xB6");
+		}
+
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+		m_model->addPass(TunkioFillType::RandomFill, false);
+	});
+
+
 	connect(
 		ui->comboBoxFillType,
 		static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -73,6 +181,11 @@ MainWindow::MainWindow(QWidget* parent) :
 		&QItemSelectionModel::selectionChanged,
 		[this](const QItemSelection& selected, const QItemSelection&)
 	{
+		if (m_tunkio.get() && m_tunkio->isRunning())
+		{
+			return;
+		}
+
 		ui->pushButtonRemovePass->setEnabled(!selected.isEmpty());
 	});
 
@@ -189,7 +302,7 @@ void MainWindow::onFillTypeSelectionChanged(int index)
 		case 1:
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
-			ui->lineEditFillValue->setText("0xff");
+			ui->lineEditFillValue->setText("0xFF");
 			return;
 		case 2:
 			ui->lineEditFillValue->setReadOnly(false);
@@ -220,22 +333,22 @@ void MainWindow::addPass()
 {
 	int index = ui->comboBoxFillType->currentIndex();
 	bool verify = ui->checkBoxVerify->isChecked();
-	QString fill = ui->lineEditFillValue->text();
+	QByteArray fill = ui->lineEditFillValue->text().toUtf8();
 
 	switch (index)
 	{
 		case 0:
-			return m_model->addPass(TunkioFillType::ZeroFill, fill, verify);
+			return m_model->addPass(TunkioFillType::ZeroFill, verify);
 		case 1:
-			return m_model->addPass(TunkioFillType::OneFill, fill, verify);
+			return m_model->addPass(TunkioFillType::OneFill, verify);
 		case 2:
-			return m_model->addPass(TunkioFillType::CharacterFill, fill, verify);
+			return m_model->addPass(TunkioFillType::CharacterFill, verify, fill);
 		case 3:
-			return m_model->addPass(TunkioFillType::SentenceFill, fill, verify);
+			return m_model->addPass(TunkioFillType::SentenceFill, verify, fill);
 		case 4:
-			return m_model->addPass(TunkioFillType::FileFill, fill, verify);
+			return m_model->addPass(TunkioFillType::FileFill, verify, fill);
 		case 5:
-			return m_model->addPass(TunkioFillType::RandomFill, fill, verify);
+			return m_model->addPass(TunkioFillType::RandomFill, verify);
 		default:
 			qCritical() << index << " is out of bounds";
 			break;
@@ -295,7 +408,7 @@ void MainWindow::startWipe()
 		{
 			QStringList message = { "Failed to add pass!" };
 			message << QString("Pass type: %1").arg(Ui::fillTypeToString(pass.fillType));
-			message << QString("Fill value: %1").arg(pass.fillValue.chopped(9));
+			message << QString("Fill value: ") << pass.fillValue.toHex(' ');
 
 			QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
 			return;
@@ -303,8 +416,8 @@ void MainWindow::startWipe()
 	}
 
 	ui->pushButtonStart->setEnabled(false);
-	ui->pushButtonClearPasses->setEnabled(false);
 	ui->pushButtonCancel->setEnabled(true);
+	ui->groupBoxAddPass->setEnabled(false);
 
 	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
 	connect(m_tunkio.get(), &TunkioRunner::passStarted, m_model, &WipePassModel::onPassStarted);
@@ -330,11 +443,12 @@ void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten
 
 	ui->pushButtonStart->setEnabled(true);
 	ui->pushButtonCancel->setEnabled(false);
+	ui->groupBoxAddPass->setEnabled(true);
 }
 
 void MainWindow::onWipeCompleted(uint16_t, uint64_t)
 {
 	ui->pushButtonStart->setEnabled(true);
-	ui->pushButtonClearPasses->setEnabled(true);
 	ui->pushButtonCancel->setEnabled(false);
+	ui->groupBoxAddPass->setEnabled(true);
 }
