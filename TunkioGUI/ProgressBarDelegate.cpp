@@ -11,28 +11,27 @@ void ProgressBarDelegate::paint(
 	const QStyleOptionViewItem& option,
 	const QModelIndex& index) const
 {
-	double progress = index.model()->data(index, Qt::DisplayRole).toDouble();
+	float progress = index.model()->data(index, Qt::DisplayRole).toFloat();
 
 	QStyleOptionProgressBar progressBar;
 	progressBar.rect = option.rect;
 	progressBar.minimum = 0;
 	progressBar.maximum = 100;
-	progressBar.progress = progress;
+	progressBar.progress = static_cast<int>(progress);
+	progressBar.textVisible = true;
 
-	if (progress <= 0.00)
+	if (progress <= 0.00f)
 	{
 		progressBar.text = "0%";
 	}
-	else if (progress >= 99.99)
+	else if (progress >= 99.99f)
 	{
 		progressBar.text = "100%";
 	}
 	else
 	{
-		progressBar.text = QString::number(progress, 'g', 2) + '%';
+		progressBar.text = QLocale::system().toString(progress, 'f', 2) + '%';
 	}
 
-	progressBar.textVisible = true;
-	
 	QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBar, painter);
 }

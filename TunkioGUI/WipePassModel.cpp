@@ -1,91 +1,99 @@
 #include "TunkioGUI-PCH.hpp"
 #include "WipePassModel.hpp"
 
-namespace
+namespace Ui
 {
-	QLocale g_locale;
-}
-
-QString Ui::fillTypeToString(TunkioFillType type)
-{
-	switch (type)
+	QString fillTypeToString(TunkioFillType type)
 	{
-		case TunkioFillType::ZeroFill:
-			return "Zeroes";
-		case TunkioFillType::OneFill:
-			return "Ones";
-		case TunkioFillType::CharacterFill:
-			return "Character";
-		case TunkioFillType::SentenceFill:
-			return "Sentence";
-		case TunkioFillType::FileFill:
-			return "File";
-		case TunkioFillType::RandomFill:
-			return "Random";
+		switch (type)
+		{
+			case TunkioFillType::ZeroFill:
+				return "Zeroes";
+			case TunkioFillType::OneFill:
+				return "Ones";
+			case TunkioFillType::CharacterFill:
+				return "Character";
+			case TunkioFillType::SentenceFill:
+				return "Sentence";
+			case TunkioFillType::FileFill:
+				return "File";
+			case TunkioFillType::RandomFill:
+				return "Random";
+		}
+
+		qCritical() << int(type) << " is out of bounds";
+		return "Unknown?";
 	}
 
-	qCritical() << int(type) << " is out of bounds";
-	return "Unknown?";
-}
-
-QVariant speedToString(const WipePassModel::Pass& pass)
-{
-	int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
-
-	if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
+	QVariant bytesWritten(const WipePassModel::Pass& pass)
 	{
-		return QVariant();
+		return QLocale::system().formattedDataSize(pass.bytesWritten);
 	}
 
-	int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-	return g_locale.formattedDataSize(bytesPerSecond).append("/s");
-}
-
-QVariant timeTaken(const WipePassModel::Pass& pass)
-{
-	int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
-
-	if (milliSecondsTaken <= 0)
+	QVariant bytesLeft(const WipePassModel::Pass& pass)
 	{
-		return QVariant();
+		return QLocale::system().formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
 	}
 
-	QTime timeLeft(0, 0, 0);
-	timeLeft = timeLeft.addMSecs(milliSecondsTaken);
-	return timeLeft.toString(Qt::ISODate);
-}
-
-QVariant timeLeft(const WipePassModel::Pass& pass)
-{
-	int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
-
-	if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
+	QVariant speedToString(const WipePassModel::Pass& pass)
 	{
-		return QVariant();
+		int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
+
+		if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
+		{
+			return QVariant();
+		}
+
+		int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+		return QLocale::system().formattedDataSize(bytesPerSecond).append("/s");
 	}
 
-	int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
-	int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
-	int64_t secondsLeft = bytesLeft / bytesPerSecond;
-
-	QTime timeLeft(0, 0, 0);
-	timeLeft = timeLeft.addSecs(secondsLeft);
-	return timeLeft.toString(Qt::ISODate);
-}
-
-double progressPercent(const WipePassModel::Pass& pass)
-{
-	if (pass.bytesWritten <= 0)
+	QVariant timeTaken(const WipePassModel::Pass& pass)
 	{
-		return 0;
+		int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
+
+		if (milliSecondsTaken <= 0)
+		{
+			return QVariant();
+		}
+
+		QTime timeLeft(0, 0, 0);
+		timeLeft = timeLeft.addMSecs(milliSecondsTaken);
+		return timeLeft.toString(Qt::ISODate);
 	}
 
-	if (pass.bytesToWrite <= 0)
+	QVariant timeLeft(const WipePassModel::Pass& pass)
 	{
-		return 100;
+		int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
+
+		if (milliSecondsTaken <= 0 || pass.bytesWritten <= 0)
+		{
+			return QVariant();
+		}
+
+		int64_t bytesPerSecond = pass.bytesWritten * 1000 / milliSecondsTaken;
+		int64_t bytesLeft = pass.bytesToWrite - pass.bytesWritten;
+		int64_t secondsLeft = bytesLeft / bytesPerSecond;
+
+		QTime timeLeft(0, 0, 0);
+		timeLeft = timeLeft.addSecs(secondsLeft);
+		return timeLeft.toString(Qt::ISODate);
 	}
 
-	return double(pass.bytesWritten) / double(pass.bytesToWrite) * 100;
+	float progressPercent(const WipePassModel::Pass& pass)
+	{
+		if (pass.bytesWritten <= 0)
+		{
+			return 0;
+		}
+
+		if (pass.bytesToWrite <= 0)
+		{
+			return 100;
+		}
+
+		return float(pass.bytesWritten) / float(pass.bytesToWrite) * 100.0f;
+	}
 }
 
 WipePassModel::WipePassModel(QObject* parent) :
@@ -131,7 +139,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return g_locale.formattedDataSize(pass.bytesWritten);
+				return Ui::bytesWritten(pass);
 			}
 			case 4:
 			{
@@ -140,7 +148,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return g_locale.formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
+				return Ui::bytesLeft(pass);
 			}
 			case 5:
 			{
@@ -149,7 +157,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return timeTaken(pass);
+				return Ui::timeTaken(pass);
 			}
 			case 6:
 			{
@@ -158,7 +166,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return timeLeft(pass);
+				return Ui::timeLeft(pass);
 			}
 			case 7:
 			{
@@ -167,7 +175,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return speedToString(pass);
+				return Ui::speedToString(pass);
 			}
 			case 8:
 			{
@@ -176,9 +184,8 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 					break;
 				}
 
-				return progressPercent(pass);
+				return Ui::progressPercent(pass);
 			}
-
 			default:
 				qCritical() << index << " is out of bounds";
 		}
@@ -278,6 +285,17 @@ const QList<WipePassModel::Pass>& WipePassModel::passes() const
 	return m_passes;
 }
 
+void WipePassModel::clearStats()
+{
+	for (Pass& pass : m_passes)
+	{
+		pass.bytesWritten = 0;
+		pass.bytesToWrite = 0;
+		pass.start = QTime();
+		pass.start = QTime();
+	}
+}
+
 void WipePassModel::removePass(int row)
 {
 	Q_ASSERT(row < m_passes.size());
@@ -301,34 +319,26 @@ void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 
 void WipePassModel::onPassStarted(uint16_t pass)
 {
-	Q_ASSERT(pass <= m_passes.size());
-	int row = pass - 1;
+	rowData(pass).start = QTime::currentTime();
+	updateRow(pass);
 
-	m_passes[row].start = QTime::currentTime();
-	updateRow(row);
-
-	qDebug() << "Pass started:" << pass << "row:" << row;
+	qDebug() << "Pass started:" << pass;
 }
 
 void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 {
-	Q_ASSERT(pass <= m_passes.size());
-	int row = pass - 1;
-
-	m_passes[row].bytesWritten = bytesWritten;
-	m_passes[row].time = QTime::currentTime();
-	updateRow(row);
+	Pass& current = rowData(pass);
+	current.bytesWritten = bytesWritten;
+	current.time = QTime::currentTime();
+	updateRow(pass);
 }
 
 void WipePassModel::onPassFinished(uint16_t pass)
 {
-	Q_ASSERT(pass <= m_passes.size());
-	int row = pass - 1;
+	rowData(pass).time = QTime::currentTime();
+	updateRow(pass);
 
-	m_passes[row].time = QTime::currentTime();
-	updateRow(row);
-
-	qDebug() << "Pass finished:" << pass << "row:" << row;
+	qDebug() << "Pass finished:" << pass;
 }
 
 void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
@@ -337,8 +347,16 @@ void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
 	qDebug() << "Wipe finished:" << pass << '/' << totalBytesWritten;
 }
 
-void WipePassModel::updateRow(int row)
+WipePassModel::Pass& WipePassModel::rowData(uint16_t pass)
 {
+	Q_ASSERT(pass <= m_passes.size());
+	int row = pass - 1;
+	return m_passes[row];
+}
+
+void WipePassModel::updateRow(uint16_t pass)
+{
+	int row = pass - 1;
 	const QModelIndex topLeft = index(row, 3);
 	const QModelIndex bottomRight = index(row, 8);
 	emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole });

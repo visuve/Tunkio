@@ -11,8 +11,8 @@ class WipePassModel : public QAbstractTableModel
 {
 	Q_OBJECT
 public:
-	WipePassModel(QObject* parent = nullptr);
-	virtual ~WipePassModel();
+	explicit WipePassModel(QObject* parent = nullptr);
+	~WipePassModel();
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -33,6 +33,7 @@ public:
 
 	bool isEmpty() const;
 	const QList<Pass>& passes() const;
+	void clearStats();
 
 public slots:
 	void addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
@@ -45,6 +46,7 @@ public slots:
 	void onWipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
 
 private:
-	void updateRow(int row);
+	Pass& rowData(uint16_t pass);
+	void updateRow(uint16_t pass);
 	QList<Pass> m_passes;
 };

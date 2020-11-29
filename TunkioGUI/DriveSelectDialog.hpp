@@ -10,7 +10,7 @@ class DriveSelectDialog : public QDialog
 	Q_OBJECT
 
 public:
-	DriveSelectDialog(QWidget* parent = nullptr);
+	explicit DriveSelectDialog(QWidget* parent = nullptr);
 	~DriveSelectDialog();
 
 	QString selectedDrive();

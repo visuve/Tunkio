@@ -273,6 +273,8 @@ void MainWindow::startWipe()
 	Q_ASSERT(!m_tunkio->isRunning());
 	Q_ASSERT(!m_model->isEmpty());
 
+	m_model->clearStats();
+
 	for (const WipePassModel::Pass& pass : m_model->passes())
 	{
 		if (!m_tunkio->addPass(pass.fillType, pass.fillValue, pass.verify))
