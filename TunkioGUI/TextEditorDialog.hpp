@@ -10,10 +10,8 @@ class TextEditorDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit TextEditorDialog(QLineEdit* parent = nullptr);
-	~TextEditorDialog();
-
-	bool eventFilter(QObject* watched, QEvent* event);
+	explicit TextEditorDialog(QWidget* parent = nullptr);
+	virtual ~TextEditorDialog();
 
 	QString text();
 	void setText(const QString&);

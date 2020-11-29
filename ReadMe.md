@@ -38,7 +38,7 @@
 ## Developer TODO
 
 - The GUI is still somewhat flaky
-- Open browse menu from clicking file fill path
+	- The code needs cleaning up too
 - Verifications
 	- Char-by-char for charfiller
 	- Sentence-by-sentece for file & sentence fillers

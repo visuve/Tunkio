@@ -14,8 +14,10 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(QWidget* parent = nullptr);
+	explicit MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
+
+	bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
 	void onOpenFileDialog();
@@ -34,5 +36,4 @@ private:
 	WipePassModel* m_model = nullptr;
 	TextEditorDialog* m_textEditDialog = nullptr;
 	std::shared_ptr<TunkioRunner> m_tunkio;
-	QString m_sentence = "Please enter some text here.";
 };

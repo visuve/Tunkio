@@ -86,14 +86,16 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->lineEditFillValue, &QLineEdit::textChanged, [&](const QString& text)
 	{
-		m_sentence = text;
+		m_textEditDialog->setText(text);
 	});
 
 	connect(m_textEditDialog, &TextEditorDialog::accepted, [this]()
 	{
-		m_sentence = m_textEditDialog->text();
-		ui->lineEditFillValue->setText(m_sentence);
+		QString sentence = m_textEditDialog->text();
+		ui->lineEditFillValue->setText(sentence);
 	});
+
+	ui->lineEditFillValue->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -141,6 +143,36 @@ void MainWindow::onOpenDriveDialog()
 	}
 }
 
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+	if (event->type() == QEvent::MouseButtonDblClick)
+	{
+		switch (ui->comboBoxFillType->currentIndex())
+		{
+			case 3:
+			{
+				m_textEditDialog->show();
+				return true;
+			}
+			case 4:
+			{
+				QFileDialog dialog(this);
+				dialog.setFileMode(QFileDialog::FileMode::ExistingFile);
+
+				if (dialog.exec() == QFileDialog::Accepted)
+				{
+					const QString file = dialog.selectedFiles().first();
+					ui->lineEditFillValue->setText(QDir::toNativeSeparators(file));
+				}
+
+				return true;
+			}
+		}
+	}
+
+	return QObject::eventFilter(watched, event);
+}
+
 void MainWindow::onFillTypeSelectionChanged(int index)
 {
 	switch (index)
@@ -149,37 +181,31 @@ void MainWindow::onFillTypeSelectionChanged(int index)
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("0x00");
-			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 1:
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("0xff");
-			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 2:
 			ui->lineEditFillValue->setReadOnly(false);
 			ui->lineEditFillValue->setInputMask("X");
 			ui->lineEditFillValue->setText("T");
-			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 3:
 			ui->lineEditFillValue->setReadOnly(false);
 			ui->lineEditFillValue->setInputMask("");
-			ui->lineEditFillValue->setText(m_sentence);
-			ui->lineEditFillValue->installEventFilter(m_textEditDialog);
+			ui->lineEditFillValue->setText(m_textEditDialog->text());
 			return;
 		case 4:
 			ui->lineEditFillValue->setReadOnly(false);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("Please enter a path to a file here.");
-			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 		case 5:
 			ui->lineEditFillValue->setReadOnly(true);
 			ui->lineEditFillValue->setInputMask("");
 			ui->lineEditFillValue->setText("MT19937 PRNG.");
-			ui->lineEditFillValue->removeEventFilter(m_textEditDialog);
 			return;
 	}
 
