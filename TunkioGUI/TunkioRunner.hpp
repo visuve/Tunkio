@@ -29,4 +29,3 @@ private:
 	TunkioTargetType m_type;
 	TunkioHandle* m_tunkio = nullptr;
 };
-

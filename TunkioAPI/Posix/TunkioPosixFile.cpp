@@ -34,13 +34,13 @@ namespace Tunkio
 		}
 
 #if defined(__linux__)
-		struct stat64 buffer = { };
+		struct stat64 buffer = {};
 		if (fstat64(m_fileDescriptor, &buffer) != 0)
 		{
 			return;
 		}
 #else
-		struct stat buffer = { };
+		struct stat buffer = {};
 		if (fstat(m_fileDescriptor, &buffer) != 0)
 		{
 			return;

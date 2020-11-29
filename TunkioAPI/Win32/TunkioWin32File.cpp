@@ -81,7 +81,7 @@ namespace Tunkio
 	std::pair<bool, uint64_t> DiskSizeByHandle(const HANDLE handle)
 	{
 		DWORD bytesReturned = 0;
-		DISK_GEOMETRY diskGeo = { };
+		DISK_GEOMETRY diskGeo = {};
 		constexpr uint32_t DiskGeoSize = sizeof(DISK_GEOMETRY);
 
 		if (!DeviceIoControl(

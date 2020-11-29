@@ -61,7 +61,7 @@ namespace Tunkio
 			provider;
 			provider = provider->lg_provider.le_next)
 		{
-			drive.Path =  provider->lg_name ;
+			drive.Path = provider->lg_name;
 			drive.Capacity = static_cast<uint64_t>(provider->lg_mediasize);
 
 			for (gconfig* config = provider->lg_config.lh_first;

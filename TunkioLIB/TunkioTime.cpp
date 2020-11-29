@@ -11,7 +11,13 @@ namespace Tunkio::Time
 	Duration Duration::Infinite()
 	{
 		constexpr auto maximum = std::numeric_limits<uint64_t>::max();
-		return Duration(Hours(maximum), Minutes(maximum), Seconds(maximum), MilliSeconds(maximum), MicroSeconds(maximum));
+
+		return Duration(
+			Hours(maximum),
+			Minutes(maximum),
+			Seconds(maximum),
+			MilliSeconds(maximum),
+			MicroSeconds(maximum));
 	}
 
 	Duration::Duration(MicroSeconds elapsed) :
@@ -86,13 +92,40 @@ namespace Tunkio::Time
 	{
 	}
 
-	std::ostream& operator << (std::ostream& os, Days s) { return os << s.count() << 'd'; }
-	std::ostream& operator << (std::ostream& os, Hours s) { return os << s.count() << 'h'; }
-	std::ostream& operator << (std::ostream& os, Minutes s) { return os << s.count() << 'm'; }
-	std::ostream& operator << (std::ostream& os, Seconds s) { return os << s.count() << 's'; }
-	std::ostream& operator << (std::ostream& os, MilliSeconds ms) { return os << ms.count() << "ms"; }
-	std::ostream& operator << (std::ostream& os, MicroSeconds us) { return os << us.count() << "us"; }
-	std::ostream& operator << (std::ostream& os, const Duration& x) { return os << x.H << ' ' << x.M << ' ' << x.S << ' ' << x.Ms << ' ' << x.Us; }
+	std::ostream& operator << (std::ostream& os, Days s)
+	{
+		return os << s.count() << 'd';
+	}
+
+	std::ostream& operator << (std::ostream& os, Hours s)
+	{
+		return os << s.count() << 'h';
+	}
+
+	std::ostream& operator << (std::ostream& os, Minutes s)
+	{
+		return os << s.count() << 'm';
+	}
+
+	std::ostream& operator << (std::ostream& os, Seconds s)
+	{
+		return os << s.count() << 's';
+	}
+
+	std::ostream& operator << (std::ostream& os, MilliSeconds ms)
+	{
+		return os << ms.count() << "ms";
+	}
+
+	std::ostream& operator << (std::ostream& os, MicroSeconds us)
+	{
+		return os << us.count() << "us";
+	}
+
+	std::ostream& operator << (std::ostream& os, const Duration& x)
+	{
+		return os << x.H << ' ' << x.M << ' ' << x.S << ' ' << x.Ms << ' ' << x.Us;
+	}
 
 	std::string HumanReadable(const Duration& duration)
 	{
@@ -128,7 +161,7 @@ namespace Tunkio::Time
 	std::string Timestamp(const std::chrono::system_clock::time_point& time, T* converterFunction)
 	{
 		const std::time_t seconds = std::chrono::system_clock::to_time_t(time);
-		std::tm dateTime = { };
+		std::tm dateTime = {};
 
 #if defined(_WIN32)
 		if (converterFunction(&dateTime, &seconds) != 0)
@@ -140,7 +173,9 @@ namespace Tunkio::Time
 		}
 
 		std::array<char, 20> buffer;
-		return std::string(buffer.data(), std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H:%M:%S", &dateTime));
+		size_t size = std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H:%M:%S", &dateTime);
+		assert(size == 19);
+		return std::string(buffer.data(), size);
 	}
 
 	std::string Timestamp(const std::chrono::system_clock::time_point& time)
@@ -165,4 +200,4 @@ namespace Tunkio::Time
 	{
 		return Duration(Elapsed<MicroSeconds>());
 	}
-}
+	}

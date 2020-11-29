@@ -317,7 +317,7 @@ void WipePassModel::addPass(TunkioFillType fillType, bool verify, const QByteArr
 			pass.fillValue = fillValue;
 			break;
 	}
-	
+
 	pass.verify = verify;
 	m_passes.append(pass);
 	endInsertRows();

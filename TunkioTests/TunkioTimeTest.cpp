@@ -82,7 +82,14 @@ namespace Tunkio::Time
 	{
 		{
 			std::stringstream stream;
-			stream << Time::Days(1) << Time::Hours(1) << Time::Minutes(1) << Time::Seconds(1) << Time::MilliSeconds(1) << Time::MicroSeconds(1);
+			stream <<
+				Time::Days(1) <<
+				Time::Hours(1) <<
+				Time::Minutes(1) <<
+				Time::Seconds(1) <<
+				Time::MilliSeconds(1) <<
+				Time::MicroSeconds(1);
+
 			EXPECT_STREQ(stream.str().c_str(), "1d1h1m1s1ms1us");
 		}
 		{
@@ -144,6 +151,5 @@ namespace Tunkio::Time
 			auto timestamp = Time::TimestampUTC(time);
 			EXPECT_STREQ("2020-05-23 10:21:55", timestamp.c_str());
 		}
-
 	}
 }

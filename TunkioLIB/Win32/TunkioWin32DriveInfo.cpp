@@ -22,7 +22,7 @@ namespace Tunkio
 			VariantClear(&m_value);
 		}
 
-		operator VARIANT*()
+		operator VARIANT* ()
 		{
 			return &m_value;
 		}

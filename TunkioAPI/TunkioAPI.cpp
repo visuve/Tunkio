@@ -30,7 +30,7 @@ constexpr size_t Length(const char* str)
 }
 
 template <typename T>
-void Set(TunkioHandle* handle, void(Tunkio::IWorkload::*setter)(T), T value)
+void Set(TunkioHandle* handle, void(Tunkio::IWorkload::* setter)(T), T value)
 {
 	assert(handle);
 	assert(setter);

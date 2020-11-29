@@ -62,7 +62,6 @@ namespace Tunkio
 			}
 		}
 
-
 		return m_fillData.data();
 	}
 }
