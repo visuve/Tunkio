@@ -4,7 +4,12 @@
 namespace Ui
 {
 	const QTime ZeroTime(0, 0, 0, 0);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 	const QLocale SystemLocale = QLocale::system();
+#else
+	QLocale SystemLocale = QLocale::system(); // Hack to satisfy Clang & GCC atm
+#endif
 
 	QString fillTypeToString(TunkioFillType type)
 	{
