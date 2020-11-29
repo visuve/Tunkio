@@ -6,7 +6,10 @@
 namespace Tunkio
 {
 	File::File(const std::filesystem::path& path) :
-		Path(path)
+		Path(path),
+		m_actualSize(true, 1),
+		m_allocationSize(true, 1),
+		m_optimalWriteSize(true, 1)
 	{
 #if defined(_WIN32)
 		UNUSED(m_handle);
@@ -30,19 +33,19 @@ namespace Tunkio
 		return true;
 	}
 
-	std::pair<bool, uint64_t> File::ActualSize() const
+	const std::pair<bool, uint64_t>& File::ActualSize() const
 	{
-		return { true, 1 };
+		return m_actualSize;
 	}
 
-	std::pair<bool, uint64_t> File::AllocationSize() const
+	const std::pair<bool, uint64_t>& File::AllocationSize() const
 	{
-		return { true, 1 };
+		return m_allocationSize;
 	}
 
-	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const
 	{
-		return { true, 1 };
+		return m_optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const
@@ -50,7 +53,12 @@ namespace Tunkio
 		return { data, size };
 	}
 
-	bool File::Remove()
+	bool File::Rewind()
+	{
+		return true;
+	}
+
+	bool File::Delete()
 	{
 		return true;
 	}

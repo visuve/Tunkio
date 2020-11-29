@@ -39,7 +39,7 @@
 
 - The GUI is still somewhat flaky
 	- The code needs cleaning up too
-- Rewind pointers to zero after a pass
+- Add a clear button to GUI
 - Verifications
 	- Char-by-char for charfiller
 	- Sentence-by-sentece for file & sentence fillers

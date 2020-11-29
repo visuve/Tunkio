@@ -54,7 +54,7 @@ namespace Tunkio
 	{
 		for (File& file : m_files.second)
 		{
-			if (!file.Remove())
+			if (!file.Delete())
 			{
 				return false;
 			}

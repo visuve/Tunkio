@@ -162,11 +162,14 @@ namespace Tunkio
 			case TunkioStage::Write:
 				std::cerr << "writing";
 				break;
+			case TunkioStage::Rewind:
+				std::cerr << "rewinding file pointer";
+				break;
 			case TunkioStage::Verify:
 				std::cerr << "verifying";
 				break;
-			case TunkioStage::Remove:
-				std::cerr << "removing file";
+			case TunkioStage::Delete:
+				std::cerr << "deleting file";
 				break;
 		}
 

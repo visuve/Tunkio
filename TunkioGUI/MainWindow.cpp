@@ -14,10 +14,12 @@ QString toString(TunkioStage type)
 			return "querying size";
 		case TunkioStage::Write:
 			return "writing";
+		case TunkioStage::Rewind:
+			return "rewinding file pointer";
 		case TunkioStage::Verify:
 			return "verifying";
-		case TunkioStage::Remove:
-			return "removing";
+		case TunkioStage::Delete:
+			return "deleting file";
 	}
 
 	qCritical() << int(type) << " is out of bounds";

@@ -90,17 +90,17 @@ namespace Tunkio
 		return true;
 	}
 
-	std::pair<bool, uint64_t> File::ActualSize() const
+	const std::pair<bool, uint64_t>& File::ActualSize() const
 	{
 		return m_actualSize;
 	}
 
-	std::pair<bool, uint64_t> File::AllocationSize() const
+	const std::pair<bool, uint64_t>& File::AllocationSize() const
 	{
 		return m_allocationSize;
 	}
 
-	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}
@@ -122,7 +122,12 @@ namespace Tunkio
 		return { fsync(m_fileDescriptor) == 0, static_cast<uint64_t>(result) };
 	}
 
-	bool File::Remove()
+	bool File::Rewind()
+	{
+		return lseek(m_fileDescriptor, 0, SEEK_SET) == 0;
+	}
+
+	bool File::Delete()
 	{
 		if (!m_isDevice && IsValid() && close(m_fileDescriptor))
 		{

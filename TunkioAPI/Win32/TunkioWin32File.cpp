@@ -187,17 +187,17 @@ namespace Tunkio
 		return true;
 	}
 
-	std::pair<bool, uint64_t> File::ActualSize() const
+	const std::pair<bool, uint64_t>& File::ActualSize() const
 	{
 		return m_actualSize;
 	}
 
-	std::pair<bool, uint64_t> File::AllocationSize() const
+	const std::pair<bool, uint64_t>& File::AllocationSize() const
 	{
 		return m_allocationSize;
 	}
 
-	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}
@@ -219,7 +219,20 @@ namespace Tunkio
 		return { FlushFileBuffers(m_handle), bytesWritten };
 	}
 
-	bool File::Remove()
+	bool File::Rewind()
+	{
+		const LARGE_INTEGER beginning = {};
+		LARGE_INTEGER newPosition = {};
+
+		if (!SetFilePointerEx(m_handle, beginning, &newPosition, FILE_BEGIN))
+		{
+			return false;
+		}
+
+		return newPosition.QuadPart == 0;
+	}
+
+	bool File::Delete()
 	{
 		if (!m_isDevice && IsValid() && CloseHandle(m_handle))
 		{

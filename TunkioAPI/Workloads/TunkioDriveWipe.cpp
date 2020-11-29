@@ -69,8 +69,12 @@ namespace Tunkio
 				}
 			}
 
-			totalBytesWritten += bytesWritten;
+			if (!drive.Rewind())
+			{
+				OnError(TunkioStage::Rewind, passes, bytesWritten, LastError);
+			}
 
+			totalBytesWritten += bytesWritten;
 			OnPassCompleted(passes);
 		}
 

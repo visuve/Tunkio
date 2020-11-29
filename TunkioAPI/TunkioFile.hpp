@@ -12,11 +12,12 @@ namespace Tunkio
 
 		bool IsValid() const;
 		bool Unmount() const;
-		std::pair<bool, uint64_t> ActualSize() const;
-		std::pair<bool, uint64_t> AllocationSize() const;
-		std::pair<bool, uint64_t> OptimalWriteSize() const;
+		const std::pair<bool, uint64_t>& ActualSize() const;
+		const std::pair<bool, uint64_t>& AllocationSize() const;
+		const std::pair<bool, uint64_t>& OptimalWriteSize() const;
 		std::pair<bool, uint64_t> Write(const void* data, const uint64_t size) const;
-		bool Remove();
+		bool Rewind();
+		bool Delete();
 
 	private:
 		std::pair<bool, uint64_t> m_actualSize;

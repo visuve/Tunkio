@@ -69,6 +69,11 @@ namespace Tunkio
 						return true;
 					}
 				}
+
+				if (!file.Rewind())
+				{
+					OnError(TunkioStage::Rewind, passes, bytesWritten, LastError);
+				}
 			}
 
 			totalBytesWritten += bytesWritten;
@@ -77,7 +82,7 @@ namespace Tunkio
 
 		if (m_removeAfterWipe && !directory.RemoveAll())
 		{
-			OnError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
+			OnError(TunkioStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 

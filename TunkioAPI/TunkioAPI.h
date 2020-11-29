@@ -42,8 +42,9 @@ extern "C"
 		Open = 'O',
 		Size = 'S',
 		Write = 'W',
+		Rewind = 'R',
 		Verify = 'V',
-		Remove = 'R'
+		Delete = 'D'
 	};
 
 	typedef void(TunkioWipeStartedCallback)(

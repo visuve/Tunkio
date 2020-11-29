@@ -64,16 +64,20 @@ namespace Tunkio
 				}
 			}
 
-			totalBytesWritten += bytesWritten;
+			if (!file.Rewind())
+			{
+				OnError(TunkioStage::Rewind, passes, bytesWritten, LastError);
+			}
 
+			totalBytesWritten += bytesWritten;
 			OnPassCompleted(passes);
 		}
 
 		OnWipeCompleted(passes, totalBytesWritten);
 
-		if (m_removeAfterWipe && !file.Remove())
+		if (m_removeAfterWipe && !file.Delete())
 		{
-			OnError(TunkioStage::Remove, passes, totalBytesWritten, LastError);
+			OnError(TunkioStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 
