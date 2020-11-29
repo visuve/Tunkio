@@ -296,6 +296,14 @@ void WipePassModel::clearStats()
 	}
 }
 
+void WipePassModel::clearPasses()
+{
+	Q_ASSERT(!m_passes.isEmpty());
+	beginResetModel();
+	m_passes.clear();
+	endResetModel();
+}
+
 void WipePassModel::removePass(int row)
 {
 	Q_ASSERT(row < m_passes.size());
@@ -360,4 +368,5 @@ void WipePassModel::updateRow(uint16_t pass)
 	const QModelIndex topLeft = index(row, 3);
 	const QModelIndex bottomRight = index(row, 8);
 	emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole });
+	QApplication::processEvents();
 }

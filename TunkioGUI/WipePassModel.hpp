@@ -34,6 +34,7 @@ public:
 	bool isEmpty() const;
 	const QList<Pass>& passes() const;
 	void clearStats();
+	void clearPasses();
 
 public slots:
 	void addPass(TunkioFillType fillType, const QString& fillValue, bool verify);

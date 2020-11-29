@@ -14,17 +14,46 @@
    <string>Tunkio - Data Erasure Tool</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="2">
-     <widget class="QGroupBox" name="groupBox">
+   <layout class="QGridLayout" name="gridLayoutCentralWidget">
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBoxPathSelect">
       <property name="title">
        <string>Selected Path:</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayoutPathSelect">
        <item>
         <widget class="QLineEdit" name="lineEditSelectedPath">
          <property name="readOnly">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBoxRun">
+      <property name="title">
+       <string>Run</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayoutRun">
+       <item>
+        <widget class="QPushButton" name="pushButtonCancel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonStart">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Start</string>
          </property>
         </widget>
        </item>
@@ -47,12 +76,12 @@
       </attribute>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="2" column="0" colspan="2">
      <widget class="QGroupBox" name="groupBoxAddPass">
       <property name="title">
        <string>Wipe Pass</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayoutAddPass">
        <item>
         <widget class="QLabel" name="labelFillType">
          <property name="text">
@@ -132,38 +161,19 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonClearPasses">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Clear</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButtonAddPass">
          <property name="text">
           <string>Add</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QGroupBox" name="groupBoxRun">
-      <property name="title">
-       <string>Run</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QPushButton" name="pushButtonCancel">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Cancel</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonStart">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Start</string>
          </property>
         </widget>
        </item>
@@ -178,7 +188,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

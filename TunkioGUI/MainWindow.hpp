@@ -26,6 +26,7 @@ private slots:
 	void onFillTypeSelectionChanged(int index);
 	void addPass();
 	void removePass();
+	void clearPasses();
 	void onAbout();
 	void startWipe();
 	void onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);

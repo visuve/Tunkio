@@ -10,7 +10,7 @@ file(GLOB TunkioTestsSource
 	"../TunkioCLI/TunkioArguments.cpp")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+	if(CMAKE_BUILD_TYPE MATCHES "Debug")
 		list(APPEND TunkioTestsSource "TestListeners/Win32/TunkioWin32MemoryLeakListener.cpp")
 	endif()
 

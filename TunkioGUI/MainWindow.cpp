@@ -65,6 +65,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
 	connect(ui->pushButtonRemovePass, &QPushButton::clicked, this, &MainWindow::removePass);
+	connect(ui->pushButtonClearPasses, &QPushButton::clicked, this, &MainWindow::clearPasses);
 	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startWipe);
 
 	connect(
@@ -77,6 +78,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	const auto enableStartButton = [this]()
 	{
+		ui->pushButtonClearPasses->setEnabled(!m_model->isEmpty());
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
 	};
 
@@ -250,6 +252,16 @@ void MainWindow::removePass()
 	}
 }
 
+void MainWindow::clearPasses()
+{
+	Q_ASSERT(!m_model->isEmpty());
+
+	ui->pushButtonClearPasses->setEnabled(false);
+	ui->pushButtonStart->setEnabled(false);
+
+	m_model->clearPasses();
+}
+
 void MainWindow::onAbout()
 {
 	QStringList text;
@@ -291,6 +303,7 @@ void MainWindow::startWipe()
 	}
 
 	ui->pushButtonStart->setEnabled(false);
+	ui->pushButtonClearPasses->setEnabled(false);
 	ui->pushButtonCancel->setEnabled(true);
 
 	connect(m_tunkio.get(), &TunkioRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
@@ -322,5 +335,6 @@ void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten
 void MainWindow::onWipeCompleted(uint16_t, uint64_t)
 {
 	ui->pushButtonStart->setEnabled(true);
+	ui->pushButtonClearPasses->setEnabled(true);
 	ui->pushButtonCancel->setEnabled(false);
 }
