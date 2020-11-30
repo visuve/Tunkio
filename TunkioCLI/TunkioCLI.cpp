@@ -156,6 +156,9 @@ namespace Tunkio
 			case TunkioStage::Open:
 				std::cerr << "opening";
 				break;
+			case TunkioStage::Unmount:
+				std::cerr << "unmounting";
+				break;
 			case TunkioStage::Size:
 				std::cerr << "querying size";
 				break;

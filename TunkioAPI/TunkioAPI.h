@@ -40,6 +40,7 @@ extern "C"
 	enum TunkioStage
 	{
 		Open = 'O',
+		Unmount = 'U',
 		Size = 'S',
 		Write = 'W',
 		Rewind = 'R',

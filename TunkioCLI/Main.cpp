@@ -36,19 +36,19 @@ namespace Tunkio
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32)
-		std::cout << "  " << exe.filename()
+		std::cout << "  " << exe.filename().string()
 			<< R"( --path="C:\\Users\\You\\SecretFile.txt" --target=f --mode=r)" << std::endl;
-		std::cout << "  " << exe.filename()
+		std::cout << "  " << exe.filename().string()
 			<< R"( --path="C:\\Users\\You\\SecretDirectory" --target=d --mode=r)" << std::endl;
-		std::cout << "  " << exe.filename()
+		std::cout << "  " << exe.filename().string()
 			<< R"( --path=\\.\PHYSICALDRIVE9 --target=D --mode=r)" << std::endl;
 #else
-		std::cout << "  " << exe.filename()
+		std::cout << "  ./" << exe.filename().string()
 			<< " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
-		std::cout << "  " << exe.filename()
+		std::cout << "  ./" << exe.filename().string()
 			<< " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
-		std::cout << "  " << exe.filename()
-			<< " --path=/dev/sdx --target= --target=D --mode=r" << std::endl;
+		std::cout << "  ./" << exe.filename().string()
+			<< " --path=/dev/sdx --target=D --mode=r" << std::endl;
 #endif
 		std::cout << std::endl;
 

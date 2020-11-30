@@ -86,8 +86,7 @@ namespace Tunkio
 
 	bool File::Unmount() const
 	{
-		// TODO!
-		return true;
+		return unmount(Path.c_str(), MNT_FORCE) == 0;
 	}
 
 	const std::pair<bool, uint64_t>& File::ActualSize() const

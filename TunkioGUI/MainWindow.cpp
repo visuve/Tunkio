@@ -10,6 +10,8 @@ QString toString(TunkioStage type)
 	{
 		case TunkioStage::Open:
 			return "opening";
+		case TunkioStage::Unmount:
+			return "unmounting";
 		case TunkioStage::Size:
 			return "querying size";
 		case TunkioStage::Write:

@@ -24,7 +24,7 @@ namespace Tunkio
 		if (!drive.Unmount())
 		{
 			// TODO: maybe add a stage "unmount" which is only used for drives
-			OnError(TunkioStage::Open, 0, 0, LastError);
+			OnError(TunkioStage::Unmount, 0, 0, LastError);
 			return false;
 		}
 
