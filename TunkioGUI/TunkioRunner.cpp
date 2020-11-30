@@ -25,7 +25,7 @@ TunkioRunner::~TunkioRunner()
 	qDebug() << "Destroyed.";
 }
 
-bool TunkioRunner::addPass(TunkioFillType fillType, const QString &fillValue, bool verify)
+bool TunkioRunner::addPass(TunkioFillType fillType, const QByteArray& fillValue, bool verify)
 {
 	Q_ASSERT(m_tunkio);
 
@@ -39,15 +39,8 @@ bool TunkioRunner::addPass(TunkioFillType fillType, const QString &fillValue, bo
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, nullptr);
 		case TunkioFillType::CharacterFill:
 		{
-			bool castOk = false;
-			char character[] = { static_cast<char>(fillValue.toShort(&castOk, 16)), '\0' };
-
-			if (castOk)
-			{
-				return TunkioAddWipeRound(m_tunkio, fillType, verify, character);
-			}
-
-			return false;
+			char character[] = { sentence[0], '\0' };
+			return TunkioAddWipeRound(m_tunkio, fillType, verify, character);
 		}
 		case TunkioFillType::SentenceFill:
 		case TunkioFillType::FileFill:

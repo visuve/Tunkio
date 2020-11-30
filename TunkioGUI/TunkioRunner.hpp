@@ -12,7 +12,7 @@ public:
 	~TunkioRunner();
 
 public slots:
-	bool addPass(TunkioFillType fillType, const QString& fillValue, bool verify);
+	bool addPass(TunkioFillType fillType, const QByteArray& fillValue, bool verify);
 	void stop();
 
 signals:

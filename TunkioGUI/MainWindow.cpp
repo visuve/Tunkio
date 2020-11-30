@@ -58,18 +58,21 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->actionNIST_SP_800_88_Rev_1, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
 		m_model->addPass(TunkioFillType::ZeroFill, false);
 	});
 
 	connect(ui->actionBritish_HMG_Infosec_Standard_5_Baseline_Standard, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
 		m_model->addPass(TunkioFillType::RandomFill, true);
 	});
 
 	connect(ui->actionBritish_HMG_Infosec_Standard_5_Enhanced_Standard, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
 		m_model->addPass(TunkioFillType::OneFill, false);
 		m_model->addPass(TunkioFillType::ZeroFill, false);
@@ -78,6 +81,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->actionCommunications_Security_Establishment_Canada_ITSG_06, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
 		m_model->addPass(TunkioFillType::ZeroFill, false);
 		m_model->addPass(TunkioFillType::OneFill, false);
@@ -94,6 +98,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->actionU_S_DoD_Unclassified_Computer_Hard_Drive_Disposition, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
 		m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
 		m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
@@ -102,6 +107,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->actionBruce_Schneier_s_Algorithm, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
 		m_model->addPass(TunkioFillType::OneFill, false);
 		m_model->addPass(TunkioFillType::ZeroFill, false);
@@ -114,53 +120,54 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->actionPeter_Gutmann_s_Algorithm, &QAction::triggered, [this]()
 	{
+		ui->groupBoxAddPass->setEnabled(false);
 		thread_local std::random_device device;
 		thread_local std::mt19937_64 engine(device());
+
+		std::array<std::pair<TunkioFillType, QByteArray>, 35> gutmannsRecipe =
+		{
+			std::make_pair(TunkioFillType::RandomFill, QByteArray()),
+			{ TunkioFillType::RandomFill, {} },
+			{ TunkioFillType::RandomFill, {} },
+			{ TunkioFillType::RandomFill, {} },
+
+			{ TunkioFillType::CharacterFill, "\x55" },
+			{ TunkioFillType::CharacterFill, "\xAA" },
+			{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
+			{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
+			{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
+			{ TunkioFillType::ZeroFill, {} },
+			{ TunkioFillType::CharacterFill, "\x11" },
+			{ TunkioFillType::CharacterFill, "\x22" },
+			{ TunkioFillType::CharacterFill, "\x33" },
+			{ TunkioFillType::CharacterFill, "\x44" },
+			{ TunkioFillType::CharacterFill, "\x55" },
+			{ TunkioFillType::CharacterFill, "\x66" },
+			{ TunkioFillType::CharacterFill, "\x77" },
+			{ TunkioFillType::CharacterFill, "\x88" },
+			{ TunkioFillType::CharacterFill, "\x99" },
+			{ TunkioFillType::CharacterFill, "\xAA" },
+			{ TunkioFillType::CharacterFill, "\xBB" },
+			{ TunkioFillType::CharacterFill, "\xCC" },
+			{ TunkioFillType::CharacterFill, "\xDD" },
+			{ TunkioFillType::CharacterFill, "\xEE" },
+			{ TunkioFillType::OneFill, {} },
+			{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
+			{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
+			{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
+			{ TunkioFillType::SentenceFill, "\x6D\xB6\xDB" },
+			{ TunkioFillType::SentenceFill, "\xB6\xDB\x6D" },
+			{ TunkioFillType::SentenceFill, "\xDB\x6D\xB6" },
+
+			{ TunkioFillType::RandomFill, {} },
+			{ TunkioFillType::RandomFill, {} },
+			{ TunkioFillType::RandomFill, {} },
+			{ TunkioFillType::RandomFill, {} },
+		};
 
 		do
 		{
 			m_model->clearPasses();
-
-			std::array<std::pair<TunkioFillType, QByteArray>, 35> gutmannsRecipe =
-			{
-				std::make_pair(TunkioFillType::RandomFill, QByteArray()),
-				{ TunkioFillType::RandomFill, {} },
-				{ TunkioFillType::RandomFill, {} },
-				{ TunkioFillType::RandomFill, {} },
-
-				{ TunkioFillType::CharacterFill, "\x55" },
-				{ TunkioFillType::CharacterFill, "\xAA" },
-				{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
-				{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
-				{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
-				{ TunkioFillType::ZeroFill, {} },
-				{ TunkioFillType::CharacterFill, "\x11" },
-				{ TunkioFillType::CharacterFill, "\x22" },
-				{ TunkioFillType::CharacterFill, "\x33" },
-				{ TunkioFillType::CharacterFill, "\x44" },
-				{ TunkioFillType::CharacterFill, "\x55" },
-				{ TunkioFillType::CharacterFill, "\x66" },
-				{ TunkioFillType::CharacterFill, "\x77" },
-				{ TunkioFillType::CharacterFill, "\x88" },
-				{ TunkioFillType::CharacterFill, "\x99" },
-				{ TunkioFillType::CharacterFill, "\xAA" },
-				{ TunkioFillType::CharacterFill, "\xBB" },
-				{ TunkioFillType::CharacterFill, "\xCC" },
-				{ TunkioFillType::CharacterFill, "\xDD" },
-				{ TunkioFillType::CharacterFill, "\xEE" },
-				{ TunkioFillType::OneFill, {} },
-				{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
-				{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
-				{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
-				{ TunkioFillType::SentenceFill, "\x6D\xB6\xDB" },
-				{ TunkioFillType::SentenceFill, "\xB6\xDB\x6D" },
-				{ TunkioFillType::SentenceFill, "\xDB\x6D\xB6" },
-
-				{ TunkioFillType::RandomFill, {} },
-				{ TunkioFillType::RandomFill, {} },
-				{ TunkioFillType::RandomFill, {} },
-				{ TunkioFillType::RandomFill, {} },
-			};
 
 			std::shuffle(gutmannsRecipe.begin() + 4, gutmannsRecipe.end() - 4, engine);
 
@@ -214,6 +221,7 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(m_model, &QAbstractItemModel::rowsInserted, enableStartButton);
 	connect(m_model, &QAbstractItemModel::rowsRemoved, enableStartButton);
+	// connect(m_model, &QAbstractItemModel::modelReset, enableStartButton);
 	// TODO: attach enableStartButton when m_tunkio is initialized
 
 	m_textEditDialog = new TextEditorDialog(ui->lineEditFillValue);
@@ -248,6 +256,7 @@ void MainWindow::onOpenFileDialog()
 		const QString file = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(file));
 		m_tunkio = std::make_shared<TunkioRunner>(file, TunkioTargetType::FileWipe);
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
 	}
 }
 
@@ -262,6 +271,7 @@ void MainWindow::onOpenDirectoryDialog()
 		const QString directory = dialog.selectedFiles().first();
 		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(directory));
 		m_tunkio = std::make_shared<TunkioRunner>(directory, TunkioTargetType::DirectoryWipe);
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
 	}
 }
 
@@ -274,6 +284,7 @@ void MainWindow::onOpenDriveDialog()
 		const QString drive = dialog.selectedDrive();
 		ui->lineEditSelectedPath->setText(drive);
 		m_tunkio = std::make_shared<TunkioRunner>(drive, TunkioTargetType::DriveWipe);
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
 	}
 }
 
