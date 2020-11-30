@@ -7,7 +7,7 @@
 	<max-ctu-depth>10</max-ctu-depth>
 	<paths>
 		<dir name="TunkioLIB"/>
-		<dir name="TunkioDLL"/>
+		<dir name="TunkioAPI"/>
 		<dir name="TunkioCLI"/>
 		<dir name="TunkioGUI"/>
 	</paths>
