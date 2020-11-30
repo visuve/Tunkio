@@ -2,6 +2,8 @@
 
 #include "TunkioFile.hpp"
 
+#include <vector>
+
 namespace Tunkio
 {
 	class Directory

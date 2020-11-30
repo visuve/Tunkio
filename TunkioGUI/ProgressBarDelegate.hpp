@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QStyledItemDelegate>
+
 class ProgressBarDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT

@@ -3,6 +3,7 @@
 #include "TunkioTime.hpp"
 
 #include <iomanip>
+#include <cmath>
 
 namespace Tunkio::DataUnit
 {

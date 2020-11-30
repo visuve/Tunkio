@@ -2,6 +2,8 @@
 
 #include "../TunkioAPI/TunkioAPI.h"
 
+#include <QThread>
+
 class TunkioRunner : public QThread
 {
 	Q_OBJECT

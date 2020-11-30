@@ -2,6 +2,9 @@
 
 #include "../TunkioAPI/TunkioAPI.h"
 
+#include <QAbstractTableModel>
+#include <QTime>
+
 namespace Ui
 {
 	QString fillTypeToString(TunkioFillType type);
