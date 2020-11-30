@@ -101,18 +101,20 @@ namespace Tunkio
 		return m_error;
 	}
 
-	void CLI::OnWipeStarted(uint16_t, uint64_t bytesLeft)
+	void CLI::OnWipeStarted(uint16_t passes, uint64_t bytesLeft)
 	{
 		m_bytesToWrite = bytesLeft;
 		m_bytesWrittenLastTime = 0;
 
-		std::cout << Time::Timestamp() << " Started!" << std::endl;
+		std::cout << Time::Timestamp() << " Wipe Started! Passes " << passes << '.' << std::endl;
 	}
 
-	void CLI::OnPassStarted(uint16_t)
+	void CLI::OnPassStarted(uint16_t pass)
 	{
 		m_totalTimer.Reset();
 		m_currentTimer.Reset();
+
+		std::cout << Time::Timestamp() << " Pass " << pass << " started!" << std::endl;
 	}
 
 	bool CLI::OnProgress(uint16_t, uint64_t bytesWritten)
@@ -143,8 +145,9 @@ namespace Tunkio
 		return m_keepRunning;
 	}
 
-	void CLI::OnPassCompleted(uint16_t)
+	void CLI::OnPassCompleted(uint16_t pass)
 	{
+		std::cout << Time::Timestamp() << " Pass " << pass << " completed!" << std::endl;
 	}
 
 	void CLI::OnError(TunkioStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
@@ -201,9 +204,10 @@ namespace Tunkio
 		m_error = error;
 	}
 
-	void CLI::OnWipeCompleted(uint16_t, uint64_t bytesWritten)
+	void CLI::OnWipeCompleted(uint16_t passes, uint64_t bytesWritten)
 	{
-		std::cout << Time::Timestamp() << " Finished. Bytes written: " << bytesWritten << std::endl;
+		std::cout << Time::Timestamp() << " Wipe complete. " <<
+			"Passes "  << passes <<  ". Bytes written: " << bytesWritten << std::endl;
 
 		const DataUnit::Bytes bytes(bytesWritten);
 		const auto elapsed = m_totalTimer.Elapsed<Time::MilliSeconds>();
