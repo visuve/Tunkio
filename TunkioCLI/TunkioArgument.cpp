@@ -1,5 +1,5 @@
 #include "TunkioCLI-PCH.hpp"
-#include "TunkioArguments.hpp"
+#include "TunkioArgument.hpp"
 
 namespace Tunkio
 {

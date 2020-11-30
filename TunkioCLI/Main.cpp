@@ -1,7 +1,7 @@
 #include "TunkioCLI-PCH.hpp"
 #include "TunkioCLI.hpp"
 #include "TunkioErrorCodes.hpp"
-#include "TunkioArguments.hpp"
+#include "TunkioArgument.hpp"
 
 namespace Tunkio
 {
@@ -208,8 +208,8 @@ int main(int argc, char* argv[])
 		Arguments.at("target").Value<TunkioTargetType>(),
 		Arguments.at("mode").Value<TunkioFillType>(),
 		Arguments.at("filler").Value<std::string>(),
-		Arguments.at("remove").Value<bool>(),
-		Arguments.at("verify").Value<bool>()))
+		Arguments.at("verify").Value<bool>(),
+		Arguments.at("remove").Value<bool>()))
 	{
 		std::cerr << "Tunkio failed to initialize." << std::endl;
 		return ErrorCode::Generic;

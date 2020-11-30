@@ -7,7 +7,7 @@ file(GLOB TunkioTestsSource
 	"../TunkioAPI/FillProviders/*.cpp"
 	"../TunkioAPI/Workloads/*.cpp"
 	"../TunkioLIB/*.cpp"
-	"../TunkioCLI/TunkioArguments.cpp")
+	"../TunkioCLI/TunkioArgument.cpp")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	if(CMAKE_BUILD_TYPE MATCHES "Debug")

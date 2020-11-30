@@ -8,6 +8,7 @@
 #include <chrono>
 #include <cuchar>
 #include <iomanip>
+#include <memory>
 #include <queue>
 #include <random>
 #include <regex>
@@ -18,4 +19,4 @@
 #include "../TunkioAPI/TunkioAPI.h"
 #include "../TunkioLIB/TunkioDataUnits.hpp"
 #include "../TunkioLIB/TunkioTime.hpp"
-#include "../TunkioCLI/TunkioArguments.hpp"
+#include "../TunkioCLI/TunkioArgument.hpp"
