@@ -15,7 +15,8 @@ namespace Tunkio
 		const void* Data(uint64_t bytes) override;
 
 	private:
-		std::vector<char8_t> m_fileContent;
+		const std::vector<char8_t> m_fileContent;
 		std::vector<char8_t> m_fillData;
+		size_t m_offset = 0;
 	};
 }

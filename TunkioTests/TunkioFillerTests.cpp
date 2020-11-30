@@ -32,6 +32,36 @@ namespace Tunkio::Fill
 			const void* data = filler.Data(15);
 			EXPECT_EQ(memcmp(data, "foobar\nfoobar\nf", 15), 0);
 		}
+		{
+			SentenceFiller filler("foobar", false);
+			{
+				auto data = reinterpret_cast<const char*>(filler.Data(3));
+				EXPECT_EQ(memcmp(data, "foo", 3), 0);
+			}
+			{
+				auto data = reinterpret_cast<const char*>(filler.Data(3));
+				EXPECT_EQ(memcmp(data, "bar", 3), 0);
+			}
+			{
+				auto data = reinterpret_cast<const char*>(filler.Data(3));
+				EXPECT_EQ(memcmp(data, "foo", 3), 0);
+			}
+		}
+		{
+			SentenceFiller filler("foobar", false);
+			{
+				const void* data = filler.Data(3);
+				EXPECT_EQ(memcmp(data, "foo", 3), 0);
+			}
+			{
+				const void* data = filler.Data(4);
+				EXPECT_EQ(memcmp(data, "barf", 4), 0);
+			}
+			{
+				const void* data = filler.Data(2);
+				EXPECT_EQ(memcmp(data, "oo", 2), 0);
+			}
+		}
 	}
 
 	TEST(TunkioFillTest, FileFiller)

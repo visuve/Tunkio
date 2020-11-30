@@ -13,7 +13,10 @@ namespace Tunkio
 		const void* Data(uint64_t bytes) override;
 
 	protected:
-		std::string m_fillString;
+		const std::string m_fillString;
 		std::string m_fillData;
+
+	private:
+		size_t m_offset = 0;
 	};
 }

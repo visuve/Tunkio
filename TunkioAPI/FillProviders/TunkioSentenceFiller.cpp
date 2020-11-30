@@ -20,11 +20,15 @@ namespace Tunkio
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
+		}
 
-			for (size_t i = 0; i < bytes; ++i)
+		for (char& c : m_fillData)
+		{
+			c = m_fillString[m_offset++];
+
+			if (m_offset >= m_fillString.size())
 			{
-				size_t mod = i % m_fillString.size();
-				m_fillData[i] = m_fillString[mod];
+				m_offset = 0;
 			}
 		}
 

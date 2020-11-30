@@ -24,8 +24,6 @@ namespace Tunkio
 
 	FileFiller::~FileFiller()
 	{
-		m_fileContent.clear();
-		m_fillData.clear();
 	}
 
 	bool FileFiller::HasContent()
@@ -40,11 +38,15 @@ namespace Tunkio
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
+		}
 
-			for (size_t i = 0; i < bytes; ++i)
+		for (char8_t& c : m_fillData)
+		{
+			c = m_fileContent[m_offset];
+
+			if (++m_offset >= m_fileContent.size())
 			{
-				size_t mod = i % m_fileContent.size();
-				m_fillData[i] = m_fileContent[mod];
+				m_offset = 0;
 			}
 		}
 
