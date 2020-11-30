@@ -11,6 +11,10 @@ namespace Tunkio
 		const std::filesystem::path Path;
 
 		explicit File(const std::filesystem::path& path);
+		File(File&&) noexcept;
+		File& operator = (File&&) noexcept;
+		File(const File&) = delete;
+		File& operator = (const File&) = delete;
 		~File();
 
 		bool IsValid() const;

@@ -174,6 +174,25 @@ namespace Tunkio
 		}
 	}
 
+	File::File(File&& other) noexcept
+	{
+		std::swap(m_handle, other.m_handle);
+		std::swap(m_actualSize, other.m_actualSize);
+		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		std::swap(m_isDevice, other.m_isDevice);
+	}
+
+	File& File::operator = (File&& other) noexcept
+	{
+		std::swap(m_handle, other.m_handle);
+		std::swap(m_actualSize, other.m_actualSize);
+		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		std::swap(m_isDevice, other.m_isDevice);
+		return *this;
+	}
+
 	File::~File()
 	{
 		if (IsValid())

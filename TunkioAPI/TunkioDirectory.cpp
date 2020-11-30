@@ -14,9 +14,9 @@ namespace Tunkio
 				continue;
 			}
 
-			const File file(entry.path().string());
+			File file(entry);
 
-			if (file.IsValid())
+			if (!file.IsValid())
 			{
 				m_files.first = false;
 				return;
@@ -28,7 +28,7 @@ namespace Tunkio
 				return;
 			}
 
-			m_files.second.emplace_back(file);
+			m_files.second.emplace_back(std::move(file));
 			m_size.second += file.AllocationSize().second;
 		}
 

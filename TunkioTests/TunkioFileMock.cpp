@@ -1,8 +1,6 @@
 #include "TunkioTests-PCH.hpp"
 #include "../TunkioAPI/TunkioFile.hpp"
 
-#define UNUSED(expr) do { (void)(expr); } while (0)
-
 namespace Tunkio
 {
 	File::File(const std::filesystem::path& path) :
@@ -11,12 +9,33 @@ namespace Tunkio
 		m_allocationSize(true, 1),
 		m_optimalWriteSize(true, 1)
 	{
+	}
+
+	File::File(File&& other) noexcept
+	{
 #if defined(_WIN32)
-		UNUSED(m_handle);
+		std::swap(m_handle, other.m_handle);
 #else
-		UNUSED(m_fileDescriptor);
+		std::swap(m_fileDescriptor, other.m_fileDescriptor);
 #endif
-		UNUSED(m_isDevice);
+		std::swap(m_actualSize, other.m_actualSize);
+		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		std::swap(m_isDevice, other.m_isDevice);
+	}
+
+	File& File::operator = (File&& other) noexcept
+	{
+#if defined(_WIN32)
+		std::swap(m_handle, other.m_handle);
+#else
+		std::swap(m_fileDescriptor, other.m_fileDescriptor);
+#endif
+		std::swap(m_actualSize, other.m_actualSize);
+		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		std::swap(m_isDevice, other.m_isDevice);
+		return *this;
 	}
 
 	File::~File()
