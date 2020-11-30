@@ -110,18 +110,6 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t size)
-	{
-		const ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(size));
-
-		if (result <= 0)
-		{
-			return { false, 0 };
-		}
-
-		return { true, static_cast<uint64_t>(result) };
-	}
-
 	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes, uint64_t offset)
 	{
 		const ssize_t result = pwrite(m_fileDescriptor, data, static_cast<size_t>(bytes), offset);
@@ -134,19 +122,6 @@ namespace Tunkio
 		uint64_t bytesWritten = static_cast<uint64_t>(result);
 
 		return { bytesWritten == bytes, bytesWritten };
-	}
-
-	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes)
-	{
-		std::shared_ptr<void> buffer(malloc(bytes));
-		const ssize_t bytesRead = read(m_fileDescriptor, buffer.get(), bytes);
-
-		if (bytesRead <= 0)
-		{
-			return { false, nullptr };
-		}
-
-		return { bytesRead == bytes, buffer };
 	}
 
 	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
@@ -165,11 +140,6 @@ namespace Tunkio
 	bool File::Flush()
 	{
 		return fsync(m_fileDescriptor) == 0;
-	}
-
-	bool File::Rewind()
-	{
-		return lseek(m_fileDescriptor, 0, SEEK_SET) == 0;
 	}
 
 	bool File::Delete()

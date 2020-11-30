@@ -43,7 +43,6 @@ extern "C"
 		Unmount = 'U',
 		Size = 'S',
 		Write = 'W',
-		Rewind = 'R',
 		Verify = 'V',
 		Delete = 'D'
 	};

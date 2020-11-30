@@ -52,11 +52,6 @@ namespace Tunkio
 				OnError(TunkioStage::Write, passes, bytesWritten, LastError);
 			}
 
-			if (!file.Rewind())
-			{
-				OnError(TunkioStage::Rewind, passes, bytesWritten, LastError);
-			}
-
 			totalBytesWritten += bytesWritten;
 			OnPassCompleted(passes);
 		}

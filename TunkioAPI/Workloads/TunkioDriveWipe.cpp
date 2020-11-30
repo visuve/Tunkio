@@ -51,11 +51,6 @@ namespace Tunkio
 				return false;
 			}
 
-			if (!drive.Rewind())
-			{
-				OnError(TunkioStage::Rewind, passes, bytesWritten, LastError);
-			}
-
 			totalBytesWritten += bytesWritten;
 			OnPassCompleted(passes);
 		}

@@ -221,18 +221,6 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes)
-	{
-		DWORD bytesWritten = 0;
-
-		if (!WriteFile(m_handle, data, static_cast<DWORD>(bytes), &bytesWritten, nullptr))
-		{
-			return { false, bytesWritten };
-		}
-
-		return { bytes == bytesWritten, bytesWritten };
-	}
-
 	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes, uint64_t offset)
 	{
 		DWORD bytesWritten = 0;
@@ -244,19 +232,6 @@ namespace Tunkio
 		}
 
 		return { bytes == bytesWritten, bytesWritten };
-	}
-
-	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes)
-	{
-		std::shared_ptr<void> buffer(malloc(bytes));
-		DWORD bytesRead = 0;
-
-		if (!ReadFile(m_handle, buffer.get(), static_cast<DWORD>(bytes), &bytesRead, nullptr))
-		{
-			return { false, nullptr };
-		}
-
-		return { bytes == bytesRead, buffer };
 	}
 
 	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
@@ -276,19 +251,6 @@ namespace Tunkio
 	bool File::Flush()
 	{
 		return FlushFileBuffers(m_handle);
-	}
-
-	bool File::Rewind()
-	{
-		const LARGE_INTEGER beginning = {};
-		LARGE_INTEGER newPosition = {};
-
-		if (!SetFilePointerEx(m_handle, beginning, &newPosition, FILE_BEGIN))
-		{
-			return false;
-		}
-
-		return newPosition.QuadPart == 0;
 	}
 
 	bool File::Delete()
