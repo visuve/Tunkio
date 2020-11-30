@@ -1,15 +1,5 @@
 #pragma once
 
-#if defined(_WIN32)
-#include <Windows.h>
-#undef min
-#undef max
-#elif defined(__linux__)
-#include <linux/fs.h>
-#else
-#include <sys/disk.h>
-#endif
-
 #if !defined(_WIN32)
 #include <fcntl.h>
 #include <stdio.h>
@@ -19,6 +9,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#endif
+
+#if defined(_WIN32)
+#include <Windows.h>
+#undef min
+#undef max
+#elif defined(__linux__)
+#include <linux/fs.h>
+#else
+#include <sys/disk.h>
 #endif
 
 #include <cassert>
