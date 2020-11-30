@@ -46,14 +46,18 @@ namespace Tunkio
 			return;
 		}
 #endif
-		if ((buffer.st_mode & S_IFMT) == S_IFBLK)
+		if (S_ISBLK(buffer.st_mode) || S_ISCHR(buffer.st_mode))
 		{
 			m_isDevice = true;
 			m_actualSize = DiskSizeByDescriptor(m_fileDescriptor);
 		}
-		else
+		else if (S_ISREG(buffer.st_mode))
 		{
 			m_actualSize = { true, buffer.st_size };
+		}
+		else
+		{
+			return;
 		}
 
 		m_allocationSize = { true, buffer.st_blocks * 512 };
@@ -86,7 +90,9 @@ namespace Tunkio
 
 	bool File::Unmount() const
 	{
-		return unmount(Path.c_str(), MNT_FORCE) == 0;
+		// TODO: need to check that it is actually mounted
+		// return unmount(Path.c_str(), MNT_FORCE) == 0;
+		return true;
 	}
 
 	const std::pair<bool, uint64_t>& File::ActualSize() const
