@@ -194,6 +194,9 @@ namespace Tunkio
 			std::wcerr << L"Detailed description: ";
 			std::wcerr.write(buffer.data(), size - 2) << std::endl; // Trim excess /r/n
 		}
+#else
+		std::cerr << "Detailed description: ";
+		std::cerr << strerror(error) << '.' << std::endl;
 #endif
 		m_error = error;
 	}
