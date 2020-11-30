@@ -346,10 +346,12 @@ void WipePassModel::clearStats()
 
 void WipePassModel::clearPasses()
 {
-	Q_ASSERT(!m_passes.isEmpty());
-	beginResetModel();
-	m_passes.clear();
-	endResetModel();
+	if (!m_passes.isEmpty())
+	{
+		beginResetModel();
+		m_passes.clear();
+		endResetModel();
+	}
 }
 
 void WipePassModel::removePass(int row)

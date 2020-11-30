@@ -181,7 +181,7 @@ MainWindow::MainWindow(QWidget* parent) :
 			"Tunkio - Shuffle",
 			"Gutmann's method requires random order of some of the passes.\n"
 			"Click retry to shuffle, OK to accept.",
-			QMessageBox::Ok | QMessageBox::Retry) == QMessageBox::Retry);
+			QMessageBox::Retry | QMessageBox::Ok) == QMessageBox::Retry);
 	});
 
 
@@ -253,8 +253,10 @@ void MainWindow::onOpenFileDialog()
 
 	if (dialog.exec() == QFileDialog::Accepted)
 	{
-		const QString file = dialog.selectedFiles().first();
-		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(file));
+		const QString selected = dialog.selectedFiles().first();
+		const QString file = QDir::toNativeSeparators(selected);
+
+		ui->lineEditSelectedPath->setText(file);
 		m_tunkio = std::make_shared<TunkioRunner>(file, TunkioTargetType::FileWipe);
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
 	}
@@ -268,8 +270,10 @@ void MainWindow::onOpenDirectoryDialog()
 
 	if (dialog.exec() == QFileDialog::Accepted)
 	{
-		const QString directory = dialog.selectedFiles().first();
-		ui->lineEditSelectedPath->setText(QDir::toNativeSeparators(directory));
+		const QString selected = dialog.selectedFiles().first();
+		const QString directory = QDir::toNativeSeparators(selected);
+
+		ui->lineEditSelectedPath->setText(directory);
 		m_tunkio = std::make_shared<TunkioRunner>(directory, TunkioTargetType::DirectoryWipe);
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
 	}
@@ -306,8 +310,9 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 
 				if (dialog.exec() == QFileDialog::Accepted)
 				{
-					const QString file = dialog.selectedFiles().first();
-					ui->lineEditFillValue->setText(QDir::toNativeSeparators(file));
+					const QString selected = dialog.selectedFiles().first();
+					const QString file = QDir::toNativeSeparators(selected);
+					ui->lineEditFillValue->setText(file);
 				}
 
 				return true;
