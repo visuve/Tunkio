@@ -38,30 +38,13 @@ namespace Tunkio
 		{
 			OnPassStarted(++passes);
 
-			uint64_t bytesWritten = 0;
 			uint64_t bytesLeft = file.AllocationSize().second;
-
+			uint64_t bytesWritten = 0;
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
-			while (bytesLeft)
+			if (!Fill(passes, bytesLeft, bytesWritten, filler, file))
 			{
-				const uint64_t size = std::min(bytesLeft, file.OptimalWriteSize().second);
-				const void* data = filler->Data(size);
-				const auto result = file.Write(data, size);
-
-				bytesWritten += result.second;
-				bytesLeft -= result.second;
-
-				if (!result.first)
-				{
-					OnError(TunkioStage::Write, passes, bytesWritten, LastError);
-					return false;
-				}
-
-				if (!OnProgress(passes, bytesWritten))
-				{
-					return true;
-				}
+				return false;
 			}
 
 			if (!file.Flush())

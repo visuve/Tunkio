@@ -125,4 +125,49 @@ namespace Tunkio
 
 		m_errorCallback(m_context, stage, pass, bytesWritten, errorCode);
 	}
+
+	bool IWorkload::Fill(uint16_t pass, uint64_t bytesLeft, uint64_t& bytesWritten, std::shared_ptr<IFillProvider> filler, File& file)
+	{
+		while (bytesLeft)
+		{
+			const uint64_t size = std::min(bytesLeft, file.OptimalWriteSize().second);
+			const uint64_t offset = bytesWritten;
+
+			const void* writtenData = filler->Data(size);
+			const auto result = file.Write(writtenData, size, offset);
+
+			bytesWritten += result.second;
+			bytesLeft -= result.second;
+
+			if (!result.first)
+			{
+				OnError(TunkioStage::Write, pass, bytesWritten, LastError);
+				return false;
+			}
+
+			if (filler->Verify)
+			{
+				const auto actualData = file.Read(size, offset);
+
+				if (!actualData.first)
+				{
+					OnError(TunkioStage::Verify, pass, bytesWritten, LastError);
+					return false;
+				}
+
+				if (std::memcmp(writtenData, actualData.second.get(), size) != 0)
+				{
+					OnError(TunkioStage::Verify, pass, bytesWritten, LastError);
+					return false;
+				}
+			}
+
+			if (!OnProgress(pass, bytesWritten))
+			{
+				return true;
+			}
+		}
+
+		return true;
+	}
 }

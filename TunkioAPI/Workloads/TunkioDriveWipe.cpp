@@ -12,7 +12,6 @@ namespace Tunkio
 
 	bool DriveWipe::Run()
 	{
-		// TODO: use FSCTL_DISMOUNT_VOLUME IOCTL
 		File drive(m_path);
 
 		if (!drive.IsValid())
@@ -43,30 +42,13 @@ namespace Tunkio
 		{
 			OnPassStarted(++passes);
 
-			uint64_t bytesWritten = 0;
 			uint64_t bytesLeft = drive.ActualSize().second;
-
+			uint64_t bytesWritten = 0;
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
-			while (bytesLeft)
+			if (!Fill(passes, bytesLeft, bytesWritten, filler, drive))
 			{
-				const uint64_t size = std::min(bytesLeft, drive.OptimalWriteSize().second);
-				const void* data = filler->Data(size);
-				const auto result = drive.Write(data, size);
-
-				bytesWritten += result.second;
-				bytesLeft -= result.second;
-
-				if (!result.first)
-				{
-					OnError(TunkioStage::Write, passes, bytesWritten, LastError);
-					return false;
-				}
-
-				if (!OnProgress(passes, bytesWritten))
-				{
-					return true;
-				}
+				return false;
 			}
 
 			if (!drive.Rewind())

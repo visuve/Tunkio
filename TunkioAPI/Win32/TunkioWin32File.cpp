@@ -1,8 +1,29 @@
+#include "..\TunkioFile.hpp"
 #include "../TunkioAPI-PCH.hpp"
 #include "../TunkioFile.hpp"
 
 namespace Tunkio
 {
+	OVERLAPPED Offset(uint64_t offset)
+	{
+		ULARGE_INTEGER cast = {};
+		cast.QuadPart = offset;
+
+		OVERLAPPED overlapped = {};
+		overlapped.Offset = cast.LowPart;
+		overlapped.OffsetHigh = cast.HighPart;
+
+		return overlapped;
+	}
+
+	uint64_t Cast(DWORD low, DWORD high)
+	{
+		ULARGE_INTEGER cast = {};
+		cast.LowPart = low;
+		cast.HighPart = high;
+		return cast.QuadPart;
+	}
+
 	HANDLE Open(const std::filesystem::path& path)
 	{
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-buffering
@@ -134,9 +155,7 @@ namespace Tunkio
 			fileInfo.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
 		{
 			m_actualSize.first = true;
-			m_actualSize.second = fileInfo.nFileSizeHigh;
-			m_actualSize.second <<= 32;
-			m_actualSize.second |= fileInfo.nFileSizeLow;
+			m_actualSize.second = Cast(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
 		}
 		else
 		{
@@ -202,16 +221,56 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, const uint64_t size) const
+	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes)
 	{
 		DWORD bytesWritten = 0;
 
-		if (!WriteFile(m_handle, data, static_cast<DWORD>(size), &bytesWritten, nullptr))
+		if (!WriteFile(m_handle, data, static_cast<DWORD>(bytes), &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
 
-		return { true, bytesWritten };
+		return { bytes == bytesWritten, bytesWritten };
+	}
+
+	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes, uint64_t offset)
+	{
+		DWORD bytesWritten = 0;
+		OVERLAPPED overlapped = Offset(offset);
+
+		if (!WriteFile(m_handle, data, static_cast<DWORD>(bytes), &bytesWritten, &overlapped))
+		{
+			return { false, bytesWritten };
+		}
+
+		return { bytes == bytesWritten, bytesWritten };
+	}
+
+	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes)
+	{
+		std::shared_ptr<void> buffer(malloc(bytes));
+		DWORD bytesRead = 0;
+
+		if (!ReadFile(m_handle, buffer.get(), static_cast<DWORD>(bytes), &bytesRead, nullptr))
+		{
+			return { false, nullptr };
+		}
+
+		return { bytes == bytesRead, buffer };
+	}
+
+	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
+	{
+		std::shared_ptr<void> buffer(malloc(bytes));
+		DWORD bytesRead = 0;
+		OVERLAPPED overlapped = Offset(offset);
+
+		if (!ReadFile(m_handle, buffer.get(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
+		{
+			return { false, nullptr };
+		}
+
+		return { bytes == bytesRead, buffer };
 	}
 
 	bool File::Flush()

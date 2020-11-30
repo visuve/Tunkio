@@ -6,7 +6,7 @@ namespace Tunkio
 	{
 	public:
 		constexpr explicit IFillProvider(bool verify) :
-			m_verify(verify)
+			Verify(verify)
 		{
 		}
 
@@ -14,7 +14,6 @@ namespace Tunkio
 
 		virtual const void* Data(uint64_t bytes) = 0;
 
-	protected:
-		bool m_verify;
+		const bool Verify;
 	};
 }
