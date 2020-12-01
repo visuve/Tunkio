@@ -472,6 +472,27 @@ void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten
 	message << QString("Bytes written: %1").arg(bytesWritten);
 	message << QString("Operating system error code: %1").arg(errorCode);
 
+#if defined(_WIN32)
+	std::array<char, 0x400> buffer = {};
+	DWORD size = FormatMessageA(
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		errorCode,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		buffer.data(),
+		static_cast<DWORD>(buffer.size()),
+		nullptr);
+
+	if (size > 2)
+	{
+		message << "Detailed description: ";
+		message << QString(buffer.data(), size - 2); // Trim excess /r/n
+	}
+#else
+	message << "Detailed description: ";
+	message << QString(strerror(errorCode)).append('.');
+#endif
+
 	QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
 
 	ui->pushButtonStart->setEnabled(true);
