@@ -67,7 +67,7 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t size, uint64_t)
+	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t size)
 	{
 		return { data != nullptr, size };
 	}

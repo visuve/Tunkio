@@ -240,12 +240,11 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes, uint64_t offset)
+	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes)
 	{
 		DWORD bytesWritten = 0;
-		OVERLAPPED overlapped = Offset(offset);
 
-		if (!WriteFile(m_handle, data, static_cast<DWORD>(bytes), &bytesWritten, &overlapped))
+		if (!WriteFile(m_handle, data, static_cast<DWORD>(bytes), &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}

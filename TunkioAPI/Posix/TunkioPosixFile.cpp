@@ -129,9 +129,9 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes, uint64_t offset)
+	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes)
 	{
-		const ssize_t result = pwrite(m_fileDescriptor, data, static_cast<size_t>(bytes), offset);
+		const ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(bytes));
 
 		if (result <= 0)
 		{

@@ -134,7 +134,7 @@ namespace Tunkio
 			const uint64_t offset = bytesWritten;
 
 			const void* writtenData = filler->Data(size);
-			const auto result = file.Write(writtenData, size, offset);
+			const auto result = file.Write(writtenData, size);
 
 			bytesWritten += result.second;
 			bytesLeft -= result.second;
