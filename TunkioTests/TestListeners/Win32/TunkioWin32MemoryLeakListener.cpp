@@ -1,6 +1,5 @@
 #include "../../TunkioTests-PCH.hpp"
 #include "TunkioWin32MemoryLeakListener.hpp"
-#include <Windows.h>
 
 namespace Tunkio
 {

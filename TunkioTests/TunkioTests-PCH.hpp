@@ -1,5 +1,13 @@
 #pragma once
 
+#if defined(_WIN32)
+#include <Windows.h>
+#include <debugapi.h>
+#undef min
+#undef max
+#endif 
+
+
 #include <gtest/gtest.h>
 
 #include <array>

@@ -23,6 +23,13 @@ namespace Tunkio
 			return;
 		}
 
+#if defined(_WIN32)
+		if (IsDebuggerPresent())
+		{
+			return;
+		}
+#endif
+
 		const auto elapsed = std::chrono::high_resolution_clock::now() - m_testStart;
 
 		if (elapsed > Limit)
