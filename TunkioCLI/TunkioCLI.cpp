@@ -177,27 +177,7 @@ namespace Tunkio
 		}
 
 		std::cerr << "! Bytes written: " << bytesWritten << '.' << std::endl;
-
-#if defined(_WIN32)
-		std::array<wchar_t, 0x400> buffer = {};
-		DWORD size = FormatMessageW(
-			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			nullptr,
-			error,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			buffer.data(),
-			static_cast<DWORD>(buffer.size()),
-			nullptr);
-
-		if (size > 2)
-		{
-			std::wcerr << L"Detailed description: ";
-			std::wcerr.write(buffer.data(), size - 2) << std::endl; // Trim excess /r/n
-		}
-#else
-		std::cerr << "Detailed description: ";
-		std::cerr << strerror(error) << '.' << std::endl;
-#endif
+		std::cerr << "Detailed description: " << SystemErrorCodeToString(error) << std::endl;
 		m_error = error;
 	}
 

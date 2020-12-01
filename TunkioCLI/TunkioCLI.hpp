@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../TunkioAPI/TunkioAPI.h"
-#include "TunkioErrorCodes.hpp"
+#include "../TunkioLIB/TunkioErrorCodes.hpp"
 
 namespace Tunkio
 {

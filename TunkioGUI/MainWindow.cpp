@@ -4,6 +4,8 @@
 #include "DriveSelectDialog.hpp"
 #include "ui_MainWindow.h"
 
+#include "../TunkioLIB/TunkioErrorCodes.hpp"
+
 QString toString(TunkioStage type)
 {
 	switch (type)
@@ -471,27 +473,8 @@ void MainWindow::onError(TunkioStage stage, uint16_t pass, uint64_t bytesWritten
 	message << QString("Pass: %1").arg(pass);
 	message << QString("Bytes written: %1").arg(bytesWritten);
 	message << QString("Operating system error code: %1").arg(errorCode);
-
-#if defined(_WIN32)
-	std::array<char, 0x400> buffer = {};
-	DWORD size = FormatMessageA(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr,
-		errorCode,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		buffer.data(),
-		static_cast<DWORD>(buffer.size()),
-		nullptr);
-
-	if (size > 2)
-	{
-		message << "Detailed description: ";
-		message << QString(buffer.data(), size - 2); // Trim excess /r/n
-	}
-#else
-	message << "Detailed description: ";
-	message << QString(strerror(errorCode)).append('.');
-#endif
+	message << "Detailed description: " <<
+		QString::fromStdString(Tunkio::SystemErrorCodeToString(errorCode));
 
 	QMessageBox::critical(this, "Tunkio - An error occurred", message.join('\n'));
 

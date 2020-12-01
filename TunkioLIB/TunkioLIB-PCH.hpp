@@ -1,8 +1,11 @@
 #pragma once
 
 #if defined(_WIN32)
+#include <Windows.h>
 #undef min
 #undef max
+#else
+#include <errno.h>
 #endif
 
 #include <any>
@@ -11,6 +14,7 @@
 #include <cassert>
 #include <chrono>
 #include <cinttypes>
+#include <cstring>
 #include <ctime>
 #include <filesystem>
 #include <iostream>
