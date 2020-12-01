@@ -145,13 +145,16 @@ namespace Tunkio
 
 	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
 	{
-		std::shared_ptr<void> buffer(malloc(bytes));
-		const ssize_t bytesRead = pread(m_fileDescriptor, buffer.get(), bytes, offset);
+		std::shared_ptr<void> buffer(malloc(bytes), free);
 
-		if (bytesRead <= 0)
+		const ssize_t result = pread(m_fileDescriptor, buffer.get(), bytes, offset);
+
+		if (result <= 0)
 		{
-			return { false, {} };
+			return { false, nullptr };
 		}
+
+		uint64_t bytesRead = static_cast<uint64_t>(result);
 
 		return { bytesRead == bytes, buffer };
 	}

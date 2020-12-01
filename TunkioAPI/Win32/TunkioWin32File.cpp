@@ -255,7 +255,7 @@ namespace Tunkio
 
 	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
 	{
-		std::shared_ptr<void> buffer(malloc(bytes));
+		std::shared_ptr<void> buffer(malloc(bytes), free);
 		DWORD bytesRead = 0;
 		OVERLAPPED overlapped = Offset(offset);
 

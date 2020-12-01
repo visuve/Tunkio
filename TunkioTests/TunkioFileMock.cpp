@@ -74,7 +74,7 @@ namespace Tunkio
 
 	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t size, uint64_t)
 	{
-		std::shared_ptr<void> buffer(malloc(1));
+		std::shared_ptr<void> buffer(malloc(1), free);
 		return { size > 0, buffer };
 	}
 
