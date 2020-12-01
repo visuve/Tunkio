@@ -3,7 +3,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 project("Tunkio")
 
-add_subdirectory("googletest")
+if(EXISTS "googletest")
+	add_subdirectory("googletest")
+else()
+	message(WARNING "Google Test not found, cannot compile unit tests. Please run git submodule update --init")
+endif()
 
 if(MSVC)
 	add_compile_options(/W4 /WX /MP /wd26812)
@@ -11,7 +15,10 @@ else()
 	add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-add_subdirectory("TunkioTests")
+if(EXISTS "googletest")
+	add_subdirectory("TunkioTests")
+endif()
+
 add_subdirectory("TunkioLIB")
 add_subdirectory("TunkioAPI")
 add_subdirectory("TunkioCLI")
