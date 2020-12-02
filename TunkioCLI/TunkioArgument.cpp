@@ -97,14 +97,14 @@ namespace Tunkio
 				result = TunkioFillType::OneFill;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::CharacterFill) :
+			case static_cast<uint8_t>(TunkioFillType::ByteFill) :
 			{
-				result = TunkioFillType::CharacterFill;
+				result = TunkioFillType::ByteFill;
 				return true;
 			}
-			case static_cast<uint8_t>(TunkioFillType::SentenceFill) :
+			case static_cast<uint8_t>(TunkioFillType::SequenceFill) :
 			{
-				result = TunkioFillType::SentenceFill;
+				result = TunkioFillType::SequenceFill;
 				return true;
 			}
 			case static_cast<uint8_t>(TunkioFillType::FileFill) :

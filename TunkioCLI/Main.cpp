@@ -23,8 +23,8 @@ namespace Tunkio
 		std::cout << "  --target=[f|d|D] where f=file, d=directory, D=drive " << std::endl;
 
 		std::cout << "  --mode=[0|1|r|c|s|f] where "
-			<< "0=fill with zeros, 1=fill with ones, r=random, c=character, s=sentence, f=filepath."
-			<< " Note: with option 'c', 's' or 'f' you need to provide filler argument." << std::endl;
+			<< "0=fill with zeros, 1=fill with ones, r=random, b=byte, s=sequence, f=filepath."
+			<< " Note: with option 'b', 's' or 'f' you need to provide filler argument." << std::endl;
 
 		std::cout << "  --remove=[y|n] remove after wipe "
 			<< "y=yes, n=no. Applies only to file or directory. Default=no" << std::endl;
@@ -120,7 +120,7 @@ namespace Tunkio
 		auto mode = Arguments.at("mode").Value<TunkioFillType>();
 		auto filler = Arguments.at("filler").Value<std::string>();
 
-		if (mode == TunkioFillType::CharacterFill)
+		if (mode == TunkioFillType::ByteFill)
 		{
 			if (filler.size() != 1)
 			{
@@ -128,11 +128,11 @@ namespace Tunkio
 				return false;
 			}
 		}
-		else if (mode == TunkioFillType::SentenceFill)
+		else if (mode == TunkioFillType::SequenceFill)
 		{
 			if (filler.empty())
 			{
-				std::cerr << "Sentence argument needs to be at least one character!" << std::endl << std::endl;
+				std::cerr << "Sequence argument needs to be at least one character!" << std::endl << std::endl;
 				return false;
 			}
 		}

@@ -1,15 +1,15 @@
 #include "../TunkioAPI-PCH.hpp"
-#include "TunkioCharFiller.hpp"
+#include "TunkioByteFiller.hpp"
 
 namespace Tunkio
 {
-	CharFiller::CharFiller(std::byte byte, bool verify) :
+	ByteFiller::ByteFiller(std::byte byte, bool verify) :
 		IFillProvider(verify),
 		m_byte(byte)
 	{
 	}
 
-	std::byte* CharFiller::Data(uint64_t bytes)
+	std::byte* ByteFiller::Data(uint64_t bytes)
 	{
 		if (m_fillData.size() != bytes)
 		{

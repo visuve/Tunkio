@@ -49,8 +49,8 @@ namespace Tunkio
 		TunkioHandle* handle = TunkioInitialize(nullptr, TunkioTargetType::FileWipe, false, &counters);
 		EXPECT_EQ(handle, nullptr);
 
-		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::CharacterFill, false, "xxx"));
-		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::SentenceFill, false, nullptr));
+		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::ByteFill, false, "xxx"));
+		EXPECT_FALSE(TunkioAddWipeRound(handle, TunkioFillType::SequenceFill, false, nullptr));
 
 		TunkioFree(handle);
 
@@ -114,8 +114,8 @@ namespace Tunkio
 
 			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::OneFill, false, nullptr));
 			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::ZeroFill, false, nullptr));
-			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::CharacterFill, false, "x"));
-			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::SentenceFill, false, "xyz"));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::ByteFill, false, "x"));
+			EXPECT_TRUE(TunkioAddWipeRound(handle, TunkioFillType::SequenceFill, false, "xyz"));
 
 			EXPECT_TRUE(TunkioRun(handle));
 			TunkioFree(handle);

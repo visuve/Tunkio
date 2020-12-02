@@ -7,8 +7,8 @@
 #include "Workloads/TunkioDriveWipe.hpp"
 
 #include "FillProviders/TunkioFillProvider.hpp"
-#include "FillProviders/TunkioCharFiller.hpp"
-#include "FillProviders/TunkioSentenceFiller.hpp"
+#include "FillProviders/TunkioByteFiller.hpp"
+#include "FillProviders/TunkioSequenceFiller.hpp"
 #include "FillProviders/TunkioFileFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
 
@@ -91,29 +91,29 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 	switch (round)
 	{
 		case TunkioFillType::ZeroFill:
-			instance->AddFiller(new Tunkio::CharFiller(std::byte(0x00), verify));
+			instance->AddFiller(new Tunkio::ByteFiller(std::byte(0x00), verify));
 			return true;
 
 		case TunkioFillType::OneFill:
-			instance->AddFiller(new Tunkio::CharFiller(std::byte(0xFF), verify));
+			instance->AddFiller(new Tunkio::ByteFiller(std::byte(0xFF), verify));
 			return true;
 
-		case TunkioFillType::CharacterFill:
+		case TunkioFillType::ByteFill:
 			if (Length(optional) != 1)
 			{
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::CharFiller(std::byte(optional[0]), verify));
+			instance->AddFiller(new Tunkio::ByteFiller(std::byte(optional[0]), verify));
 			return true;
 
-		case TunkioFillType::SentenceFill:
+		case TunkioFillType::SequenceFill:
 			if (Length(optional) < 1)
 			{
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::SentenceFiller(optional, verify));
+			instance->AddFiller(new Tunkio::SequenceFiller(optional, verify));
 			return true;
 
 		case TunkioFillType::FileFill:

@@ -1,9 +1,9 @@
 #include "../TunkioAPI-PCH.hpp"
-#include "TunkioSentenceFiller.hpp"
+#include "TunkioSequenceFiller.hpp"
 
 namespace Tunkio
 {
-	SentenceFiller::SentenceFiller(
+	SequenceFiller::SequenceFiller(
 		const std::string& fillString,
 		bool verify) :
 		IFillProvider(verify),
@@ -11,7 +11,7 @@ namespace Tunkio
 	{
 	}
 
-	std::byte* SentenceFiller::Data(uint64_t bytes)
+	std::byte* SequenceFiller::Data(uint64_t bytes)
 	{
 		if (m_fillData.size() != bytes)
 		{

@@ -29,7 +29,7 @@ bool TunkioRunner::addPass(TunkioFillType fillType, const QByteArray& fillValue,
 {
 	Q_ASSERT(m_tunkio);
 
-	const std::string sentence = fillValue.toStdString();
+	const std::string sequence = fillValue.toStdString();
 
 	switch (fillType)
 	{
@@ -37,14 +37,14 @@ bool TunkioRunner::addPass(TunkioFillType fillType, const QByteArray& fillValue,
 		case TunkioFillType::OneFill:
 		case TunkioFillType::RandomFill:
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, nullptr);
-		case TunkioFillType::CharacterFill:
+		case TunkioFillType::ByteFill:
 		{
-			char character[] = { sentence[0], '\0' };
+			char character[] = { sequence[0], '\0' };
 			return TunkioAddWipeRound(m_tunkio, fillType, verify, character);
 		}
-		case TunkioFillType::SentenceFill:
+		case TunkioFillType::SequenceFill:
 		case TunkioFillType::FileFill:
-			return TunkioAddWipeRound(m_tunkio, fillType, verify, sentence.c_str());
+			return TunkioAddWipeRound(m_tunkio, fillType, verify, sequence.c_str());
 	}
 
 	return false;

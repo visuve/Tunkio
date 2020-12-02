@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QPlainTextEdit" name="plainTextEdit">
      <property name="plainText">
-      <string>Please enter some text here.</string>
+      <string>Please enter some text here. The text will be converted to bytes.</string>
      </property>
     </widget>
    </item>

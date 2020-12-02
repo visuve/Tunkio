@@ -4,11 +4,11 @@
 
 namespace Tunkio
 {
-	class CharFiller : public IFillProvider
+	class ByteFiller : public IFillProvider
 	{
 	public:
-		explicit CharFiller(std::byte byte, bool verify);
-		~CharFiller() = default;
+		explicit ByteFiller(std::byte byte, bool verify);
+		~ByteFiller() = default;
 
 		std::byte* Data(uint64_t bytes) override;
 

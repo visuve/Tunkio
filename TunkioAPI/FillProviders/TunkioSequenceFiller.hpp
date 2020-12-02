@@ -4,11 +4,11 @@
 
 namespace Tunkio
 {
-	class SentenceFiller : public IFillProvider
+	class SequenceFiller : public IFillProvider
 	{
 	public:
-		explicit SentenceFiller(const std::string& fillString, bool verify);
-		~SentenceFiller() = default;
+		explicit SequenceFiller(const std::string& fillString, bool verify);
+		~SequenceFiller() = default;
 
 		std::byte* Data(uint64_t bytes) override;
 

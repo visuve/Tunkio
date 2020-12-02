@@ -19,10 +19,10 @@ namespace Ui
 				return "Zeroes";
 			case TunkioFillType::OneFill:
 				return "Ones";
-			case TunkioFillType::CharacterFill:
-				return "Character";
-			case TunkioFillType::SentenceFill:
-				return "Sentence";
+			case TunkioFillType::ByteFill:
+				return "Byte";
+			case TunkioFillType::SequenceFill:
+				return "Sequence";
 			case TunkioFillType::FileFill:
 				return "File";
 			case TunkioFillType::RandomFill:
@@ -302,7 +302,7 @@ void WipePassModel::addPass(TunkioFillType fillType, bool verify, const QByteArr
 			pass.fillValue = QByteArray("\xFF", 1);
 			break;
 		}
-		case CharacterFill:
+		case ByteFill:
 		{
 			Q_ASSERT(fillValue.size() == 1);
 			pass.fillValue = fillValue;

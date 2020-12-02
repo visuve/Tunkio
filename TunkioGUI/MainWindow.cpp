@@ -102,8 +102,8 @@ MainWindow::MainWindow(QWidget* parent) :
 	{
 		ui->groupBoxAddPass->setEnabled(false);
 		m_model->clearPasses();
-		m_model->addPass(TunkioFillType::CharacterFill, false, "\x55");
-		m_model->addPass(TunkioFillType::CharacterFill, false, "\xAA");
+		m_model->addPass(TunkioFillType::ByteFill, false, "\x55");
+		m_model->addPass(TunkioFillType::ByteFill, false, "\xAA");
 		m_model->addPass(TunkioFillType::RandomFill,  false);
 	});
 
@@ -133,33 +133,33 @@ MainWindow::MainWindow(QWidget* parent) :
 			{ TunkioFillType::RandomFill, {} },
 			{ TunkioFillType::RandomFill, {} },
 
-			{ TunkioFillType::CharacterFill, "\x55" },
-			{ TunkioFillType::CharacterFill, "\xAA" },
-			{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
-			{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
-			{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
+			{ TunkioFillType::ByteFill, "\x55" },
+			{ TunkioFillType::ByteFill, "\xAA" },
+			{ TunkioFillType::SequenceFill, "\x92\x49\x24" },
+			{ TunkioFillType::SequenceFill, "\x49\x24\x92" },
+			{ TunkioFillType::SequenceFill, "\x24\x92\x49" },
 			{ TunkioFillType::ZeroFill, {} },
-			{ TunkioFillType::CharacterFill, "\x11" },
-			{ TunkioFillType::CharacterFill, "\x22" },
-			{ TunkioFillType::CharacterFill, "\x33" },
-			{ TunkioFillType::CharacterFill, "\x44" },
-			{ TunkioFillType::CharacterFill, "\x55" },
-			{ TunkioFillType::CharacterFill, "\x66" },
-			{ TunkioFillType::CharacterFill, "\x77" },
-			{ TunkioFillType::CharacterFill, "\x88" },
-			{ TunkioFillType::CharacterFill, "\x99" },
-			{ TunkioFillType::CharacterFill, "\xAA" },
-			{ TunkioFillType::CharacterFill, "\xBB" },
-			{ TunkioFillType::CharacterFill, "\xCC" },
-			{ TunkioFillType::CharacterFill, "\xDD" },
-			{ TunkioFillType::CharacterFill, "\xEE" },
+			{ TunkioFillType::ByteFill, "\x11" },
+			{ TunkioFillType::ByteFill, "\x22" },
+			{ TunkioFillType::ByteFill, "\x33" },
+			{ TunkioFillType::ByteFill, "\x44" },
+			{ TunkioFillType::ByteFill, "\x55" },
+			{ TunkioFillType::ByteFill, "\x66" },
+			{ TunkioFillType::ByteFill, "\x77" },
+			{ TunkioFillType::ByteFill, "\x88" },
+			{ TunkioFillType::ByteFill, "\x99" },
+			{ TunkioFillType::ByteFill, "\xAA" },
+			{ TunkioFillType::ByteFill, "\xBB" },
+			{ TunkioFillType::ByteFill, "\xCC" },
+			{ TunkioFillType::ByteFill, "\xDD" },
+			{ TunkioFillType::ByteFill, "\xEE" },
 			{ TunkioFillType::OneFill, {} },
-			{ TunkioFillType::SentenceFill, "\x92\x49\x24" },
-			{ TunkioFillType::SentenceFill, "\x49\x24\x92" },
-			{ TunkioFillType::SentenceFill, "\x24\x92\x49" },
-			{ TunkioFillType::SentenceFill, "\x6D\xB6\xDB" },
-			{ TunkioFillType::SentenceFill, "\xB6\xDB\x6D" },
-			{ TunkioFillType::SentenceFill, "\xDB\x6D\xB6" },
+			{ TunkioFillType::SequenceFill, "\x92\x49\x24" },
+			{ TunkioFillType::SequenceFill, "\x49\x24\x92" },
+			{ TunkioFillType::SequenceFill, "\x24\x92\x49" },
+			{ TunkioFillType::SequenceFill, "\x6D\xB6\xDB" },
+			{ TunkioFillType::SequenceFill, "\xB6\xDB\x6D" },
+			{ TunkioFillType::SequenceFill, "\xDB\x6D\xB6" },
 
 			{ TunkioFillType::RandomFill, {} },
 			{ TunkioFillType::RandomFill, {} },
@@ -185,13 +185,6 @@ MainWindow::MainWindow(QWidget* parent) :
 			"Click retry to shuffle, OK to accept.",
 			QMessageBox::Retry | QMessageBox::Ok) == QMessageBox::Retry);
 	});
-
-
-	connect(
-		ui->comboBoxFillType,
-		static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-		this,
-		&MainWindow::onFillTypeSelectionChanged);
 
 	m_model = new WipePassModel(this);
 	ui->tableViewWipePasses->setModel(m_model);
@@ -228,15 +221,25 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	m_textEditDialog = new TextEditorDialog(ui->lineEditFillValue);
 
-	connect(ui->lineEditFillValue, &QLineEdit::textChanged, [&](const QString& text)
+	auto indexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
+
+	connect(ui->comboBoxFillType, indexChanged, [this](int index)
 	{
-		m_textEditDialog->setText(text);
+		this->onFillTypeSelectionChanged(index);
+	});
+
+	connect(ui->lineEditFillValue, &QLineEdit::textEdited, [&](const QString& text)
+	{
+		if (ui->comboBoxFillType->currentIndex() == 3)
+		{
+			m_textEditDialog->setText(text);
+		}
 	});
 
 	connect(m_textEditDialog, &TextEditorDialog::accepted, [this]()
 	{
-		QString sentence = m_textEditDialog->text();
-		ui->lineEditFillValue->setText(sentence);
+		QString sequence = m_textEditDialog->text();
+		ui->lineEditFillValue->setText(sequence);
 	});
 
 	ui->lineEditFillValue->installEventFilter(this);
@@ -377,9 +380,9 @@ void MainWindow::addPass()
 		case 1:
 			return m_model->addPass(TunkioFillType::OneFill, verify);
 		case 2:
-			return m_model->addPass(TunkioFillType::CharacterFill, verify, fill);
+			return m_model->addPass(TunkioFillType::ByteFill, verify, fill);
 		case 3:
-			return m_model->addPass(TunkioFillType::SentenceFill, verify, fill);
+			return m_model->addPass(TunkioFillType::SequenceFill, verify, fill);
 		case 4:
 			return m_model->addPass(TunkioFillType::FileFill, verify, fill);
 		case 5:

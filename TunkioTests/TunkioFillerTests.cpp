@@ -1,39 +1,39 @@
 #include "TunkioTests-PCH.hpp"
 
 #include "FillProviders/TunkioFillProvider.hpp"
-#include "FillProviders/TunkioCharFiller.hpp"
-#include "FillProviders/TunkioSentenceFiller.hpp"
+#include "FillProviders/TunkioByteFiller.hpp"
+#include "FillProviders/TunkioSequenceFiller.hpp"
 #include "FillProviders/TunkioRandomFiller.hpp"
 #include "FillProviders/TunkioFileFiller.hpp"
 
 namespace Tunkio::Fill
 {
-	TEST(TunkioFillTest, CharFiller)
+	TEST(TunkioFillTest, ByteFiller)
 	{
-		CharFiller filler(std::byte(0x58), false);
+		ByteFiller filler(std::byte(0x58), false);
 		auto data = filler.Data(3);
 		EXPECT_EQ(memcmp(data, "XXX", 3), 0);
 	}
 
-	TEST(TunkioFillTest, SentenceFiller)
+	TEST(TunkioFillTest, SequenceFiller)
 	{
 		{
-			SentenceFiller filler("foobar\n", false);
+			SequenceFiller filler("foobar\n", false);
 			const auto data = filler.Data(3);
 			EXPECT_EQ(memcmp(data, "foo", 3), 0);
 		}
 		{
-			SentenceFiller filler("foobar\n", false);
+			SequenceFiller filler("foobar\n", false);
 			const auto data = filler.Data(14);
 			EXPECT_EQ(memcmp(data, "foobar\nfoobar\n", 14), 0);
 		}
 		{
-			SentenceFiller filler("foobar\n", false);
+			SequenceFiller filler("foobar\n", false);
 			const auto data = filler.Data(15);
 			EXPECT_EQ(memcmp(data, "foobar\nfoobar\nf", 15), 0);
 		}
 		{
-			SentenceFiller filler("foobar", false);
+			SequenceFiller filler("foobar", false);
 			{
 				const auto data = filler.Data(3);
 				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
@@ -48,7 +48,7 @@ namespace Tunkio::Fill
 			}
 		}
 		{
-			SentenceFiller filler("foobar", false);
+			SequenceFiller filler("foobar", false);
 			{
 				const void* data = filler.Data(3);
 				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);

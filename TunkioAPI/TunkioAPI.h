@@ -32,8 +32,8 @@ extern "C"
 	{
 		ZeroFill = '0',
 		OneFill = '1',
-		CharacterFill = 'c',
-		SentenceFill = 's',
+		ByteFill = 'b',
+		SequenceFill = 's',
 		FileFill = 'f',
 		RandomFill = 'r',
 	};

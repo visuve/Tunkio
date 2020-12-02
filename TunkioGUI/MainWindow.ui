@@ -103,12 +103,12 @@
          </item>
          <item>
           <property name="text">
-           <string>Character</string>
+           <string>Byte</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Sentence</string>
+           <string>Sequence</string>
           </property>
          </item>
          <item>
