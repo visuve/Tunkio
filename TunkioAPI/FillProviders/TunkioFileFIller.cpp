@@ -4,14 +4,18 @@
 
 namespace Tunkio
 {
-	std::vector<char8_t> ReadContents(const std::filesystem::path& path)
+	std::vector<std::byte> ReadContents(const std::filesystem::path& path)
 	{
 		// TODO: with big files it would be nice to have some kind of progress
-		std::basic_ifstream<char8_t> stream(path, std::ios_base::binary);
-		return { std::istreambuf_iterator<char8_t>(stream), std::istreambuf_iterator<char8_t>() };
+		std::basic_ifstream<std::byte> stream(path, std::ios_base::binary);
+		return
+		{
+			std::istreambuf_iterator<std::byte>(stream),
+			std::istreambuf_iterator<std::byte>()
+		};
 	}
 
-	FileFiller::FileFiller(const std::vector<char8_t>& content, bool verify) :
+	FileFiller::FileFiller(const std::vector<std::byte>& content, bool verify) :
 		IFillProvider(verify),
 		m_fileContent(content)
 	{
@@ -22,16 +26,12 @@ namespace Tunkio
 	{
 	}
 
-	FileFiller::~FileFiller()
-	{
-	}
-
 	bool FileFiller::HasContent()
 	{
 		return !m_fileContent.empty();
 	}
 
-	const void* FileFiller::Data(uint64_t bytes)
+	std::byte* FileFiller::Data(uint64_t bytes)
 	{
 		assert(HasContent());
 
@@ -40,9 +40,9 @@ namespace Tunkio
 			m_fillData.resize(bytes);
 		}
 
-		for (char8_t& c : m_fillData)
+		for (std::byte& byte : m_fillData)
 		{
-			c = m_fileContent[m_offset];
+			byte = m_fileContent[m_offset];
 
 			if (++m_offset >= m_fileContent.size())
 			{

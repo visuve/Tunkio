@@ -8,13 +8,12 @@ namespace Tunkio
 	{
 	public:
 		explicit SentenceFiller(const std::string& fillString, bool verify);
-		virtual ~SentenceFiller();
+		~SentenceFiller() = default;
 
-		const void* Data(uint64_t bytes) override;
+		std::byte* Data(uint64_t bytes) override;
 
 	protected:
 		const std::string m_fillString;
-		std::string m_fillData;
 
 	private:
 		size_t m_offset = 0;

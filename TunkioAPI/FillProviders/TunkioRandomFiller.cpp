@@ -7,7 +7,7 @@ namespace Tunkio
 	union UInt64Union
 	{
 		uint64_t u64;
-		char8_t u8[8];
+		std::byte byte[8];
 	};
 
 	RandomFiller::RandomFiller(bool verify) :
@@ -15,11 +15,7 @@ namespace Tunkio
 	{
 	}
 
-	RandomFiller::~RandomFiller()
-	{
-	}
-
-	const void* RandomFiller::Data(uint64_t bytes)
+	std::byte* RandomFiller::Data(uint64_t bytes)
 	{
 		thread_local std::random_device device;
 		thread_local std::mt19937_64 engine(device());
@@ -34,14 +30,14 @@ namespace Tunkio
 			while (bytes > 8)
 			{
 				randomNumber.u64 = distribution(engine);
-				m_fillData[--bytes] = randomNumber.u8[0];
-				m_fillData[--bytes] = randomNumber.u8[1];
-				m_fillData[--bytes] = randomNumber.u8[2];
-				m_fillData[--bytes] = randomNumber.u8[3];
-				m_fillData[--bytes] = randomNumber.u8[4];
-				m_fillData[--bytes] = randomNumber.u8[5];
-				m_fillData[--bytes] = randomNumber.u8[6];
-				m_fillData[--bytes] = randomNumber.u8[7];
+				m_fillData[--bytes] = randomNumber.byte[0];
+				m_fillData[--bytes] = randomNumber.byte[1];
+				m_fillData[--bytes] = randomNumber.byte[2];
+				m_fillData[--bytes] = randomNumber.byte[3];
+				m_fillData[--bytes] = randomNumber.byte[4];
+				m_fillData[--bytes] = randomNumber.byte[5];
+				m_fillData[--bytes] = randomNumber.byte[6];
+				m_fillData[--bytes] = randomNumber.byte[7];
 			}
 		}
 		else
@@ -51,14 +47,14 @@ namespace Tunkio
 
 			while (bytes > 8)
 			{
-				m_fillData[--bytes] ^= randomNumber.u8[0];
-				m_fillData[--bytes] ^= randomNumber.u8[1];
-				m_fillData[--bytes] ^= randomNumber.u8[2];
-				m_fillData[--bytes] ^= randomNumber.u8[3];
-				m_fillData[--bytes] ^= randomNumber.u8[4];
-				m_fillData[--bytes] ^= randomNumber.u8[5];
-				m_fillData[--bytes] ^= randomNumber.u8[6];
-				m_fillData[--bytes] ^= randomNumber.u8[7];
+				m_fillData[--bytes] ^= randomNumber.byte[0];
+				m_fillData[--bytes] ^= randomNumber.byte[1];
+				m_fillData[--bytes] ^= randomNumber.byte[2];
+				m_fillData[--bytes] ^= randomNumber.byte[3];
+				m_fillData[--bytes] ^= randomNumber.byte[4];
+				m_fillData[--bytes] ^= randomNumber.byte[5];
+				m_fillData[--bytes] ^= randomNumber.byte[6];
+				m_fillData[--bytes] ^= randomNumber.byte[7];
 			}
 		}
 

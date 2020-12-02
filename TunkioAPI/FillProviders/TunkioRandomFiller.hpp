@@ -8,11 +8,8 @@ namespace Tunkio
 	{
 	public:
 		explicit RandomFiller(bool verify);
-		~RandomFiller();
+		~RandomFiller() = default;
 
-		const void* Data(uint64_t bytes) override;
-
-	private:
-		std::vector<char8_t> m_fillData;
+		std::byte* Data(uint64_t bytes) override;
 	};
 }

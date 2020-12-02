@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <uchar.h>
 
 #if defined(_WIN32)
 #define TUNKIO_EXPORT __declspec(dllexport)

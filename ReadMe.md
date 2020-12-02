@@ -46,3 +46,11 @@
 	- Char-by-char for charfiller
 	- Sentence-by-sentece for file & sentence fillers
 	- SHA-256 for random
+
+## Further reading notes:
+
+- https://linux.die.net/man/2/open
+- https://www.ibm.com/support/knowledgecenter/STXKQY_5.0.5/com.ibm.spectrum.scale.v5r05.doc/bl1adm_considerations_direct_io.htm
+- https://github.com/ronomon/direct-io
+- https://lwn.net/Articles/457667/
+- https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-160

@@ -3,22 +3,17 @@
 
 namespace Tunkio
 {
-	CharFiller::CharFiller(char8_t byte, bool verify) :
+	CharFiller::CharFiller(std::byte byte, bool verify) :
 		IFillProvider(verify),
-		m_fillChar(byte)
+		m_byte(byte)
 	{
 	}
 
-	CharFiller::~CharFiller()
-	{
-		m_fillData.clear();
-	}
-
-	const void* CharFiller::Data(uint64_t bytes)
+	std::byte* CharFiller::Data(uint64_t bytes)
 	{
 		if (m_fillData.size() != bytes)
 		{
-			m_fillData.resize(bytes, m_fillChar);
+			m_fillData.resize(bytes, m_byte);
 		}
 
 		return m_fillData.data();

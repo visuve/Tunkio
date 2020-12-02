@@ -5,15 +5,21 @@ namespace Tunkio
 	class IFillProvider
 	{
 	public:
-		constexpr explicit IFillProvider(bool verify) :
+		explicit IFillProvider(bool verify) :
 			Verify(verify)
 		{
 		}
 
-		virtual ~IFillProvider() = default;
+		virtual ~IFillProvider()
+		{
+			m_fillData.clear();
+		}
 
-		virtual const void* Data(uint64_t bytes) = 0;
+		virtual std::byte* Data(uint64_t bytes) = 0;
 
 		const bool Verify;
+
+	protected:
+		std::vector<std::byte> m_fillData;
 	};
 }

@@ -10,78 +10,79 @@ namespace Tunkio::Fill
 {
 	TEST(TunkioFillTest, CharFiller)
 	{
-		CharFiller filler(u8'X', false);
+		CharFiller filler(std::byte(0x58), false);
 		auto data = filler.Data(3);
-		EXPECT_EQ(memcmp(data, u8"XXX", 3), 0);
+		EXPECT_EQ(memcmp(data, "XXX", 3), 0);
 	}
 
 	TEST(TunkioFillTest, SentenceFiller)
 	{
 		{
 			SentenceFiller filler("foobar\n", false);
-			const void* data = filler.Data(3);
+			const auto data = filler.Data(3);
 			EXPECT_EQ(memcmp(data, "foo", 3), 0);
 		}
 		{
 			SentenceFiller filler("foobar\n", false);
-			const void* data = filler.Data(14);
+			const auto data = filler.Data(14);
 			EXPECT_EQ(memcmp(data, "foobar\nfoobar\n", 14), 0);
 		}
 		{
 			SentenceFiller filler("foobar\n", false);
-			const void* data = filler.Data(15);
+			const auto data = filler.Data(15);
 			EXPECT_EQ(memcmp(data, "foobar\nfoobar\nf", 15), 0);
 		}
 		{
 			SentenceFiller filler("foobar", false);
 			{
-				auto data = reinterpret_cast<const char*>(filler.Data(3));
-				EXPECT_EQ(memcmp(data, "foo", 3), 0);
+				const auto data = filler.Data(3);
+				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
 			}
 			{
-				auto data = reinterpret_cast<const char*>(filler.Data(3));
-				EXPECT_EQ(memcmp(data, "bar", 3), 0);
+				const auto data = filler.Data(3);
+				EXPECT_EQ(memcmp(data, u8"bar", 3), 0);
 			}
 			{
-				auto data = reinterpret_cast<const char*>(filler.Data(3));
-				EXPECT_EQ(memcmp(data, "foo", 3), 0);
+				const auto data = filler.Data(3);
+				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
 			}
 		}
 		{
 			SentenceFiller filler("foobar", false);
 			{
 				const void* data = filler.Data(3);
-				EXPECT_EQ(memcmp(data, "foo", 3), 0);
+				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
 			}
 			{
 				const void* data = filler.Data(4);
-				EXPECT_EQ(memcmp(data, "barf", 4), 0);
+				EXPECT_EQ(memcmp(data, u8"barf", 4), 0);
 			}
 			{
 				const void* data = filler.Data(2);
-				EXPECT_EQ(memcmp(data, "oo", 2), 0);
+				EXPECT_EQ(memcmp(data, u8"oo", 2), 0);
 			}
 		}
 	}
 
 	TEST(TunkioFillTest, FileFiller)
 	{
-		const char8_t* str = u8"foobar\n";
-		std::vector<char8_t> fileContent = { str, str + 7 };
+		const auto str = reinterpret_cast<const std::byte*>(u8"foobar\n");
+
+		std::vector<std::byte> fileContent = { str, str + 7 };
 
 		{
 			FileFiller filler(fileContent, false);
-			const auto data = reinterpret_cast<const char8_t*>(filler.Data(3));
+			const auto data = filler.Data(3);
 			EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
 		}
 		{
 			FileFiller filler(fileContent, false);
-			const auto data = reinterpret_cast<const char8_t*>(filler.Data(14));
+			const auto data = filler.Data(14);
 			EXPECT_EQ(memcmp(data, u8"foobar\nfoobar\n", 14), 0);
 		}
 		{
 			FileFiller filler(fileContent, false);
-			const auto data = reinterpret_cast<const char8_t*>(filler.Data(15));
+			const auto data = filler.Data(15);
 			EXPECT_EQ(memcmp(data, u8"foobar\nfoobar\nf", 15), 0);
 		}
 	}
@@ -97,11 +98,11 @@ namespace Tunkio::Fill
 	{
 		RandomFiller filler(false);
 
-		auto data = reinterpret_cast<const char8_t*>(filler.Data(10));
-		std::vector<char8_t> data1 = { data, data + 10 };
+		auto data = reinterpret_cast<const std::byte*>(filler.Data(10));
+		std::vector<std::byte> data1 = { data, data + 10 };
 
-		data = reinterpret_cast<const char8_t*>(filler.Data(10));
-		std::vector<char8_t> data2 = { data, data + 10 };
+		data = reinterpret_cast<const std::byte*>(filler.Data(10));
+		std::vector<std::byte> data2 = { data, data + 10 };
 
 		EXPECT_NE(memcmp(data1.data(), data2.data(), 10), 0);
 

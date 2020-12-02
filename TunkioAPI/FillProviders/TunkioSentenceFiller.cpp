@@ -11,20 +11,16 @@ namespace Tunkio
 	{
 	}
 
-	SentenceFiller::~SentenceFiller()
-	{
-	}
-
-	const void* SentenceFiller::Data(uint64_t bytes)
+	std::byte* SentenceFiller::Data(uint64_t bytes)
 	{
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
 		}
 
-		for (char& c : m_fillData)
+		for (std::byte& byte : m_fillData)
 		{
-			c = m_fillString[m_offset++];
+			byte = std::byte(m_fillString[m_offset++]);
 
 			if (m_offset >= m_fillString.size())
 			{

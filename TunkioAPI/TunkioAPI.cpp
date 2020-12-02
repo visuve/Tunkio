@@ -91,11 +91,11 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 	switch (round)
 	{
 		case TunkioFillType::ZeroFill:
-			instance->AddFiller(new Tunkio::CharFiller(0x00, verify));
+			instance->AddFiller(new Tunkio::CharFiller(std::byte(0x00), verify));
 			return true;
 
 		case TunkioFillType::OneFill:
-			instance->AddFiller(new Tunkio::CharFiller(0xFF, verify));
+			instance->AddFiller(new Tunkio::CharFiller(std::byte(0xFF), verify));
 			return true;
 
 		case TunkioFillType::CharacterFill:
@@ -104,7 +104,7 @@ bool TUNKIO_CALLING_CONVENTION TunkioAddWipeRound(
 				return false;
 			}
 
-			instance->AddFiller(new Tunkio::CharFiller(optional[0], verify));
+			instance->AddFiller(new Tunkio::CharFiller(std::byte(optional[0]), verify));
 			return true;
 
 		case TunkioFillType::SentenceFill:
