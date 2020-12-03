@@ -11,7 +11,7 @@ namespace Tunkio
 	{
 	}
 
-	std::byte* SequenceFiller::Data(uint64_t bytes)
+	std::span<std::byte> SequenceFiller::Data(uint64_t bytes)
 	{
 		if (m_fillData.size() != bytes)
 		{
@@ -28,6 +28,6 @@ namespace Tunkio
 			}
 		}
 
-		return m_fillData.data();
+		return m_fillData;
 	}
 }

@@ -15,7 +15,7 @@ namespace Tunkio
 			m_fillData.clear();
 		}
 
-		virtual std::byte* Data(uint64_t bytes) = 0;
+		virtual std::span<std::byte> Data(uint64_t bytes) = 0;
 
 		const bool Verify;
 

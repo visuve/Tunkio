@@ -240,11 +240,11 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes)
+	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data, uint64_t bytes)
 	{
 		DWORD bytesWritten = 0;
 
-		if (!WriteFile(m_handle, data, static_cast<DWORD>(bytes), &bytesWritten, nullptr))
+		if (!WriteFile(m_handle, data.data(), static_cast<DWORD>(bytes), &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
@@ -252,18 +252,18 @@ namespace Tunkio
 		return { bytes == bytesWritten, bytesWritten };
 	}
 
-	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
+	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)
 	{
-		std::shared_ptr<void> buffer(malloc(bytes), free);
+		std::vector<std::byte> buffer(bytes);
 		DWORD bytesRead = 0;
 		OVERLAPPED overlapped = Offset(offset);
 
-		if (!ReadFile(m_handle, buffer.get(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
+		if (!ReadFile(m_handle, buffer.data(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
 		{
-			return { false, nullptr };
+			return { false, {} };
 		}
 
-		return { bytes == bytesRead, buffer };
+		return { bytes == bytesRead, std::move(buffer) };
 	}
 
 	bool File::Flush()

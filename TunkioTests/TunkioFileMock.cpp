@@ -67,15 +67,14 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t size)
+	std::pair<bool, uint64_t> File::Write(std::span<std::byte> data, uint64_t size)
 	{
-		return { data != nullptr, size };
+		return { !data.empty(), size };
 	}
 
-	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t size, uint64_t)
+	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t size, uint64_t)
 	{
-		std::shared_ptr<void> buffer(malloc(1), free);
-		return { size > 0, buffer };
+		return { size > 0, std::vector<std::byte>(1, std::byte(0xFF)) };
 	}
 
 	bool File::Flush()

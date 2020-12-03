@@ -8,11 +8,21 @@
 
 namespace Tunkio::Fill
 {
+	bool operator == (std::span<std::byte> lhs, std::string_view rhs)
+	{
+		if (lhs.size() != rhs.size())
+		{
+			return false;
+		}
+
+		return memcmp(lhs.data(), rhs.data(), rhs.size()) == 0;
+	}
+
 	TEST(TunkioFillTest, ByteFiller)
 	{
 		ByteFiller filler(std::byte(0x58), false);
 		auto data = filler.Data(3);
-		EXPECT_EQ(memcmp(data, "XXX", 3), 0);
+		EXPECT_TRUE(data == "XXX");
 	}
 
 	TEST(TunkioFillTest, SequenceFiller)
@@ -20,46 +30,46 @@ namespace Tunkio::Fill
 		{
 			SequenceFiller filler("foobar\n", false);
 			const auto data = filler.Data(3);
-			EXPECT_EQ(memcmp(data, "foo", 3), 0);
+			EXPECT_TRUE(data == "foo");
 		}
 		{
 			SequenceFiller filler("foobar\n", false);
 			const auto data = filler.Data(14);
-			EXPECT_EQ(memcmp(data, "foobar\nfoobar\n", 14), 0);
+			EXPECT_TRUE(data == "foobar\nfoobar\n");
 		}
 		{
 			SequenceFiller filler("foobar\n", false);
 			const auto data = filler.Data(15);
-			EXPECT_EQ(memcmp(data, "foobar\nfoobar\nf", 15), 0);
+			EXPECT_TRUE(data == "foobar\nfoobar\nf");
 		}
 		{
 			SequenceFiller filler("foobar", false);
 			{
 				const auto data = filler.Data(3);
-				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
+				EXPECT_TRUE(data == "foo");
 			}
 			{
 				const auto data = filler.Data(3);
-				EXPECT_EQ(memcmp(data, u8"bar", 3), 0);
+				EXPECT_TRUE(data == "bar");
 			}
 			{
 				const auto data = filler.Data(3);
-				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
+				EXPECT_TRUE(data == "foo");
 			}
 		}
 		{
 			SequenceFiller filler("foobar", false);
 			{
-				const void* data = filler.Data(3);
-				EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
+				const auto data = filler.Data(3);
+				EXPECT_TRUE(data == "foo");
 			}
 			{
-				const void* data = filler.Data(4);
-				EXPECT_EQ(memcmp(data, u8"barf", 4), 0);
+				const auto data = filler.Data(4);
+				EXPECT_TRUE(data == "barf");
 			}
 			{
-				const void* data = filler.Data(2);
-				EXPECT_EQ(memcmp(data, u8"oo", 2), 0);
+				const auto data = filler.Data(2);
+				EXPECT_TRUE(data == "oo");
 			}
 		}
 	}
@@ -73,41 +83,65 @@ namespace Tunkio::Fill
 		{
 			FileFiller filler(fileContent, false);
 			const auto data = filler.Data(3);
-			EXPECT_EQ(memcmp(data, u8"foo", 3), 0);
+			EXPECT_TRUE(data == "foo");
 		}
 		{
 			FileFiller filler(fileContent, false);
 			const auto data = filler.Data(14);
-			EXPECT_EQ(memcmp(data, u8"foobar\nfoobar\n", 14), 0);
+			EXPECT_TRUE(data == "foobar\nfoobar\n");
 		}
 		{
 			FileFiller filler(fileContent, false);
 			const auto data = filler.Data(15);
-			EXPECT_EQ(memcmp(data, u8"foobar\nfoobar\nf", 15), 0);
+			EXPECT_TRUE(data == "foobar\nfoobar\nf");
 		}
 	}
 
 	TEST(TunkioFillTest, RandomFillByte)
 	{
 		RandomFiller filler(false);
-		auto data = filler.Data(1);
-		EXPECT_NE(data, nullptr);
+
+		for (uint64_t i = 0; i < 10; ++i)
+		{
+			EXPECT_NO_THROW(filler.Data(i));
+		}
 	}
 
-	TEST(TunkioFillTest, RandomFillNotDivisibleByEight)
+	TEST(TunkioFillTest, RandomFillTwice)
 	{
 		RandomFiller filler(false);
+		std::vector<std::byte> before;
+		std::vector<std::byte> after;
 
-		auto data = reinterpret_cast<const std::byte*>(filler.Data(10));
-		std::vector<std::byte> data1 = { data, data + 10 };
+		{
+			auto data = filler.Data(8);
+			before.insert(before.begin(), data.begin(), data.end());
+		}
+		{
+			auto data = filler.Data(8);
+			after.insert(after.begin(), data.begin(), data.end());
+		}
 
-		data = reinterpret_cast<const std::byte*>(filler.Data(10));
-		std::vector<std::byte> data2 = { data, data + 10 };
+		EXPECT_NE(before, after);
+	}
 
-		EXPECT_NE(memcmp(data1.data(), data2.data(), 10), 0);
+	TEST(TunkioFillTest, RandomFillDifferentFillers)
+	{
+		RandomFiller fillerA(false);
+		RandomFiller fillerB(false);
 
-		// This might hold true, as the data is not divisible by 8
-		//EXPECT_TRUE(data1[8] == data2[8]);
-		//EXPECT_TRUE(data1[9] == data2[9]);
+		std::vector<std::byte> fillA;
+		std::vector<std::byte> fillB;
+
+		{
+			auto data = fillerA.Data(8);
+			fillA.insert(fillA.begin(), data.begin(), data.end());
+		}
+		{
+			auto data = fillerB.Data(8);
+			fillB.insert(fillB.begin(), data.begin(), data.end());
+		}
+
+		EXPECT_NE(fillA, fillB);
 	}
 }

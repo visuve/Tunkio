@@ -20,6 +20,7 @@
 #include <queue>
 #include <random>
 #include <regex>
+#include <span>
 #include <sstream>
 #include <string>
 #include <vector>

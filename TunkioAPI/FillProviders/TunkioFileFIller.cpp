@@ -31,7 +31,7 @@ namespace Tunkio
 		return !m_fileContent.empty();
 	}
 
-	std::byte* FileFiller::Data(uint64_t bytes)
+	std::span<std::byte> FileFiller::Data(uint64_t bytes)
 	{
 		assert(HasContent());
 
@@ -50,6 +50,6 @@ namespace Tunkio
 			}
 		}
 
-		return m_fillData.data();
+		return m_fillData;
 	}
 }

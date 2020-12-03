@@ -129,7 +129,7 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const void* data, uint64_t bytes)
+	std::pair<bool, uint64_t> File::Write(std::span<std::byte> data, uint64_t bytes)
 	{
 		const ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(bytes));
 
@@ -143,20 +143,20 @@ namespace Tunkio
 		return { bytesWritten == bytes, bytesWritten };
 	}
 
-	std::pair<bool, std::shared_ptr<void>> File::Read(uint64_t bytes, uint64_t offset)
+	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)
 	{
-		std::shared_ptr<void> buffer(malloc(bytes), free);
+		std::vector<std::byte> buffer;
 
-		const ssize_t result = pread(m_fileDescriptor, buffer.get(), bytes, offset);
+		const ssize_t result = pread(m_fileDescriptor, buffer.data(), bytes, offset);
 
 		if (result <= 0)
 		{
-			return { false, nullptr };
+			return { false, {} };
 		}
 
 		uint64_t bytesRead = static_cast<uint64_t>(result);
 
-		return { bytesRead == bytes, buffer };
+		return { bytesRead == bytes, std::move(buffer) };
 	}
 
 	bool File::Flush()

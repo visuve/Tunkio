@@ -9,13 +9,13 @@ namespace Tunkio
 	{
 	}
 
-	std::byte* ByteFiller::Data(uint64_t bytes)
+	std::span<std::byte> ByteFiller::Data(uint64_t bytes)
 	{
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes, m_byte);
 		}
 
-		return m_fillData.data();
+		return m_fillData;
 	}
 }

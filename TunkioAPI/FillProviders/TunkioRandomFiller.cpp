@@ -15,7 +15,7 @@ namespace Tunkio
 	{
 	}
 
-	std::byte* RandomFiller::Data(uint64_t bytes)
+	std::span<std::byte> RandomFiller::Data(uint64_t bytes)
 	{
 		thread_local std::random_device device;
 		thread_local std::mt19937_64 engine(device());
@@ -27,7 +27,7 @@ namespace Tunkio
 
 			UInt64Union randomNumber;
 
-			while (bytes > 8)
+			while (bytes >= 8)
 			{
 				randomNumber.u64 = distribution(engine);
 				m_fillData[--bytes] = randomNumber.byte[0];
@@ -45,7 +45,7 @@ namespace Tunkio
 			// This hack almost doubles the performance
 			UInt64Union randomNumber = { distribution(engine) };
 
-			while (bytes > 8)
+			while (bytes >= 8)
 			{
 				m_fillData[--bytes] ^= randomNumber.byte[0];
 				m_fillData[--bytes] ^= randomNumber.byte[1];
@@ -58,6 +58,6 @@ namespace Tunkio
 			}
 		}
 
-		return m_fillData.data();
+		return m_fillData;
 	}
 }

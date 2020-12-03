@@ -22,8 +22,8 @@ namespace Tunkio
 		const std::pair<bool, uint64_t>& ActualSize() const;
 		const std::pair<bool, uint64_t>& AllocationSize() const;
 		const std::pair<bool, uint64_t>& OptimalWriteSize() const;
-		std::pair<bool, uint64_t> Write(const void* data, uint64_t bytes);
-		std::pair<bool, std::shared_ptr<void>> Read(uint64_t bytes, uint64_t offset);
+		std::pair<bool, uint64_t> Write(std::span<std::byte> data, uint64_t bytes);
+		std::pair<bool, std::vector<std::byte>> Read(uint64_t bytes, uint64_t offset);
 		bool Flush();
 		bool Delete();
 
