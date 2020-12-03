@@ -129,9 +129,9 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(std::span<std::byte> data, uint64_t bytes)
+	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
 	{
-		const ssize_t result = write(m_fileDescriptor, data, static_cast<size_t>(bytes));
+		const ssize_t result = write(m_fileDescriptor, data.data(), data.size_bytes());
 
 		if (result <= 0)
 		{
@@ -140,7 +140,7 @@ namespace Tunkio
 
 		uint64_t bytesWritten = static_cast<uint64_t>(result);
 
-		return { bytesWritten == bytes, bytesWritten };
+		return { data.size_bytes() == bytesWritten, bytesWritten };
 	}
 
 	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)

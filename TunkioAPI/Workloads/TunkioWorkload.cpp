@@ -133,8 +133,8 @@ namespace Tunkio
 			const uint64_t size = std::min(bytesLeft, file.OptimalWriteSize().second);
 			const uint64_t offset = bytesWritten;
 
-			const std::span<std::byte> writtenData = filler->Data(size);
-			const auto result = file.Write(writtenData, size);
+			const std::span<std::byte> writtenData = filler->Data(size, 512); // TODO: remove hardcoding
+			const auto result = file.Write(writtenData);
 
 			bytesWritten += result.second;
 			bytesLeft -= result.second;

@@ -5,9 +5,9 @@ namespace Tunkio
 {
 	File::File(const std::filesystem::path& path) :
 		Path(path),
-		m_actualSize(true, 1),
-		m_allocationSize(true, 1),
-		m_optimalWriteSize(true, 1)
+		m_actualSize(true, 1234),
+		m_allocationSize(true, 4096),
+		m_optimalWriteSize(true, 1024)
 	{
 	}
 
@@ -67,9 +67,9 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(std::span<std::byte> data, uint64_t size)
+	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
 	{
-		return { !data.empty(), size };
+		return { !data.empty(), data.size() };
 	}
 
 	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t size, uint64_t)

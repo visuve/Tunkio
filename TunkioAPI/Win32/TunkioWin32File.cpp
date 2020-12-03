@@ -170,6 +170,7 @@ namespace Tunkio
 			// Something is horribly wrong
 			m_actualSize.first = false;
 			m_allocationSize.first = false;
+			m_alignment.first = false;
 			m_optimalWriteSize.first = false;
 		}
 	}
@@ -179,6 +180,7 @@ namespace Tunkio
 		std::swap(m_handle, other.m_handle);
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_alignment, other.m_alignment);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 	}
@@ -188,6 +190,7 @@ namespace Tunkio
 		std::swap(m_handle, other.m_handle);
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_alignment, other.m_alignment);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 		return *this;
@@ -235,21 +238,26 @@ namespace Tunkio
 		return m_allocationSize;
 	}
 
+	const std::pair<bool, uint64_t>& File::Alignment() const
+	{
+		return m_alignment;
+	}
+
 	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data, uint64_t bytes)
+	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
 	{
 		DWORD bytesWritten = 0;
 
-		if (!WriteFile(m_handle, data.data(), static_cast<DWORD>(bytes), &bytesWritten, nullptr))
+		if (!WriteFile(m_handle, data.data(), static_cast<DWORD>(data.size_bytes()), &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
 
-		return { bytes == bytesWritten, bytesWritten };
+		return { data.size_bytes() == bytesWritten, bytesWritten };
 	}
 
 	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)
