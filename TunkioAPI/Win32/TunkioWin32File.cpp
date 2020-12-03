@@ -4,6 +4,8 @@
 
 namespace Tunkio
 {
+	void* vittupointteri = nullptr;
+
 	OVERLAPPED Offset(uint64_t offset)
 	{
 		ULARGE_INTEGER cast = {};
@@ -30,8 +32,7 @@ namespace Tunkio
 		// https://docs.microsoft.com/en-us/windows/win32/fileio/file-caching
 		constexpr uint32_t DesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		constexpr uint32_t ShareMode = 0;
-		constexpr uint32_t CreationFlags =
-			FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+		constexpr uint32_t CreationFlags = FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
 
 		return CreateFileW(
 			path.c_str(),
@@ -96,7 +97,14 @@ namespace Tunkio
 		}
 
 		return { true, standardInfo.AllocationSize.QuadPart };
+	}
 
+	std::pair<bool, uint64_t> SystemAlignmentSize()
+	{
+		SYSTEM_INFO systemInfo = {};
+		GetSystemInfo(&systemInfo);
+
+		return { true, systemInfo.dwPageSize };
 	}
 
 	std::pair<bool, uint64_t> DiskSizeByHandle(const HANDLE handle)
@@ -164,15 +172,18 @@ namespace Tunkio
 
 		m_optimalWriteSize = OptimalWriteSizeByHandle(m_handle);
 		m_allocationSize = AllocationSizeByHandle(m_handle);
+		m_alignmentSize = SystemAlignmentSize();
 
 		if (m_allocationSize.second % 512 != 0)
 		{
 			// Something is horribly wrong
 			m_actualSize.first = false;
 			m_allocationSize.first = false;
-			m_alignment.first = false;
+			m_alignmentSize.first = false;
 			m_optimalWriteSize.first = false;
 		}
+
+		vittupointteri = _aligned_malloc(0x10000, 512);
 	}
 
 	File::File(File&& other) noexcept
@@ -180,7 +191,7 @@ namespace Tunkio
 		std::swap(m_handle, other.m_handle);
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignment, other.m_alignment);
+		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 	}
@@ -190,7 +201,7 @@ namespace Tunkio
 		std::swap(m_handle, other.m_handle);
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignment, other.m_alignment);
+		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 		return *this;
@@ -203,6 +214,9 @@ namespace Tunkio
 			CloseHandle(m_handle);
 			m_handle = nullptr;
 		}
+
+		if (vittupointteri)
+			_aligned_free(vittupointteri);
 	}
 
 	bool File::IsValid() const
@@ -238,9 +252,9 @@ namespace Tunkio
 		return m_allocationSize;
 	}
 
-	const std::pair<bool, uint64_t>& File::Alignment() const
+	const std::pair<bool, uint64_t>& File::AlignmentSize() const
 	{
-		return m_alignment;
+		return m_alignmentSize;
 	}
 
 	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const
@@ -248,16 +262,17 @@ namespace Tunkio
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
+	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> /*data*/)
 	{
-		DWORD bytesWritten = 0;
+		DWORD bytesWritten = 0; 
 
-		if (!WriteFile(m_handle, data.data(), static_cast<DWORD>(data.size_bytes()), &bytesWritten, nullptr))
+		if (!WriteFile(m_handle, vittupointteri, 0x10000, &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
 
-		return { data.size_bytes() == bytesWritten, bytesWritten };
+		// return { data.size_bytes() == bytesWritten, bytesWritten };
+		return { true, bytesWritten };
 	}
 
 	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)

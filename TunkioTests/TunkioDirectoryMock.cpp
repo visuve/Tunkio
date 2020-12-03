@@ -10,7 +10,7 @@ namespace Tunkio
 		m_files.second.emplace_back("foobar");
 
 		m_size.first = true;
-		m_size.second = 1;
+		m_size.second = 4000;
 	}
 
 	Directory::~Directory()

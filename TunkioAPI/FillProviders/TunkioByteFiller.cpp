@@ -9,11 +9,12 @@ namespace Tunkio
 	{
 	}
 
-	std::span<std::byte> ByteFiller::Data(uint64_t bytes)
+	std::span<std::byte> ByteFiller::Data(uint64_t bytes, uint64_t alignment)
 	{
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes, m_byte);
+			AlignData(bytes, alignment);
 		}
 
 		return m_fillData;

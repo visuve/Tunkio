@@ -5,7 +5,7 @@ namespace Tunkio
 {
 	File::File(const std::filesystem::path& path) :
 		Path(path),
-		m_actualSize(true, 1234),
+		m_actualSize(true, 4000),
 		m_allocationSize(true, 4096),
 		m_optimalWriteSize(true, 1024)
 	{
@@ -58,6 +58,11 @@ namespace Tunkio
 	}
 
 	const std::pair<bool, uint64_t>& File::AllocationSize() const
+	{
+		return m_allocationSize;
+	}
+
+	const std::pair<bool, uint64_t>& File::AlignmentSize() const
 	{
 		return m_allocationSize;
 	}

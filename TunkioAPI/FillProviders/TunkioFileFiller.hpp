@@ -12,7 +12,7 @@ namespace Tunkio
 		~FileFiller() = default;
 
 		bool HasContent();
-		std::span<std::byte> Data(uint64_t bytes) override;
+		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
 
 	private:
 		const std::vector<std::byte> m_fileContent;

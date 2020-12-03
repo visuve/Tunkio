@@ -15,7 +15,7 @@ namespace Tunkio
 	{
 	}
 
-	std::span<std::byte> RandomFiller::Data(uint64_t bytes)
+	std::span<std::byte> RandomFiller::Data(uint64_t bytes, uint64_t alignment)
 	{
 		thread_local std::random_device device;
 		thread_local std::mt19937_64 engine(device());
@@ -24,6 +24,7 @@ namespace Tunkio
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
+			AlignData(bytes, alignment);
 
 			UInt64Union randomNumber;
 

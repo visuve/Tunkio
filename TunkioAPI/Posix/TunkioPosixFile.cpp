@@ -63,7 +63,9 @@ namespace Tunkio
 		m_allocationSize = { true, buffer.st_blocks * 512 };
 
 		// See notes in TunkioWin32File.cpp
-		m_optimalWriteSize = { buffer.st_blksize % 512 != 0, (buffer.st_blksize / 512) * 0x10000 };
+
+		m_alignmentSize = { buffer.st_blksize % 512 == 0, buffer.st_blksize };
+		m_optimalWriteSize = { buffer.st_blksize % 512 == 0, (buffer.st_blksize / 512) * 0x10000 };
 
 		if (m_allocationSize.second % 512 != 0)
 		{
@@ -79,6 +81,7 @@ namespace Tunkio
 		std::swap(m_fileDescriptor, other.m_fileDescriptor);
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 	}
@@ -88,6 +91,7 @@ namespace Tunkio
 		std::swap(m_fileDescriptor, other.m_fileDescriptor);
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 		return *this;
@@ -122,6 +126,11 @@ namespace Tunkio
 	const std::pair<bool, uint64_t>& File::AllocationSize() const
 	{
 		return m_allocationSize;
+	}
+
+	const std::pair<bool, uint64_t>& File::AlignmentSize() const
+	{
+		return m_alignmentSize;
 	}
 
 	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const

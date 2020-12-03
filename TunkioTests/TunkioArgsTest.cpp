@@ -122,16 +122,4 @@ namespace Tunkio
 		EXPECT_EQ(Arguments.at("verify").Value<bool>(), false);
 		EXPECT_EQ(Arguments.at("remove").Value<bool>(), false);
 	}
-
-#ifndef __clang__
-	TEST_F(TunkioArgsTest, ParseUnsupportedTypes)
-	{
-		std::map<std::string, Argument> unsupported =
-		{
-			{ "x", Argument(0, uint64_t()) },
-		};
-
-		EXPECT_FALSE(ParseVector(unsupported, { "--x=555" }));
-	}
-#endif
 }

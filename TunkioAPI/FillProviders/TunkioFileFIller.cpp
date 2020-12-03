@@ -31,18 +31,19 @@ namespace Tunkio
 		return !m_fileContent.empty();
 	}
 
-	std::span<std::byte> FileFiller::Data(uint64_t bytes)
+	std::span<std::byte> FileFiller::Data(uint64_t bytes, uint64_t alignment)
 	{
 		assert(HasContent());
 
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
+			AlignData(bytes, alignment);
 		}
 
-		for (std::byte& byte : m_fillData)
+		for (size_t i = 0; i < bytes; ++bytes)
 		{
-			byte = m_fileContent[m_offset];
+			m_fillData[i]  = m_fileContent[m_offset];
 
 			if (++m_offset >= m_fileContent.size())
 			{

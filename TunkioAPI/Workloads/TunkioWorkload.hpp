@@ -46,7 +46,12 @@ namespace Tunkio
 		const bool m_removeAfterWipe = false;
 
 
-		bool Fill(uint16_t pass, uint64_t bytesLeft, uint64_t& bytesWritten, std::shared_ptr<IFillProvider> filler, File& file);
+		bool Fill(
+			uint16_t pass,
+			uint64_t bytesLeft,
+			uint64_t& bytesWritten,
+			std::shared_ptr<IFillProvider> filler,
+			File& file);
 
 	private:
 		TunkioWipeStartedCallback* m_wipeStartedCallback = nullptr;

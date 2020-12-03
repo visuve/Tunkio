@@ -10,7 +10,7 @@ namespace Tunkio
 		explicit SequenceFiller(const std::string& fillString, bool verify);
 		~SequenceFiller() = default;
 
-		std::span<std::byte> Data(uint64_t bytes) override;
+		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
 
 	protected:
 		const std::string m_fillString;

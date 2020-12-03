@@ -23,6 +23,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <cstddef>
 #include <filesystem>
 #include <iomanip>
 #include <limits>
