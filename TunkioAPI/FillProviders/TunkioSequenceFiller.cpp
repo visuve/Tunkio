@@ -16,7 +16,7 @@ namespace Tunkio
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
-			AlignData(bytes, alignment);
+			AlignData(alignment);
 		}
 
 		for (size_t i = 0; i < bytes; ++i)

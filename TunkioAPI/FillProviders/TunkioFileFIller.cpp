@@ -38,10 +38,10 @@ namespace Tunkio
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
-			AlignData(bytes, alignment);
+			AlignData(alignment);
 		}
 
-		for (size_t i = 0; i < bytes; ++bytes)
+		for (size_t i = 0; i < bytes; ++i)
 		{
 			m_fillData[i]  = m_fileContent[m_offset];
 

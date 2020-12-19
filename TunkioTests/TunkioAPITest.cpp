@@ -122,7 +122,7 @@ namespace Tunkio
 
 			EXPECT_EQ(counters.OnWipeStartedCount, 1);
 			EXPECT_EQ(counters.OnPassStartedCount, 4);
-			EXPECT_EQ(counters.OnProgressCount, 16);
+			EXPECT_EQ(counters.OnProgressCount, 8);
 			EXPECT_EQ(counters.OnPassCompletedCount, 4);
 			EXPECT_EQ(counters.OnWipeCompletedCount, 1);
 			EXPECT_EQ(counters.OnErrorCount, 0);

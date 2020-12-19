@@ -24,7 +24,7 @@ namespace Tunkio
 		if (m_fillData.size() != bytes)
 		{
 			m_fillData.resize(bytes);
-			AlignData(bytes, alignment);
+			AlignData(alignment);
 
 			UInt64Union randomNumber;
 

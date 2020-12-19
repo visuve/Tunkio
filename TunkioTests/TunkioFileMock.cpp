@@ -5,8 +5,9 @@ namespace Tunkio
 {
 	File::File(const std::filesystem::path& path) :
 		Path(path),
-		m_actualSize(true, 4000),
-		m_allocationSize(true, 4096),
+		m_actualSize(true, 2048),
+		m_allocationSize(true, 2048),
+		m_alignmentSize(true, 512),
 		m_optimalWriteSize(true, 1024)
 	{
 	}
@@ -20,6 +21,7 @@ namespace Tunkio
 #endif
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 	}
@@ -33,6 +35,7 @@ namespace Tunkio
 #endif
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		std::swap(m_isDevice, other.m_isDevice);
 		return *this;
@@ -64,7 +67,7 @@ namespace Tunkio
 
 	const std::pair<bool, uint64_t>& File::AlignmentSize() const
 	{
-		return m_allocationSize;
+		return m_alignmentSize;
 	}
 
 	const std::pair<bool, uint64_t>& File::OptimalWriteSize() const

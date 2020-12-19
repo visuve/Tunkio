@@ -19,15 +19,15 @@ namespace Tunkio
 
 		virtual std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) = 0;
 
-		inline void AlignData(uint64_t bytes, uint64_t alignment)
+		inline void AlignData(uint64_t alignment)
 		{
-			assert(bytes);
-			assert(bytes % 512 == 0);
-
 			if (alignment)
 			{
 				size_t space = m_fillData.size();
 				void* data = m_fillData.data();
+
+				assert(space && space % 512 == 0);
+				assert(space >= alignment);
 
 				void* ptr = std::align(
 					alignment,
