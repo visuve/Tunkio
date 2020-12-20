@@ -1,11 +1,11 @@
 #include "TunkioGUI-PCH.hpp"
 #include "TunkioRunner.hpp"
 
-TunkioRunner::TunkioRunner(QString path, TunkioTargetType type, QObject* parent) :
+TunkioRunner::TunkioRunner(QString path, TunkioTargetType type, bool remove, QObject* parent) :
 	QThread(parent),
 	m_path(path),
 	m_type(type),
-	m_tunkio(TunkioInitialize(m_path.toUtf8().constData(), m_type, false, this))
+	m_tunkio(TunkioInitialize(m_path.toUtf8().constData(), m_type, remove, this))
 {
 	attachCallbacks();
 }

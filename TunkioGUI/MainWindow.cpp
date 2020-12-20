@@ -262,8 +262,12 @@ void MainWindow::onOpenFileDialog()
 		const QString file = QDir::toNativeSeparators(selected);
 
 		ui->lineEditSelectedPath->setText(file);
-		m_tunkio = std::make_shared<TunkioRunner>(file, TunkioTargetType::FileWipe);
+		m_tunkio = std::make_shared<TunkioRunner>(
+			file,
+			TunkioTargetType::FileWipe,
+			ui->checkBoxDelete->isChecked());
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
+		ui->groupBoxPathSelect->setEnabled(false);
 	}
 }
 
@@ -279,8 +283,14 @@ void MainWindow::onOpenDirectoryDialog()
 		const QString directory = QDir::toNativeSeparators(selected);
 
 		ui->lineEditSelectedPath->setText(directory);
-		m_tunkio = std::make_shared<TunkioRunner>(directory, TunkioTargetType::DirectoryWipe);
+
+		m_tunkio = std::make_shared<TunkioRunner>(
+			directory,
+			TunkioTargetType::DirectoryWipe,
+			ui->checkBoxDelete->isChecked());
+
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
+		ui->groupBoxPathSelect->setEnabled(false);
 	}
 }
 
@@ -288,12 +298,20 @@ void MainWindow::onOpenDriveDialog()
 {
 	DriveSelectDialog dialog(this);
 
+	ui->checkBoxDelete->setCheckState(Qt::CheckState::Unchecked);
+
 	if (dialog.exec() == QDialog::Accepted)
 	{
 		const QString drive = dialog.selectedDrive();
 		ui->lineEditSelectedPath->setText(drive);
-		m_tunkio = std::make_shared<TunkioRunner>(drive, TunkioTargetType::DriveWipe);
+
+		m_tunkio = std::make_shared<TunkioRunner>(
+			drive,
+			TunkioTargetType::DriveWipe,
+			false);
+
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_tunkio.get());
+		ui->groupBoxPathSelect->setEnabled(false);
 	}
 }
 

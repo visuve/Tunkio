@@ -8,7 +8,7 @@ class TunkioRunner : public QThread
 {
 	Q_OBJECT
 public:
-	explicit TunkioRunner(QString path, TunkioTargetType type, QObject* parent = nullptr);
+	explicit TunkioRunner(QString path, TunkioTargetType type, bool remove, QObject* parent = nullptr);
 	~TunkioRunner();
 
 public slots:

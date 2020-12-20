@@ -28,6 +28,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxDelete">
+         <property name="text">
+          <string>Delete after wipe?</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -146,7 +153,7 @@
        <item>
         <widget class="QCheckBox" name="checkBoxVerify">
          <property name="text">
-          <string>Verify</string>
+          <string>Verify?</string>
          </property>
         </widget>
        </item>
