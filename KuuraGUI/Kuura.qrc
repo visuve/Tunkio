@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="Kuura.png">../KuuraResources/Kuura.png</file>
+  </qresource>
+</RCC>

@@ -1,4 +1,4 @@
-# Tunkio
+# Kuura
 
 - Wipes files, folders or drives
 - Originally written during the small hours of a boring night
@@ -6,18 +6,18 @@
 
 ## Folders
 
-- ``TunkioLIB/``
-	- Tunkio Static Library, contains shared stuff between GUI & CLI.
-- ``TunkioAPI/``
-	- Tunkio Shared Library, contains all the actual wiping logic and nothing else
+- ``KuuraLIB/``
+	- Kuura Static Library, contains shared stuff between GUI & CLI.
+- ``KuuraAPI/``
+	- Kuura Shared Library, contains all the actual wiping logic and nothing else
 	- C-compatible interface
-	- Depengs on ``TunkioLIB``
-- ``TunkioCLI/``
-	- Tunkio Command Line Interface, shows nice progress output etc.
-	- Depends on ``TunkioAPI`` & ``TunkioLIB``
-- ``TunkioGUI/``
-	- Tunkio Graphical User Interface, a simple dialog to show progress
-	- Depends on ``TunkioAPI`` & ``TunkioLIB``
+	- Depengs on ``KuuraLIB``
+- ``KuuraCLI/``
+	- Kuura Command Line Interface, shows nice progress output etc.
+	- Depends on ``KuuraAPI`` & ``KuuraLIB``
+- ``KuuraGUI/``
+	- Kuura Graphical User Interface, a simple dialog to show progress
+	- Depends on ``KuuraAPI`` & ``KuuraLIB``
 
 ## Submodules
 

@@ -32,5 +32,5 @@ jobs:
 
     - name: Run unit tests
       run: |
-        cd out/TunkioTests
-        valgrind --leak-check=yes ./tunkio-tests
+        cd out/KuuraTests
+        valgrind --leak-check=yes ./kuura-tests

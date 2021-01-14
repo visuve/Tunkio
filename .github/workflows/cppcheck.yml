@@ -18,4 +18,4 @@ jobs:
 
     - name: Static analysis
       run: |
-        cppcheck --project=Tunkio.cppcheck
+        cppcheck --project=Kuura.cppcheck

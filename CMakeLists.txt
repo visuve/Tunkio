@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 20)
 
-project("Tunkio")
+project("Kuura")
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/googletest")
 	add_subdirectory("googletest")
@@ -16,10 +16,10 @@ else()
 endif()
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/googletest")
-	add_subdirectory("TunkioTests")
+	add_subdirectory("KuuraTests")
 endif()
 
-add_subdirectory("TunkioLIB")
-add_subdirectory("TunkioAPI")
-add_subdirectory("TunkioCLI")
-add_subdirectory("TunkioGUI")
+add_subdirectory("KuuraLIB")
+add_subdirectory("KuuraAPI")
+add_subdirectory("KuuraCLI")
+add_subdirectory("KuuraGUI")
