@@ -159,11 +159,11 @@ int main(int argc, char* argv[])
 	using namespace Kuura;
 
 	std::cout << std::endl;
-	std::cout << " #######   #     #   #     #   #   #   ###    #####" << std::endl;
-	std::cout << "    #      #     #   # #   #   #  #     #    #     #" << std::endl;
-	std::cout << "    #      #     #   #  #  #   ###      #    #     #" << std::endl;
-	std::cout << "    #      #     #   #   # #   #  #     #    #     #" << std::endl;
-	std::cout << "    #       #####    #     #   #   #   ###    #####" << std::endl;
+	std::cout << " #  #  #   #  #   #  ###     ###" << std::endl;
+	std::cout << " # #   #   #  #   #  #  #   #   #" << std::endl;
+	std::cout << " ##    #   #  #   #  # #    #####" << std::endl;
+	std::cout << " # #   #   #  #   #  #  #   #   #"<< std::endl;
+	std::cout << " #  #   ###    ###   #   #  #   #" << std::endl;
 	std::cout << std::endl << "Version 0.1" << std::endl << std::endl;
 
 	if (argc <= 1)

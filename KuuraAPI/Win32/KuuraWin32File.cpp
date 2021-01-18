@@ -1,11 +1,9 @@
-#include "..\KuuraFile.hpp"
+#include "../KuuraFile.hpp"
 #include "../KuuraAPI-PCH.hpp"
 #include "../KuuraFile.hpp"
 
 namespace Kuura
 {
-	void* vittupointteri = nullptr;
-
 	OVERLAPPED Offset(uint64_t offset)
 	{
 		ULARGE_INTEGER cast = {};
@@ -182,8 +180,6 @@ namespace Kuura
 			m_alignmentSize.first = false;
 			m_optimalWriteSize.first = false;
 		}
-
-		vittupointteri = _aligned_malloc(0x10000, 512);
 	}
 
 	File::File(File&& other) noexcept
@@ -214,9 +210,6 @@ namespace Kuura
 			CloseHandle(m_handle);
 			m_handle = nullptr;
 		}
-
-		if (vittupointteri)
-			_aligned_free(vittupointteri);
 	}
 
 	bool File::IsValid() const
@@ -262,17 +255,17 @@ namespace Kuura
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> /*data*/)
+	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data*)
 	{
-		DWORD bytesWritten = 0; 
+		DWORD bytesWritten = 0;
+		DWORD bytesToWrite = static_cast<DWORD>(data.size_bytes());
 
-		if (!WriteFile(m_handle, vittupointteri, 0x10000, &bytesWritten, nullptr))
+		if (!WriteFile(m_handle, data.data(), bytesToWrite, &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
 
-		// return { data.size_bytes() == bytesWritten, bytesWritten };
-		return { true, bytesWritten };
+		return { bytesToWrite == bytesWritten, bytesWritten };
 	}
 
 	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)

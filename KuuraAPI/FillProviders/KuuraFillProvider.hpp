@@ -2,6 +2,12 @@
 
 #include <cstdlib>
 
+#if WIN32
+#define UNUSED_IN_RELEASE_MODE
+#else
+#define UNUSED_IN_RELEASE_MODE __attribute__((unused))
+#endif
+
 namespace Kuura
 {
 	class IFillProvider
@@ -29,7 +35,7 @@ namespace Kuura
 				assert(space && space % 512 == 0);
 				assert(space >= alignment);
 
-				void* ptr = std::align(
+				void* UNUSED_IN_RELEASE_MODE ptr = std::align(
 					alignment,
 					1,
 					data,

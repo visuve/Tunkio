@@ -1,7 +1,9 @@
 #pragma once
 
 #include <filesystem>
+#include <span>
 #include <utility>
+#include <vector>
 
 namespace Kuura
 {
