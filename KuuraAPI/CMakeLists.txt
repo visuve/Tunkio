@@ -1,7 +1,7 @@
 # KuuraAPI
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*cpp" "Win32/*.cpp")
+	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*.cpp" "FillConsumers/*.cpp" "Win32/*.cpp")
 	add_library("KuuraAPI" SHARED ${KuuraAPISource})
 	target_precompile_headers("KuuraAPI" PRIVATE "KuuraAPI-PCH.hpp")
 	set_source_files_properties("KuuraAPI.c" PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
@@ -10,7 +10,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*cpp" "Posix/*.cpp")
+	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*.cpp" "FillConsumers/*.cpp" "Posix/*.cpp")
 	add_library("kuura-api" SHARED ${KuuraAPISource})
 	target_precompile_headers("kuura-api" PRIVATE "KuuraAPI-PCH.hpp")
 	set_source_files_properties("KuuraAPI.c" PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
@@ -19,7 +19,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*cpp" "Posix/*.cpp")
+	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*.cpp" "FillConsumers/*.cpp" "Posix/*.cpp")
 	add_library("kuura-api" SHARED ${KuuraAPISource})
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		target_precompile_headers("kuura-api" PRIVATE "KuuraAPI-PCH.hpp")

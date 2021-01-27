@@ -1,5 +1,4 @@
-#include "KuuraDirectory.hpp"
-#include "KuuraAPI-PCH.hpp"
+#include "../KuuraAPI-PCH.hpp"
 #include "KuuraDirectory.hpp"
 
 namespace Kuura
@@ -14,22 +13,22 @@ namespace Kuura
 				continue;
 			}
 
-			File file(entry);
+			auto file = std::make_shared<File>(entry);
 
-			if (!file.IsValid())
+			if (!file->IsValid())
 			{
 				m_files.first = false;
 				return;
 			}
 
-			if (!file.AllocationSize().first)
+			if (!file->Size().first)
 			{
 				m_size.first = false;
 				return;
 			}
 
 			m_files.second.emplace_back(std::move(file));
-			m_size.second += file.AllocationSize().second;
+			m_size.second += file->Size().second;
 		}
 
 		m_files.first = true;
@@ -40,7 +39,7 @@ namespace Kuura
 	{
 	}
 
-	std::pair<bool, std::vector<File>>& Directory::Files()
+	std::pair<bool, std::vector<std::shared_ptr<File>>>& Directory::Files()
 	{
 		return m_files;
 	}
@@ -52,9 +51,9 @@ namespace Kuura
 
 	bool Directory::RemoveAll()
 	{
-		for (File& file : m_files.second)
+		for (auto& file : m_files.second)
 		{
-			if (!file.Delete())
+			if (!file->Delete())
 			{
 				return false;
 			}

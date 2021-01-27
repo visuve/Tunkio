@@ -1,6 +1,6 @@
 #include "../KuuraAPI-PCH.hpp"
 #include "KuuraDirectoryWipe.hpp"
-#include "../KuuraDirectory.hpp"
+#include "../FillConsumers/KuuraDirectory.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
@@ -17,7 +17,7 @@ namespace Kuura
 	{
 		Directory directory(m_path);
 
-		std::pair<bool, std::vector<File>>& files = directory.Files();
+		std::pair<bool, std::vector<std::shared_ptr<File>>>& files = directory.Files();
 
 		if (!files.first)
 		{
@@ -44,9 +44,9 @@ namespace Kuura
 
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
-			for (File& file : files.second)
+			for (auto& file : files.second)
 			{
-				uint64_t bytesLeft = file.AllocationSize().second;
+				uint64_t bytesLeft = file->Size().second;
 				uint64_t bytesWritten = 0;
 
 				if (!Fill(passes, bytesLeft, bytesWritten, filler, file))
@@ -54,7 +54,7 @@ namespace Kuura
 					return false;
 				}
 
-				if (!file.Flush())
+				if (!file->Flush())
 				{
 					OnError(KuuraStage::Write, passes, bytesWritten, LastError);
 				}

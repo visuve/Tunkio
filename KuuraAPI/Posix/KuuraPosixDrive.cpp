@@ -1,5 +1,5 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "../FillConsumers/KuuraFile.hpp"
+#include "../FillConsumers/KuuraDrive.hpp"
 
 namespace Kuura
 {
@@ -12,7 +12,19 @@ namespace Kuura
 	// https://linux.die.net/man/2/open
 	constexpr uint32_t OpenFlags = O_RDWR | O_DIRECT | O_SYNC;
 
-	File::File(const std::filesystem::path& path) :
+	std::pair<bool, uint64_t> DiskSizeByDescriptor(const int descriptor)
+	{
+		uint64_t size = 0;
+
+		if (ioctl(descriptor, DiskSizeRequest, &size) != 0)
+		{
+			return { false, size };
+		}
+
+		return { true, size };
+	}
+
+	Drive::Drive(const std::filesystem::path& path) :
 		Path(path),
 		m_fileDescriptor(open(path.c_str(), OpenFlags))
 	{
@@ -34,39 +46,39 @@ namespace Kuura
 			return;
 		}
 #endif
-		m_allocationSize = { true, buffer.st_blocks * 512 };
+		m_actualSize = DiskSizeByDescriptor(m_fileDescriptor);
 
 		// See notes in KuuraWin32File.cpp
 
 		m_alignmentSize = { buffer.st_blksize % 512 == 0, buffer.st_blksize };
 		m_optimalWriteSize = { buffer.st_blksize % 512 == 0, (buffer.st_blksize / 512) * 0x10000 };
 
-		if (m_allocationSize.second % 512 != 0)
+		if (buffer.st_blksize % 512 != 0)
 		{
 			// Something is horribly wrong
-			m_allocationSize.first = false;
+			m_actualSize.first = false;
 			m_optimalWriteSize.first = false;
 		}
 	}
 
-	File::File(File&& other) noexcept
+	Drive::Drive(Drive&& other) noexcept
 	{
 		std::swap(m_fileDescriptor, other.m_fileDescriptor);
-		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 	}
 
-	File& File::operator = (File&& other) noexcept
+	Drive& Drive::operator = (Drive&& other) noexcept
 	{
 		std::swap(m_fileDescriptor, other.m_fileDescriptor);
-		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		return *this;
 	}
 
-	File::~File()
+	Drive::~Drive()
 	{
 		if (m_fileDescriptor)
 		{
@@ -75,27 +87,34 @@ namespace Kuura
 		}
 	}
 
-	bool File::IsValid() const
+	bool Drive::IsValid() const
 	{
 		return m_fileDescriptor > 0;
 	}
 
-	std::pair<bool, uint64_t> File::Size() const
+	bool Drive::Unmount() const
 	{
-		return m_allocationSize;
+		// TODO: need to check that it is actually mounted
+		// return unmount(Path.c_str(), MNT_FORCE) == 0;
+		return true;
 	}
 
-	std::pair<bool, uint64_t> File::AlignmentSize() const
+	std::pair<bool, uint64_t> Drive::Size() const
+	{
+		return m_actualSize;
+	}
+
+	std::pair<bool, uint64_t> Drive::AlignmentSize() const
 	{
 		return m_alignmentSize;
 	}
 
-	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	std::pair<bool, uint64_t> Drive::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
+	std::pair<bool, uint64_t> Drive::Write(const std::span<std::byte> data)
 	{
 		const ssize_t result = write(m_fileDescriptor, data.data(), data.size_bytes());
 
@@ -109,7 +128,7 @@ namespace Kuura
 		return { data.size_bytes() == bytesWritten, bytesWritten };
 	}
 
-	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t bytes, uint64_t offset)
+	std::pair<bool, std::vector<std::byte>> Drive::Read(uint64_t bytes, uint64_t offset)
 	{
 		std::vector<std::byte> buffer;
 
@@ -123,21 +142,5 @@ namespace Kuura
 		uint64_t bytesRead = static_cast<uint64_t>(result);
 
 		return { bytesRead == bytes, std::move(buffer) };
-	}
-
-	bool File::Flush()
-	{
-		return fsync(m_fileDescriptor) == 0;
-	}
-
-	bool File::Delete()
-	{
-		if (IsValid() && close(m_fileDescriptor))
-		{
-			m_fileDescriptor = -1;
-			return remove(Path.c_str()) == 0;
-		}
-
-		return false;
 	}
 }

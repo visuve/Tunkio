@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../KuuraAPI.h"
-#include "../KuuraFile.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
+#include "../FillConsumers/KuuraFillConsumer.hpp"
 
 namespace Kuura
 {
@@ -51,7 +51,7 @@ namespace Kuura
 			uint64_t bytesLeft,
 			uint64_t& bytesWritten,
 			std::shared_ptr<IFillProvider> filler,
-			File& file);
+			std::shared_ptr<IFillConsumer> fillable);
 
 	private:
 		KuuraWipeStartedCallback* m_wipeStartedCallback = nullptr;

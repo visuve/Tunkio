@@ -126,15 +126,20 @@ namespace Kuura
 		m_errorCallback(m_context, stage, pass, bytesWritten, errorCode);
 	}
 
-	bool IWorkload::Fill(uint16_t pass, uint64_t bytesLeft, uint64_t& bytesWritten, std::shared_ptr<IFillProvider> filler, File& file)
+	bool IWorkload::Fill(
+		uint16_t pass,
+		uint64_t bytesLeft,
+		uint64_t& bytesWritten,
+		std::shared_ptr<IFillProvider> filler,
+		std::shared_ptr<IFillConsumer> fillable)
 	{
 		while (bytesLeft)
 		{
-			const uint64_t size = std::min(bytesLeft, file.OptimalWriteSize().second);
+			const uint64_t size = std::min(bytesLeft, fillable->OptimalWriteSize().second);
 			const uint64_t offset = bytesWritten;
 
-			const std::span<std::byte> writtenData = filler->Data(size, file.AlignmentSize().second);
-			const auto result = file.Write(writtenData);
+			const std::span<std::byte> writtenData = filler->Data(size, fillable->AlignmentSize().second);
+			const auto result = fillable->Write(writtenData);
 
 			bytesWritten += result.second;
 			bytesLeft -= std::min(bytesLeft, result.second);
@@ -147,7 +152,7 @@ namespace Kuura
 
 			if (filler->Verify)
 			{
-				const auto actualData = file.Read(size, offset);
+				const auto actualData = fillable->Read(size, offset);
 
 				if (!actualData.first)
 				{

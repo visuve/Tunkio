@@ -1,6 +1,6 @@
 #include "../KuuraAPI-PCH.hpp"
 #include "KuuraDriveWipe.hpp"
-#include "../KuuraFile.hpp"
+#include "../FillConsumers/KuuraDrive.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
@@ -12,22 +12,22 @@ namespace Kuura
 
 	bool DriveWipe::Run()
 	{
-		File drive(m_path);
+		auto drive = std::make_shared<Drive>(m_path);
 
-		if (!drive.IsValid())
+		if (!drive->IsValid())
 		{
 			OnError(KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
-		if (!drive.Unmount())
+		if (!drive->Unmount())
 		{
 			// TODO: maybe add a stage "unmount" which is only used for drives
 			OnError(KuuraStage::Unmount, 0, 0, LastError);
 			return false;
 		}
 
-		if (!drive.ActualSize().first)
+		if (!drive->Size().first)
 		{
 			OnError(KuuraStage::Size, 0, 0, LastError);
 			return false;
@@ -36,13 +36,13 @@ namespace Kuura
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), drive.ActualSize().second);
+		OnWipeStarted(FillerCount(), drive->Size().second);
 
 		while (HasFillers())
 		{
 			OnPassStarted(++passes);
 
-			uint64_t bytesLeft = drive.ActualSize().second;
+			uint64_t bytesLeft = drive->Size().second;
 			uint64_t bytesWritten = 0;
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
