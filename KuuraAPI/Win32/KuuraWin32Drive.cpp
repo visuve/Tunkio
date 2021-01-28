@@ -17,7 +17,7 @@ namespace Kuura
 			diskGeo.BytesPerSector;
 	}
 
-	std::pair<bool, uint64_t> DiskSizeByHandle(const HANDLE handle)
+	std::optional<uint64_t> DiskSizeByHandle(const HANDLE handle)
 	{
 		DWORD bytesReturned = 0;
 		DISK_GEOMETRY diskGeo = {};
@@ -33,12 +33,12 @@ namespace Kuura
 			&bytesReturned,
 			nullptr))
 		{
-			return { false, 0 };
+			return std::nullopt;
 		}
 
 		assert(bytesReturned == DiskGeoSize);
 
-		return { true, Bytes(diskGeo) };
+		return Bytes(diskGeo);
 	}
 
 
@@ -52,15 +52,15 @@ namespace Kuura
 		}
 
 		m_actualSize = DiskSizeByHandle(m_handle);
+		m_alignmentSize = PageSize();
 		m_optimalWriteSize = OptimalWriteSizeByHandle(m_handle);
-		m_alignmentSize = SystemAlignmentSize();
 
-		if (m_actualSize.second % 512 != 0)
+		if (!m_alignmentSize || m_alignmentSize.value() % 512 != 0)
 		{
 			// Something is horribly wrong
-			m_actualSize.first = false;
-			m_alignmentSize.first = false;
-			m_optimalWriteSize.first = false;
+			m_actualSize = std::nullopt;
+			m_alignmentSize = std::nullopt;
+			m_optimalWriteSize = std::nullopt;
 		}
 	}
 
@@ -113,17 +113,17 @@ namespace Kuura
 		return true;
 	}
 
-	std::pair<bool, uint64_t> Drive::Size() const
+	std::optional<uint64_t> Drive::Size() const
 	{
 		return m_actualSize;
 	}
 
-	std::pair<bool, uint64_t> Drive::AlignmentSize() const
+	std::optional<uint64_t> Drive::AlignmentSize() const
 	{
 		return m_alignmentSize;
 	}
 
-	std::pair<bool, uint64_t> Drive::OptimalWriteSize() const
+	std::optional<uint64_t> Drive::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}

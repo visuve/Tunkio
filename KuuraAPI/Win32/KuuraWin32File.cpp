@@ -15,14 +15,14 @@ namespace Kuura
 
 		m_allocationSize = AllocationSizeByHandle(m_handle);
 		m_optimalWriteSize = OptimalWriteSizeByHandle(m_handle);
-		m_alignmentSize = SystemAlignmentSize();
+		m_alignmentSize = PageSize();
 
-		if (m_allocationSize.second % 512 != 0)
+		if (!m_allocationSize || m_allocationSize.value() % 512 != 0)
 		{
 			// Something is horribly wrong
-			m_allocationSize.first = false;
-			m_alignmentSize.first = false;
-			m_optimalWriteSize.first = false;
+			m_allocationSize = std::nullopt;
+			m_alignmentSize = std::nullopt;
+			m_optimalWriteSize = std::nullopt;
 		}
 	}
 
@@ -57,17 +57,17 @@ namespace Kuura
 		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
 	}
 
-	std::pair<bool, uint64_t> File::Size() const
+	std::optional<uint64_t> File::Size() const
 	{
 		return m_allocationSize;
 	}
 
-	std::pair<bool, uint64_t> File::AlignmentSize() const
+	std::optional<uint64_t> File::AlignmentSize() const
 	{
 		return m_alignmentSize;
 	}
 
-	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	std::optional<uint64_t> File::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}

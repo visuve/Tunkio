@@ -46,7 +46,7 @@ namespace Kuura
 
 			for (auto& file : files.second)
 			{
-				uint64_t bytesLeft = file->Size().second;
+				uint64_t bytesLeft = file->Size().value();
 				uint64_t bytesWritten = 0;
 
 				if (!Fill(passes, bytesLeft, bytesWritten, filler, file))

@@ -135,10 +135,10 @@ namespace Kuura
 	{
 		while (bytesLeft)
 		{
-			const uint64_t size = std::min(bytesLeft, fillable->OptimalWriteSize().second);
+			const uint64_t size = std::min(bytesLeft, fillable->OptimalWriteSize().value());
 			const uint64_t offset = bytesWritten;
 
-			const std::span<std::byte> writtenData = filler->Data(size, fillable->AlignmentSize().second);
+			const std::span<std::byte> writtenData = filler->Data(size, fillable->AlignmentSize().value());
 			const auto result = fillable->Write(writtenData);
 
 			bytesWritten += result.second;

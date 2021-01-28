@@ -29,6 +29,7 @@
 #include <limits>
 #include <numeric>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <random>
 #include <span>

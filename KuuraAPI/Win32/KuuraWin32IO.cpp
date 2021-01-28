@@ -3,7 +3,6 @@
 
 namespace Kuura
 {
-
 	OVERLAPPED Offset(uint64_t offset)
 	{
 		ULARGE_INTEGER cast = {};
@@ -34,7 +33,7 @@ namespace Kuura
 			nullptr);
 	}
 
-	std::pair<bool, uint64_t> OptimalWriteSizeByHandle(const HANDLE handle)
+	std::optional<uint64_t> OptimalWriteSizeByHandle(HANDLE handle)
 	{
 		FILE_STORAGE_INFO storageInfo = {};
 
@@ -44,23 +43,23 @@ namespace Kuura
 			&storageInfo,
 			sizeof(FILE_STORAGE_INFO)))
 		{
-			return { false, 0 };
+			return std::nullopt;
 		}
 
 		uint64_t performanceSize = storageInfo.PhysicalBytesPerSectorForPerformance;
 
 		if (performanceSize % 512 != 0)
 		{
-			return { false, performanceSize };
+			return std::nullopt;
 		}
 
 		// This formula is somewhat ripped from my arse. It's loosely based on my guess about this old article:
 		// https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-2000-server/cc938632(v=technet.10)
 		// I bet that with modern NVME drives, 64KB still creates overhead.
-		return { true, (performanceSize / 512) * 0x10000 };
+		return performanceSize / 512 * 0x10000;
 	}
 
-	std::pair<bool, uint64_t> AllocationSizeByHandle(const HANDLE handle)
+	std::optional<uint64_t> AllocationSizeByHandle(HANDLE handle)
 	{
 		FILE_STANDARD_INFO standardInfo = {};
 
@@ -70,17 +69,44 @@ namespace Kuura
 			&standardInfo,
 			sizeof(FILE_STANDARD_INFO)))
 		{
-			return { false, 0 };
+			return std::nullopt;
 		}
 
-		return { true, standardInfo.AllocationSize.QuadPart };
+		return standardInfo.AllocationSize.QuadPart;
 	}
 
-	std::pair<bool, uint64_t> SystemAlignmentSize()
+	uint64_t PageSize()
 	{
 		SYSTEM_INFO systemInfo = {};
 		GetSystemInfo(&systemInfo);
 
-		return { true, systemInfo.dwPageSize };
+		return systemInfo.dwPageSize;
+	}
+
+	std::pair<bool, uint64_t> WriteTo(HANDLE handle, const std::span<std::byte> data)
+	{
+		DWORD bytesWritten = 0;
+		DWORD bytesToWrite = static_cast<DWORD>(data.size_bytes());
+
+		if (!WriteFile(handle, data.data(), bytesToWrite, &bytesWritten, nullptr))
+		{
+			return { false, bytesWritten };
+		}
+
+		return { bytesToWrite == bytesWritten, bytesWritten };
+	}
+
+	std::pair<bool, std::vector<std::byte>> ReadFrom(HANDLE handle, uint64_t bytes, uint64_t offset)
+	{
+		std::vector<std::byte> buffer(bytes);
+		DWORD bytesRead = 0;
+		OVERLAPPED overlapped = Offset(offset);
+
+		if (!ReadFile(handle, buffer.data(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
+		{
+			return { false, std::move(buffer) };
+		}
+
+		return { bytes == bytesRead, std::move(buffer) };
 	}
 }

@@ -1,6 +1,5 @@
 # KuuraGUI
 
-set(CMAKE_CXX_STANDARD 17) # MSVC 16.8.2 + Qt 5.15.2 causes compilation errors on C++20
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)

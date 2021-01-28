@@ -23,7 +23,7 @@ namespace Kuura
 			return false;
 		}
 
-		if (!file->Size().first)
+		if (!file->Size())
 		{
 			OnError(KuuraStage::Size, 0, 0, LastError);
 			return false;
@@ -32,13 +32,13 @@ namespace Kuura
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), file->Size().second);
+		OnWipeStarted(FillerCount(), file->Size().value());
 
 		while (HasFillers())
 		{
 			OnPassStarted(++passes);
 
-			uint64_t bytesLeft = file->Size().second;
+			uint64_t bytesLeft = file->Size().value();
 			uint64_t bytesWritten = 0;
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 

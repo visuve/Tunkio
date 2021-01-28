@@ -27,7 +27,7 @@ namespace Kuura
 			return false;
 		}
 
-		if (!drive->Size().first)
+		if (!drive->Size())
 		{
 			OnError(KuuraStage::Size, 0, 0, LastError);
 			return false;
@@ -36,13 +36,13 @@ namespace Kuura
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), drive->Size().second);
+		OnWipeStarted(FillerCount(), drive->Size().value());
 
 		while (HasFillers())
 		{
 			OnPassStarted(++passes);
 
-			uint64_t bytesLeft = drive->Size().second;
+			uint64_t bytesLeft = drive->Size().value();
 			uint64_t bytesWritten = 0;
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 

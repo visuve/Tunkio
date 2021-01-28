@@ -5,9 +5,9 @@ namespace Kuura
 {
 	Drive::Drive(const std::filesystem::path& path) :
 		Path(path),
-		m_actualSize(true, 2048),
-		m_alignmentSize(true, 512),
-		m_optimalWriteSize(true, 1024)
+		m_actualSize(2048),
+		m_alignmentSize(512),
+		m_optimalWriteSize(1024)
 	{
 	}
 
@@ -16,7 +16,7 @@ namespace Kuura
 #if defined(_WIN32)
 		std::swap(m_handle, other.m_handle);
 #else
-		std::swap(m_fileDescriptor, other.m_fileDescriptor);
+		std::swap(m_descriptor, other.m_descriptor);
 #endif
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_alignmentSize, other.m_alignmentSize);
@@ -28,7 +28,7 @@ namespace Kuura
 #if defined(_WIN32)
 		std::swap(m_handle, other.m_handle);
 #else
-		std::swap(m_fileDescriptor, other.m_fileDescriptor);
+		std::swap(m_descriptor, other.m_descriptor);
 #endif
 		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_alignmentSize, other.m_alignmentSize);
@@ -45,17 +45,17 @@ namespace Kuura
 		return true;
 	}
 
-	std::pair<bool, uint64_t> Drive::Size() const
+	std::optional<uint64_t> Drive::Size() const
 	{
 		return m_actualSize;
 	}
 
-	std::pair<bool, uint64_t> Drive::AlignmentSize() const
+	std::optional<uint64_t> Drive::AlignmentSize() const
 	{
 		return m_alignmentSize;
 	}
 
-	std::pair<bool, uint64_t> Drive::OptimalWriteSize() const
+	std::optional<uint64_t> Drive::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}

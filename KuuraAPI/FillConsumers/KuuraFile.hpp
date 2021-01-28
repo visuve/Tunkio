@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <span>
 
 #include "KuuraFillConsumer.hpp"
 
@@ -19,23 +20,23 @@ namespace Kuura
 		~File();
 
 		bool IsValid() const;
-		std::pair<bool, uint64_t> Size() const override;
-		std::pair<bool, uint64_t> AlignmentSize() const override;
-		std::pair<bool, uint64_t> OptimalWriteSize() const override;
+		std::optional<uint64_t> Size() const override;
+		std::optional<uint64_t> AlignmentSize() const override;
+		std::optional<uint64_t> OptimalWriteSize() const override;
 		std::pair<bool, uint64_t> Write(const std::span<std::byte> data) override;
 		std::pair<bool, std::vector<std::byte>> Read(uint64_t bytes, uint64_t offset) override;
 		bool Flush();
 		bool Delete();
 
 	private:
-		std::pair<bool, uint64_t> m_allocationSize;
-		std::pair<bool, uint64_t> m_alignmentSize;
-		std::pair<bool, uint64_t> m_optimalWriteSize;
+		std::optional<uint64_t> m_allocationSize;
+		std::optional<uint64_t> m_alignmentSize;
+		std::optional<uint64_t> m_optimalWriteSize;
 
 #if defined(_WIN32)
 		void* m_handle = reinterpret_cast<void*>(-1);
 #else
-		int m_fileDescriptor = -1;
+		int m_descriptor = -1;
 #endif
 	};
 }
