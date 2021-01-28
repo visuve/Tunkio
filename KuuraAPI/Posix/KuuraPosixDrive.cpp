@@ -1,5 +1,6 @@
 #include "../KuuraAPI-PCH.hpp"
 #include "../FillConsumers/KuuraDrive.hpp"
+#include "KuuraPosixIO.hpp"
 
 namespace Kuura
 {
@@ -33,27 +34,22 @@ namespace Kuura
 			return;
 		}
 
-#if defined(__linux__)
-		struct stat64 buffer = {};
-		if (fstat64(m_fileDescriptor, &buffer) != 0)
+		std::optional<FileInfo> fileInfo =
+			FileInfoFromDescriptor(m_fileDescriptor);
+
+		if (!fileInfo.has_value())
 		{
 			return;
 		}
-#else
-		struct stat buffer = {};
-		if (fstat(m_fileDescriptor, &buffer) != 0)
-		{
-			return;
-		}
-#endif
+
 		m_actualSize = DiskSizeByDescriptor(m_fileDescriptor);
 
 		// See notes in KuuraWin32File.cpp
 
-		m_alignmentSize = { buffer.st_blksize % 512 == 0, buffer.st_blksize };
-		m_optimalWriteSize = { buffer.st_blksize % 512 == 0, (buffer.st_blksize / 512) * 0x10000 };
+		m_alignmentSize = { fileInfo->st_blksize % 512 == 0, fileInfo->st_blksize };
+		m_optimalWriteSize = { fileInfo->st_blksize % 512 == 0, (fileInfo->st_blksize / 512) * 0x10000 };
 
-		if (buffer.st_blksize % 512 != 0)
+		if (fileInfo->st_blksize % 512 != 0)
 		{
 			// Something is horribly wrong
 			m_actualSize.first = false;

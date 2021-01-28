@@ -1,81 +1,76 @@
 #include "KuuraTests-PCH.hpp"
-#include "FillConsumers/KuuraFile.hpp"
+#include "FillConsumers/KuuraDrive.hpp"
 
 namespace Kuura
 {
-	File::File(const std::filesystem::path& path) :
+	Drive::Drive(const std::filesystem::path& path) :
 		Path(path),
-		m_allocationSize(true, 2048),
+		m_actualSize(true, 2048),
 		m_alignmentSize(true, 512),
 		m_optimalWriteSize(true, 1024)
 	{
 	}
 
-	File::File(File&& other) noexcept
+	Drive::Drive(Drive&& other) noexcept
 	{
 #if defined(_WIN32)
 		std::swap(m_handle, other.m_handle);
 #else
 		std::swap(m_fileDescriptor, other.m_fileDescriptor);
 #endif
-		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 	}
 
-	File& File::operator = (File&& other) noexcept
+	Drive& Drive::operator = (Drive&& other) noexcept
 	{
 #if defined(_WIN32)
 		std::swap(m_handle, other.m_handle);
 #else
 		std::swap(m_fileDescriptor, other.m_fileDescriptor);
 #endif
-		std::swap(m_allocationSize, other.m_allocationSize);
+		std::swap(m_actualSize, other.m_actualSize);
 		std::swap(m_alignmentSize, other.m_alignmentSize);
 		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
 		return *this;
 	}
 
-	File::~File()
+	Drive::~Drive()
 	{
 	}
 
-	bool File::IsValid() const
+	bool Drive::IsValid() const
 	{
 		return true;
 	}
 
-	std::pair<bool, uint64_t> File::Size() const
+	std::pair<bool, uint64_t> Drive::Size() const
 	{
-		return m_allocationSize;
+		return m_actualSize;
 	}
 
-	std::pair<bool, uint64_t> File::AlignmentSize() const
+	std::pair<bool, uint64_t> Drive::AlignmentSize() const
 	{
 		return m_alignmentSize;
 	}
 
-	std::pair<bool, uint64_t> File::OptimalWriteSize() const
+	std::pair<bool, uint64_t> Drive::OptimalWriteSize() const
 	{
 		return m_optimalWriteSize;
 	}
 
-	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
+	std::pair<bool, uint64_t> Drive::Write(const std::span<std::byte> data)
 	{
 		return { !data.empty(), data.size() };
 	}
 
-	std::pair<bool, std::vector<std::byte>> File::Read(uint64_t size, uint64_t)
+	std::pair<bool, std::vector<std::byte>> Drive::Read(uint64_t size, uint64_t)
 	{
 		return { size > 0, std::vector<std::byte>(1, std::byte(0xFF)) };
 	}
 
-	bool File::Flush()
-	{
-		return true;
-	}
-
-	bool File::Delete()
+	bool Drive::Unmount() const
 	{
 		return true;
 	}

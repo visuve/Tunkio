@@ -1,5 +1,5 @@
 #include "KuuraTests-PCH.hpp"
-#include "../KuuraAPI/KuuraDirectory.hpp"
+#include "FillConsumers/KuuraDirectory.hpp"
 
 namespace Kuura
 {
@@ -7,7 +7,7 @@ namespace Kuura
 		Path(path)
 	{
 		m_files.first = true;
-		m_files.second.emplace_back("foobar");
+		m_files.second.emplace_back(std::make_shared<File>("foobar"));
 
 		m_size.first = true;
 		m_size.second = 4000;
@@ -17,7 +17,7 @@ namespace Kuura
 	{
 	}
 
-	std::pair<bool, std::vector<File>>& Directory::Files()
+	std::pair<bool, std::vector<std::shared_ptr<File>>>& Directory::Files()
 	{
 		return m_files;
 	}

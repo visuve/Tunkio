@@ -23,8 +23,8 @@ namespace Kuura
 		std::pair<bool, uint64_t> Size() const override;
 		std::pair<bool, uint64_t> AlignmentSize() const override;
 		std::pair<bool, uint64_t> OptimalWriteSize() const override;
-		std::pair<bool, uint64_t> Write(const std::span<std::byte> data);
-		std::pair<bool, std::vector<std::byte>> Read(uint64_t bytes, uint64_t offset);
+		std::pair<bool, uint64_t> Write(const std::span<std::byte> data) override;
+		std::pair<bool, std::vector<std::byte>> Read(uint64_t bytes, uint64_t offset) override;
 
 	private:
 		std::pair<bool, uint64_t> m_actualSize;
