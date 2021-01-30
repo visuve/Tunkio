@@ -17,6 +17,7 @@ jobs:
 
     - name: Install tools
       run: |
+        sudo apt update
         sudo apt --yes install clang cmake ninja-build
         sudo apt --yes install libudev-dev qtbase5-dev
         sudo apt --yes install valgrind
