@@ -3,13 +3,6 @@
 
 namespace Kuura
 {
-
-#if defined(__linux__)
-	constexpr unsigned long int DiskSizeRequest = BLKGETSIZE64;
-#else
-	constexpr unsigned long int DiskSizeRequest = DIOCGMEDIASIZE;
-#endif
-
 	std::optional<FileInfo> FileInfoFromDescriptor(int descriptor)
 	{
 		FileInfo fileInfo = {};
