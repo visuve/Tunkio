@@ -86,7 +86,6 @@ private:
 	std::vector<Kuura::Drive> m_drives = Kuura::DriveInfo();
 };
 
-
 DriveSelectDialog::DriveSelectDialog(QWidget* parent) :
 	QDialog(parent),
 	ui(new Ui::DriveSelectDialog())

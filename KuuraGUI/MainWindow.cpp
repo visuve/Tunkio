@@ -34,6 +34,76 @@ MainWindow::MainWindow(QWidget* parent) :
 {
 	ui->setupUi(this);
 
+	initMenu();
+
+	m_model = new WipePassModel(this);
+	ui->tableViewWipePasses->setModel(m_model);
+	ui->tableViewWipePasses->setItemDelegateForColumn(8, new ProgressBarDelegate(this));
+
+	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
+	connect(ui->pushButtonRemovePass, &QPushButton::clicked, this, &MainWindow::removePass);
+	connect(ui->pushButtonClearPasses, &QPushButton::clicked, this, &MainWindow::clearPasses);
+	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startWipe);
+
+	connect(
+		ui->tableViewWipePasses->selectionModel(),
+		&QItemSelectionModel::selectionChanged,
+		[this](const QItemSelection& selected, const QItemSelection&)
+	{
+		if (m_kuura.get() && m_kuura->isRunning())
+		{
+			return;
+		}
+
+		ui->pushButtonRemovePass->setEnabled(!selected.isEmpty());
+	});
+
+	const auto enableStartButton = [this]()
+	{
+		ui->pushButtonClearPasses->setEnabled(!m_model->isEmpty());
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_kuura.get());
+	};
+
+	connect(m_model, &QAbstractItemModel::rowsInserted, enableStartButton);
+	connect(m_model, &QAbstractItemModel::rowsRemoved, enableStartButton);
+	// connect(m_model, &QAbstractItemModel::modelReset, enableStartButton);
+	// TODO: attach enableStartButton when m_kuura is initialized
+
+	m_textEditDialog = new TextEditorDialog(ui->lineEditFillValue);
+
+	auto indexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
+
+	connect(ui->comboBoxFillType, indexChanged, [this](int index)
+	{
+		this->onFillTypeSelectionChanged(index);
+	});
+
+	connect(ui->lineEditFillValue, &QLineEdit::textEdited, [&](const QString& text)
+	{
+		if (ui->comboBoxFillType->currentIndex() == 3)
+		{
+			m_textEditDialog->setText(text);
+		}
+	});
+
+	connect(m_textEditDialog, &TextEditorDialog::accepted, [this]()
+	{
+		QString sequence = m_textEditDialog->text();
+		ui->lineEditFillValue->setText(sequence);
+	});
+
+	ui->lineEditFillValue->installEventFilter(this);
+}
+
+MainWindow::~MainWindow()
+{
+	m_kuura.reset();
+	delete ui;
+}
+
+void MainWindow::initMenu()
+{
+
 	// ui->menuFile->setIcon(QApplication::style()->standardIcon(QStyle::SP_ComputerIcon));
 	// ui->menuPresets->setIcon(QApplication::style()->standardIcon(QStyle::SP_MediaPlay));
 
@@ -104,7 +174,7 @@ MainWindow::MainWindow(QWidget* parent) :
 		m_model->clearPasses();
 		m_model->addPass(KuuraFillType::ByteFill, false, "\x55");
 		m_model->addPass(KuuraFillType::ByteFill, false, "\xAA");
-		m_model->addPass(KuuraFillType::RandomFill,  false);
+		m_model->addPass(KuuraFillType::RandomFill, false);
 	});
 
 	connect(ui->actionBruce_Schneier_s_Algorithm, &QAction::triggered, [this]()
@@ -178,77 +248,14 @@ MainWindow::MainWindow(QWidget* parent) :
 				m_model->addPass(type, false, value);
 			}
 
-		} while (QMessageBox::question(
+		}
+		while (QMessageBox::question(
 			this,
 			"Kuura - Shuffle",
 			"Gutmann's method requires random order of some of the passes.\n"
 			"Click retry to shuffle, OK to accept.",
 			QMessageBox::Retry | QMessageBox::Ok) == QMessageBox::Retry);
 	});
-
-	m_model = new WipePassModel(this);
-	ui->tableViewWipePasses->setModel(m_model);
-	ui->tableViewWipePasses->setItemDelegateForColumn(8, new ProgressBarDelegate(this));
-
-	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
-	connect(ui->pushButtonRemovePass, &QPushButton::clicked, this, &MainWindow::removePass);
-	connect(ui->pushButtonClearPasses, &QPushButton::clicked, this, &MainWindow::clearPasses);
-	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startWipe);
-
-	connect(
-		ui->tableViewWipePasses->selectionModel(),
-		&QItemSelectionModel::selectionChanged,
-		[this](const QItemSelection& selected, const QItemSelection&)
-	{
-		if (m_kuura.get() && m_kuura->isRunning())
-		{
-			return;
-		}
-
-		ui->pushButtonRemovePass->setEnabled(!selected.isEmpty());
-	});
-
-	const auto enableStartButton = [this]()
-	{
-		ui->pushButtonClearPasses->setEnabled(!m_model->isEmpty());
-		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_kuura.get());
-	};
-
-	connect(m_model, &QAbstractItemModel::rowsInserted, enableStartButton);
-	connect(m_model, &QAbstractItemModel::rowsRemoved, enableStartButton);
-	// connect(m_model, &QAbstractItemModel::modelReset, enableStartButton);
-	// TODO: attach enableStartButton when m_kuura is initialized
-
-	m_textEditDialog = new TextEditorDialog(ui->lineEditFillValue);
-
-	auto indexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
-
-	connect(ui->comboBoxFillType, indexChanged, [this](int index)
-	{
-		this->onFillTypeSelectionChanged(index);
-	});
-
-	connect(ui->lineEditFillValue, &QLineEdit::textEdited, [&](const QString& text)
-	{
-		if (ui->comboBoxFillType->currentIndex() == 3)
-		{
-			m_textEditDialog->setText(text);
-		}
-	});
-
-	connect(m_textEditDialog, &TextEditorDialog::accepted, [this]()
-	{
-		QString sequence = m_textEditDialog->text();
-		ui->lineEditFillValue->setText(sequence);
-	});
-
-	ui->lineEditFillValue->installEventFilter(this);
-}
-
-MainWindow::~MainWindow()
-{
-	m_kuura.reset();
-	delete ui;
 }
 
 void MainWindow::onOpenFileDialog()

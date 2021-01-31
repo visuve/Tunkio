@@ -22,6 +22,7 @@ public:
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
+	void initMenu();
 	void onOpenFileDialog();
 	void onOpenDirectoryDialog();
 	void onOpenDriveDialog();
