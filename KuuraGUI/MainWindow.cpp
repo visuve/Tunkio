@@ -256,6 +256,24 @@ void MainWindow::initMenu()
 			"Click retry to shuffle, OK to accept.",
 			QMessageBox::Retry | QMessageBox::Ok) == QMessageBox::Retry);
 	});
+
+	connect(ui->actionU_S_Air_Force_System_Security_Instruction_5020, &QAction::triggered, [this]()
+	{
+		ui->groupBoxAddPass->setEnabled(false);
+		m_model->clearPasses();
+		m_model->addPass(KuuraFillType::ByteFill, false, "\x00");
+		m_model->addPass(KuuraFillType::ByteFill, false, "\xFF");
+		m_model->addPass(KuuraFillType::RandomFill, true);
+	});
+
+	connect(ui->actionU_S_Navy_Staff_Office_Publication_NAVSO_P_5239_26, &QAction::triggered, [this]()
+	{
+		ui->groupBoxAddPass->setEnabled(false);
+		m_model->clearPasses();
+		m_model->addPass(KuuraFillType::ByteFill, false, "\xFF");
+		m_model->addPass(KuuraFillType::ByteFill, false, "\x00");
+		m_model->addPass(KuuraFillType::RandomFill, true);
+	});
 }
 
 void MainWindow::onOpenFileDialog()
