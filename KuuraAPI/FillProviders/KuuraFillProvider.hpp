@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 #if WIN32
-#define UNUSED_IN_RELEASE_MODE
+#define UNUSED_IN_RELEASE_MODE [[maybe_unused]]
 #else
 #define UNUSED_IN_RELEASE_MODE __attribute__((unused))
 #endif
