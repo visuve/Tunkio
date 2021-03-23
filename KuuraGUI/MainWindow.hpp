@@ -1,10 +1,12 @@
 #pragma once
 
-#include "WipePassModel.hpp"
-#include "KuuraRunner.hpp"
-#include "TextEditorDialog.hpp"
-
 #include <QMainWindow>
+
+class TargetSelectTab;
+class PathSelectTab;
+class DriveSelectTab;
+class AlgorithmTab;
+class ProgressTab;
 
 namespace Ui
 {
@@ -19,25 +21,17 @@ public:
 	explicit MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
-	bool eventFilter(QObject* watched, QEvent* event) override;
-
-private slots:
-	void initMenu();
-	void onOpenFileDialog();
-	void onOpenDirectoryDialog();
-	void onOpenDriveDialog();
-	void onFillTypeSelectionChanged(int index);
-	void addPass();
-	void removePass();
-	void clearPasses();
 	void onAbout();
-	void startWipe();
-	void onError(KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
-	void onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten);
+	void onTargetTypeSelected(KuuraTargetType);
+
+	void dragEnterEvent(QDragEnterEvent* e);
+	void dropEvent(QDropEvent* e);
 
 private:
 	Ui::MainWindow* ui = nullptr;
-	WipePassModel* m_model = nullptr;
-	TextEditorDialog* m_textEditDialog = nullptr;
-	std::shared_ptr<KuuraRunner> m_kuura;
+	TargetSelectTab* m_targetSelectTab = nullptr;
+	PathSelectTab* m_pathSelectTab = nullptr;
+	DriveSelectTab* m_driveSelectTab = nullptr;
+	AlgorithmTab* m_algorithmTab = nullptr;
+	ProgressTab* m_progressTab = nullptr;
 };

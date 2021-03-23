@@ -15,176 +15,54 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayoutCentralWidget">
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBoxPathSelect">
-      <property name="title">
-       <string>Selected Path:</string>
+    <item row="0" column="0" colspan="2">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayoutPathSelect">
-       <item>
-        <widget class="QLineEdit" name="lineEditSelectedPath">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxDelete">
-         <property name="text">
-          <string>Delete after wipe?</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QGroupBox" name="groupBoxRun">
-      <property name="title">
-       <string>Run</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayoutRun">
-       <item>
-        <widget class="QPushButton" name="pushButtonCancel">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Cancel</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonStart">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="QTableView" name="tableViewWipePasses">
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectRows</enum>
-      </property>
-      <attribute name="horizontalHeaderStretchLastSection">
-       <bool>true</bool>
-      </attribute>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="2">
-     <widget class="QGroupBox" name="groupBoxAddPass">
-      <property name="title">
-       <string>Wipe Pass</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayoutAddPass">
-       <item>
-        <widget class="QLabel" name="labelFillType">
-         <property name="text">
-          <string>Fill Type:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBoxFillType">
-         <item>
-          <property name="text">
-           <string>Zeroes</string>
+      <widget class="QWidget" name="tabWelcome">
+       <attribute name="title">
+        <string>Welcome</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="2" column="0">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ones</string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
           </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Byte</string>
+         </spacer>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Welcome</string>
           </property>
-         </item>
-         <item>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0" colspan="2">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>TODO!</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pushButtonNext">
           <property name="text">
-           <string>Sequence</string>
+           <string>Next</string>
           </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>File</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Random</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelFillValue">
-         <property name="text">
-          <string>Fill Value:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEditFillValue">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>0x00</string>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBoxVerify">
-         <property name="text">
-          <string>Verify?</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonRemovePass">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Remove</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonClearPasses">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Clear</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonAddPass">
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -195,17 +73,13 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menuMain">
     <property name="title">
-     <string>File</string>
+     <string>Menu</string>
     </property>
-    <addaction name="actionOpenFile"/>
-    <addaction name="actionOpenDirectory"/>
-    <addaction name="actionOpenDrive"/>
-    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
@@ -213,106 +87,25 @@
      <string>About</string>
     </property>
     <addaction name="actionAbout"/>
-    <addaction name="actionLicenses"/>
+    <addaction name="actionLicences"/>
    </widget>
-   <widget class="QMenu" name="menuPresets">
-    <property name="title">
-     <string>Presets</string>
-    </property>
-    <addaction name="actionNIST_SP_800_88_Rev_1"/>
-    <addaction name="actionBritish_HMG_Infosec_Standard_5_Baseline_Standard"/>
-    <addaction name="actionBritish_HMG_Infosec_Standard_5_Enhanced_Standard"/>
-    <addaction name="actionCommunications_Security_Establishment_Canada_ITSG_06"/>
-    <addaction name="actionGerman_Federal_Office_for_Information_Security"/>
-    <addaction name="actionU_S_DoD_Unclassified_Computer_Hard_Drive_Disposition"/>
-    <addaction name="actionBruce_Schneier_s_Algorithm"/>
-    <addaction name="actionPeter_Gutmann_s_Algorithm"/>
-    <addaction name="actionU_S_Air_Force_System_Security_Instruction_5020"/>
-    <addaction name="actionU_S_Navy_Staff_Office_Publication_NAVSO_P_5239_26"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuPresets"/>
+   <addaction name="menuMain"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionOpenDirectory">
+  <action name="actionAbout">
    <property name="text">
-    <string>Open Directory</string>
+    <string>About</string>
    </property>
   </action>
-  <action name="actionLicenses">
+  <action name="actionLicences">
    <property name="text">
     <string>About Qt</string>
-   </property>
-  </action>
-  <action name="actionOpenFile">
-   <property name="text">
-    <string>Open File</string>
-   </property>
-  </action>
-  <action name="actionOpenDrive">
-   <property name="text">
-    <string>Open Drive</string>
-   </property>
-  </action>
-  <action name="actionNIST_SP_800_88_Rev_1">
-   <property name="text">
-    <string>NIST SP-800-88 Rev. 1 [Recommended]</string>
-   </property>
-  </action>
-  <action name="actionBritish_HMG_Infosec_Standard_5_Enhanced_Standard">
-   <property name="text">
-    <string>British HMG Infosec Standard 5, Enhanced Standard</string>
-   </property>
-  </action>
-  <action name="actionBritish_HMG_Infosec_Standard_5_Baseline_Standard">
-   <property name="text">
-    <string>British HMG Infosec Standard 5, Baseline Standard</string>
-   </property>
-  </action>
-  <action name="actionCommunications_Security_Establishment_Canada_ITSG_06">
-   <property name="text">
-    <string>Communications Security Establishment Canada ITSG-06</string>
-   </property>
-  </action>
-  <action name="actionGerman_Federal_Office_for_Information_Security">
-   <property name="text">
-    <string>German Federal Office for Information Security</string>
-   </property>
-  </action>
-  <action name="actionU_S_DoD_Unclassified_Computer_Hard_Drive_Disposition">
-   <property name="text">
-    <string>U.S. DoD Unclassified Computer Hard Drive Disposition</string>
-   </property>
-  </action>
-  <action name="actionBruce_Schneier_s_Algorithm">
-   <property name="text">
-    <string>Bruce Schneier's Algorithm</string>
-   </property>
-  </action>
-  <action name="actionPeter_Gutmann_s_Algorithm">
-   <property name="text">
-    <string>Peter Gutmann's Algorithm</string>
-   </property>
-  </action>
-  <action name="actionU_S_Air_Force_System_Security_Instruction_5020">
-   <property name="text">
-    <string>U.S. Air Force System Security Instruction 5020</string>
-   </property>
-  </action>
-  <action name="actionU_S_Navy_Staff_Office_Publication_NAVSO_P_5239_26">
-   <property name="text">
-    <string>U.S. Navy Staff Office Publication NAVSO P-5239-26</string>
    </property>
   </action>
  </widget>
