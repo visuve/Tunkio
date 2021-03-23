@@ -1,7 +1,7 @@
 #include "../KuuraLIB-PCH.hpp"
 #include "../KuuraDriveInfo.hpp"
 
-#include <libudev.h> // apt install libudev-dev
+#include <libudev.h> // apt install libudev-dev OR sudo dnf install systemd-devel
 
 namespace Kuura
 {
