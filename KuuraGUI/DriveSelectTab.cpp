@@ -93,6 +93,11 @@ DriveSelectTab::DriveSelectTab(QWidget *parent) :
 	ui->setupUi(this);
 
 	ui->tableViewDrives->setModel(new DriveSelectModel(this));
+
+	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
+	{
+		emit targetDrivesSelected({});
+	});
 }
 
 DriveSelectTab::~DriveSelectTab()

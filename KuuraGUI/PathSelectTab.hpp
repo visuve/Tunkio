@@ -17,8 +17,11 @@ public:
 	explicit PathSelectTab(QWidget *parent = nullptr);
 	~PathSelectTab();
 
+signals:
+	void targetPathsSelected(const QStringList&);
+
 private:
-	void onAddPaths(bool isDirectory);
+	void onAddPaths(QFileDialog::FileMode mode);
 
 	Ui::PathSelectTab* ui;
 };

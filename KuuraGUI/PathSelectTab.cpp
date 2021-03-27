@@ -65,8 +65,20 @@ PathSelectTab::PathSelectTab(QWidget *parent) :
 
 	ui->listViewPaths->setModel(new PathModel(this));
 
-	connect(ui->pushButtonAddFiles, &QPushButton::clicked, std::bind(&PathSelectTab::onAddPaths, this, false));
-	connect(ui->pushButtonAddFolder, &QPushButton::clicked, std::bind(&PathSelectTab::onAddPaths, this, true));
+	connect(
+		ui->pushButtonAddFiles,
+		&QPushButton::clicked,
+		std::bind(&PathSelectTab::onAddPaths, this, QFileDialog::ExistingFiles));
+
+	connect(
+		ui->pushButtonAddFolder,
+		&QPushButton::clicked,
+		std::bind(&PathSelectTab::onAddPaths, this, QFileDialog::Directory));
+
+	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
+	{
+		emit targetPathsSelected({});
+	});
 }
 
 PathSelectTab::~PathSelectTab()
@@ -75,10 +87,10 @@ PathSelectTab::~PathSelectTab()
 	qDebug();
 }
 
-void PathSelectTab::onAddPaths(bool isDirectory)
+void PathSelectTab::onAddPaths(QFileDialog::FileMode mode)
 {
 	QFileDialog dialog(this);
-	dialog.setFileMode(isDirectory ? QFileDialog::Directory : QFileDialog::ExistingFiles);
+	dialog.setFileMode(mode);
 
 	if (dialog.exec() != QFileDialog::Accepted)
 	{

@@ -37,6 +37,9 @@ MainWindow::MainWindow(QWidget* parent) :
 	});
 
 	connect(m_targetSelectTab, &TargetSelectTab::targetTypeSelected, this, &MainWindow::onTargetTypeSelected);
+	connect(m_pathSelectTab, &PathSelectTab::targetPathsSelected, this, &MainWindow::onTargetPathsSelected);
+	connect(m_driveSelectTab, &DriveSelectTab::targetDrivesSelected, this, &MainWindow::onTargetDrivesSelected);
+	connect(m_algorithmTab, &AlgorithmTab::algorithmSelected, this, &MainWindow::onAlgorithmSelected);
 
 	ui->tabWidget->insertTab(1, m_targetSelectTab, "Target");
 	ui->tabWidget->insertTab(2, m_pathSelectTab, "Path");
@@ -83,16 +86,31 @@ void MainWindow::onTargetTypeSelected(KuuraTargetType tt)
 			ui->tabWidget->setTabVisible(1, true);
 			ui->tabWidget->setTabVisible(2, true);
 			ui->tabWidget->setTabVisible(3, false);
-			ui->tabWidget->setCurrentIndex(2);
-			break;
+			ui->tabWidget->setCurrentWidget(m_pathSelectTab);
+			return;
 		case DriveWipe:
 			ui->tabWidget->setTabVisible(0, true);
 			ui->tabWidget->setTabVisible(1, true);
 			ui->tabWidget->setTabVisible(2, false);
 			ui->tabWidget->setTabVisible(3, true);
-			ui->tabWidget->setCurrentIndex(3);
-			break;
+			ui->tabWidget->setCurrentWidget(m_driveSelectTab);
+			return;
 	}
+}
+
+void MainWindow::onTargetPathsSelected(const QStringList&)
+{
+	ui->tabWidget->setCurrentWidget(m_algorithmTab);
+}
+
+void MainWindow::onTargetDrivesSelected(const QStringList&)
+{
+	ui->tabWidget->setCurrentWidget(m_algorithmTab);
+}
+
+void MainWindow::onAlgorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&)
+{
+	ui->tabWidget->setCurrentWidget(m_progressTab);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* e)

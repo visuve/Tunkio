@@ -14,6 +14,9 @@ public:
 	explicit DriveSelectTab(QWidget *parent = nullptr);
 	~DriveSelectTab();
 
+signals:
+	void targetDrivesSelected(const QStringList&);
+
 private:
 	Ui::DriveSelectTab *ui;
 };

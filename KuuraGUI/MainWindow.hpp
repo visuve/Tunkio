@@ -23,6 +23,9 @@ public:
 
 	void onAbout();
 	void onTargetTypeSelected(KuuraTargetType);
+	void onTargetPathsSelected(const QStringList&);
+	void onTargetDrivesSelected(const QStringList&);
+	void onAlgorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&);
 
 	void dragEnterEvent(QDragEnterEvent* e);
 	void dropEvent(QDropEvent* e);

@@ -14,6 +14,9 @@ public:
 	explicit AlgorithmTab(QWidget *parent = nullptr);
 	~AlgorithmTab();
 
+signals:
+	void algorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&);
+
 private:
 	void presetChanged(int index);
 

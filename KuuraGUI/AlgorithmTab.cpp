@@ -195,6 +195,11 @@ AlgorithmTab::AlgorithmTab(QWidget *parent) :
 #else
 	connect(ui->comboBoxPresets, SIGNAL(currentIndexChanged(int)), this, SLOT(presetChanged(int)));
 #endif
+
+	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
+	{
+		emit algorithmSelected({});
+	});
 }
 
 AlgorithmTab::~AlgorithmTab()
