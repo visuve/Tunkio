@@ -6,11 +6,21 @@ ProgressBarDelegate::ProgressBarDelegate(QObject* parent) :
 {
 }
 
+ProgressBarDelegate::~ProgressBarDelegate()
+{
+	qDebug();
+}
+
 void ProgressBarDelegate::paint(
 	QPainter* painter,
 	const QStyleOptionViewItem& option,
 	const QModelIndex& index) const
 {
+	if (!index.isValid())
+	{
+		return;
+	}
+
 	const QVariant data = index.model()->data(index, Qt::DisplayRole);
 
 	if (!data.isValid())

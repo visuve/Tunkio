@@ -8,6 +8,7 @@ class ProgressBarDelegate : public QStyledItemDelegate
 
 public:
 	explicit ProgressBarDelegate(QObject* parent = nullptr);
+	~ProgressBarDelegate();
 
 	void paint(QPainter* painter,
 		const QStyleOptionViewItem& option,
