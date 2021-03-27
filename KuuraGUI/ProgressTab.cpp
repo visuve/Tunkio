@@ -5,44 +5,10 @@
 
 #include <QStandardItemModel>
 
-enum class CellDisplayType : int
-{
-	Path = 0,
-	TimeTaken,
-	TimeLeft,
-	BytesWritten,
-	BytesLeft,
-	Speed,
-	Progress
-};
-
-int timeToSeconds(const QTime& t) // WTF, why QTime sucks so bad?
-{
-	int result = 0;
-
-	if (t.hour() > 0)
-	{
-		result += t.hour() * 3600;
-	}
-
-	if (t.minute() > 0)
-	{
-		result += t.minute() * 60;
-	}
-
-	if (t.second() > 0)
-	{
-		result += t.second();
-	}
-
-	return result;
-}
-
 struct Node
 {
-	Node(Node* parent, const QMap<CellDisplayType, QVariant>& data) :
-		m_parent(parent),
-		m_data(data)
+	Node(Node* parent) :
+		m_parent(parent)
 	{
 	}
 
@@ -60,7 +26,14 @@ struct Node
 
 	Node* m_parent;
 	QVector<Node*> m_children;
-	QMap<CellDisplayType, QVariant> m_data;
+
+	QString path;
+	uint64_t secondsTaken = 0;
+	uint64_t secondsLeft = 0;
+	uint64_t bytesWritten = 0;
+	uint64_t bytesToWrite = 0;
+	uint64_t bytesPerSecond = 0;
+	float progressPercent = 0;
 };
 
 class ProgressModel : public QAbstractItemModel
@@ -68,43 +41,41 @@ class ProgressModel : public QAbstractItemModel
 public:
 	ProgressModel(QObject* parent) :
 		QAbstractItemModel(parent),
-		m_root(new Node(nullptr, { }))
+		m_root(new Node(nullptr))
 	{
-		auto alpha = new Node(m_root, { { CellDisplayType::Path, "alpha.txt" } });
-		auto progressA1 = new Node(alpha,
-		{
-			{ CellDisplayType::TimeTaken, QTime(3, 2, 1) },
-			{ CellDisplayType::TimeLeft, QTime(0, 0, 0) },
-			{ CellDisplayType::BytesWritten, 444 },
-			{ CellDisplayType::BytesLeft, 000 },
-			{ CellDisplayType::Speed, "123 MiB/s" },
-			{ CellDisplayType::Progress, 100.0f },
-		});
+		auto alpha = new Node(m_root);
+		alpha->path = "alpha.txt";
 
-		auto progressA2 = new Node(alpha,
-		{
-			{ CellDisplayType::TimeTaken, QTime(1, 2, 3) },
-			{ CellDisplayType::TimeLeft, QTime(3, 2, 1) },
-			{ CellDisplayType::BytesWritten, 123 },
-			{ CellDisplayType::BytesLeft, 321 },
-			{ CellDisplayType::Speed, "123 MiB/s" },
-			{ CellDisplayType::Progress, 38.32f },
-		});
+		auto progressA1 = new Node(alpha);
+		progressA1->secondsTaken = 444;
+		progressA1->secondsLeft = 0;
+		progressA1->bytesWritten = 444;
+		progressA1->bytesToWrite = 0;
+		progressA1->bytesPerSecond = 1;
+		progressA1->progressPercent = 100.0f;
+
+		auto progressA2 = new Node(alpha);
+		progressA2->secondsTaken = 321;
+		progressA2->secondsLeft = 123;
+		progressA2->bytesWritten = 321;
+		progressA2->bytesToWrite = 123;
+		progressA2->bytesPerSecond = 1;
+		 progressA2->progressPercent = 38.32f;
+
+		alpha->secondsTaken = progressA1->secondsTaken + progressA2->secondsTaken;
+		alpha->secondsLeft = progressA1->secondsLeft + progressA2->secondsLeft;
+		alpha->bytesWritten = progressA1->bytesWritten + progressA2->bytesWritten;
+		alpha->bytesToWrite = progressA1->secondsTaken + progressA2->secondsTaken;
+		alpha->bytesPerSecond = progressA1->bytesPerSecond + progressA2->bytesPerSecond / 2;		 
+		alpha->progressPercent = (progressA1->progressPercent + progressA2->progressPercent) / 2;
 
 		alpha->m_children.append(progressA1);
 		alpha->m_children.append(progressA2);
 
-		auto bravo = new Node(m_root, { { CellDisplayType::Path, "bravo.txt" } });
-		auto progressB1 = new Node(bravo,
-		{
-			{ CellDisplayType::BytesLeft, 12345 },
-			{ CellDisplayType::Progress, 0 },
-		});
-		auto progressB2 = new Node(bravo,
-		{
-			{ CellDisplayType::BytesLeft, 12345 },
-			{ CellDisplayType::Progress, 0 },
-		});
+		auto bravo = new Node(m_root);
+		bravo->path = "bravo.txt";
+		auto progressB1 = new Node(bravo);
+		auto progressB2 = new Node(bravo);
 
 		bravo->m_children.append(progressB1);
 		bravo->m_children.append(progressB2);
@@ -159,8 +130,7 @@ public:
 
 	int columnCount(const QModelIndex&) const override
 	{
-		// Progress is the last column
-		return static_cast<int>(CellDisplayType::Progress) + 1;
+		return 7;
 	}
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
@@ -172,82 +142,30 @@ public:
 
 		Node* node = static_cast<Node*>(index.internalPointer());
 		bool topLevel = node->m_parent == m_root;
-		bool step = index.column() == 0 && !topLevel;
-		bool pathCell = index.column() == 0 && topLevel;
-		bool progressCell = index.column() >= 1 && index.column() <= 6 && !topLevel;
 
 		if (role == Qt::DisplayRole)
 		{
-			const auto cellType = static_cast<CellDisplayType>(index.column());
-
-			if (step)
+			switch (index.column())
 			{
-				return QString("Pass %1").arg(index.row() + 1);
-			}
-
-			if (pathCell)
-			{
-				return node->m_data[CellDisplayType::Path];
-			}
-
-			if (progressCell)
-			{
-				return node->m_data[cellType];
-			}
-
-
-			switch (cellType)
-			{
-				case CellDisplayType::TimeTaken:
-				case CellDisplayType::TimeLeft:
+				case 0:
 				{
-					Q_ASSERT(topLevel);
+					if (topLevel)
+						return node->path;
 
-					int seconds = 0;
-
-					for (Node* childNode : node->m_children)
-					{
-						seconds += timeToSeconds(childNode->m_data[cellType].toTime());
-					}
-
-					QTime time(0, 0, 0);
-					time = time.addSecs(seconds);
-
-					if (time > QTime(0, 0, 0))
-						return time;
+					return QString("Pass %1").arg(index.row() + 1);
 				}
-
-				case CellDisplayType::BytesWritten:
-				case CellDisplayType::BytesLeft:
-				{
-					Q_ASSERT(topLevel);
-
-					qulonglong bytes = 0;
-
-					for (Node* childNode : node->m_children)
-					{
-						bytes += childNode->m_data[cellType].toULongLong();
-					}
-
-					if (bytes > 0)
-						return bytes;
-				}
-
-				case CellDisplayType::Progress:
-				{
-					Q_ASSERT(topLevel);
-
-					float sum = 0;
-					float childCount = node->m_children.size();
-
-					for (Node* childNode : node->m_children)
-					{
-						sum += childNode->m_data[cellType].toInt();
-					}
-
-					if (sum > 0 && childCount > 0)
-						return sum / childCount;
-				}
+				case 1:
+					return node->secondsTaken;
+				case 2:
+					return node->secondsLeft;
+				case 3:
+					return node->bytesWritten;
+				case 4:
+					return node->bytesWritten;
+				case 5:
+					return node->bytesPerSecond;
+				case 6:
+					return node->progressPercent;
 			}
 		}
 
@@ -263,23 +181,21 @@ public:
 
 		if (orientation == Qt::Horizontal)
 		{
-			const auto cellType = static_cast<CellDisplayType>(section);
-
-			switch (cellType)
+			switch (section)
 			{
-				case CellDisplayType::Path:
+				case 0:
 					return "Path";
-				case CellDisplayType::TimeTaken:
+				case 1:
 					return "Time taken";
-				case CellDisplayType::TimeLeft:
+				case 2:
 					return "Time left";
-				case CellDisplayType::BytesWritten:
+				case 3:
 					return "Bytes written";
-				case CellDisplayType::BytesLeft:
+				case 4:
 					return "Bytes left";
-				case CellDisplayType::Speed:
+				case 5:
 					return "Speed";
-				case CellDisplayType::Progress:
+				case 6:
 					return "Progress";
 			}
 		}
@@ -297,10 +213,9 @@ ProgressTab::ProgressTab(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	ui->treeViewProgress->setModel(new ProgressModel(this));
-	ui->treeViewProgress->setItemDelegateForColumn(
-		static_cast<int>(CellDisplayType::Progress),
-		new ProgressBarDelegate(this));
+	auto model = new ProgressModel(this);
+	ui->treeViewProgress->setModel(model);
+	ui->treeViewProgress->setItemDelegateForColumn(6, new ProgressBarDelegate(this));
 }
 
 ProgressTab::~ProgressTab()
