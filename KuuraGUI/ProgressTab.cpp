@@ -44,7 +44,7 @@ public:
 		m_root(new Node(nullptr))
 	{
 		auto alpha = new Node(m_root);
-		alpha->path = "alpha.txt";
+		alpha->path = "D:\\TEST DATA\\foo.txt";
 
 		auto progressA1 = new Node(alpha);
 		progressA1->secondsTaken = 444;
@@ -73,7 +73,7 @@ public:
 		alpha->m_children.append(progressA2);
 
 		auto bravo = new Node(m_root);
-		bravo->path = "bravo.txt";
+		bravo->path = "D:\\TEST DATA\\bar.txt";
 		auto progressB1 = new Node(bravo);
 		auto progressB2 = new Node(bravo);
 
@@ -216,6 +216,12 @@ ProgressTab::ProgressTab(QWidget *parent) :
 	auto model = new ProgressModel(this);
 	ui->treeViewProgress->setModel(model);
 	ui->treeViewProgress->setItemDelegateForColumn(6, new ProgressBarDelegate(this));
+
+	// TODO: remove
+	connect(ui->pushButtonNext, &QPushButton::clicked, [this]
+	{
+		emit overwriteFinished();
+	});
 }
 
 ProgressTab::~ProgressTab()

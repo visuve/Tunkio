@@ -7,6 +7,7 @@ class PathSelectTab;
 class DriveSelectTab;
 class AlgorithmTab;
 class ProgressTab;
+class ResultsTab;
 
 namespace Ui
 {
@@ -26,6 +27,7 @@ public:
 	void onTargetPathsSelected(const QStringList&);
 	void onTargetDrivesSelected(const QStringList&);
 	void onAlgorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&);
+	void onOverWriteFinished();
 
 	void dragEnterEvent(QDragEnterEvent* e);
 	void dropEvent(QDropEvent* e);
@@ -37,4 +39,5 @@ private:
 	DriveSelectTab* m_driveSelectTab = nullptr;
 	AlgorithmTab* m_algorithmTab = nullptr;
 	ProgressTab* m_progressTab = nullptr;
+	ResultsTab* m_resultsTab = nullptr;
 };

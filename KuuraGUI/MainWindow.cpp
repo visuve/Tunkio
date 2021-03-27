@@ -7,6 +7,7 @@
 #include "DriveSelectTab.hpp"
 #include "AlgorithmTab.hpp"
 #include "ProgressTab.hpp"
+#include "ResultsTab.hpp"
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
@@ -15,7 +16,8 @@ MainWindow::MainWindow(QWidget* parent) :
 	m_pathSelectTab(new PathSelectTab(ui->tabWidget)),
 	m_driveSelectTab(new DriveSelectTab(ui->tabWidget)),
 	m_algorithmTab(new AlgorithmTab(ui->tabWidget)),
-	m_progressTab(new ProgressTab(ui->tabWidget))
+	m_progressTab(new ProgressTab(ui->tabWidget)),
+	m_resultsTab(new ResultsTab(ui->tabWidget))
 {
 	ui->setupUi(this);
 
@@ -40,12 +42,14 @@ MainWindow::MainWindow(QWidget* parent) :
 	connect(m_pathSelectTab, &PathSelectTab::targetPathsSelected, this, &MainWindow::onTargetPathsSelected);
 	connect(m_driveSelectTab, &DriveSelectTab::targetDrivesSelected, this, &MainWindow::onTargetDrivesSelected);
 	connect(m_algorithmTab, &AlgorithmTab::algorithmSelected, this, &MainWindow::onAlgorithmSelected);
+	connect(m_progressTab, &ProgressTab::overwriteFinished, this, &MainWindow::onOverWriteFinished);
 
 	ui->tabWidget->insertTab(1, m_targetSelectTab, "Target");
 	ui->tabWidget->insertTab(2, m_pathSelectTab, "Path");
 	ui->tabWidget->insertTab(3, m_driveSelectTab, "Path");
 	ui->tabWidget->insertTab(4, m_algorithmTab, "Algorithm");
 	ui->tabWidget->insertTab(5, m_progressTab, "Progress");
+	ui->tabWidget->insertTab(6, m_resultsTab, "Results");
 	ui->tabWidget->setTabVisible(3, false);
 
 	setAcceptDrops(true);
@@ -111,6 +115,11 @@ void MainWindow::onTargetDrivesSelected(const QStringList&)
 void MainWindow::onAlgorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&)
 {
 	ui->tabWidget->setCurrentWidget(m_progressTab);
+}
+
+void MainWindow::onOverWriteFinished()
+{
+	ui->tabWidget->setCurrentWidget(m_resultsTab);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* e)

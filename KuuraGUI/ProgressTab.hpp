@@ -15,6 +15,9 @@ public:
 	explicit ProgressTab(QWidget *parent = nullptr);
 	~ProgressTab();
 
+signals:
+	void overwriteFinished();
+
 private:
 	Ui::ProgressTab *ui;
 };
