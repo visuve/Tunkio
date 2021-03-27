@@ -24,12 +24,12 @@ public:
 	{
 		if (role != Qt::DisplayRole)
 		{
-			return {};
+			return QVariant();
 		}
 
 		if (index.row() > m_files.size())
 		{
-			return {};
+			return QVariant();
 		}
 
 		const QFileInfo& file = m_files[index.row()];

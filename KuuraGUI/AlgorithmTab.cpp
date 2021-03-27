@@ -47,7 +47,7 @@ namespace Ui
 			case KuuraFillType::RandomFill:
 				return "Random";
 			default:
-				return pass.fillValue.toHex(' ');
+				return "0x" + pass.fillValue.toHex(':').toUpper().replace(':', " 0x");
 		}
 	}
 }
@@ -180,14 +180,13 @@ private:
 	QVector<OverWriteRequest> m_request;
 };
 
-AlgorithmTab::AlgorithmTab(QWidget *parent) :
+AlgorithmTab::AlgorithmTab(QWidget* parent) :
 	QWidget(parent),
 	ui(new Ui::AlgorithmTab)
 {
 	ui->setupUi(this);
 
 	ui->tableViewWipePasses->setModel(new AlgorithmModel(this));
-	ui->tableViewWipePasses->setEnabled(false);
 	ui->groupBoxAddPass->setEnabled(false);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -199,6 +198,20 @@ AlgorithmTab::AlgorithmTab(QWidget *parent) :
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
 	{
 		emit algorithmSelected({});
+	});
+
+	connect(ui->radioButtonCustomize, &QRadioButton::clicked, [this]()
+	{
+		ui->tableViewWipePasses->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		ui->groupBoxAddPass->setEnabled(true);
+		ui->comboBoxPresets->setEnabled(false);
+	});
+
+	connect(ui->radioButtonPresets, &QRadioButton::clicked, [this]()
+	{
+		ui->tableViewWipePasses->setEditTriggers(QAbstractItemView::AllEditTriggers);
+		ui->groupBoxAddPass->setEnabled(false);
+		ui->comboBoxPresets->setEnabled(true);
 	});
 }
 
