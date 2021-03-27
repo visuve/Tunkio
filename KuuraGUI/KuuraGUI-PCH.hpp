@@ -17,8 +17,8 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QObject>
+#include <QPainter>
 #include <QPushButton>
-#include <QProgressBar>
 #include <QScreen>
 #include <QStyledItemDelegate>
 #include <QTreeWidgetItem>
