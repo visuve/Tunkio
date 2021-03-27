@@ -65,7 +65,7 @@ void loadIcon(QApplication& application)
 {
 	QPixmap pixmap;
 
-	if (!pixmap.load(":/Kuura.png"))
+	if (!pixmap.load(":/Kuura.svg"))
 	{
 		qWarning() << "Failed to load application icon!";
 		return;
