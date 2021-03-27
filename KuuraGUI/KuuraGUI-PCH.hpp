@@ -18,6 +18,7 @@
 #include <QMimeData>
 #include <QObject>
 #include <QPushButton>
+#include <QProgressBar>
 #include <QScreen>
 #include <QStyledItemDelegate>
 #include <QTreeWidgetItem>
