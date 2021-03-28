@@ -23,6 +23,7 @@ public:
 	~MainWindow();
 
 	void onAbout();
+	void onBackRequested();
 	void onTargetTypeSelected(KuuraTargetType);
 	void onTargetPathsSelected(const QStringList&);
 	void onTargetDrivesSelected(const QStringList&);

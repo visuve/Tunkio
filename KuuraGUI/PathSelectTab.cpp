@@ -65,6 +65,11 @@ PathSelectTab::PathSelectTab(QWidget *parent) :
 
 	ui->listViewPaths->setModel(new PathModel(this));
 
+	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
+	{
+		emit backRequested();
+	});
+
 	connect(
 		ui->pushButtonAddFiles,
 		&QPushButton::clicked,

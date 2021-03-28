@@ -18,6 +18,11 @@ TargetSelectTab::TargetSelectTab(QWidget* parent) :
 		m_selectedTargetType = KuuraTargetType::DriveWipe;
 	});
 
+	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
+	{
+		emit backRequested();
+	});
+
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
 	{
 		emit targetTypeSelected(m_selectedTargetType);

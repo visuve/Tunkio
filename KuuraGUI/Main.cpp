@@ -83,9 +83,9 @@ void resizeToScreen(MainWindow& window)
 		qWarning() << "Failed to detect primary screen!";
 		return;
 	}
-	
+
 	const QRect screenGeometry = screen->geometry();
-	window.resize(screenGeometry.width() / 2, screenGeometry.height() / 3);
+	window.resize(screenGeometry.width() / 2, screenGeometry.height() / 2);
 }
 
 int main(int argc, char* argv[])

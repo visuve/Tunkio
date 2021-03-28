@@ -15,6 +15,7 @@ public:
 	~DriveSelectTab();
 
 signals:
+	void backRequested();
 	void targetDrivesSelected(const QStringList&);
 
 private:

@@ -18,6 +18,7 @@ public:
 	~PathSelectTab();
 
 signals:
+	void backRequested();
 	void targetPathsSelected(const QStringList&);
 
 private:

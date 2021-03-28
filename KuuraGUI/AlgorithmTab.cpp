@@ -194,6 +194,10 @@ AlgorithmTab::AlgorithmTab(QWidget* parent) :
 #else
 	connect(ui->comboBoxPresets, SIGNAL(currentIndexChanged(int)), this, SLOT(presetChanged(int)));
 #endif
+	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
+	{
+		emit backRequested();
+	});
 
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
 	{

@@ -17,6 +17,7 @@ public:
 	~TargetSelectTab();
 
 signals:
+	void backRequested();
 	void targetTypeSelected(KuuraTargetType);
 
 private:

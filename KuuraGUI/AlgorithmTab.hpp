@@ -15,6 +15,7 @@ public:
 	~AlgorithmTab();
 
 signals:
+	void backRequested();
 	void algorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&);
 
 private:

@@ -38,9 +38,16 @@ MainWindow::MainWindow(QWidget* parent) :
 		ui->tabWidget->setCurrentIndex(1);
 	});
 
+	connect(m_targetSelectTab, &TargetSelectTab::backRequested, this, &MainWindow::onBackRequested);
 	connect(m_targetSelectTab, &TargetSelectTab::targetTypeSelected, this, &MainWindow::onTargetTypeSelected);
+
+	connect(m_pathSelectTab, &PathSelectTab::backRequested, this, &MainWindow::onBackRequested);
 	connect(m_pathSelectTab, &PathSelectTab::targetPathsSelected, this, &MainWindow::onTargetPathsSelected);
+
+	connect(m_driveSelectTab, &DriveSelectTab::backRequested, this, &MainWindow::onBackRequested);
 	connect(m_driveSelectTab, &DriveSelectTab::targetDrivesSelected, this, &MainWindow::onTargetDrivesSelected);
+
+	connect(m_algorithmTab, &AlgorithmTab::backRequested, this, &MainWindow::onBackRequested);
 	connect(m_algorithmTab, &AlgorithmTab::algorithmSelected, this, &MainWindow::onAlgorithmSelected);
 	connect(m_progressTab, &ProgressTab::overwriteFinished, this, &MainWindow::onOverWriteFinished);
 
@@ -80,21 +87,41 @@ void MainWindow::onAbout()
 	QMessageBox::about(this, "Kuura", text.join('\n'));
 }
 
+void MainWindow::onBackRequested()
+{
+	switch (ui->tabWidget->currentIndex())
+	{
+		case 1:
+			ui->tabWidget->setCurrentIndex(0);
+			return;
+		case 2:
+		case 3:
+			ui->tabWidget->setCurrentIndex(1);
+			return;
+		case 4:
+			if (ui->tabWidget->isTabVisible(2))
+			{
+				ui->tabWidget->setCurrentIndex(2);
+			}
+			if (ui->tabWidget->isTabVisible(3))
+			{
+				ui->tabWidget->setCurrentIndex(3);
+			}
+			return;
+	}
+}
+
 void MainWindow::onTargetTypeSelected(KuuraTargetType tt)
 {
 	switch (tt)
 	{
 		case FileWipe:
 		case DirectoryWipe:
-			ui->tabWidget->setTabVisible(0, true);
-			ui->tabWidget->setTabVisible(1, true);
 			ui->tabWidget->setTabVisible(2, true);
 			ui->tabWidget->setTabVisible(3, false);
 			ui->tabWidget->setCurrentWidget(m_pathSelectTab);
 			return;
 		case DriveWipe:
-			ui->tabWidget->setTabVisible(0, true);
-			ui->tabWidget->setTabVisible(1, true);
 			ui->tabWidget->setTabVisible(2, false);
 			ui->tabWidget->setTabVisible(3, true);
 			ui->tabWidget->setCurrentWidget(m_driveSelectTab);
