@@ -41,13 +41,66 @@
         <item row="1" column="0" colspan="2">
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>Welcome</string>
+           <string>Start</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0" colspan="2">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
             <widget class="QLabel" name="label">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
              <property name="text">
-              <string>TODO!</string>
+              <string>&lt;html&gt;
+&lt;head/&gt;
+&lt;body&gt;
+&lt;h2&gt;Welcome to Kuura Data Erasure Tool!&lt;/h2&gt;
+&lt;br/&gt;
+&lt;h4&gt;This Graphical User Interface will guide you through overwriting files or drives.&lt;/h4&gt;
+&lt;br/&gt;
+&lt;p&gt;&lt;u&gt;WARNING: &lt;/u&gt; please note that overwriting individual files is not recommend: please use drive encryption instead. On e.g. copy-on-write based file systems (APFS, ZFS, Btrfs‍), it's impossible to securely delete individual files.&lt;/p&gt;
+&lt;br/&gt;
+&lt;p&gt;&lt;u&gt;NOTE: &lt;/u&gt;Kuura is free and open source comes and with absolutely no warranty: use at your own risk. See &lt;a href=&quot;LICENSE.txt&quot;&gt;LICENSE.txt&lt;/a&gt; for more details.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="styleSheet">
+              <string notr="true">image: url(:/Kuura.svg);</string>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;
+&lt;head&gt;
+&lt;style&gt;body { margin: 100px; }&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h3&gt;&lt;u&gt;Kuura&lt;/u&gt;&lt;/h3&gt;
+&lt;h4&gt;&lt;u&gt;Finnish&lt;/u&gt;&lt;/h4&gt;
+&lt;h5&gt;Etymology&lt;/h5&gt;
+&lt;p&gt;Uncertain. Variously connected with Proto-Germanic *skuro and (supposed) Proto-Uralic *kura, but both proposals suffer from problems.&lt;/p&gt;
+&lt;h5&gt;Pronunciation&lt;/h5&gt;
+&lt;ul&gt;
+	&lt;li&gt;IPA: /'ku?r?/, ['ku?r?]&lt;/li&gt;
+	&lt;li&gt;Rhymes: -u?r?&lt;/li&gt;
+	&lt;li&gt;Syllabification: kuu?ra&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5&gt;Noun&lt;/h5&gt;
+&lt;p&gt;&lt;strong&gt;kuura&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;frost (created by deposition of water vapor into solid ice, when the dew point is below 0 °C, the surface temperature is less than the dew point, and the air temperature is over the dew point)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p style=&quot;text-align:center&quot;&gt;Source: &lt;a href=&quot;https://en.wiktionary.org/wiki/kuura&quot;&gt;https://en.wiktionary.org/wiki/kuura&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
