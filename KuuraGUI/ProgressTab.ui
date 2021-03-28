@@ -17,11 +17,15 @@
    <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Overwrite progress:</string>
+      <string>Overwrite progress</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTreeView" name="treeViewProgress"/>
+       <widget class="QTreeView" name="treeViewProgress">
+        <property name="frameShape">
+         <enum>QFrame::WinPanel</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

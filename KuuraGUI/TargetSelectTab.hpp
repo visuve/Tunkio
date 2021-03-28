@@ -16,9 +16,12 @@ public:
 	explicit TargetSelectTab(QWidget *parent = nullptr);
 	~TargetSelectTab();
 
+	KuuraTargetType selectedTargetType() const;
+
 signals:
-	void backRequested();
 	void targetTypeSelected(KuuraTargetType);
+	void nextRequested();
+	void backRequested();
 
 private:
 	Ui::TargetSelectTab *ui;

@@ -23,11 +23,16 @@ public:
 
 	int columnCount(const QModelIndex&) const
 	{
-		return 4;
+		return 5;
 	}
 
 	QVariant data(const QModelIndex& index, int role) const
 	{
+		if (role == Qt::CheckStateRole && index.column() == 4)
+		{
+			return Qt::CheckState::Unchecked;
+		}
+
 		if (role == Qt::DisplayRole)
 		{
 			const size_t row = static_cast<size_t>(index.row());
@@ -44,6 +49,8 @@ public:
 					return drive.Partitions;
 				case 3:
 					return QLocale().formattedDataSize(drive.Capacity);
+				case 4:
+					return "No";
 			}
 
 			qCritical() << index << " is out of bounds";
@@ -68,6 +75,8 @@ public:
 						return "Partitions";
 					case 3:
 						return "Size";
+					case 4:
+						return "Selected";
 				}
 
 				qCritical() << section << " is out of bounds";
@@ -82,6 +91,18 @@ public:
 		return QVariant();
 	}
 
+	void refresh()
+	{
+		beginResetModel();
+		m_drives = Kuura::DriveInfo();
+		endResetModel();
+	}
+
+	QStringList selectedDrives() const
+	{
+		return {}; // TODO:
+	}
+
 private:
 	std::vector<Kuura::Drive> m_drives = Kuura::DriveInfo();
 };
@@ -92,7 +113,8 @@ DriveSelectTab::DriveSelectTab(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	ui->tableViewDrives->setModel(new DriveSelectModel(this));
+	auto model = new DriveSelectModel(this);
+	ui->tableViewDrives->setModel(model);
 
 	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
 	{
@@ -101,11 +123,20 @@ DriveSelectTab::DriveSelectTab(QWidget *parent) :
 
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
 	{
-		emit targetDrivesSelected({});
+		emit nextRequested();
 	});
+
+	connect(ui->pushButtonRefresh, &QPushButton::clicked, model, &DriveSelectModel::refresh);
 }
 
 DriveSelectTab::~DriveSelectTab()
 {
 	delete ui;
+}
+
+QStringList DriveSelectTab::selectedDrives() const
+{
+	auto model = reinterpret_cast<DriveSelectModel*>(ui->tableViewDrives->model());
+	Q_ASSERT(model);
+	return model->selectedDrives();
 }

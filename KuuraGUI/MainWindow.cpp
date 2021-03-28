@@ -33,23 +33,22 @@ MainWindow::MainWindow(QWidget* parent) :
 		QMessageBox::aboutQt(this, "Kuura");
 	});
 
-	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
-	{
-		ui->tabWidget->setCurrentIndex(1);
-	});
+	connect(ui->pushButtonNext, &QPushButton::clicked, this, &MainWindow::onNextRequested);
 
 	connect(m_targetSelectTab, &TargetSelectTab::backRequested, this, &MainWindow::onBackRequested);
 	connect(m_targetSelectTab, &TargetSelectTab::targetTypeSelected, this, &MainWindow::onTargetTypeSelected);
+	connect(m_targetSelectTab, &TargetSelectTab::nextRequested, this, &MainWindow::onNextRequested);
 
 	connect(m_pathSelectTab, &PathSelectTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_pathSelectTab, &PathSelectTab::targetPathsSelected, this, &MainWindow::onTargetPathsSelected);
+	connect(m_pathSelectTab, &PathSelectTab::nextRequested, this, &MainWindow::onNextRequested);
 
 	connect(m_driveSelectTab, &DriveSelectTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_driveSelectTab, &DriveSelectTab::targetDrivesSelected, this, &MainWindow::onTargetDrivesSelected);
+	connect(m_driveSelectTab, &DriveSelectTab::nextRequested, this, &MainWindow::onNextRequested);
 
 	connect(m_algorithmTab, &AlgorithmTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_algorithmTab, &AlgorithmTab::algorithmSelected, this, &MainWindow::onAlgorithmSelected);
-	connect(m_progressTab, &ProgressTab::overwriteFinished, this, &MainWindow::onOverWriteFinished);
+	connect(m_algorithmTab, &AlgorithmTab::nextRequested, this, &MainWindow::onNextRequested);
+
+	connect(m_progressTab, &ProgressTab::nextRequested, this, &MainWindow::onNextRequested);
 
 	ui->tabWidget->insertTab(1, m_targetSelectTab, "Target");
 	ui->tabWidget->insertTab(2, m_pathSelectTab, "Path");
@@ -92,22 +91,71 @@ void MainWindow::onBackRequested()
 	switch (ui->tabWidget->currentIndex())
 	{
 		case 1:
+		{
 			ui->tabWidget->setCurrentIndex(0);
 			return;
+		}
 		case 2:
 		case 3:
+		{
 			ui->tabWidget->setCurrentIndex(1);
 			return;
+		}
 		case 4:
-			if (ui->tabWidget->isTabVisible(2))
+		{
+			switch (m_targetSelectTab->selectedTargetType())
 			{
-				ui->tabWidget->setCurrentIndex(2);
-			}
-			if (ui->tabWidget->isTabVisible(3))
-			{
-				ui->tabWidget->setCurrentIndex(3);
+				case KuuraTargetType::FileWipe:
+				case KuuraTargetType::DirectoryWipe:
+					ui->tabWidget->setCurrentIndex(2);
+					return;
+				case KuuraTargetType::DriveWipe:
+					ui->tabWidget->setCurrentIndex(3);
+					return;
 			}
 			return;
+		}
+	}
+}
+
+void MainWindow::onNextRequested()
+{
+	switch (ui->tabWidget->currentIndex())
+	{
+		case 0:
+		{
+			ui->tabWidget->setCurrentIndex(1);
+			return;
+		}
+		case 1:
+		{
+			switch (m_targetSelectTab->selectedTargetType())
+			{
+				case KuuraTargetType::FileWipe:
+				case KuuraTargetType::DirectoryWipe:
+					ui->tabWidget->setCurrentIndex(2);
+					return;
+				case KuuraTargetType::DriveWipe:
+					ui->tabWidget->setCurrentIndex(3);
+					return;
+			}
+		}
+		case 2:
+		case 3:
+		{
+			ui->tabWidget->setCurrentIndex(4);
+			return;
+		}
+		case 4:
+		{
+			ui->tabWidget->setCurrentIndex(5);
+			return;
+		}
+		case 5:
+		{
+			ui->tabWidget->setCurrentIndex(6);
+			return;
+		}
 	}
 }
 
@@ -119,48 +167,29 @@ void MainWindow::onTargetTypeSelected(KuuraTargetType tt)
 		case DirectoryWipe:
 			ui->tabWidget->setTabVisible(2, true);
 			ui->tabWidget->setTabVisible(3, false);
-			ui->tabWidget->setCurrentWidget(m_pathSelectTab);
 			return;
 		case DriveWipe:
 			ui->tabWidget->setTabVisible(2, false);
 			ui->tabWidget->setTabVisible(3, true);
-			ui->tabWidget->setCurrentWidget(m_driveSelectTab);
 			return;
 	}
 }
 
-void MainWindow::onTargetPathsSelected(const QStringList&)
-{
-	ui->tabWidget->setCurrentWidget(m_algorithmTab);
-}
-
-void MainWindow::onTargetDrivesSelected(const QStringList&)
-{
-	ui->tabWidget->setCurrentWidget(m_algorithmTab);
-}
-
-void MainWindow::onAlgorithmSelected(const QVector<QPair<KuuraFillType, QByteArray>>&)
-{
-	ui->tabWidget->setCurrentWidget(m_progressTab);
-}
-
-void MainWindow::onOverWriteFinished()
-{
-	ui->tabWidget->setCurrentWidget(m_resultsTab);
-}
-
 void MainWindow::dragEnterEvent(QDragEnterEvent* e)
 {
-	if (e->mimeData()->hasUrls() && ui->tabWidget->isTabVisible(2))
+	if (e->mimeData()->hasUrls() && ui->tabWidget->currentIndex() == 2)
 	{
 		e->acceptProposedAction();
 	}
 }
 void MainWindow::dropEvent(QDropEvent* e)
 {
-	for(const QUrl& url : e->mimeData()->urls())
+	QStringList paths;
+
+	for (const QUrl& url : e->mimeData()->urls())
 	{
-		QString fileName = url.toLocalFile();
-		qDebug() << "Dropped file:" << fileName;
+		paths << QDir::toNativeSeparators(url.toLocalFile());
 	}
+
+	m_pathSelectTab->addPaths(paths);
 }

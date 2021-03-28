@@ -66,7 +66,7 @@ public:
 		alpha->secondsLeft = progressA1->secondsLeft + progressA2->secondsLeft;
 		alpha->bytesWritten = progressA1->bytesWritten + progressA2->bytesWritten;
 		alpha->bytesToWrite = progressA1->secondsTaken + progressA2->secondsTaken;
-		alpha->bytesPerSecond = progressA1->bytesPerSecond + progressA2->bytesPerSecond / 2;		 
+		alpha->bytesPerSecond = progressA1->bytesPerSecond + progressA2->bytesPerSecond / 2;
 		alpha->progressPercent = (progressA1->progressPercent + progressA2->progressPercent) / 2;
 
 		alpha->m_children.append(progressA1);
@@ -217,10 +217,9 @@ ProgressTab::ProgressTab(QWidget *parent) :
 	ui->treeViewProgress->setModel(model);
 	ui->treeViewProgress->setItemDelegateForColumn(6, new ProgressBarDelegate(this));
 
-	// TODO: remove
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]
 	{
-		emit overwriteFinished();
+		emit nextRequested(); // TODO: remove
 	});
 }
 

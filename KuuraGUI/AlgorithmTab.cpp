@@ -120,7 +120,7 @@ public:
 		return section + 1;
 	}
 
-	void addRequest(KuuraFillType fillType, bool verify, const QByteArray& fillValue = QByteArray())
+	void addOverwritePass(KuuraFillType fillType, bool verify, const QByteArray& fillValue = QByteArray())
 	{
 		int row = m_request.size();
 		beginInsertRows(QModelIndex(), row, row);
@@ -201,7 +201,7 @@ AlgorithmTab::AlgorithmTab(QWidget* parent) :
 
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
 	{
-		emit algorithmSelected({});
+		emit nextRequested();
 	});
 
 	connect(ui->radioButtonCustomize, &QRadioButton::clicked, [this]()
@@ -225,29 +225,34 @@ AlgorithmTab::~AlgorithmTab()
 	qDebug();
 }
 
+QVector<QPair<KuuraFillType, QByteArray> > AlgorithmTab::selectedAlgorithms()
+{
+	return {}; // TODO!
+}
+
 void AlgorithmTab::presetChanged(int index)
 {
 	auto model = reinterpret_cast<AlgorithmModel*>(ui->tableViewWipePasses->model());
 
-	model->clearRequests();	
+	model->clearRequests();
 
 	switch (index)
 	{
 		case 0:
-			model->addRequest(KuuraFillType::ZeroFill, true);
+			model->addOverwritePass(KuuraFillType::ZeroFill, true);
 			break;
 		case 1:
-			model->addRequest(KuuraFillType::RandomFill, true);
+			model->addOverwritePass(KuuraFillType::RandomFill, true);
 			break;
 		case 2:
-			model->addRequest(KuuraFillType::OneFill, false);
-			model->addRequest(KuuraFillType::ZeroFill, false);
-			model->addRequest(KuuraFillType::RandomFill, true);
+			model->addOverwritePass(KuuraFillType::OneFill, false);
+			model->addOverwritePass(KuuraFillType::ZeroFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, true);
 			break;
 		case 3:
-			model->addRequest(KuuraFillType::ZeroFill, false);
-			model->addRequest(KuuraFillType::OneFill, false);
-			model->addRequest(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::ZeroFill, false);
+			model->addOverwritePass(KuuraFillType::OneFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
 			break;
 		case 4:
 			QMessageBox::critical(
@@ -256,19 +261,19 @@ void AlgorithmTab::presetChanged(int index)
 				"This feature is not yet implemented");
 			break;
 		case 5:
-			model->addRequest(KuuraFillType::ByteFill, false, "\x55");
-			model->addRequest(KuuraFillType::ByteFill, false, "\xAA");
-			model->addRequest(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::ByteFill, false, "\x55");
+			model->addOverwritePass(KuuraFillType::ByteFill, false, "\xAA");
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
 			break;
 
 		case 6:
-			model->addRequest(KuuraFillType::OneFill, false);
-			model->addRequest(KuuraFillType::ZeroFill, false);
-			model->addRequest(KuuraFillType::RandomFill, false);
-			model->addRequest(KuuraFillType::RandomFill, false);
-			model->addRequest(KuuraFillType::RandomFill, false);
-			model->addRequest(KuuraFillType::RandomFill, false);
-			model->addRequest(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::OneFill, false);
+			model->addOverwritePass(KuuraFillType::ZeroFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
+			model->addOverwritePass(KuuraFillType::RandomFill, false);
 			break;
 		case 7:
 		{
@@ -324,7 +329,7 @@ void AlgorithmTab::presetChanged(int index)
 
 				for (const auto& [type, value] : gutmannsRecipe)
 				{
-					model->addRequest(type, false, value);
+					model->addOverwritePass(type, false, value);
 				}
 
 			}
@@ -338,14 +343,14 @@ void AlgorithmTab::presetChanged(int index)
 			break;
 		}
 		case 8:
-			model->addRequest(KuuraFillType::ByteFill, false, { 1, '\x00' });
-			model->addRequest(KuuraFillType::ByteFill, false, "\xFF");
-			model->addRequest(KuuraFillType::RandomFill, true);
+			model->addOverwritePass(KuuraFillType::ByteFill, false, { 1, '\x00' });
+			model->addOverwritePass(KuuraFillType::ByteFill, false, "\xFF");
+			model->addOverwritePass(KuuraFillType::RandomFill, true);
 			break;
 		case 9:
-			model->addRequest(KuuraFillType::ByteFill, false, "\xFF");
-			model->addRequest(KuuraFillType::ByteFill, false, { 1, '\x00' });
-			model->addRequest(KuuraFillType::RandomFill, true);
+			model->addOverwritePass(KuuraFillType::ByteFill, false, "\xFF");
+			model->addOverwritePass(KuuraFillType::ByteFill, false, { 1, '\x00' });
+			model->addOverwritePass(KuuraFillType::RandomFill, true);
 			break;
 	}
 }

@@ -21,7 +21,11 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTextEdit" name="textEditReport"/>
+       <widget class="QTextEdit" name="textEditReport">
+        <property name="frameShape">
+         <enum>QFrame::WinPanel</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

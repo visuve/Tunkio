@@ -11,11 +11,13 @@ TargetSelectTab::TargetSelectTab(QWidget* parent) :
 	connect(ui->radioButtonPath, &QRadioButton::clicked, [this]()
 	{
 		m_selectedTargetType = KuuraTargetType::FileWipe;
+		emit targetTypeSelected(KuuraTargetType::FileWipe);
 	});
 
 	connect(ui->radioButtonDrive, &QRadioButton::clicked, [this]()
 	{
 		m_selectedTargetType = KuuraTargetType::DriveWipe;
+		emit targetTypeSelected(KuuraTargetType::DriveWipe);
 	});
 
 	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
@@ -25,7 +27,7 @@ TargetSelectTab::TargetSelectTab(QWidget* parent) :
 
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
 	{
-		emit targetTypeSelected(m_selectedTargetType);
+		emit nextRequested();
 	});
 }
 
@@ -33,4 +35,9 @@ TargetSelectTab::~TargetSelectTab()
 {
 	delete ui;
 	qDebug();
+}
+
+KuuraTargetType TargetSelectTab::selectedTargetType() const
+{
+	return m_selectedTargetType;
 }

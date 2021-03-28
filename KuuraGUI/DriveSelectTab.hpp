@@ -2,7 +2,8 @@
 
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 	class DriveSelectTab;
 }
 
@@ -14,11 +15,12 @@ public:
 	explicit DriveSelectTab(QWidget *parent = nullptr);
 	~DriveSelectTab();
 
+	QStringList selectedDrives() const;
+
 signals:
 	void backRequested();
-	void targetDrivesSelected(const QStringList&);
+	void nextRequested();
 
 private:
 	Ui::DriveSelectTab *ui;
 };
-

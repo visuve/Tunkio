@@ -76,7 +76,9 @@
              <property name="text">
               <string>&lt;html&gt;
 &lt;head&gt;
-&lt;style&gt;body { margin: 100px; }&lt;/style&gt;
+ &lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;/head&gt; 
+&lt;style&gt;body { margin-left: 50px; margin-right: 50px; }&lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
 &lt;h3&gt;&lt;u&gt;Kuura&lt;/u&gt;&lt;/h3&gt;
@@ -85,16 +87,16 @@
 &lt;p&gt;Uncertain. Variously connected with Proto-Germanic *skuro and (supposed) Proto-Uralic *kura, but both proposals suffer from problems.&lt;/p&gt;
 &lt;h5&gt;Pronunciation&lt;/h5&gt;
 &lt;ul&gt;
-	&lt;li&gt;IPA: /'ku?r?/, ['ku?r?]&lt;/li&gt;
-	&lt;li&gt;Rhymes: -u?r?&lt;/li&gt;
-	&lt;li&gt;Syllabification: kuu?ra&lt;/li&gt;
+	&lt;li&gt;IPA: /ˈkuːrɑ/, [ˈkuːrɑ]&lt;/li&gt;
+	&lt;li&gt;Rhymes: -uːrɑ&lt;/li&gt;
+	&lt;li&gt;Syllabification: kuu‧ra&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h5&gt;Noun&lt;/h5&gt;
 &lt;p&gt;&lt;strong&gt;kuura&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
 	&lt;li&gt;frost (created by deposition of water vapor into solid ice, when the dew point is below 0 °C, the surface temperature is less than the dew point, and the air temperature is over the dew point)&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p style=&quot;text-align:center&quot;&gt;Source: &lt;a href=&quot;https://en.wiktionary.org/wiki/kuura&quot;&gt;https://en.wiktionary.org/wiki/kuura&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;text-align:center;&quot;&gt;Source: &lt;a href=&quot;https://en.wiktionary.org/wiki/kuura&quot;&gt;https://en.wiktionary.org/wiki/kuura&lt;/a&gt;&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 </string>

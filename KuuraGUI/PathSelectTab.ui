@@ -44,13 +44,26 @@
    <item row="0" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Selected paths:</string>
+      <string>Selected paths</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0" rowspan="4">
-       <widget class="QListView" name="listViewPaths"/>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Please select the files and/or folders you wish to overwrite using the buttons on the right:
+Note: you can also drag &amp; drop items here.
+</string>
+        </property>
+       </widget>
       </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
+       <widget class="QPushButton" name="pushButtonAddFolder">
+        <property name="text">
+         <string>Add folder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -63,24 +76,30 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="0" rowspan="4">
+       <widget class="QListView" name="listViewPaths">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::WinPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
        <widget class="QPushButton" name="pushButtonAddFiles">
         <property name="text">
          <string>Add files</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="QPushButton" name="pushButtonRemove">
         <property name="text">
          <string>Remove selection</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="pushButtonAddFolder">
-        <property name="text">
-         <string>Add folder</string>
         </property>
        </widget>
       </item>

@@ -16,7 +16,7 @@ public:
 	~ProgressTab();
 
 signals:
-	void overwriteFinished();
+	void nextRequested();
 
 private:
 	Ui::ProgressTab *ui;
