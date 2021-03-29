@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QFileDialog>
 
 #include "../KuuraAPI/KuuraAPI.h"
 

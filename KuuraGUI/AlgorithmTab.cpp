@@ -189,11 +189,13 @@ AlgorithmTab::AlgorithmTab(QWidget* parent) :
 	ui->tableViewWipePasses->setModel(new AlgorithmModel(this));
 	ui->groupBoxAddPass->setEnabled(false);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	connect(ui->comboBoxPresets, &QComboBox::currentIndexChanged, this, &AlgorithmTab::presetChanged);
-#else
-	connect(ui->comboBoxPresets, SIGNAL(currentIndexChanged(int)), this, SLOT(presetChanged(int)));
-#endif
+	connect(ui->comboBoxPresets,
+		static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		this,
+		&AlgorithmTab::presetChanged);
+
+	emit presetChanged(0);
+
 	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
 	{
 		emit backRequested();

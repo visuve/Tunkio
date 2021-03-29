@@ -139,6 +139,7 @@ void MainWindow::onNextRequested()
 					ui->tabWidget->setCurrentIndex(3);
 					return;
 			}
+			return;
 		}
 		case 2:
 		case 3:

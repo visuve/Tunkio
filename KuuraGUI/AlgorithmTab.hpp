@@ -1,8 +1,10 @@
 #pragma once
 
 #include <QWidget>
+#include "../KuuraAPI/KuuraAPI.h"
 
-namespace Ui {
+namespace Ui
+{
 	class AlgorithmTab;
 }
 
