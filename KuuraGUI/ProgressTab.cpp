@@ -155,15 +155,15 @@ public:
 					return QString("Pass %1").arg(index.row() + 1);
 				}
 				case 1:
-					return node->secondsTaken;
+					return QVariant::fromValue(node->secondsTaken);
 				case 2:
-					return node->secondsLeft;
+					return QVariant::fromValue(node->secondsLeft);
 				case 3:
-					return node->bytesWritten;
+					return QVariant::fromValue(node->bytesWritten);
 				case 4:
-					return node->bytesWritten;
+					return QVariant::fromValue(node->bytesWritten);
 				case 5:
-					return node->bytesPerSecond;
+					return QVariant::fromValue(node->bytesPerSecond);
 				case 6:
 					return node->progressPercent;
 			}
