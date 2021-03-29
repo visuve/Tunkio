@@ -4,35 +4,33 @@
 namespace Kuura
 {
 	Drive::Drive(const std::filesystem::path& path) :
-		Path(path),
+		IFillConsumer(path),
 		m_actualSize(2048),
 		m_alignmentSize(512),
 		m_optimalWriteSize(1024)
 	{
 	}
 
-	Drive::Drive(Drive&& other) noexcept
+	Drive::Drive(Drive&& other) noexcept :
+		IFillConsumer("")
 	{
-#if defined(_WIN32)
-		std::swap(m_handle, other.m_handle);
-#else
-		std::swap(m_descriptor, other.m_descriptor);
-#endif
-		std::swap(m_actualSize, other.m_actualSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		*this = std::move(other);
 	}
 
 	Drive& Drive::operator = (Drive&& other) noexcept
 	{
+		if (this != &other)
+		{
 #if defined(_WIN32)
-		std::swap(m_handle, other.m_handle);
+			std::swap(m_handle, other.m_handle);
 #else
-		std::swap(m_descriptor, other.m_descriptor);
+			std::swap(m_descriptor, other.m_descriptor);
 #endif
-		std::swap(m_actualSize, other.m_actualSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+			std::swap(m_actualSize, other.m_actualSize);
+			std::swap(m_alignmentSize, other.m_alignmentSize);
+			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		}
+
 		return *this;
 	}
 

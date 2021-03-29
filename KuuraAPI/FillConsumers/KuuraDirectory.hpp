@@ -13,13 +13,13 @@ namespace Kuura
 
 		Directory(const std::filesystem::path& path);
 		~Directory();
-		std::pair<bool, std::vector<std::shared_ptr<File>>>& Files();
-		std::pair<bool, uint64_t> Size() const;
+		std::optional<std::vector<std::shared_ptr<File>>>& Files();
+		std::optional<uint64_t> Size() const;
 
 		bool RemoveAll();
 
 	private:
-		std::pair<bool, std::vector<std::shared_ptr<File>>> m_files;
-		std::pair<bool, uint64_t> m_size;
+		std::optional<std::vector<std::shared_ptr<File>>> m_files;
+		std::optional<uint64_t> m_size;
 	};
 }

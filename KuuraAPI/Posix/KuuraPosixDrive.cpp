@@ -26,7 +26,7 @@ namespace Kuura
 	}
 
 	Drive::Drive(const std::filesystem::path& path) :
-		Path(path),
+		IFillConsumer(path),
 		m_descriptor(open(path.c_str(), OpenFlags))
 	{
 		if (!IsValid())
@@ -59,20 +59,23 @@ namespace Kuura
 		}
 	}
 
-	Drive::Drive(Drive&& other) noexcept
+	Drive::Drive(Drive&& other) noexcept :
+		IFillConsumer("")
 	{
-		std::swap(m_descriptor, other.m_descriptor);
-		std::swap(m_actualSize, other.m_actualSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		*this = std::move(other);
 	}
 
 	Drive& Drive::operator = (Drive&& other) noexcept
 	{
-		std::swap(m_descriptor, other.m_descriptor);
-		std::swap(m_actualSize, other.m_actualSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		if (this != &other)
+		{
+			std::swap(Path, other.Path);
+			std::swap(m_descriptor, other.m_descriptor);
+			std::swap(m_actualSize, other.m_actualSize);
+			std::swap(m_alignmentSize, other.m_alignmentSize);
+			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		}
+
 		return *this;
 	}
 

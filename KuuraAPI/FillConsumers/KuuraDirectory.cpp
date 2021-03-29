@@ -17,41 +17,51 @@ namespace Kuura
 
 			if (!file->IsValid())
 			{
-				m_files.first = false;
 				return;
 			}
 
 			if (!file->Size())
 			{
-				m_size.first = false;
 				return;
 			}
 
-			m_files.second.emplace_back(std::move(file));
-			m_size.second += file->Size().value();
-		}
+			if (!m_files.has_value())
+			{
+				m_files.emplace();
+			}
 
-		m_files.first = true;
-		m_size.first = true;
+			if (!m_size.has_value())
+			{
+				m_size = 0;
+			}
+
+			m_files.value().emplace_back(file);
+			m_size.value() += file->Size().value();
+		}
 	}
 
 	Directory::~Directory()
 	{
 	}
 
-	std::pair<bool, std::vector<std::shared_ptr<File>>>& Directory::Files()
+	std::optional<std::vector<std::shared_ptr<File>>>& Directory::Files()
 	{
 		return m_files;
 	}
 
-	std::pair<bool, uint64_t> Directory::Size() const
+	std::optional<uint64_t> Directory::Size() const
 	{
 		return m_size;
 	}
 
 	bool Directory::RemoveAll()
 	{
-		for (auto& file : m_files.second)
+		if (!m_files.has_value())
+		{
+			return false;
+		}
+
+		for (auto& file : m_files.value())
 		{
 			if (!file->Delete())
 			{

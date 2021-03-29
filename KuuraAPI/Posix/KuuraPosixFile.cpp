@@ -8,7 +8,7 @@ namespace Kuura
 	constexpr uint32_t OpenFlags = O_RDWR | O_DIRECT | O_SYNC;
 
 	File::File(const std::filesystem::path& path) :
-		Path(path),
+		IFillConsumer(path),
 		m_descriptor(open(path.c_str(), OpenFlags))
 	{
 		if (!IsValid())
@@ -40,20 +40,23 @@ namespace Kuura
 		}
 	}
 
-	File::File(File&& other) noexcept
+	File::File(File&& other) noexcept :
+		IFillConsumer("")
 	{
-		std::swap(m_descriptor, other.m_descriptor);
-		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		*this = std::move(other);
 	}
 
 	File& File::operator = (File&& other) noexcept
 	{
-		std::swap(m_descriptor, other.m_descriptor);
-		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		if (this != &other)
+		{
+			std::swap(Path, other.Path);
+			std::swap(m_descriptor, other.m_descriptor);
+			std::swap(m_allocationSize, other.m_allocationSize);
+			std::swap(m_alignmentSize, other.m_alignmentSize);
+			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		}
+
 		return *this;
 	}
 

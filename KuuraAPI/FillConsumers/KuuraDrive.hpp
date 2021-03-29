@@ -9,8 +9,6 @@ namespace Kuura
 	class Drive : public IFillConsumer
 	{
 	public:
-		const std::filesystem::path Path;
-
 		explicit Drive(const std::filesystem::path& path);
 		Drive(Drive&&) noexcept;
 		Drive& operator = (Drive&&) noexcept;

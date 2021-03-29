@@ -6,23 +6,20 @@ namespace Kuura
 	Directory::Directory(const std::filesystem::path& path) :
 		Path(path)
 	{
-		m_files.first = true;
-		m_files.second.emplace_back(std::make_shared<File>("foobar"));
-
-		m_size.first = true;
-		m_size.second = 4000;
+		m_files.emplace().emplace_back(std::make_shared<File>("foobar"));
+		m_size = 4000;
 	}
 
 	Directory::~Directory()
 	{
 	}
 
-	std::pair<bool, std::vector<std::shared_ptr<File>>>& Directory::Files()
+	std::optional<std::vector<std::shared_ptr<File>>>& Directory::Files()
 	{
 		return m_files;
 	}
 
-	std::pair<bool, uint64_t> Directory::Size() const
+	std::optional<uint64_t> Directory::Size() const
 	{
 		return m_size;
 	}

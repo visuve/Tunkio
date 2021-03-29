@@ -17,17 +17,17 @@ namespace Kuura
 	{
 		Directory directory(m_path);
 
-		std::pair<bool, std::vector<std::shared_ptr<File>>>& files = directory.Files();
+		std::optional<std::vector<std::shared_ptr<File>>>& files = directory.Files();
 
-		if (!files.first)
+		if (!files)
 		{
 			OnError(KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
-		std::pair<bool, uint64_t> directorySize = directory.Size();
+		std::optional<uint64_t> directorySize = directory.Size();
 
-		if (!directorySize.first)
+		if (!directorySize)
 		{
 			OnError(KuuraStage::Size, 0, 0, LastError);
 			return false;
@@ -36,7 +36,7 @@ namespace Kuura
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), directorySize.second);
+		OnWipeStarted(FillerCount(), directorySize.value());
 
 		while (HasFillers())
 		{
@@ -44,7 +44,7 @@ namespace Kuura
 
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
-			for (auto& file : files.second)
+			for (auto& file : files.value())
 			{
 				uint64_t bytesLeft = file->Size().value();
 				uint64_t bytesWritten = 0;

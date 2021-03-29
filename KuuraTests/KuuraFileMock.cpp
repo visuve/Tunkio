@@ -4,35 +4,33 @@
 namespace Kuura
 {
 	File::File(const std::filesystem::path& path) :
-		Path(path),
+		IFillConsumer(path),
 		m_allocationSize(2048),
 		m_alignmentSize(512),
 		m_optimalWriteSize(1024)
 	{
 	}
 
-	File::File(File&& other) noexcept
+	File::File(File&& other) noexcept :
+		IFillConsumer("")
 	{
-#if defined(_WIN32)
-		std::swap(m_handle, other.m_handle);
-#else
-		std::swap(m_descriptor, other.m_descriptor);
-#endif
-		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		*this = std::move(other);
 	}
 
 	File& File::operator = (File&& other) noexcept
 	{
+		if (this != &other)
+		{
 #if defined(_WIN32)
-		std::swap(m_handle, other.m_handle);
+			std::swap(m_handle, other.m_handle);
 #else
-		std::swap(m_descriptor, other.m_descriptor);
+			std::swap(m_descriptor, other.m_descriptor);
 #endif
-		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+			std::swap(m_allocationSize, other.m_allocationSize);
+			std::swap(m_alignmentSize, other.m_alignmentSize);
+			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		}
+
 		return *this;
 	}
 

@@ -5,7 +5,7 @@
 namespace Kuura
 {
 	File::File(const std::filesystem::path& path) :
-		Path(path),
+		IFillConsumer(path),
 		m_handle(Open(path))
 	{
 		if (!IsValid())
@@ -26,20 +26,23 @@ namespace Kuura
 		}
 	}
 
-	File::File(File&& other) noexcept
+	File::File(File&& other) noexcept :
+		IFillConsumer("")
 	{
-		std::swap(m_handle, other.m_handle);
-		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		*this = std::move(other);
 	}
 
 	File& File::operator = (File&& other) noexcept
 	{
-		std::swap(m_handle, other.m_handle);
-		std::swap(m_allocationSize, other.m_allocationSize);
-		std::swap(m_alignmentSize, other.m_alignmentSize);
-		std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		if (this != &other)
+		{
+			std::swap(Path, other.Path);
+			std::swap(m_handle, other.m_handle);
+			std::swap(m_allocationSize, other.m_allocationSize);
+			std::swap(m_alignmentSize, other.m_alignmentSize);
+			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+		}
+
 		return *this;
 	}
 

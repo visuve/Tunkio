@@ -10,8 +10,6 @@ namespace Kuura
 	class File : public IFillConsumer
 	{
 	public:
-		const std::filesystem::path Path;
-
 		explicit File(const std::filesystem::path& path);
 		File(File&&) noexcept;
 		File& operator = (File&&) noexcept;
