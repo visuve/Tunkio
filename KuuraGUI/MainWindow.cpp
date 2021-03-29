@@ -185,12 +185,16 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* e)
 }
 void MainWindow::dropEvent(QDropEvent* e)
 {
-	QStringList paths;
+	QVector<QFileInfo> paths;
 
 	for (const QUrl& url : e->mimeData()->urls())
 	{
-		paths << QDir::toNativeSeparators(url.toLocalFile());
+	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		paths.emplace(QDir::toNativeSeparators(url.toLocalFile()));
+	#else
+		paths.append(QDir::toNativeSeparators(url.toLocalFile()));
+	#endif
 	}
 
-	m_pathSelectTab->addPaths(paths);
+	m_pathSelectTab->addPaths(std::move(paths));
 }

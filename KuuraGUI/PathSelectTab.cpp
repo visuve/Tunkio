@@ -42,11 +42,11 @@ public:
 		return QVariant();
 	}
 
-	void addPaths(const QStringList& files)
+	void addPaths(QVector<QFileInfo>&& paths)
 	{
-		beginInsertRows(QModelIndex(), m_files.size(), m_files.size() + files.size());
+		beginInsertRows(QModelIndex(), m_files.size(), m_files.size() + paths.size());
 
-		for (const QString& file : files)
+		for (const QFileInfo& file : paths)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 			m_files.emplaceBack(file);
@@ -58,16 +58,9 @@ public:
 		endInsertRows();
 	}
 
-	QStringList selectedPaths() const
+	const QVector<QFileInfo>& selectedPaths() const
 	{
-		QStringList selected;
-
-		for (const QFileInfo& file : m_files)
-		{
-			selected << QDir::toNativeSeparators(file.absoluteFilePath());
-		}
-
-		return selected;
+		return m_files;
 	}
 
 private:
@@ -109,14 +102,14 @@ PathSelectTab::~PathSelectTab()
 	qDebug();
 }
 
-void PathSelectTab::addPaths(const QStringList& paths)
+void PathSelectTab::addPaths(QVector<QFileInfo>&& paths)
 {
 	auto model = reinterpret_cast<PathSelectModel*>(ui->listViewPaths->model());
 	Q_ASSERT(model);
-	model->addPaths(paths);
+	model->addPaths(std::move(paths));
 }
 
-QStringList PathSelectTab::selectedPaths() const
+const QVector<QFileInfo>& PathSelectTab::selectedPaths() const
 {
 	auto model = reinterpret_cast<PathSelectModel*>(ui->listViewPaths->model());
 	Q_ASSERT(model);
@@ -133,9 +126,16 @@ void PathSelectTab::onAddPaths(QFileDialog::FileMode mode)
 		return;
 	}
 
+	QVector<QFileInfo> fileInfos;
 	const QStringList selectedFiles = dialog.selectedFiles();
+
+	std::transform(
+		selectedFiles.cbegin(),
+		selectedFiles.cend(),
+		std::inserter(fileInfos, fileInfos.end()),
+		[](const QString& path){ return QFileInfo(path); });
 
 	auto model = reinterpret_cast<PathSelectModel*>(ui->listViewPaths->model());
 	Q_ASSERT(model);
-	model->addPaths(selectedFiles);
+	model->addPaths(std::move(fileInfos));
 }

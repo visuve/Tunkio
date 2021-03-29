@@ -132,6 +132,7 @@ DriveSelectTab::DriveSelectTab(QWidget *parent) :
 DriveSelectTab::~DriveSelectTab()
 {
 	delete ui;
+	qDebug();
 }
 
 QStringList DriveSelectTab::selectedDrives() const

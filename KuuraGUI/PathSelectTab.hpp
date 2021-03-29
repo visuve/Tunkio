@@ -18,8 +18,8 @@ public:
 	explicit PathSelectTab(QWidget *parent = nullptr);
 	~PathSelectTab();
 
-	void addPaths(const QStringList& paths);
-	QStringList selectedPaths() const;
+	void addPaths(QVector<QFileInfo>&& paths);
+	const QVector<QFileInfo>& selectedPaths() const;
 
 signals:
 	void backRequested();

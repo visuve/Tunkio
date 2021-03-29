@@ -1,3 +1,4 @@
+#include "KuuraGUI-PCH.hpp"
 #include "ResultsTab.hpp"
 #include "ui_ResultsTab.h"
 
@@ -11,4 +12,5 @@ ResultsTab::ResultsTab(QWidget *parent) :
 ResultsTab::~ResultsTab()
 {
 	delete ui;
+	qDebug();
 }
