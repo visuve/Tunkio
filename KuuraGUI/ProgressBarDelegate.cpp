@@ -1,6 +1,9 @@
 #include "KuuraGUI-PCH.hpp"
 #include "ProgressBarDelegate.hpp"
 
+constexpr QColor PowderBlue(176, 224, 230);
+constexpr QColor Crystalsong(79, 179, 179);
+
 ProgressBarDelegate::ProgressBarDelegate(QObject* parent) :
 	QStyledItemDelegate(parent)
 {
@@ -28,15 +31,15 @@ void ProgressBarDelegate::paint(
 		return;
 	}
 
-	float percent = std::clamp(data.toFloat(), 0.00f, 100.00f);
+	const float percent = std::clamp(data.toFloat(), 0.00f, 100.00f);
 
 	QRect progressRect = option.rect;
 	progressRect.setWidth(progressRect.width() * (percent / 100.0f ));
 
 	painter->setPen(Qt::NoPen);
-	painter->fillRect(progressRect, Qt::green);
+	painter->fillRect(progressRect, PowderBlue);
 
-	QBrush verBrush(Qt::darkGreen, index.parent().isValid() ? Qt::BDiagPattern : Qt::FDiagPattern);
+	QBrush verBrush(Crystalsong, index.parent().isValid() ? Qt::BDiagPattern : Qt::FDiagPattern);
 	painter->setBrush(verBrush);
 	painter->drawRect(progressRect);
 }
