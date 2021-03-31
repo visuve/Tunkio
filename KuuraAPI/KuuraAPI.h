@@ -55,15 +55,18 @@ extern "C"
 
 	typedef void(KuuraPassStartedCallback)(
 		void* context,
+		const char* path,
 		uint16_t pass);
 
 	typedef bool(KuuraProgressCallback)(
 		void* context,
+		const char* path,
 		uint16_t pass,
 		uint64_t bytesWritten); // Return false to cancel
 
 	typedef void(KuuraPassCompletedCallback)(
 		void* context,
+		const char* path,
 		uint16_t pass);
 
 	typedef void(KuuraWipeCompletedCallback)(
@@ -73,6 +76,7 @@ extern "C"
 
 	typedef void(KuuraErrorCallback)(
 		void* context,
+		const char* path,
 		enum KuuraStage stage,
 		uint16_t pass,
 		uint64_t bytesWritten,

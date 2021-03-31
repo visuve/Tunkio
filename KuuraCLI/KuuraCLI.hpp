@@ -24,10 +24,10 @@ namespace Kuura
 		int32_t Error() const;
 
 		void OnWipeStarted(uint16_t passes, uint64_t bytesLeft);
-		void OnPassStarted(uint16_t pass);
-		bool OnProgress(uint16_t pass, uint64_t bytesWritten);
-		void OnPassCompleted(uint16_t pass);
-		void OnError(KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t error);
+		void OnPassStarted(std::string_view path, uint16_t pass);
+		bool OnProgress(std::string_view path, uint16_t pass, uint64_t bytesWritten);
+		void OnPassCompleted(std::string_view path, uint16_t pass);
+		void OnError(std::string_view path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t error);
 		void OnWipeCompleted(uint16_t passes, uint64_t bytesWritten);
 
 	private:

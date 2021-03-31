@@ -513,9 +513,9 @@ void MainWindow::startWipe()
 	m_kuura->start();
 }
 
-void MainWindow::onError(KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
+void MainWindow::onError(const QString& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 {
-	QStringList message = { QString("An error occurred while %1!\n").arg(toString(stage)) };
+	QStringList message = { QString("An error occurred while %1 %2!\n").arg(toString(stage)).arg(path) };
 	message << QString("Pass: %1").arg(pass);
 	message << QString("Bytes written: %1").arg(bytesWritten);
 	message << QString("Operating system error code: %1").arg(errorCode);

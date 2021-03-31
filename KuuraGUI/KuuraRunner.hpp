@@ -17,11 +17,11 @@ public slots:
 
 signals:
 	void wipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
-	void passStarted(uint16_t pass);
-	void passProgressed(uint16_t pass, uint64_t bytesWritten);
-	void passFinished(uint16_t pass);
+	void passStarted(const QString& path, uint16_t pass);
+	void passProgressed(const QString& path, uint16_t pass, uint64_t bytesWritten);
+	void passFinished(const QString& path, uint16_t pass);
 	void wipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
-	void errorOccurred(KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
+	void errorOccurred(const QString& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
 	std::atomic<bool> m_keepRunning;

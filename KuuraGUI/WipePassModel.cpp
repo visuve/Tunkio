@@ -375,15 +375,15 @@ void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 }
 
 
-void WipePassModel::onPassStarted(uint16_t pass)
+void WipePassModel::onPassStarted(const QString& path, uint16_t pass)
 {
 	rowData(pass).start = QTime::currentTime();
 	updateRow(pass);
 
-	qDebug() << "Pass started:" << pass;
+	qDebug() << "Pass started:" << path << pass;
 }
 
-void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
+void WipePassModel::onPassProgressed(const QString&, uint16_t pass, uint64_t bytesWritten)
 {
 	Pass& current = rowData(pass);
 	current.bytesWritten = bytesWritten;
@@ -391,12 +391,12 @@ void WipePassModel::onPassProgressed(uint16_t pass, uint64_t bytesWritten)
 	updateRow(pass);
 }
 
-void WipePassModel::onPassFinished(uint16_t pass)
+void WipePassModel::onPassFinished(const QString& path, uint16_t pass)
 {
 	rowData(pass).time = QTime::currentTime();
 	updateRow(pass);
 
-	qDebug() << "Pass finished:" << pass;
+	qDebug() << "Pass finished:" << path << pass;
 }
 
 void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
@@ -417,5 +417,6 @@ void WipePassModel::updateRow(uint16_t pass)
 	int row = pass - 1;
 	const QModelIndex topLeft = index(row, 3);
 	const QModelIndex bottomRight = index(row, 8);
+
 	emit dataChanged(topLeft, bottomRight, { Qt::DisplayRole });
 }

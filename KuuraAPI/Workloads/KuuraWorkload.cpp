@@ -79,7 +79,8 @@ namespace Kuura
 			return;
 		}
 
-		m_passStartedCallback(m_context, pass);
+		std::string tmp = m_path.string();
+		m_passStartedCallback(m_context, tmp.data(), pass);
 	}
 
 	bool IWorkload::OnProgress(uint16_t pass, uint64_t bytesWritten)
@@ -89,7 +90,8 @@ namespace Kuura
 			return true;
 		}
 
-		return m_progressCallback(m_context, pass, bytesWritten);
+		std::string tmp = m_path.string();
+		return m_progressCallback(m_context, tmp.data(), pass, bytesWritten);
 	}
 
 	void IWorkload::OnPassCompleted(uint16_t pass)
@@ -99,7 +101,8 @@ namespace Kuura
 			return;
 		}
 
-		m_passCompletedCallback(m_context, pass);
+		std::string tmp = m_path.string();
+		m_passCompletedCallback(m_context, tmp.data(), pass);
 	}
 
 	void IWorkload::OnWipeCompleted(uint16_t passes, uint64_t totalBytesWritten)
@@ -123,7 +126,8 @@ namespace Kuura
 			return;
 		}
 
-		m_errorCallback(m_context, stage, pass, bytesWritten, errorCode);
+		std::string tmp = m_path.string();
+		m_errorCallback(m_context, tmp.data(), stage, pass, bytesWritten, errorCode);
 	}
 
 	bool IWorkload::Fill(

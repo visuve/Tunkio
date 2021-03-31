@@ -40,27 +40,30 @@ namespace Kuura
 
 		KuuraSetPassStartedCallback(m_handle, [](
 			void* context,
+			const char* path,
 			uint16_t pass)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
-			self->OnPassStarted(pass);
+			self->OnPassStarted(path, pass);
 		});
 
 		KuuraSetProgressCallback(m_handle, [](
 			void* context,
+			const char* path,
 			uint16_t pass,
 			uint64_t bytesWritten)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
-			return self->OnProgress(pass, bytesWritten);
+			return self->OnProgress(path, pass, bytesWritten);
 		});
 
 		KuuraSetPassCompletedCallback(m_handle, [](
 			void* context,
+			const char* path,
 			uint16_t pass)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
-			self->OnPassCompleted(pass);
+			self->OnPassCompleted(path, pass);
 		});
 
 		KuuraSetWipeCompletedCallback(m_handle, [](
@@ -74,13 +77,14 @@ namespace Kuura
 
 		KuuraSetErrorCallback(m_handle, [](
 			void* context,
+			const char* path,
 			KuuraStage stage,
 			uint16_t pass,
 			uint64_t bytesWritten,
 			uint32_t error)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
-			self->OnError(stage, pass, bytesWritten, error);
+			self->OnError(path, stage, pass, bytesWritten, error);
 		});
 
 		return KuuraAddWipeRound(m_handle, fillType, verify, filler.c_str());
@@ -109,7 +113,7 @@ namespace Kuura
 		std::cout << Time::Timestamp() << " Wipe Started! Passes " << passes << '.' << std::endl;
 	}
 
-	void CLI::OnPassStarted(uint16_t pass)
+	void CLI::OnPassStarted(std::string_view, uint16_t pass)
 	{
 		m_totalTimer.Reset();
 		m_currentTimer.Reset();
@@ -117,7 +121,7 @@ namespace Kuura
 		std::cout << Time::Timestamp() << " Pass " << pass << " started!" << std::endl;
 	}
 
-	bool CLI::OnProgress(uint16_t, uint64_t bytesWritten)
+	bool CLI::OnProgress(std::string_view, uint16_t, uint64_t bytesWritten)
 	{
 		if (!m_keepRunning)
 		{
@@ -145,12 +149,12 @@ namespace Kuura
 		return m_keepRunning;
 	}
 
-	void CLI::OnPassCompleted(uint16_t pass)
+	void CLI::OnPassCompleted(std::string_view, uint16_t pass)
 	{
 		std::cout << Time::Timestamp() << " Pass " << pass << " completed!" << std::endl;
 	}
 
-	void CLI::OnError(KuuraStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
+	void CLI::OnError(std::string_view path, KuuraStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
 	{
 		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
 
@@ -172,11 +176,11 @@ namespace Kuura
 				std::cerr << "verifying";
 				break;
 			case KuuraStage::Delete:
-				std::cerr << "deleting file";
+				std::cerr << "deleting";
 				break;
 		}
 
-		std::cerr << "! Bytes written: " << bytesWritten << '.' << std::endl;
+		std::cerr << ' ' << path << "! Bytes written: " << bytesWritten << '.' << std::endl;
 		std::cerr << "Detailed description: " << SystemErrorCodeToString(error) << std::endl;
 		m_error = error;
 	}

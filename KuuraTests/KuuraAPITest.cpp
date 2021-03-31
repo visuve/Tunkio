@@ -17,18 +17,18 @@ namespace Kuura
 		reinterpret_cast<Counters*>(context)->OnWipeStartedCount++;
 	}
 
-	void OnPassStarted(void* context, uint16_t)
+	void OnPassStarted(void* context, const char*, uint16_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnPassStartedCount++;
 	}
 
-	bool OnProgress(void* context, uint16_t, uint64_t)
+	bool OnProgress(void* context, const char*, uint16_t, uint64_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnProgressCount++;
 		return true;
 	}
 
-	void OnPassCompleted(void* context, uint16_t)
+	void OnPassCompleted(void* context, const char*, uint16_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnPassCompletedCount++;
 	}
@@ -38,7 +38,7 @@ namespace Kuura
 		reinterpret_cast<Counters*>(context)->OnWipeCompletedCount++;
 	}
 
-	void OnError(void* context, KuuraStage, uint16_t, uint64_t, uint32_t)
+	void OnError(void* context, const char*, KuuraStage, uint16_t, uint64_t, uint32_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnErrorCount++;
 	}

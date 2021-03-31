@@ -75,31 +75,34 @@ void KuuraRunner::attachCallbacks()
 
 	KuuraSetPassStartedCallback(m_kuura, [](
 		void* context,
+		const char* path,
 		uint16_t pass)
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->passStarted(pass);
+		emit self->passStarted(path, pass);
 	});
 
 	KuuraSetProgressCallback(m_kuura, [](
 		void* context,
+		const char* path,
 		uint16_t pass,
 		uint64_t bytesWritten)
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->passProgressed(pass, bytesWritten);
+		emit self->passProgressed(path, pass, bytesWritten);
 		return self->m_keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
 	});
 
 	KuuraSetPassCompletedCallback(m_kuura, [](
 		void* context,
+		const char* path,
 		uint16_t pass)
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->passFinished(pass);
+		emit self->passFinished(path, pass);
 	});
 
 	KuuraSetWipeCompletedCallback(m_kuura, [](
@@ -114,6 +117,7 @@ void KuuraRunner::attachCallbacks()
 
 	KuuraSetErrorCallback(m_kuura, [](
 		void* context,
+		const char* path,
 		KuuraStage stage,
 		uint16_t pass,
 		uint64_t bytesWritten,
@@ -121,7 +125,7 @@ void KuuraRunner::attachCallbacks()
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->errorOccurred(stage, pass, bytesWritten, errorCode);
+		emit self->errorOccurred(path, stage, pass, bytesWritten, errorCode);
 	});
 }
 
