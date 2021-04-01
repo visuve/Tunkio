@@ -1,11 +1,9 @@
 #include "KuuraGUI-PCH.hpp"
 #include "KuuraRunner.hpp"
 
-KuuraRunner::KuuraRunner(QString path, KuuraTargetType type, bool remove, QObject* parent) :
+KuuraRunner::KuuraRunner(QObject* parent) :
 	QThread(parent),
-	m_path(path),
-	m_type(type),
-	m_kuura(KuuraInitialize(m_path.toUtf8().constData(), m_type, remove, this))
+	m_kuura(KuuraInitialize(this))
 {
 	attachCallbacks();
 }
@@ -23,6 +21,12 @@ KuuraRunner::~KuuraRunner()
 	}
 
 	qDebug() << "Destroyed.";
+}
+
+bool KuuraRunner::addTarget(const QString& path, KuuraTargetType type, bool remove)
+{
+	const auto tmp = path.toStdString();
+	return KuuraAddTarget(m_kuura, tmp.c_str(), type, remove);
 }
 
 bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify)

@@ -8,10 +8,11 @@ class KuuraRunner : public QThread
 {
 	Q_OBJECT
 public:
-	explicit KuuraRunner(QString path, KuuraTargetType type, bool remove, QObject* parent = nullptr);
+	explicit KuuraRunner(QObject* parent = nullptr);
 	~KuuraRunner();
 
 public slots:
+	bool addTarget(const QString& path, KuuraTargetType type, bool remove);
 	bool addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify);
 	void stop();
 
@@ -27,7 +28,5 @@ private:
 	std::atomic<bool> m_keepRunning;
 	void attachCallbacks();
 	void run() override;
-	QString m_path;
-	KuuraTargetType m_type;
 	KuuraHandle* m_kuura = nullptr;
 };

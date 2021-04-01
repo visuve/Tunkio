@@ -287,7 +287,8 @@ void MainWindow::onOpenFileDialog()
 		const QString file = QDir::toNativeSeparators(selected);
 
 		ui->lineEditSelectedPath->setText(file);
-		m_kuura = std::make_shared<KuuraRunner>(
+		m_kuura = std::make_shared<KuuraRunner>();
+		m_kuura->addTarget(
 			file,
 			KuuraTargetType::FileWipe,
 			ui->checkBoxDelete->isChecked());
@@ -309,7 +310,8 @@ void MainWindow::onOpenDirectoryDialog()
 
 		ui->lineEditSelectedPath->setText(directory);
 
-		m_kuura = std::make_shared<KuuraRunner>(
+		m_kuura = std::make_shared<KuuraRunner>();
+		m_kuura->addTarget(
 			directory,
 			KuuraTargetType::DirectoryWipe,
 			ui->checkBoxDelete->isChecked());
@@ -330,7 +332,8 @@ void MainWindow::onOpenDriveDialog()
 		const QString drive = dialog.selectedDrive();
 		ui->lineEditSelectedPath->setText(drive);
 
-		m_kuura = std::make_shared<KuuraRunner>(
+		m_kuura = std::make_shared<KuuraRunner>();
+		m_kuura->addTarget(
 			drive,
 			KuuraTargetType::DriveWipe,
 			false);

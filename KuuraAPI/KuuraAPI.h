@@ -83,10 +83,13 @@ extern "C"
 		uint32_t errorCode);
 
 	KUURA_EXPORT struct KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(
+		void* context);
+
+	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddTarget(
+		struct KuuraHandle*,
 		const char* path,
 		enum KuuraTargetType type,
-		bool removeAfterWipe,
-		void* context);
+		bool removeAfterWipe);
 
 	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddWipeRound(
 		struct KuuraHandle*,

@@ -21,11 +21,17 @@ namespace Kuura
 		bool verify,
 		bool remove)
 	{
-		m_handle = KuuraInitialize(path.string().c_str(), targetType, remove, this);
+		m_handle = KuuraInitialize(this);
 
-		if (!m_handle)
+		if (!KuuraAddTarget(m_handle, path.string().c_str(), targetType, remove))
 		{
-			std::cerr << "KuuraInitialize failed!" << std::endl;
+			std::cerr << "KuuraAddTarget failed!" << std::endl;
+			return false;
+		}
+
+		if (!KuuraAddWipeRound(m_handle, fillType, verify, filler.c_str()))
+		{
+			std::cerr << "KuuraAddWipeRound failed!" << std::endl;
 			return false;
 		}
 
@@ -87,7 +93,7 @@ namespace Kuura
 			self->OnError(path, stage, pass, bytesWritten, error);
 		});
 
-		return KuuraAddWipeRound(m_handle, fillType, verify, filler.c_str());
+		return true;
 	}
 
 	bool CLI::Run()

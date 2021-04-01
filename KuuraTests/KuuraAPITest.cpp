@@ -43,11 +43,14 @@ namespace Kuura
 		reinterpret_cast<Counters*>(context)->OnErrorCount++;
 	}
 
-	TEST(KuuraAPITest, CreateHandleFail)
+	TEST(KuuraAPITest, DecorateFail)
 	{
 		Counters counters;
-		KuuraHandle* handle = KuuraInitialize(nullptr, KuuraTargetType::FileWipe, false, &counters);
+		KuuraHandle* handle = KuuraInitialize(&counters);
 		EXPECT_EQ(handle, nullptr);
+
+		EXPECT_FALSE(KuuraAddTarget(nullptr, nullptr, KuuraTargetType::FileWipe, false));
+		EXPECT_FALSE(KuuraAddTarget(handle, nullptr, KuuraTargetType::FileWipe, false));
 
 		EXPECT_FALSE(KuuraAddWipeRound(handle, KuuraFillType::ByteFill, false, "xxx"));
 		EXPECT_FALSE(KuuraAddWipeRound(handle, KuuraFillType::SequenceFill, false, nullptr));
@@ -62,25 +65,21 @@ namespace Kuura
 		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
 
-	TEST(KuuraAPITest, CreateHandleFailDriveWipe)
-	{
-		KuuraHandle* handle = KuuraInitialize("foobar", KuuraTargetType::DriveWipe, true, nullptr);
-		EXPECT_EQ(handle, nullptr);
-	}
-
 	TEST(KuuraAPITest, CreateHandleSuccess)
 	{
 		Counters counters;
-		KuuraHandle* handle = KuuraInitialize("foobar", KuuraTargetType::FileWipe, false, &counters);
+		KuuraHandle* handle = KuuraInitialize(&counters);
 		EXPECT_NE(handle, nullptr);
-		KuuraFree(handle);
 
+		EXPECT_TRUE(KuuraAddTarget(handle, "foobar", KuuraTargetType::FileWipe, false));
 		EXPECT_EQ(counters.OnWipeStartedCount, 0);
 		EXPECT_EQ(counters.OnPassStartedCount, 0);
 		EXPECT_EQ(counters.OnProgressCount, 0);
 		EXPECT_EQ(counters.OnPassCompletedCount, 0);
 		EXPECT_EQ(counters.OnWipeCompletedCount, 0);
 		EXPECT_EQ(counters.OnErrorCount, 0);
+
+		KuuraFree(handle);
 	}
 
 	TEST(KuuraAPITest, WipeSuccess)
@@ -95,7 +94,8 @@ namespace Kuura
 		for (KuuraTargetType type : Types)
 		{
 			Counters counters;
-			KuuraHandle* handle = KuuraInitialize("foobar", type, false, &counters);
+			KuuraHandle* handle = KuuraInitialize(&counters);
+			EXPECT_TRUE(KuuraAddTarget(handle, "foobar", type, false));
 			EXPECT_NE(handle, nullptr);
 
 			EXPECT_EQ(counters.OnWipeStartedCount, 0);
