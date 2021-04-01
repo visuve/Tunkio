@@ -6,22 +6,23 @@
 namespace Kuura
 {
 	DirectoryWipe::DirectoryWipe(
+		const CallbackContainer& callbacks,
 		const std::filesystem::path& path,
-		bool removeAfterWipe,
-		void* context) :
-		IWorkload(path, removeAfterWipe, context)
+		bool removeAfterWipe) :
+		IWorkload(callbacks, path, removeAfterWipe)
 	{
 	}
 
 	bool DirectoryWipe::Run()
 	{
 		Directory directory(m_path);
+		const auto path = m_path.string();
 
 		std::optional<std::vector<std::shared_ptr<File>>>& files = directory.Files();
 
 		if (!files)
 		{
-			OnError(KuuraStage::Open, 0, 0, LastError);
+			m_callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
@@ -29,18 +30,18 @@ namespace Kuura
 
 		if (!directorySize)
 		{
-			OnError(KuuraStage::Size, 0, 0, LastError);
+			m_callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), directorySize.value());
+		m_callbacks.OnWipeStarted(FillerCount(), directorySize.value());
 
 		while (HasFillers())
 		{
-			OnPassStarted(++passes);
+			m_callbacks.OnPassStarted(path.c_str(), ++passes);
 
 			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
@@ -56,22 +57,22 @@ namespace Kuura
 
 				if (!file->Flush())
 				{
-					OnError(KuuraStage::Write, passes, bytesWritten, LastError);
+					m_callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 				}
 
 				totalBytesWritten += bytesWritten;
 			}
 
-			OnPassCompleted(passes);
+			m_callbacks.OnPassCompleted(path.c_str(), passes);
 		}
 
 		if (m_removeAfterWipe && !directory.RemoveAll())
 		{
-			OnError(KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			m_callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 
-		OnWipeCompleted(passes, totalBytesWritten);
+		m_callbacks.OnWipeCompleted(passes, totalBytesWritten);
 		return true;
 	}
 }

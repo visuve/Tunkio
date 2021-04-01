@@ -33,22 +33,22 @@ class KuuraObject
 {
 public:
 	KuuraObject(void* context) :
-		m_context(context)
+		Callbacks(context)
 	{
 	}
 
-	bool AddWorkload(std::string_view path, KuuraTargetType type, bool removeAfterWipe)
+	bool AddWorkload(const char* path, KuuraTargetType type, bool removeAfterWipe)
 	{
 		switch (type)
 		{
 			case KuuraTargetType::FileWipe:
 			{
-				m_workloads.emplace_back(new Kuura::FileWipe(path, removeAfterWipe, m_context));
+				m_workloads.emplace_back(new Kuura::FileWipe(Callbacks, path, removeAfterWipe));
 				return true;
 			}
 			case KuuraTargetType::DirectoryWipe:
 			{
-				m_workloads.emplace_back(new Kuura::DirectoryWipe(path, removeAfterWipe, m_context));
+				m_workloads.emplace_back(new Kuura::DirectoryWipe(Callbacks, path, removeAfterWipe));
 				return true;
 			}
 			case KuuraTargetType::DriveWipe:
@@ -58,7 +58,7 @@ public:
 					return false;
 				}
 
-				m_workloads.emplace_back(new Kuura::DriveWipe(path, m_context));
+				m_workloads.emplace_back(new Kuura::DriveWipe(Callbacks, path));
 				return true;
 			}
 		}
@@ -127,16 +127,6 @@ public:
 		return false;
 	}
 
-	template<typename T>
-	void SetCallbacks(void(Kuura::IWorkload::* setter)(T), T value)
-	{
-		for (auto& workload : m_workloads)
-		{
-			Kuura::IWorkload* wl = workload.get();
-			(wl->*setter)(value);
-		}
-	}
-
 	bool Run()
 	{
 		// TODO: this is shit
@@ -156,17 +146,18 @@ public:
 		return true;
 	}
 
+	Kuura::CallbackContainer Callbacks;
+
 private:
-	void* m_context = nullptr;
 	std::vector<std::shared_ptr<Kuura::IWorkload>> m_workloads;
 	std::vector<std::shared_ptr<Kuura::IFillProvider>> m_fillers;
 };
 
 template <typename T>
-void Set(KuuraHandle* handle, void(Kuura::IWorkload::* setter)(T), T value)
+void Set(KuuraHandle* handle, T(Kuura::CallbackContainer::* field), T value)
 {
 	assert(handle);
-	assert(setter);
+	assert(field);
 	assert(value);
 
 	auto instance = reinterpret_cast<KuuraObject*>(handle);
@@ -176,7 +167,7 @@ void Set(KuuraHandle* handle, void(Kuura::IWorkload::* setter)(T), T value)
 		return;
 	}
 
-	instance->SetCallbacks(setter, value);
+	instance->Callbacks.*field = value;
 }
 
 KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(void* context)
@@ -225,42 +216,42 @@ void KUURA_CALLING_CONVENTION KuuraSetWipeStartedCallback(
 	KuuraHandle* handle,
 	KuuraWipeStartedCallback* callback)
 {
-	Set(handle, &Kuura::IWorkload::SetWipeStartedCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::WipeStartedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetPassStartedCallback(
 	KuuraHandle* handle,
 	KuuraPassStartedCallback* callback)
 {
-	Set(handle, &Kuura::IWorkload::SetPassStartedCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::PassStartedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetProgressCallback(
 	KuuraHandle* handle,
 	KuuraProgressCallback* callback)
 {
-	Set(handle, &Kuura::IWorkload::SetProgressCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::ProgressCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetPassCompletedCallback(
 	KuuraHandle* handle,
 	KuuraPassCompletedCallback* callback)
 {
-	Set(handle, &Kuura::IWorkload::SetPassCompletedCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::PassCompletedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetWipeCompletedCallback(
 	KuuraHandle* handle,
 	KuuraWipeCompletedCallback* callback)
 {
-	Set(handle, &Kuura::IWorkload::SetWipeCompletedCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::WipeCompletedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetErrorCallback(
 	KuuraHandle* handle,
 	KuuraErrorCallback* callback)
 {
-	Set(handle, &Kuura::IWorkload::SetErrorCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::ErrorCallback, callback);
 }
 
 bool KUURA_CALLING_CONVENTION KuuraRun(KuuraHandle* handle)

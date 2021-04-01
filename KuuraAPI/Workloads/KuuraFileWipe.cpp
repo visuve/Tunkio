@@ -6,37 +6,38 @@
 namespace Kuura
 {
 	FileWipe::FileWipe(
+		const CallbackContainer& callbacks,
 		const std::filesystem::path& path,
-		bool removeAfterWipe,
-		void* context) :
-		IWorkload(path, removeAfterWipe, context)
+		bool removeAfterWipe) :
+		IWorkload(callbacks, path, removeAfterWipe)
 	{
 	}
 
 	bool FileWipe::Run()
 	{
 		auto file = std::make_shared<File>(m_path);
+		const auto path = m_path.string();
 
 		if (!file->IsValid())
 		{
-			OnError(KuuraStage::Open, 0, 0, LastError);
+			m_callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
 		if (!file->Size())
 		{
-			OnError(KuuraStage::Size, 0, 0, LastError);
+			m_callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		OnWipeStarted(FillerCount(), file->Size().value());
+		m_callbacks.OnWipeStarted(FillerCount(), file->Size().value());
 
 		while (HasFillers())
 		{
-			OnPassStarted(++passes);
+			m_callbacks.OnPassStarted(path.c_str(), ++passes);
 
 			uint64_t bytesLeft = file->Size().value();
 			uint64_t bytesWritten = 0;
@@ -49,18 +50,18 @@ namespace Kuura
 
 			if (!file->Flush())
 			{
-				OnError(KuuraStage::Write, passes, bytesWritten, LastError);
+				m_callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 			}
 
 			totalBytesWritten += bytesWritten;
-			OnPassCompleted(passes);
+			m_callbacks.OnPassCompleted(path.c_str(), passes);
 		}
 
-		OnWipeCompleted(passes, totalBytesWritten);
+		m_callbacks.OnWipeCompleted(passes, totalBytesWritten);
 
 		if (m_removeAfterWipe && !file->Delete())
 		{
-			OnError(KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			m_callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 

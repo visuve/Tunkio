@@ -8,7 +8,7 @@ namespace Kuura
 	class DriveWipe : public FileWipe
 	{
 	public:
-		DriveWipe(const std::filesystem::path& path, void* context);
+		DriveWipe(const CallbackContainer& callbacks, const std::filesystem::path& path);
 		bool Run() override;
 	};
 }
