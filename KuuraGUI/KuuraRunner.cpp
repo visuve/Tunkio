@@ -5,7 +5,6 @@ KuuraRunner::KuuraRunner(QObject* parent) :
 	QThread(parent),
 	m_kuura(KuuraInitialize(this))
 {
-	attachCallbacks();
 }
 
 KuuraRunner::~KuuraRunner()
@@ -139,6 +138,8 @@ void KuuraRunner::run()
 	Q_ASSERT(m_kuura);
 
 	m_keepRunning = true;
+
+	attachCallbacks();
 
 	if (!KuuraRun(m_kuura))
 	{

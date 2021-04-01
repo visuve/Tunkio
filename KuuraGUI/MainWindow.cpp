@@ -288,11 +288,11 @@ void MainWindow::onOpenFileDialog()
 
 		ui->lineEditSelectedPath->setText(file);
 		m_kuura = std::make_shared<KuuraRunner>();
-		m_kuura->addTarget(
+		bool result = m_kuura->addTarget(
 			file,
 			KuuraTargetType::FileWipe,
 			ui->checkBoxDelete->isChecked());
-		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_kuura.get());
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
 		ui->groupBoxPathSelect->setEnabled(false);
 	}
 }
@@ -311,12 +311,12 @@ void MainWindow::onOpenDirectoryDialog()
 		ui->lineEditSelectedPath->setText(directory);
 
 		m_kuura = std::make_shared<KuuraRunner>();
-		m_kuura->addTarget(
+		bool result = m_kuura->addTarget(
 			directory,
 			KuuraTargetType::DirectoryWipe,
 			ui->checkBoxDelete->isChecked());
 
-		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_kuura.get());
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
 		ui->groupBoxPathSelect->setEnabled(false);
 	}
 }
@@ -333,12 +333,12 @@ void MainWindow::onOpenDriveDialog()
 		ui->lineEditSelectedPath->setText(drive);
 
 		m_kuura = std::make_shared<KuuraRunner>();
-		m_kuura->addTarget(
+		bool result = m_kuura->addTarget(
 			drive,
 			KuuraTargetType::DriveWipe,
 			false);
 
-		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && m_kuura.get());
+		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
 		ui->groupBoxPathSelect->setEnabled(false);
 	}
 }

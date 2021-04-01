@@ -14,43 +14,6 @@
 
 #include "KuuraDataUnits.hpp"
 
-struct KuuraObject
-{
-	KuuraObject(void* context) :
-		Context(context)
-	{
-	}
-
-	void AddWorkload(std::shared_ptr<Kuura::IWorkload>&& workload)
-	{
-		Workloads.emplace_back(workload);
-	}
-
-	void AddFiller(std::shared_ptr<Kuura::IFillProvider>&& filler)
-	{
-		for (auto& workload : Workloads)
-		{
-			workload->AddFiller(filler);
-		}
-	}
-
-	bool Run()
-	{
-		for (auto& workload : Workloads)
-		{
-			if (!workload->Run())
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	void* Context = nullptr;
-	std::vector<std::shared_ptr<Kuura::IWorkload>> Workloads;
-};
-
 constexpr size_t Length(const char* str)
 {
 	char* ptr = const_cast<char*>(str);
@@ -66,6 +29,139 @@ constexpr size_t Length(const char* str)
 	return (ptr - str);
 }
 
+class KuuraObject
+{
+public:
+	KuuraObject(void* context) :
+		m_context(context)
+	{
+	}
+
+	bool AddWorkload(std::string_view path, KuuraTargetType type, bool removeAfterWipe)
+	{
+		switch (type)
+		{
+			case KuuraTargetType::FileWipe:
+			{
+				m_workloads.emplace_back(new Kuura::FileWipe(path, removeAfterWipe, m_context));
+				return true;
+			}
+			case KuuraTargetType::DirectoryWipe:
+			{
+				m_workloads.emplace_back(new Kuura::DirectoryWipe(path, removeAfterWipe, m_context));
+				return true;
+			}
+			case KuuraTargetType::DriveWipe:
+			{
+				if (removeAfterWipe)
+				{
+					return false;
+				}
+
+				m_workloads.emplace_back(new Kuura::DriveWipe(path, m_context));
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool AddFiller(KuuraFillType type, bool verify, const char* optional)
+	{
+		switch (type)
+		{
+			case KuuraFillType::ZeroFill:
+			{
+				m_fillers.emplace_back(new Kuura::ByteFiller(std::byte(0x00), verify));
+				return true;
+			}
+			case KuuraFillType::OneFill:
+			{
+				m_fillers.emplace_back(new Kuura::ByteFiller(std::byte(0xFF), verify));
+				return true;
+			}
+			case KuuraFillType::ByteFill:
+			{
+				if (Length(optional) != 1)
+				{
+					return false;
+				}
+
+				m_fillers.emplace_back(new Kuura::ByteFiller(std::byte(optional[0]), verify));
+				return true;
+			}
+			case KuuraFillType::SequenceFill:
+			{
+				if (Length(optional) < 1)
+				{
+					return false;
+				}
+
+				m_fillers.emplace_back(new Kuura::SequenceFiller(optional, verify));
+				return true;
+			}
+			case KuuraFillType::FileFill:
+			{
+				if (Length(optional) < 1)
+				{
+					return false;
+				}
+					
+				auto fileFiller = std::make_shared<Kuura::FileFiller>(optional, verify);
+
+				if (!fileFiller->HasContent())
+				{
+					return false;
+				}
+
+				m_fillers.emplace_back(fileFiller);
+				return true;
+			}
+			case KuuraFillType::RandomFill:
+			{
+				m_fillers.emplace_back(new Kuura::RandomFiller(verify));
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template<typename T>
+	void SetCallbacks(void(Kuura::IWorkload::* setter)(T), T value)
+	{
+		for (auto& workload : m_workloads)
+		{
+			Kuura::IWorkload* wl = workload.get();
+			(wl->*setter)(value);
+		}
+	}
+
+	bool Run()
+	{
+		// TODO: this is shit
+		for (auto& workload : m_workloads)
+		{
+			for (auto& filler : m_fillers)
+			{
+				workload->AddFiller(filler);
+			}
+
+			if (!workload->Run())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+private:
+	void* m_context = nullptr;
+	std::vector<std::shared_ptr<Kuura::IWorkload>> m_workloads;
+	std::vector<std::shared_ptr<Kuura::IFillProvider>> m_fillers;
+};
+
 template <typename T>
 void Set(KuuraHandle* handle, void(Kuura::IWorkload::* setter)(T), T value)
 {
@@ -80,14 +176,10 @@ void Set(KuuraHandle* handle, void(Kuura::IWorkload::* setter)(T), T value)
 		return;
 	}
 
-	for (auto& workload : instance->Workloads)
-	{
-		(workload.get()->*setter)(value);
-	}
+	instance->SetCallbacks(setter, value);
 }
 
-KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(
-	void* context)
+KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(void* context)
 {
 	return reinterpret_cast<KuuraHandle*>(new KuuraObject(context));
 }
@@ -110,36 +202,12 @@ bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 		return false;
 	}
 
-	switch (type)
-	{
-		case KuuraTargetType::FileWipe:
-		{
-			kuuraObject->AddWorkload(std::make_shared<Kuura::FileWipe>(path, removeAfterWipe, kuuraObject->Context));
-			return true;
-		}
-		case KuuraTargetType::DirectoryWipe:
-		{
-			kuuraObject->AddWorkload(std::make_shared<Kuura::DirectoryWipe>(path, removeAfterWipe, kuuraObject->Context));
-			return true;
-		}
-		case KuuraTargetType::DriveWipe:
-		{
-			if (removeAfterWipe)
-			{
-				return false;
-			}
-
-			kuuraObject->AddWorkload(std::make_shared<Kuura::DriveWipe>(path, kuuraObject->Context));
-			return true;
-		}
-	}
-
-	return false;
+	return kuuraObject->AddWorkload(path, type, removeAfterWipe);
 }
 
 bool KUURA_CALLING_CONVENTION KuuraAddWipeRound(
 	struct KuuraHandle* handle,
-	KuuraFillType round,
+	KuuraFillType type,
 	bool verify,
 	const char* optional)
 {
@@ -150,57 +218,7 @@ bool KUURA_CALLING_CONVENTION KuuraAddWipeRound(
 		return false;
 	}
 
-	switch (round)
-	{
-		case KuuraFillType::ZeroFill:
-			instance->AddFiller(std::make_shared<Kuura::ByteFiller>(std::byte(0x00), verify));
-			return true;
-
-		case KuuraFillType::OneFill:
-			instance->AddFiller(std::make_shared<Kuura::ByteFiller>(std::byte(0xFF), verify));
-			return true;
-
-		case KuuraFillType::ByteFill:
-			if (Length(optional) != 1)
-			{
-				return false;
-			}
-
-			instance->AddFiller(std::make_shared<Kuura::ByteFiller>(std::byte(optional[0]), verify));
-			return true;
-
-		case KuuraFillType::SequenceFill:
-			if (Length(optional) < 1)
-			{
-				return false;
-			}
-
-			instance->AddFiller(std::make_shared<Kuura::SequenceFiller>(optional, verify));
-			return true;
-
-		case KuuraFillType::FileFill:
-			if (Length(optional) < 1)
-			{
-				return false;
-			}
-			{
-				auto fileFiller = std::make_shared<Kuura::FileFiller>(optional, verify);
-
-				if (fileFiller->HasContent())
-				{
-					instance->AddFiller(fileFiller);
-					return true;
-				}
-			}
-			return false;
-
-		case KuuraFillType::RandomFill:
-			instance->AddFiller(std::make_shared<Kuura::RandomFiller>(verify));
-			return true;
-
-	}
-
-	return false;
+	return instance->AddFiller(type, verify, optional);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetWipeStartedCallback(
