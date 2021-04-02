@@ -47,7 +47,7 @@ namespace Kuura
 	{
 		Counters counters;
 		KuuraHandle* handle = KuuraInitialize(&counters);
-		EXPECT_EQ(handle, nullptr);
+		EXPECT_NE(handle, nullptr);
 
 		EXPECT_FALSE(KuuraAddTarget(nullptr, nullptr, KuuraTargetType::FileWipe, false));
 		EXPECT_FALSE(KuuraAddTarget(handle, nullptr, KuuraTargetType::FileWipe, false));
@@ -55,6 +55,24 @@ namespace Kuura
 		EXPECT_FALSE(KuuraAddWipeRound(handle, KuuraFillType::ByteFill, false, "xxx"));
 		EXPECT_FALSE(KuuraAddWipeRound(handle, KuuraFillType::SequenceFill, false, nullptr));
 
+		KuuraFree(handle);
+
+		EXPECT_EQ(counters.OnWipeStartedCount, 0);
+		EXPECT_EQ(counters.OnPassStartedCount, 0);
+		EXPECT_EQ(counters.OnProgressCount, 0);
+		EXPECT_EQ(counters.OnPassCompletedCount, 0);
+		EXPECT_EQ(counters.OnWipeCompletedCount, 0);
+		EXPECT_EQ(counters.OnErrorCount, 0);
+	}
+
+	TEST(KuuraAPITest, RunNoTarget)
+	{
+		Counters counters;
+		KuuraHandle* handle = KuuraInitialize(&counters);
+		EXPECT_NE(handle, nullptr);
+		EXPECT_TRUE(KuuraAddWipeRound(handle, KuuraFillType::ByteFill, false, "x"));
+
+		EXPECT_FALSE(KuuraRun(handle));
 		KuuraFree(handle);
 
 		EXPECT_EQ(counters.OnWipeStartedCount, 0);

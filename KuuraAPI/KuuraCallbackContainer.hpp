@@ -12,27 +12,40 @@ namespace Kuura
 
 		inline void OnWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass) const
 		{
-			WipeStartedCallback(Context, passes, bytesToWritePerPass);
+			if (WipeStartedCallback)
+			{
+				WipeStartedCallback(Context, passes, bytesToWritePerPass);
+			}
 		}
 
 		inline void OnPassStarted(const char* path, uint16_t pass) const
 		{
-			PassStartedCallback(Context, path, pass);
+			if (PassStartedCallback)
+			{
+				PassStartedCallback(Context, path, pass);
+			}
 		}
 
 		inline bool OnProgress(const char* path, uint16_t pass, uint64_t bytesWritten) const
 		{
-			return ProgressCallback(Context, path, pass, bytesWritten);
+			
+			return ProgressCallback ? ProgressCallback(Context, path, pass, bytesWritten) : true;
 		}
 
 		inline void OnPassCompleted(const char* path, uint16_t pass) const
 		{
-			PassCompletedCallback(Context, path, pass);
+			if (PassCompletedCallback)
+			{
+				PassCompletedCallback(Context, path, pass);
+			}
 		}
 
 		inline void OnWipeCompleted(uint16_t passes, uint64_t totalBytesWritten) const
 		{
-			WipeCompletedCallback(Context, passes, totalBytesWritten);
+			if (WipeCompletedCallback)
+			{
+				WipeCompletedCallback(Context, passes, totalBytesWritten);
+			}
 		}
 
 		inline void OnError(
@@ -42,7 +55,10 @@ namespace Kuura
 			uint64_t bytesWritten,
 			uint32_t errorCode) const
 		{
-			ErrorCallback(Context, path, stage, pass, bytesWritten, errorCode);
+			if (ErrorCallback)
+			{
+				ErrorCallback(Context, path, stage, pass, bytesWritten, errorCode);
+			}
 		}
 
 		void* Context = nullptr;

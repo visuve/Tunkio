@@ -3,8 +3,8 @@
 
 namespace Kuura
 {
-	IWorkload::IWorkload(const CallbackContainer& callbacks, const std::filesystem::path& path, bool remove) :
-		m_callbacks(callbacks),
+	IWorkload::IWorkload(const Composer* parent, const std::filesystem::path& path, bool remove) :
+		m_parent(parent),
 		m_path(path),
 		m_removeAfterWipe(remove)
 	{
@@ -12,24 +12,6 @@ namespace Kuura
 
 	IWorkload::~IWorkload()
 	{
-	}
-
-	uint16_t IWorkload::FillerCount() const
-	{
-		return static_cast<uint16_t>(m_fillers.size());
-	}
-
-	bool IWorkload::HasFillers() const
-	{
-		return !m_fillers.empty();
-	}
-
-	std::shared_ptr<IFillProvider> IWorkload::TakeFiller()
-	{
-		assert(HasFillers());
-		const auto next = m_fillers.front();
-		m_fillers.pop();
-		return next;
 	}
 
 	bool IWorkload::Fill(
@@ -54,7 +36,7 @@ namespace Kuura
 
 			if (!result.first)
 			{
-				m_callbacks.OnError(path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
+				m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
 				return false;
 			}
 
@@ -64,18 +46,18 @@ namespace Kuura
 
 				if (!actualData.first)
 				{
-					m_callbacks.OnError(path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 
 				if (!std::equal(writtenData.begin(), writtenData.end(), actualData.second.begin()))
 				{
-					m_callbacks.OnError(path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 			}
 
-			if (!m_callbacks.OnProgress(path.c_str(), pass, bytesWritten))
+			if (!m_parent->Callbacks.OnProgress(path.c_str(), pass, bytesWritten))
 			{
 				return true;
 			}

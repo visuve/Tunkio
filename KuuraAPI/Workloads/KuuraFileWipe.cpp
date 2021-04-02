@@ -6,10 +6,10 @@
 namespace Kuura
 {
 	FileWipe::FileWipe(
-		const CallbackContainer& callbacks,
+		const Composer* parent,
 		const std::filesystem::path& path,
 		bool removeAfterWipe) :
-		IWorkload(callbacks, path, removeAfterWipe)
+		IWorkload(parent, path, removeAfterWipe)
 	{
 	}
 
@@ -20,28 +20,29 @@ namespace Kuura
 
 		if (!file->IsValid())
 		{
-			m_callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
+			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
 		if (!file->Size())
 		{
-			m_callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
+			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		m_callbacks.OnWipeStarted(FillerCount(), file->Size().value());
+		auto fillers = m_parent->Fillers();
 
-		while (HasFillers())
+		m_parent->Callbacks.OnWipeStarted(static_cast<uint16_t>(fillers.size()), file->Size().value());
+
+		for (auto filler : fillers)
 		{
-			m_callbacks.OnPassStarted(path.c_str(), ++passes);
+			m_parent->Callbacks.OnPassStarted(path.c_str(), ++passes);
 
 			uint64_t bytesLeft = file->Size().value();
 			uint64_t bytesWritten = 0;
-			std::shared_ptr<IFillProvider> filler = TakeFiller();
 
 			if (!Fill(passes, bytesLeft, bytesWritten, filler, file))
 			{
@@ -50,18 +51,18 @@ namespace Kuura
 
 			if (!file->Flush())
 			{
-				m_callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+				m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 			}
 
 			totalBytesWritten += bytesWritten;
-			m_callbacks.OnPassCompleted(path.c_str(), passes);
+			m_parent->Callbacks.OnPassCompleted(path.c_str(), passes);
 		}
 
-		m_callbacks.OnWipeCompleted(passes, totalBytesWritten);
+		m_parent->Callbacks.OnWipeCompleted(passes, totalBytesWritten);
 
 		if (m_removeAfterWipe && !file->Delete())
 		{
-			m_callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 

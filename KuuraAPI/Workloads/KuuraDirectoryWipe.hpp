@@ -9,7 +9,7 @@ namespace Kuura
 	{
 	public:
 		DirectoryWipe(
-			const CallbackContainer& callbacks,
+			const Composer* parent,
 			const std::filesystem::path& path,
 			bool removeAfterWipe);
 

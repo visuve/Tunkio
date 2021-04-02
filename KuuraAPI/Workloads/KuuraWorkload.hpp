@@ -1,19 +1,17 @@
 #pragma once
 
 #include "../KuuraAPI.h"
-#include "../KuuraCallbackContainer.hpp"
+#include "../KuuraComposer.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 #include "../FillConsumers/KuuraFillConsumer.hpp"
 
 namespace Kuura
 {
-	
-
 	class IWorkload
 	{
 	public:
 		IWorkload(
-			const CallbackContainer& callbacks,
+			const Composer* parent,
 			const std::filesystem::path& path,
 			bool removeAfterWipe);
 
@@ -23,20 +21,7 @@ namespace Kuura
 
 		bool VerifyPass = false;
 
-		template <typename T>
-		void AddFiller(T&& provider)
-		{
-			m_fillers.emplace(provider);
-		}
-
-		uint16_t FillerCount() const;
-		bool HasFillers() const;
-
 	protected:
-		std::shared_ptr<IFillProvider> TakeFiller();
-
-
-
 		const std::filesystem::path m_path;
 		const bool m_removeAfterWipe = false;
 
@@ -47,7 +32,7 @@ namespace Kuura
 			std::shared_ptr<IFillProvider> filler,
 			std::shared_ptr<IFillConsumer> fillable);
 
-		const CallbackContainer& m_callbacks;
+		const Composer* m_parent;
 
 	private:
 		std::queue<std::shared_ptr<IFillProvider>> m_fillers;

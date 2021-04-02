@@ -2,7 +2,7 @@
 
 - Wipes files, folders or drives
 - Originally written during the small hours of a boring night
-	- Since then it has bloated a bit
+	- Since then it has bloated a bit...
 
 ## Folders
 
@@ -37,15 +37,10 @@
 
 ## Developer TODO
 
-- The GUI is still somewhat flaky:
-	- The GUI is not always updated when onProgress is emitted
-	- The code needs cleaning up too
+- Known bug: if file has no allocation size e.g. lies within MFT, the overwrite will fail
+- Clarify the usage of words wipe, overwrite and pass within the code
 - Complement fill option
 	Complements the disk contents
-- Verifications
-	- Char-by-char for charfiller
-	- Sentence-by-sentece for file & sentence fillers
-	- SHA-256 for random
 
 ## Further reading notes:
 

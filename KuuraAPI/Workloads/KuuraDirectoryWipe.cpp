@@ -6,10 +6,10 @@
 namespace Kuura
 {
 	DirectoryWipe::DirectoryWipe(
-		const CallbackContainer& callbacks,
+		const Composer* parent,
 		const std::filesystem::path& path,
 		bool removeAfterWipe) :
-		IWorkload(callbacks, path, removeAfterWipe)
+		IWorkload(parent, path, removeAfterWipe)
 	{
 	}
 
@@ -22,7 +22,7 @@ namespace Kuura
 
 		if (!files)
 		{
-			m_callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
+			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
@@ -30,20 +30,19 @@ namespace Kuura
 
 		if (!directorySize)
 		{
-			m_callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
+			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		m_callbacks.OnWipeStarted(FillerCount(), directorySize.value());
+		auto fillers  = m_parent->Fillers();
+		m_parent->Callbacks.OnWipeStarted(static_cast<uint16_t>(fillers.size()), directorySize.value());
 
-		while (HasFillers())
+		for (auto& filler : fillers)
 		{
-			m_callbacks.OnPassStarted(path.c_str(), ++passes);
-
-			std::shared_ptr<IFillProvider> filler = TakeFiller();
+			m_parent->Callbacks.OnPassStarted(path.c_str(), ++passes);
 
 			for (auto& file : files.value())
 			{
@@ -57,22 +56,22 @@ namespace Kuura
 
 				if (!file->Flush())
 				{
-					m_callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+					m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 				}
 
 				totalBytesWritten += bytesWritten;
 			}
 
-			m_callbacks.OnPassCompleted(path.c_str(), passes);
+			m_parent->Callbacks.OnPassCompleted(path.c_str(), passes);
 		}
 
 		if (m_removeAfterWipe && !directory.RemoveAll())
 		{
-			m_callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 
-		m_callbacks.OnWipeCompleted(passes, totalBytesWritten);
+		m_parent->Callbacks.OnWipeCompleted(passes, totalBytesWritten);
 		return true;
 	}
 }

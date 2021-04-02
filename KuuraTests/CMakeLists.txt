@@ -4,6 +4,7 @@ file(GLOB KuuraTestsSource
 	"*.cpp"
 	"TestListeners/*.cpp"
 	"../KuuraAPI/KuuraAPI.cpp"
+	"../KuuraAPI/KuuraComposer.cpp"
 	"../KuuraAPI/FillProviders/*.cpp"
 	"../KuuraAPI/Workloads/*.cpp"
 	"../KuuraLIB/*.cpp"
