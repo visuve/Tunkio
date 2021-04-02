@@ -6,6 +6,17 @@ namespace Kuura
 {
 	CLI g_cli;
 
+	std::map<std::string, Argument> Arguments =
+	{
+		{ "path", Argument(true, std::filesystem::path()) },
+		{ "target", Argument(false, KuuraTargetType::FileWipe) },
+		{ "mode", Argument(false, KuuraFillType::ZeroFill) },
+		{ "filler", Argument(false, std::string()) },
+		{ "verify", Argument(false, false) },
+		{ "remove", Argument(false, false) },
+		{ "prompt", Argument(false, true) }
+	};
+
 	void SignalHandler(int signal)
 	{
 		std::cout << "Got signal: " << signal << std::endl;
@@ -31,6 +42,12 @@ namespace Kuura
 
 		std::cout << "  --filler=[character|string|filepath] "
 			<< "required when --mode is c, s or f." << std::endl;
+
+		std::cout << "  --verify=[y|n] "
+			<< "verify overwritten data. Default=no" << std::endl;
+
+		std::cout << "  --prompt=[y|n] "
+			<< "prompt before beginning overwrite. Default=yes" << std::endl;
 
 		std::cout << std::endl;
 		std::cout << " Usage examples:" << std::endl << std::endl;
@@ -98,22 +115,18 @@ namespace Kuura
 			std::accumulate(args.cbegin(), args.cend(), std::string(), accumulator);
 
 		std::cout << "Provided arguments: " << joined << std::endl;
+
+		if (!Arguments.at("prompt").Value<bool>())
+		{
+			return true;
+		}
+
 		std::cout << "Are you sure you want to continue? [y/n]" << std::endl;
 
 		const int prompt = getchar();
 		std::cout << std::endl;
 		return prompt == 'y' || prompt == 'Y';
 	}
-
-	std::map<std::string, Argument> Arguments =
-	{
-		{ "path", Argument(true, std::filesystem::path()) },
-		{ "target", Argument(false, KuuraTargetType::FileWipe) },
-		{ "mode", Argument(false, KuuraFillType::ZeroFill) },
-		{ "filler", Argument(false, std::string()) },
-		{ "verify", Argument(false, false) },
-		{ "remove", Argument(false, false) }
-	};
 
 	bool CheckArguments()
 	{
