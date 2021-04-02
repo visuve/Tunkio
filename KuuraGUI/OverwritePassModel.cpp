@@ -1,5 +1,5 @@
 #include "KuuraGUI-PCH.hpp"
-#include "WipePassModel.hpp"
+#include "OverwritePassModel.hpp"
 
 namespace Ui
 {
@@ -33,7 +33,7 @@ namespace Ui
 		return "Unknown?";
 	}
 
-	QVariant fillValue(const WipePassModel::Pass& pass)
+	QVariant fillValue(const OverwritePassModel::Pass& pass)
 	{
 		switch (pass.fillType)
 		{
@@ -46,17 +46,17 @@ namespace Ui
 		}
 	}
 
-	QVariant bytesWritten(const WipePassModel::Pass& pass)
+	QVariant bytesWritten(const OverwritePassModel::Pass& pass)
 	{
 		return SystemLocale.formattedDataSize(pass.bytesWritten);
 	}
 
-	QVariant bytesLeft(const WipePassModel::Pass& pass)
+	QVariant bytesLeft(const OverwritePassModel::Pass& pass)
 	{
 		return SystemLocale.formattedDataSize(pass.bytesToWrite - pass.bytesWritten);
 	}
 
-	QVariant speedToString(const WipePassModel::Pass& pass)
+	QVariant speedToString(const OverwritePassModel::Pass& pass)
 	{
 		int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
 
@@ -69,7 +69,7 @@ namespace Ui
 		return SystemLocale.formattedDataSize(bytesPerSecond).append("/s");
 	}
 
-	QVariant timeTaken(const WipePassModel::Pass& pass)
+	QVariant timeTaken(const OverwritePassModel::Pass& pass)
 	{
 		int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
 
@@ -82,7 +82,7 @@ namespace Ui
 		return SystemLocale.toString(timeLeft, QLocale::LongFormat);
 	}
 
-	QVariant timeLeft(const WipePassModel::Pass& pass)
+	QVariant timeLeft(const OverwritePassModel::Pass& pass)
 	{
 		int64_t milliSecondsTaken = pass.start.msecsTo(pass.time);
 
@@ -99,7 +99,7 @@ namespace Ui
 		return SystemLocale.toString(timeLeft, QLocale::LongFormat);
 	}
 
-	float progressPercent(const WipePassModel::Pass& pass)
+	float progressPercent(const OverwritePassModel::Pass& pass)
 	{
 		if (pass.bytesWritten <= 0)
 		{
@@ -115,27 +115,27 @@ namespace Ui
 	}
 }
 
-WipePassModel::WipePassModel(QObject* parent) :
+OverwritePassModel::OverwritePassModel(QObject* parent) :
 	QAbstractTableModel(parent)
 {
 }
 
-WipePassModel::~WipePassModel()
+OverwritePassModel::~OverwritePassModel()
 {
 	m_passes.clear();
 }
 
-int WipePassModel::rowCount(const QModelIndex& /*parent*/) const
+int OverwritePassModel::rowCount(const QModelIndex& /*parent*/) const
 {
 	return m_passes.count();
 }
 
-int WipePassModel::columnCount(const QModelIndex&) const
+int OverwritePassModel::columnCount(const QModelIndex&) const
 {
 	return 9;
 }
 
-QVariant WipePassModel::data(const QModelIndex& index, int role) const
+QVariant OverwritePassModel::data(const QModelIndex& index, int role) const
 {
 	if (role == Qt::DisplayRole)
 	{
@@ -213,7 +213,7 @@ QVariant WipePassModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
-bool WipePassModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool OverwritePassModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (role == Qt::EditRole)
 	{
@@ -240,7 +240,7 @@ bool WipePassModel::setData(const QModelIndex& index, const QVariant& value, int
 	return false;
 }
 
-QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant OverwritePassModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role == Qt::DisplayRole)
 	{
@@ -280,7 +280,7 @@ QVariant WipePassModel::headerData(int section, Qt::Orientation orientation, int
 	return QVariant();
 }
 
-void WipePassModel::addPass(KuuraFillType fillType, bool verify, const QByteArray& fillValue)
+void OverwritePassModel::addPass(KuuraFillType fillType, bool verify, const QByteArray& fillValue)
 {
 	int row = static_cast<int>(m_passes.size());
 	beginInsertRows(QModelIndex(), row, row);
@@ -323,17 +323,17 @@ void WipePassModel::addPass(KuuraFillType fillType, bool verify, const QByteArra
 	endInsertRows();
 }
 
-bool WipePassModel::isEmpty() const
+bool OverwritePassModel::isEmpty() const
 {
 	return m_passes.isEmpty();
 }
 
-const QList<WipePassModel::Pass>& WipePassModel::passes() const
+const QList<OverwritePassModel::Pass>& OverwritePassModel::passes() const
 {
 	return m_passes;
 }
 
-void WipePassModel::clearStats()
+void OverwritePassModel::clearStats()
 {
 	for (Pass& pass : m_passes)
 	{
@@ -344,7 +344,7 @@ void WipePassModel::clearStats()
 	}
 }
 
-void WipePassModel::clearPasses()
+void OverwritePassModel::clearPasses()
 {
 	if (!m_passes.isEmpty())
 	{
@@ -354,7 +354,7 @@ void WipePassModel::clearPasses()
 	}
 }
 
-void WipePassModel::removePass(int row)
+void OverwritePassModel::removePass(int row)
 {
 	Q_ASSERT(row < m_passes.size());
 	beginRemoveRows(QModelIndex(), row, row);
@@ -362,7 +362,7 @@ void WipePassModel::removePass(int row)
 	endRemoveRows();
 }
 
-void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)
+void OverwritePassModel::onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
 	Q_ASSERT(passes == m_passes.size());
 
@@ -371,11 +371,11 @@ void WipePassModel::onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 		pass.bytesToWrite = bytesToWritePerPass;
 	}
 
-	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+	qDebug() << "Overwrite started:" << passes << '/' << bytesToWritePerPass;
 }
 
 
-void WipePassModel::onPassStarted(const std::filesystem::path& path, uint16_t pass)
+void OverwritePassModel::onPassStarted(const std::filesystem::path& path, uint16_t pass)
 {
 	rowData(pass).start = QTime::currentTime();
 	updateRow(pass);
@@ -383,7 +383,7 @@ void WipePassModel::onPassStarted(const std::filesystem::path& path, uint16_t pa
 	qDebug() << "Pass started:" << path << pass;
 }
 
-void WipePassModel::onPassProgressed(const std::filesystem::path&, uint16_t pass, uint64_t bytesWritten)
+void OverwritePassModel::onPassProgressed(const std::filesystem::path&, uint16_t pass, uint64_t bytesWritten)
 {
 	Pass& current = rowData(pass);
 	current.bytesWritten = bytesWritten;
@@ -391,7 +391,7 @@ void WipePassModel::onPassProgressed(const std::filesystem::path&, uint16_t pass
 	updateRow(pass);
 }
 
-void WipePassModel::onPassFinished(const std::filesystem::path& path, uint16_t pass)
+void OverwritePassModel::onPassFinished(const std::filesystem::path& path, uint16_t pass)
 {
 	rowData(pass).time = QTime::currentTime();
 	updateRow(pass);
@@ -399,20 +399,20 @@ void WipePassModel::onPassFinished(const std::filesystem::path& path, uint16_t p
 	qDebug() << "Pass finished:" << path << pass;
 }
 
-void WipePassModel::onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten)
+void OverwritePassModel::onOverwriteCompleted(uint16_t pass, uint64_t totalBytesWritten)
 {
 	Q_ASSERT(pass <= m_passes.size());
-	qDebug() << "Wipe finished:" << pass << '/' << totalBytesWritten;
+	qDebug() << "Overwrite finished:" << pass << '/' << totalBytesWritten;
 }
 
-WipePassModel::Pass& WipePassModel::rowData(uint16_t pass)
+OverwritePassModel::Pass& OverwritePassModel::rowData(uint16_t pass)
 {
 	Q_ASSERT(pass <= m_passes.size());
 	int row = pass - 1;
 	return m_passes[row];
 }
 
-void WipePassModel::updateRow(uint16_t pass)
+void OverwritePassModel::updateRow(uint16_t pass)
 {
 	int row = pass - 1;
 	const QModelIndex topLeft = index(row, 3);

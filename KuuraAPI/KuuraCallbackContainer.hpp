@@ -10,11 +10,11 @@ namespace Kuura
 		{
 		}
 
-		inline void OnWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass) const
+		inline void OnOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass) const
 		{
-			if (WipeStartedCallback)
+			if (OverwriteStartedCallback)
 			{
-				WipeStartedCallback(Context, passes, bytesToWritePerPass);
+				OverwriteStartedCallback(Context, passes, bytesToWritePerPass);
 			}
 		}
 
@@ -40,11 +40,11 @@ namespace Kuura
 			}
 		}
 
-		inline void OnWipeCompleted(uint16_t passes, uint64_t totalBytesWritten) const
+		inline void OnOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritten) const
 		{
-			if (WipeCompletedCallback)
+			if (OverwriteCompletedCallback)
 			{
-				WipeCompletedCallback(Context, passes, totalBytesWritten);
+				OverwriteCompletedCallback(Context, passes, totalBytesWritten);
 			}
 		}
 
@@ -62,11 +62,11 @@ namespace Kuura
 		}
 
 		void* Context = nullptr;
-		KuuraWipeStartedCallback* WipeStartedCallback = nullptr;
+		KuuraOverwriteStartedCallback* OverwriteStartedCallback = nullptr;
 		KuuraPassStartedCallback* PassStartedCallback = nullptr;
 		KuuraProgressCallback* ProgressCallback = nullptr;
 		KuuraPassCompletedCallback* PassCompletedCallback = nullptr;
-		KuuraWipeCompletedCallback* WipeCompletedCallback = nullptr;
+		KuuraOverwriteCompletedCallback* OverwriteCompletedCallback = nullptr;
 		KuuraErrorCallback* ErrorCallback = nullptr;
 	};
 }

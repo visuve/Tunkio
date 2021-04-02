@@ -6,7 +6,7 @@ namespace Kuura
 	IWorkload::IWorkload(const Composer* parent, const std::filesystem::path& path, bool remove) :
 		m_parent(parent),
 		m_path(path),
-		m_removeAfterWipe(remove)
+		m_removeAfterOverwrite(remove)
 	{
 	}
 

@@ -5,13 +5,13 @@
 
 namespace Kuura
 {
-	class FileWipe : public IWorkload
+	class FileOverwrite : public IWorkload
 	{
 	public:
-		FileWipe(
+		FileOverwrite(
 			const Composer* parent,
 			const std::filesystem::path& path,
-			bool removeAfterWipe);
+			bool removeAfterOverwrite);
 
 		bool Run() override;
 	};

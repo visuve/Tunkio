@@ -9,7 +9,7 @@ namespace Kuura
 	std::map<std::string, Argument> Arguments =
 	{
 		{ "path", Argument(true, std::filesystem::path()) },
-		{ "target", Argument(false, KuuraTargetType::FileWipe) },
+		{ "target", Argument(false, KuuraTargetType::FileOverwrite) },
 		{ "mode", Argument(false, KuuraFillType::ZeroFill) },
 		{ "filler", Argument(false, std::string()) },
 		{ "verify", Argument(false, false) },

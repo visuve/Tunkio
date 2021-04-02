@@ -1,16 +1,16 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "KuuraDriveWipe.hpp"
+#include "KuuraDriveOverwrite.hpp"
 #include "../FillConsumers/KuuraDrive.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
 {
-	DriveWipe::DriveWipe(const Composer* parent, const std::filesystem::path& path) :
-		FileWipe(parent, path, false)
+	DriveOverwrite::DriveOverwrite(const Composer* parent, const std::filesystem::path& path) :
+		FileOverwrite(parent, path, false)
 	{
 	}
 
-	bool DriveWipe::Run()
+	bool DriveOverwrite::Run()
 	{
 		auto drive = std::make_shared<Drive>(m_path);
 
@@ -37,7 +37,7 @@ namespace Kuura
 		uint64_t totalBytesWritten = 0;
 
 		auto fillers = m_parent->Fillers();
-		m_parent->Callbacks.OnWipeStarted(static_cast<uint16_t>(fillers.size()), drive->Size().value());
+		m_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), drive->Size().value());
 
 		for (auto& filler : fillers)
 		{
@@ -55,7 +55,7 @@ namespace Kuura
 			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
 		}
 
-		m_parent->Callbacks.OnWipeCompleted(passes, totalBytesWritten);
+		m_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
 
 		return true;
 	}

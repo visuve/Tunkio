@@ -1,6 +1,6 @@
 #pragma once
 
-#include "WipePassModel.hpp"
+#include "OverwritePassModel.hpp"
 #include "KuuraRunner.hpp"
 #include "TextEditorDialog.hpp"
 
@@ -31,13 +31,13 @@ private slots:
 	void removePass();
 	void clearPasses();
 	void onAbout();
-	void startWipe();
+	void startOverwrite();
 	void onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
-	void onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten);
+	void onOverwriteCompleted(uint16_t pass, uint64_t totalBytesWritten);
 
 private:
 	Ui::MainWindow* ui = nullptr;
-	WipePassModel* m_model = nullptr;
+	OverwritePassModel* m_model = nullptr;
 	TextEditorDialog* m_textEditDialog = nullptr;
 	std::shared_ptr<KuuraRunner> m_kuura;
 };

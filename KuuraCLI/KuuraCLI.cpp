@@ -29,19 +29,19 @@ namespace Kuura
 			return false;
 		}
 
-		if (!KuuraAddWipeRound(m_handle, fillType, verify, filler.c_str()))
+		if (!KuuraAddOverwriteRound(m_handle, fillType, verify, filler.c_str()))
 		{
-			std::cerr << "KuuraAddWipeRound failed!" << std::endl;
+			std::cerr << "KuuraAddOverwriteRound failed!" << std::endl;
 			return false;
 		}
 
-		KuuraSetWipeStartedCallback(m_handle, [](
+		KuuraSetOverwriteStartedCallback(m_handle, [](
 			void* context,
 			uint16_t passes,
 			uint64_t bytesToWritePerPass)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
-			self->OnWipeStarted(passes, bytesToWritePerPass);
+			self->OnOverwriteStarted(passes, bytesToWritePerPass);
 		});
 
 		KuuraSetPassStartedCallback(m_handle, [](
@@ -72,13 +72,13 @@ namespace Kuura
 			self->OnPassCompleted(path, pass);
 		});
 
-		KuuraSetWipeCompletedCallback(m_handle, [](
+		KuuraSetOverwriteCompletedCallback(m_handle, [](
 			void* context,
 			uint16_t passes,
 			uint64_t totalBytesWritten)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
-			self->OnWipeCompleted(passes, totalBytesWritten);
+			self->OnOverwriteCompleted(passes, totalBytesWritten);
 		});
 
 		KuuraSetErrorCallback(m_handle, [](
@@ -111,12 +111,12 @@ namespace Kuura
 		return m_error;
 	}
 
-	void CLI::OnWipeStarted(uint16_t passes, uint64_t bytesLeft)
+	void CLI::OnOverwriteStarted(uint16_t passes, uint64_t bytesLeft)
 	{
 		m_bytesToWrite = bytesLeft;
 		m_bytesWrittenLastTime = 0;
 
-		std::cout << Time::Timestamp() << " Wipe Started! Passes " << passes << '.' << std::endl;
+		std::cout << Time::Timestamp() << " Overwrite Started! Passes " << passes << '.' << std::endl;
 	}
 
 	void CLI::OnPassStarted(const std::filesystem::path&, uint16_t pass)
@@ -191,9 +191,9 @@ namespace Kuura
 		m_error = error;
 	}
 
-	void CLI::OnWipeCompleted(uint16_t passes, uint64_t bytesWritten)
+	void CLI::OnOverwriteCompleted(uint16_t passes, uint64_t bytesWritten)
 	{
-		std::cout << Time::Timestamp() << " Wipe complete. " <<
+		std::cout << Time::Timestamp() << " Overwrite complete. " <<
 			"Passes "  << passes <<  ". Bytes written: " << bytesWritten << std::endl;
 
 		const DataUnit::Bytes bytes(bytesWritten);

@@ -1,19 +1,19 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "KuuraDirectoryWipe.hpp"
+#include "KuuraDirectoryOverwrite.hpp"
 #include "../FillConsumers/KuuraDirectory.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
 {
-	DirectoryWipe::DirectoryWipe(
+	DirectoryOverwrite::DirectoryOverwrite(
 		const Composer* parent,
 		const std::filesystem::path& path,
-		bool removeAfterWipe) :
-		IWorkload(parent, path, removeAfterWipe)
+		bool removeAfterOverwrite) :
+		IWorkload(parent, path, removeAfterOverwrite)
 	{
 	}
 
-	bool DirectoryWipe::Run()
+	bool DirectoryOverwrite::Run()
 	{
 		Directory directory(m_path);
 
@@ -37,7 +37,7 @@ namespace Kuura
 		uint64_t totalBytesWritten = 0;
 
 		auto fillers  = m_parent->Fillers();
-		m_parent->Callbacks.OnWipeStarted(static_cast<uint16_t>(fillers.size()), directorySize.value());
+		m_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), directorySize.value());
 
 		for (auto& filler : fillers)
 		{
@@ -64,13 +64,13 @@ namespace Kuura
 			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
 		}
 
-		if (m_removeAfterWipe && !directory.RemoveAll())
+		if (m_removeAfterOverwrite && !directory.RemoveAll())
 		{
 			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 
-		m_parent->Callbacks.OnWipeCompleted(passes, totalBytesWritten);
+		m_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
 		return true;
 	}
 }

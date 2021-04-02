@@ -8,9 +8,9 @@
 #include "FillProviders/KuuraRandomFiller.hpp"
 
 #include "Workloads/KuuraWorkload.hpp"
-#include "Workloads/KuuraFileWipe.hpp"
-#include "Workloads/KuuraDirectoryWipe.hpp"
-#include "Workloads/KuuraDriveWipe.hpp"
+#include "Workloads/KuuraFileOverwrite.hpp"
+#include "Workloads/KuuraDirectoryOverwrite.hpp"
+#include "Workloads/KuuraDriveOverwrite.hpp"
 
 namespace Kuura
 {
@@ -34,28 +34,28 @@ namespace Kuura
 	{
 	}
 
-	bool Composer::AddWorkload(const std::filesystem::path& path, KuuraTargetType type, bool removeAfterWipe)
+	bool Composer::AddWorkload(const std::filesystem::path& path, KuuraTargetType type, bool removeAfterOverwrite)
 	{
 		switch (type)
 		{
-			case KuuraTargetType::FileWipe:
+			case KuuraTargetType::FileOverwrite:
 			{
-				m_workloads.emplace_back(new Kuura::FileWipe(this, path, removeAfterWipe));
+				m_workloads.emplace_back(new Kuura::FileOverwrite(this, path, removeAfterOverwrite));
 				return true;
 			}
-			case KuuraTargetType::DirectoryWipe:
+			case KuuraTargetType::DirectoryOverwrite:
 			{
-				m_workloads.emplace_back(new Kuura::DirectoryWipe(this, path, removeAfterWipe));
+				m_workloads.emplace_back(new Kuura::DirectoryOverwrite(this, path, removeAfterOverwrite));
 				return true;
 			}
-			case KuuraTargetType::DriveWipe:
+			case KuuraTargetType::DriveOverwrite:
 			{
-				if (removeAfterWipe)
+				if (removeAfterOverwrite)
 				{
 					return false;
 				}
 
-				m_workloads.emplace_back(new Kuura::DriveWipe(this, path));
+				m_workloads.emplace_back(new Kuura::DriveOverwrite(this, path));
 				return true;
 			}
 		}

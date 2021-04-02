@@ -28,7 +28,7 @@ bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 	struct KuuraHandle* handle,
 	const KuuraChar* path,
 	enum KuuraTargetType type,
-	bool removeAfterWipe)
+	bool removeAfterOverwrite)
 {
 	if (!path)
 	{
@@ -42,10 +42,10 @@ bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 		return false;
 	}
 
-	return instance->AddWorkload(path, type, removeAfterWipe);
+	return instance->AddWorkload(path, type, removeAfterOverwrite);
 }
 
-bool KUURA_CALLING_CONVENTION KuuraAddWipeRound(
+bool KUURA_CALLING_CONVENTION KuuraAddOverwriteRound(
 	struct KuuraHandle* handle,
 	KuuraFillType type,
 	bool verify,
@@ -61,11 +61,11 @@ bool KUURA_CALLING_CONVENTION KuuraAddWipeRound(
 	return instance->AddFiller(type, verify, optional);
 }
 
-void KUURA_CALLING_CONVENTION KuuraSetWipeStartedCallback(
+void KUURA_CALLING_CONVENTION KuuraSetOverwriteStartedCallback(
 	KuuraHandle* handle,
-	KuuraWipeStartedCallback* callback)
+	KuuraOverwriteStartedCallback* callback)
 {
-	Set(handle, &Kuura::CallbackContainer::WipeStartedCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::OverwriteStartedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetPassStartedCallback(
@@ -89,11 +89,11 @@ void KUURA_CALLING_CONVENTION KuuraSetPassCompletedCallback(
 	Set(handle, &Kuura::CallbackContainer::PassCompletedCallback, callback);
 }
 
-void KUURA_CALLING_CONVENTION KuuraSetWipeCompletedCallback(
+void KUURA_CALLING_CONVENTION KuuraSetOverwriteCompletedCallback(
 	KuuraHandle* handle,
-	KuuraWipeCompletedCallback* callback)
+	KuuraOverwriteCompletedCallback* callback)
 {
-	Set(handle, &Kuura::CallbackContainer::WipeCompletedCallback, callback);
+	Set(handle, &Kuura::CallbackContainer::OverwriteCompletedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetErrorCallback(

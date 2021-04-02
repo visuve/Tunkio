@@ -23,12 +23,12 @@ namespace Kuura
 		void Stop();
 		int32_t Error() const;
 
-		void OnWipeStarted(uint16_t passes, uint64_t bytesLeft);
+		void OnOverwriteStarted(uint16_t passes, uint64_t bytesLeft);
 		void OnPassStarted(const std::filesystem::path& path, uint16_t pass);
 		bool OnProgress(const std::filesystem::path&, uint16_t pass, uint64_t bytesWritten);
 		void OnPassCompleted(const std::filesystem::path& path, uint16_t pass);
 		void OnError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t error);
-		void OnWipeCompleted(uint16_t passes, uint64_t bytesWritten);
+		void OnOverwriteCompleted(uint16_t passes, uint64_t bytesWritten);
 
 	private:
 		std::atomic<bool> m_keepRunning = true;

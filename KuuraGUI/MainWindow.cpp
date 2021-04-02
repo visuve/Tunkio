@@ -36,17 +36,17 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	initMenu();
 
-	m_model = new WipePassModel(this);
-	ui->tableViewWipePasses->setModel(m_model);
-	ui->tableViewWipePasses->setItemDelegateForColumn(8, new ProgressBarDelegate(this));
+	m_model = new OverwritePassModel(this);
+	ui->tableViewOverwritePasses->setModel(m_model);
+	ui->tableViewOverwritePasses->setItemDelegateForColumn(8, new ProgressBarDelegate(this));
 
 	connect(ui->pushButtonAddPass, &QPushButton::clicked, this, &MainWindow::addPass);
 	connect(ui->pushButtonRemovePass, &QPushButton::clicked, this, &MainWindow::removePass);
 	connect(ui->pushButtonClearPasses, &QPushButton::clicked, this, &MainWindow::clearPasses);
-	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startWipe);
+	connect(ui->pushButtonStart, &QPushButton::clicked, this, &MainWindow::startOverwrite);
 
 	connect(
-		ui->tableViewWipePasses->selectionModel(),
+		ui->tableViewOverwritePasses->selectionModel(),
 		&QItemSelectionModel::selectionChanged,
 		[this](const QItemSelection& selected, const QItemSelection&)
 	{
@@ -290,7 +290,7 @@ void MainWindow::onOpenFileDialog()
 		m_kuura = std::make_shared<KuuraRunner>();
 		bool result = m_kuura->addTarget(
 			file.toStdString(),
-			KuuraTargetType::FileWipe,
+			KuuraTargetType::FileOverwrite,
 			ui->checkBoxDelete->isChecked());
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
 		ui->groupBoxPathSelect->setEnabled(false);
@@ -313,7 +313,7 @@ void MainWindow::onOpenDirectoryDialog()
 		m_kuura = std::make_shared<KuuraRunner>();
 		bool result = m_kuura->addTarget(
 			directory.toStdString(),
-			KuuraTargetType::DirectoryWipe,
+			KuuraTargetType::DirectoryOverwrite,
 			ui->checkBoxDelete->isChecked());
 
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
@@ -335,7 +335,7 @@ void MainWindow::onOpenDriveDialog()
 		m_kuura = std::make_shared<KuuraRunner>();
 		bool result = m_kuura->addTarget(
 			drive.toStdString(),
-			KuuraTargetType::DriveWipe,
+			KuuraTargetType::DriveOverwrite,
 			false);
 
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
@@ -443,7 +443,7 @@ void MainWindow::removePass()
 {
 	Q_ASSERT(!m_model->isEmpty());
 
-	for (const QModelIndex& selected : ui->tableViewWipePasses->selectionModel()->selectedRows())
+	for (const QModelIndex& selected : ui->tableViewOverwritePasses->selectionModel()->selectedRows())
 	{
 		m_model->removePass(selected.row());
 	}
@@ -478,7 +478,7 @@ void MainWindow::onAbout()
 	QMessageBox::about(this, "Kuura", text.join('\n'));
 }
 
-void MainWindow::startWipe()
+void MainWindow::startOverwrite()
 {
 	Q_ASSERT(m_kuura.get());
 	Q_ASSERT(!m_kuura->isRunning());
@@ -486,7 +486,7 @@ void MainWindow::startWipe()
 
 	m_model->clearStats();
 
-	for (const WipePassModel::Pass& pass : m_model->passes())
+	for (const OverwritePassModel::Pass& pass : m_model->passes())
 	{
 		if (!m_kuura->addPass(pass.fillType, pass.fillValue, pass.verify))
 		{
@@ -503,12 +503,12 @@ void MainWindow::startWipe()
 	ui->pushButtonCancel->setEnabled(true);
 	ui->groupBoxAddPass->setEnabled(false);
 
-	connect(m_kuura.get(), &KuuraRunner::wipeStarted, m_model, &WipePassModel::onWipeStarted);
-	connect(m_kuura.get(), &KuuraRunner::passStarted, m_model, &WipePassModel::onPassStarted);
-	connect(m_kuura.get(), &KuuraRunner::passProgressed, m_model, &WipePassModel::onPassProgressed);
-	connect(m_kuura.get(), &KuuraRunner::passFinished, m_model, &WipePassModel::onPassFinished);
-	connect(m_kuura.get(), &KuuraRunner::wipeCompleted, m_model, &WipePassModel::onWipeCompleted);
-	connect(m_kuura.get(), &KuuraRunner::wipeCompleted, this, &MainWindow::onWipeCompleted);
+	connect(m_kuura.get(), &KuuraRunner::wipeStarted, m_model, &OverwritePassModel::onOverwriteStarted);
+	connect(m_kuura.get(), &KuuraRunner::passStarted, m_model, &OverwritePassModel::onPassStarted);
+	connect(m_kuura.get(), &KuuraRunner::passProgressed, m_model, &OverwritePassModel::onPassProgressed);
+	connect(m_kuura.get(), &KuuraRunner::passFinished, m_model, &OverwritePassModel::onPassFinished);
+	connect(m_kuura.get(), &KuuraRunner::wipeCompleted, m_model, &OverwritePassModel::onOverwriteCompleted);
+	connect(m_kuura.get(), &KuuraRunner::wipeCompleted, this, &MainWindow::onOverwriteCompleted);
 	connect(m_kuura.get(), &KuuraRunner::errorOccurred, this, &MainWindow::onError);
 
 	connect(ui->pushButtonCancel, &QPushButton::clicked, m_kuura.get(), &KuuraRunner::stop);
@@ -532,7 +532,7 @@ void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, ui
 	ui->groupBoxAddPass->setEnabled(true);
 }
 
-void MainWindow::onWipeCompleted(uint16_t, uint64_t)
+void MainWindow::onOverwriteCompleted(uint16_t, uint64_t)
 {
 	ui->pushButtonStart->setEnabled(true);
 	ui->pushButtonCancel->setEnabled(false);

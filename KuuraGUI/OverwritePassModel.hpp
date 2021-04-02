@@ -10,12 +10,12 @@ namespace Ui
 	QString fillTypeToString(KuuraFillType type);
 }
 
-class WipePassModel : public QAbstractTableModel
+class OverwritePassModel : public QAbstractTableModel
 {
 	Q_OBJECT
 public:
-	explicit WipePassModel(QObject* parent = nullptr);
-	~WipePassModel();
+	explicit OverwritePassModel(QObject* parent = nullptr);
+	~OverwritePassModel();
 
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -47,11 +47,11 @@ public slots:
 	void addPass(KuuraFillType fillType, bool verify, const QByteArray& fillValue = {});
 	void removePass(int row);
 
-	void onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
+	void onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass);
 	void onPassStarted(const std::filesystem::path& path, uint16_t pass);
 	void onPassProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten);
 	void onPassFinished(const std::filesystem::path& path, uint16_t pass);
-	void onWipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
+	void onOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritten);
 
 private:
 	Pass& rowData(uint16_t pass);

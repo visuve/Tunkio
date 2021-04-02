@@ -1,6 +1,6 @@
 # Kuura
 
-- Wipes files, folders or drives
+- Overwrites files, folders or drives
 - Originally written during the small hours of a boring night
 	- Since then it has bloated a bit...
 

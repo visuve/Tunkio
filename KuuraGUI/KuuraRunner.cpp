@@ -38,15 +38,15 @@ bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, b
 		case KuuraFillType::ZeroFill:
 		case KuuraFillType::OneFill:
 		case KuuraFillType::RandomFill:
-			return KuuraAddWipeRound(m_kuura, fillType, verify, nullptr);
+			return KuuraAddOverwriteRound(m_kuura, fillType, verify, nullptr);
 		case KuuraFillType::ByteFill:
 		{
 			char character[] = { sequence[0], '\0' };
-			return KuuraAddWipeRound(m_kuura, fillType, verify, character);
+			return KuuraAddOverwriteRound(m_kuura, fillType, verify, character);
 		}
 		case KuuraFillType::SequenceFill:
 		case KuuraFillType::FileFill:
-			return KuuraAddWipeRound(m_kuura, fillType, verify, sequence.c_str());
+			return KuuraAddOverwriteRound(m_kuura, fillType, verify, sequence.c_str());
 	}
 
 	return false;
@@ -65,7 +65,7 @@ void KuuraRunner::attachCallbacks()
 		return;
 	}
 
-	KuuraSetWipeStartedCallback(m_kuura, [](
+	KuuraSetOverwriteStartedCallback(m_kuura, [](
 		void* context,
 		uint16_t passes,
 		uint64_t bytesToWritePerPass)
@@ -107,7 +107,7 @@ void KuuraRunner::attachCallbacks()
 		emit self->passFinished(path, pass);
 	});
 
-	KuuraSetWipeCompletedCallback(m_kuura, [](
+	KuuraSetOverwriteCompletedCallback(m_kuura, [](
 		void* context,
 		uint16_t passes,
 		uint64_t totalBytesWritten)

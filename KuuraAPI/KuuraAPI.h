@@ -25,9 +25,9 @@ extern "C"
 
 	enum KuuraTargetType
 	{
-		FileWipe = 'f',
-		DirectoryWipe = 'd',
-		DriveWipe = 'D'
+		FileOverwrite = 'f',
+		DirectoryOverwrite = 'd',
+		DriveOverwrite = 'D'
 	};
 
 	enum KuuraFillType
@@ -50,7 +50,7 @@ extern "C"
 		Delete = 'D'
 	};
 
-	typedef void(KuuraWipeStartedCallback)(
+	typedef void(KuuraOverwriteStartedCallback)(
 		void* context,
 		uint16_t passes,
 		uint64_t bytesToWritePerPass);
@@ -71,7 +71,7 @@ extern "C"
 		const KuuraChar* path,
 		uint16_t pass);
 
-	typedef void(KuuraWipeCompletedCallback)(
+	typedef void(KuuraOverwriteCompletedCallback)(
 		void* context,
 		uint16_t passes,
 		uint64_t totalBytesWritten);
@@ -91,17 +91,17 @@ extern "C"
 		struct KuuraHandle*,
 		const KuuraChar* path,
 		enum KuuraTargetType type,
-		bool removeAfterWipe);
+		bool removeAfterOverwrite);
 
-	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddWipeRound(
+	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddOverwriteRound(
 		struct KuuraHandle*,
 		enum KuuraFillType,
 		bool verify,
 		const char* optional);
 
-	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetWipeStartedCallback(
+	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetOverwriteStartedCallback(
 		struct KuuraHandle*,
-		KuuraWipeStartedCallback*);
+		KuuraOverwriteStartedCallback*);
 
 	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetPassStartedCallback(
 		struct KuuraHandle*,
@@ -115,9 +115,9 @@ extern "C"
 		struct KuuraHandle*,
 		KuuraPassCompletedCallback*);
 
-	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetWipeCompletedCallback(
+	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetOverwriteCompletedCallback(
 		struct KuuraHandle*,
-		KuuraWipeCompletedCallback*);
+		KuuraOverwriteCompletedCallback*);
 
 	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetErrorCallback(
 		struct KuuraHandle*,

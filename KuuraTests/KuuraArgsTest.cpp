@@ -12,7 +12,7 @@ namespace Kuura
 			Arguments =
 			{
 				{ "path", Argument(true, std::filesystem::path()) },
-				{ "target", Argument(true, KuuraTargetType::FileWipe) },
+				{ "target", Argument(true, KuuraTargetType::FileOverwrite) },
 				{ "mode", Argument(false, KuuraFillType::ZeroFill) },
 				{ "filler", Argument(false, std::string()) },
 				{ "verify", Argument(false, false) },
@@ -31,7 +31,7 @@ namespace Kuura
 
 		EXPECT_EQ(
 			Arguments.at("target").Value<KuuraTargetType>(),
-			KuuraTargetType::DirectoryWipe);
+			KuuraTargetType::DirectoryOverwrite);
 	}
 
 	TEST_F(KuuraArgsTest, ParseRequiredFailure)
@@ -63,7 +63,7 @@ namespace Kuura
 
 		EXPECT_EQ(
 			Arguments.at("target").Value<KuuraTargetType>(),
-			KuuraTargetType::DirectoryWipe);
+			KuuraTargetType::DirectoryOverwrite);
 
 		EXPECT_EQ(Arguments.at("mode").Value<KuuraFillType>(), KuuraFillType::OneFill);
 		EXPECT_STREQ(Arguments.at("filler").Value<std::string>().c_str(), "foobar");
@@ -89,7 +89,7 @@ namespace Kuura
 
 		EXPECT_EQ(
 			Arguments.at("target").Value<KuuraTargetType>(),
-			KuuraTargetType::DriveWipe);
+			KuuraTargetType::DriveOverwrite);
 
 		EXPECT_EQ(Arguments.at("mode").Value<KuuraFillType>(), KuuraFillType::RandomFill);
 		EXPECT_STREQ(Arguments.at("filler").Value<std::string>().c_str(), "bar foo\nfoo bar");
@@ -115,7 +115,7 @@ namespace Kuura
 
 		EXPECT_EQ(
 			Arguments.at("target").Value<KuuraTargetType>(),
-			KuuraTargetType::FileWipe);
+			KuuraTargetType::FileOverwrite);
 
 		EXPECT_EQ(Arguments.at("mode").Value<KuuraFillType>(), KuuraFillType::ZeroFill);
 		EXPECT_TRUE(Arguments.at("filler").Value<std::string>().empty());

@@ -63,19 +63,19 @@ namespace Kuura
 	{
 		switch (c)
 		{
-			case static_cast<uint8_t>(KuuraTargetType::FileWipe) :
+			case static_cast<uint8_t>(KuuraTargetType::FileOverwrite) :
 			{
-				result = KuuraTargetType::FileWipe;
+				result = KuuraTargetType::FileOverwrite;
 				return true;
 			}
-			case static_cast<uint8_t>(KuuraTargetType::DirectoryWipe) :
+			case static_cast<uint8_t>(KuuraTargetType::DirectoryOverwrite) :
 			{
-				result = KuuraTargetType::DirectoryWipe;
+				result = KuuraTargetType::DirectoryOverwrite;
 				return true;
 			}
-			case  static_cast<uint8_t>(KuuraTargetType::DriveWipe) :
+			case  static_cast<uint8_t>(KuuraTargetType::DriveOverwrite) :
 			{
-				result = KuuraTargetType::DriveWipe;
+				result = KuuraTargetType::DriveOverwrite;
 				return true;
 			}
 		}

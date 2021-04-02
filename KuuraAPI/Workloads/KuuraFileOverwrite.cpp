@@ -1,19 +1,19 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "KuuraFileWipe.hpp"
+#include "KuuraFileOverwrite.hpp"
 #include "../FillConsumers/KuuraFile.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
 {
-	FileWipe::FileWipe(
+	FileOverwrite::FileOverwrite(
 		const Composer* parent,
 		const std::filesystem::path& path,
-		bool removeAfterWipe) :
-		IWorkload(parent, path, removeAfterWipe)
+		bool removeAfterOverwrite) :
+		IWorkload(parent, path, removeAfterOverwrite)
 	{
 	}
 
-	bool FileWipe::Run()
+	bool FileOverwrite::Run()
 	{
 		auto file = std::make_shared<File>(m_path);
 
@@ -34,7 +34,7 @@ namespace Kuura
 
 		auto fillers = m_parent->Fillers();
 
-		m_parent->Callbacks.OnWipeStarted(static_cast<uint16_t>(fillers.size()), file->Size().value());
+		m_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), file->Size().value());
 
 		for (auto filler : fillers)
 		{
@@ -57,9 +57,9 @@ namespace Kuura
 			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
 		}
 
-		m_parent->Callbacks.OnWipeCompleted(passes, totalBytesWritten);
+		m_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
 
-		if (m_removeAfterWipe && !file->Delete())
+		if (m_removeAfterOverwrite && !file->Delete())
 		{
 			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;

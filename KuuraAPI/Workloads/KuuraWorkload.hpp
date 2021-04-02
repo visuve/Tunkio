@@ -13,7 +13,7 @@ namespace Kuura
 		IWorkload(
 			const Composer* parent,
 			const std::filesystem::path& path,
-			bool removeAfterWipe);
+			bool removeAfterOverwrite);
 
 		virtual ~IWorkload();
 
@@ -23,7 +23,7 @@ namespace Kuura
 
 	protected:
 		const std::filesystem::path m_path;
-		const bool m_removeAfterWipe = false;
+		const bool m_removeAfterOverwrite = false;
 
 		bool Fill(
 			uint16_t pass,
