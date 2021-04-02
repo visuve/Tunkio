@@ -289,7 +289,7 @@ void MainWindow::onOpenFileDialog()
 		ui->lineEditSelectedPath->setText(file);
 		m_kuura = std::make_shared<KuuraRunner>();
 		bool result = m_kuura->addTarget(
-			file,
+			file.toStdString(),
 			KuuraTargetType::FileWipe,
 			ui->checkBoxDelete->isChecked());
 		ui->pushButtonStart->setEnabled(!m_model->isEmpty() && result);
@@ -312,7 +312,7 @@ void MainWindow::onOpenDirectoryDialog()
 
 		m_kuura = std::make_shared<KuuraRunner>();
 		bool result = m_kuura->addTarget(
-			directory,
+			directory.toStdString(),
 			KuuraTargetType::DirectoryWipe,
 			ui->checkBoxDelete->isChecked());
 
@@ -334,7 +334,7 @@ void MainWindow::onOpenDriveDialog()
 
 		m_kuura = std::make_shared<KuuraRunner>();
 		bool result = m_kuura->addTarget(
-			drive,
+			drive.toStdString(),
 			KuuraTargetType::DriveWipe,
 			false);
 
@@ -516,9 +516,9 @@ void MainWindow::startWipe()
 	m_kuura->start();
 }
 
-void MainWindow::onError(const QString& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
+void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 {
-	QStringList message = { QString("An error occurred while %1 %2!\n").arg(toString(stage)).arg(path) };
+	QStringList message = { QString("An error occurred while %1 %2!\n").arg(toString(stage)).arg(path.c_str()) };
 	message << QString("Pass: %1").arg(pass);
 	message << QString("Bytes written: %1").arg(bytesWritten);
 	message << QString("Operating system error code: %1").arg(errorCode);

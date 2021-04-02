@@ -13,24 +13,23 @@ namespace Kuura
 	bool DriveWipe::Run()
 	{
 		auto drive = std::make_shared<Drive>(m_path);
-		const auto path = m_path.string();
 
 		if (!drive->IsValid())
 		{
-			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
+			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
 		if (!drive->Unmount())
 		{
 			// TODO: maybe add a stage "unmount" which is only used for drives
-			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
+			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
 			return false;
 		}
 
 		if (!drive->Size())
 		{
-			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
+			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
@@ -42,7 +41,7 @@ namespace Kuura
 
 		for (auto& filler : fillers)
 		{
-			m_parent->Callbacks.OnPassStarted(path.c_str(), ++passes);
+			m_parent->Callbacks.OnPassStarted(m_path.c_str(), ++passes);
 
 			uint64_t bytesLeft = drive->Size().value();
 			uint64_t bytesWritten = 0;
@@ -53,7 +52,7 @@ namespace Kuura
 			}
 
 			totalBytesWritten += bytesWritten;
-			m_parent->Callbacks.OnPassCompleted(path.c_str(), passes);
+			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
 		}
 
 		m_parent->Callbacks.OnWipeCompleted(passes, totalBytesWritten);

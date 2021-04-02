@@ -48,9 +48,9 @@ public slots:
 	void removePass(int row);
 
 	void onWipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
-	void onPassStarted(const QString& path, uint16_t pass);
-	void onPassProgressed(const QString& path, uint16_t pass, uint64_t bytesWritten);
-	void onPassFinished(const QString& path, uint16_t pass);
+	void onPassStarted(const std::filesystem::path& path, uint16_t pass);
+	void onPassProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten);
+	void onPassFinished(const std::filesystem::path& path, uint16_t pass);
 	void onWipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
 
 private:

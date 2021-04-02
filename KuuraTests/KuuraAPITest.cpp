@@ -17,18 +17,18 @@ namespace Kuura
 		reinterpret_cast<Counters*>(context)->OnWipeStartedCount++;
 	}
 
-	void OnPassStarted(void* context, const char*, uint16_t)
+	void OnPassStarted(void* context, const KuuraChar*, uint16_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnPassStartedCount++;
 	}
 
-	bool OnProgress(void* context, const char*, uint16_t, uint64_t)
+	bool OnProgress(void* context, const KuuraChar*, uint16_t, uint64_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnProgressCount++;
 		return true;
 	}
 
-	void OnPassCompleted(void* context, const char*, uint16_t)
+	void OnPassCompleted(void* context, const KuuraChar*, uint16_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnPassCompletedCount++;
 	}
@@ -38,7 +38,7 @@ namespace Kuura
 		reinterpret_cast<Counters*>(context)->OnWipeCompletedCount++;
 	}
 
-	void OnError(void* context, const char*, KuuraStage, uint16_t, uint64_t, uint32_t)
+	void OnError(void* context, const KuuraChar*, KuuraStage, uint16_t, uint64_t, uint32_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnErrorCount++;
 	}
@@ -89,7 +89,7 @@ namespace Kuura
 		KuuraHandle* handle = KuuraInitialize(&counters);
 		EXPECT_NE(handle, nullptr);
 
-		EXPECT_TRUE(KuuraAddTarget(handle, "foobar", KuuraTargetType::FileWipe, false));
+		EXPECT_TRUE(KuuraAddTarget(handle, std::filesystem::path("foobar").c_str(), KuuraTargetType::FileWipe, false));
 		EXPECT_EQ(counters.OnWipeStartedCount, 0);
 		EXPECT_EQ(counters.OnPassStartedCount, 0);
 		EXPECT_EQ(counters.OnProgressCount, 0);
@@ -113,7 +113,7 @@ namespace Kuura
 		{
 			Counters counters;
 			KuuraHandle* handle = KuuraInitialize(&counters);
-			EXPECT_TRUE(KuuraAddTarget(handle, "foobar", type, false));
+			EXPECT_TRUE(KuuraAddTarget(handle, std::filesystem::path("foobar").c_str(), type, false));
 			EXPECT_NE(handle, nullptr);
 
 			EXPECT_EQ(counters.OnWipeStartedCount, 0);

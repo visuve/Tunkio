@@ -23,7 +23,7 @@ namespace Kuura
 	{
 		m_handle = KuuraInitialize(this);
 
-		if (!KuuraAddTarget(m_handle, path.string().c_str(), targetType, remove))
+		if (!KuuraAddTarget(m_handle, path.c_str(), targetType, remove))
 		{
 			std::cerr << "KuuraAddTarget failed!" << std::endl;
 			return false;
@@ -46,7 +46,7 @@ namespace Kuura
 
 		KuuraSetPassStartedCallback(m_handle, [](
 			void* context,
-			const char* path,
+			const KuuraChar* path,
 			uint16_t pass)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
@@ -55,7 +55,7 @@ namespace Kuura
 
 		KuuraSetProgressCallback(m_handle, [](
 			void* context,
-			const char* path,
+			const KuuraChar* path,
 			uint16_t pass,
 			uint64_t bytesWritten)
 		{
@@ -65,7 +65,7 @@ namespace Kuura
 
 		KuuraSetPassCompletedCallback(m_handle, [](
 			void* context,
-			const char* path,
+			const KuuraChar* path,
 			uint16_t pass)
 		{
 			auto self = reinterpret_cast<CLI*>(context);
@@ -83,7 +83,7 @@ namespace Kuura
 
 		KuuraSetErrorCallback(m_handle, [](
 			void* context,
-			const char* path,
+			const KuuraChar* path,
 			KuuraStage stage,
 			uint16_t pass,
 			uint64_t bytesWritten,
@@ -119,7 +119,7 @@ namespace Kuura
 		std::cout << Time::Timestamp() << " Wipe Started! Passes " << passes << '.' << std::endl;
 	}
 
-	void CLI::OnPassStarted(std::string_view, uint16_t pass)
+	void CLI::OnPassStarted(const std::filesystem::path&, uint16_t pass)
 	{
 		m_totalTimer.Reset();
 		m_currentTimer.Reset();
@@ -127,7 +127,7 @@ namespace Kuura
 		std::cout << Time::Timestamp() << " Pass " << pass << " started!" << std::endl;
 	}
 
-	bool CLI::OnProgress(std::string_view, uint16_t, uint64_t bytesWritten)
+	bool CLI::OnProgress(const std::filesystem::path&, uint16_t, uint64_t bytesWritten)
 	{
 		if (!m_keepRunning)
 		{
@@ -155,12 +155,12 @@ namespace Kuura
 		return m_keepRunning;
 	}
 
-	void CLI::OnPassCompleted(std::string_view, uint16_t pass)
+	void CLI::OnPassCompleted(const std::filesystem::path&, uint16_t pass)
 	{
 		std::cout << Time::Timestamp() << " Pass " << pass << " completed!" << std::endl;
 	}
 
-	void CLI::OnError(std::string_view path, KuuraStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
+	void CLI::OnError(const std::filesystem::path& path, KuuraStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)
 	{
 		std::cerr << Time::Timestamp() << " Error " << error << " occurred while ";
 

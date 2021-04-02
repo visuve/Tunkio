@@ -32,7 +32,7 @@ private slots:
 	void clearPasses();
 	void onAbout();
 	void startWipe();
-	void onError(const QString& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
+	void onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 	void onWipeCompleted(uint16_t pass, uint64_t totalBytesWritten);
 
 private:

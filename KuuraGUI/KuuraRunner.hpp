@@ -12,17 +12,17 @@ public:
 	~KuuraRunner();
 
 public slots:
-	bool addTarget(const QString& path, KuuraTargetType type, bool remove);
+	bool addTarget(const std::filesystem::path& path, KuuraTargetType type, bool remove);
 	bool addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify);
 	void stop();
 
 signals:
 	void wipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
-	void passStarted(const QString& path, uint16_t pass);
-	void passProgressed(const QString& path, uint16_t pass, uint64_t bytesWritten);
-	void passFinished(const QString& path, uint16_t pass);
+	void passStarted(const std::filesystem::path& path, uint16_t pass);
+	void passProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten);
+	void passFinished(const std::filesystem::path& path, uint16_t pass);
 	void wipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
-	void errorOccurred(const QString& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
+	void errorOccurred(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
 	std::atomic<bool> m_keepRunning;

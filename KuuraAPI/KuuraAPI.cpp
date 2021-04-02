@@ -26,7 +26,7 @@ KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(void* context)
 
 bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 	struct KuuraHandle* handle,
-	const char* path,
+	const KuuraChar* path,
 	enum KuuraTargetType type,
 	bool removeAfterWipe)
 {

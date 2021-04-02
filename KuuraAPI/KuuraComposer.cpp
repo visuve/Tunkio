@@ -34,7 +34,7 @@ namespace Kuura
 	{
 	}
 
-	bool Composer::AddWorkload(const char* path, KuuraTargetType type, bool removeAfterWipe)
+	bool Composer::AddWorkload(const std::filesystem::path& path, KuuraTargetType type, bool removeAfterWipe)
 	{
 		switch (type)
 		{

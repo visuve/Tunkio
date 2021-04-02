@@ -7,9 +7,11 @@
 #if defined(_WIN32)
 #define KUURA_EXPORT __declspec(dllexport)
 #define KUURA_CALLING_CONVENTION __cdecl
+#define KuuraChar wchar_t
 #else
 #define KUURA_EXPORT __attribute__((visibility("default")))
 #define KUURA_CALLING_CONVENTION
+#define KuuraChar char
 #endif
 
 #if defined(__cplusplus)
@@ -55,18 +57,18 @@ extern "C"
 
 	typedef void(KuuraPassStartedCallback)(
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		uint16_t pass);
 
 	typedef bool(KuuraProgressCallback)(
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		uint16_t pass,
 		uint64_t bytesWritten); // Return false to cancel
 
 	typedef void(KuuraPassCompletedCallback)(
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		uint16_t pass);
 
 	typedef void(KuuraWipeCompletedCallback)(
@@ -76,7 +78,7 @@ extern "C"
 
 	typedef void(KuuraErrorCallback)(
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		enum KuuraStage stage,
 		uint16_t pass,
 		uint64_t bytesWritten,
@@ -87,7 +89,7 @@ extern "C"
 
 	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 		struct KuuraHandle*,
-		const char* path,
+		const KuuraChar* path,
 		enum KuuraTargetType type,
 		bool removeAfterWipe);
 

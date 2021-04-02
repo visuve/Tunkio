@@ -18,7 +18,7 @@ namespace Kuura
 			}
 		}
 
-		inline void OnPassStarted(const char* path, uint16_t pass) const
+		inline void OnPassStarted(const KuuraChar* path, uint16_t pass) const
 		{
 			if (PassStartedCallback)
 			{
@@ -26,13 +26,13 @@ namespace Kuura
 			}
 		}
 
-		inline bool OnProgress(const char* path, uint16_t pass, uint64_t bytesWritten) const
+		inline bool OnProgress(const KuuraChar* path, uint16_t pass, uint64_t bytesWritten) const
 		{
 			
 			return ProgressCallback ? ProgressCallback(Context, path, pass, bytesWritten) : true;
 		}
 
-		inline void OnPassCompleted(const char* path, uint16_t pass) const
+		inline void OnPassCompleted(const KuuraChar* path, uint16_t pass) const
 		{
 			if (PassCompletedCallback)
 			{
@@ -49,7 +49,7 @@ namespace Kuura
 		}
 
 		inline void OnError(
-			const char* path,
+			const KuuraChar* path,
 			KuuraStage stage,
 			uint16_t pass,
 			uint64_t bytesWritten,

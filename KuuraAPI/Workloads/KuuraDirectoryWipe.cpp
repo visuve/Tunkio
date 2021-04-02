@@ -16,13 +16,12 @@ namespace Kuura
 	bool DirectoryWipe::Run()
 	{
 		Directory directory(m_path);
-		const auto path = m_path.string();
 
 		std::optional<std::vector<std::shared_ptr<File>>>& files = directory.Files();
 
 		if (!files)
 		{
-			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Open, 0, 0, LastError);
+			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
@@ -30,7 +29,7 @@ namespace Kuura
 
 		if (!directorySize)
 		{
-			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Size, 0, 0, LastError);
+			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
@@ -42,7 +41,7 @@ namespace Kuura
 
 		for (auto& filler : fillers)
 		{
-			m_parent->Callbacks.OnPassStarted(path.c_str(), ++passes);
+			m_parent->Callbacks.OnPassStarted(m_path.c_str(), ++passes);
 
 			for (auto& file : files.value())
 			{
@@ -56,18 +55,18 @@ namespace Kuura
 
 				if (!file->Flush())
 				{
-					m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+					m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 				}
 
 				totalBytesWritten += bytesWritten;
 			}
 
-			m_parent->Callbacks.OnPassCompleted(path.c_str(), passes);
+			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
 		}
 
 		if (m_removeAfterWipe && !directory.RemoveAll())
 		{
-			m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 

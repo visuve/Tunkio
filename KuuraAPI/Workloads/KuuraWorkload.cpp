@@ -21,8 +21,6 @@ namespace Kuura
 		std::shared_ptr<IFillProvider> filler,
 		std::shared_ptr<IFillConsumer> fillable)
 	{
-		const auto path = m_path.string();
-
 		while (bytesLeft)
 		{
 			const uint64_t size = std::min(bytesLeft, fillable->OptimalWriteSize().value());
@@ -36,7 +34,7 @@ namespace Kuura
 
 			if (!result.first)
 			{
-				m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
+				m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
 				return false;
 			}
 
@@ -46,18 +44,18 @@ namespace Kuura
 
 				if (!actualData.first)
 				{
-					m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 
 				if (!std::equal(writtenData.begin(), writtenData.end(), actualData.second.begin()))
 				{
-					m_parent->Callbacks.OnError(path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 			}
 
-			if (!m_parent->Callbacks.OnProgress(path.c_str(), pass, bytesWritten))
+			if (!m_parent->Callbacks.OnProgress(m_path.c_str(), pass, bytesWritten))
 			{
 				return true;
 			}

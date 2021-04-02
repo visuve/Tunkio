@@ -22,10 +22,9 @@ KuuraRunner::~KuuraRunner()
 	qDebug() << "Destroyed.";
 }
 
-bool KuuraRunner::addTarget(const QString& path, KuuraTargetType type, bool remove)
+bool KuuraRunner::addTarget(const std::filesystem::path& path, KuuraTargetType type, bool remove)
 {
-	const auto tmp = path.toStdString();
-	return KuuraAddTarget(m_kuura, tmp.c_str(), type, remove);
+	return KuuraAddTarget(m_kuura, path.c_str(), type, remove);
 }
 
 bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify)
@@ -78,7 +77,7 @@ void KuuraRunner::attachCallbacks()
 
 	KuuraSetPassStartedCallback(m_kuura, [](
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		uint16_t pass)
 	{
 		auto self = static_cast<KuuraRunner*>(context);
@@ -88,7 +87,7 @@ void KuuraRunner::attachCallbacks()
 
 	KuuraSetProgressCallback(m_kuura, [](
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		uint16_t pass,
 		uint64_t bytesWritten)
 	{
@@ -100,7 +99,7 @@ void KuuraRunner::attachCallbacks()
 
 	KuuraSetPassCompletedCallback(m_kuura, [](
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		uint16_t pass)
 	{
 		auto self = static_cast<KuuraRunner*>(context);
@@ -120,7 +119,7 @@ void KuuraRunner::attachCallbacks()
 
 	KuuraSetErrorCallback(m_kuura, [](
 		void* context,
-		const char* path,
+		const KuuraChar* path,
 		KuuraStage stage,
 		uint16_t pass,
 		uint64_t bytesWritten,
