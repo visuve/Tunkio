@@ -8,24 +8,24 @@
 struct Node
 {
 	Node(Node* parent) :
-		m_parent(parent)
+		_parent(parent)
 	{
 	}
 
 	~Node()
 	{
-		qDeleteAll(m_children);
+		qDeleteAll(_children);
 	}
 
 	int parentRow() const
 	{
-		return m_parent ?
-			m_parent->m_children.indexOf(const_cast<Node*>(this)) :
+		return _parent ?
+			_parent->_children.indexOf(const_cast<Node*>(this)) :
 			0;
 	}
 
-	Node* m_parent;
-	QVector<Node*> m_children;
+	Node* _parent;
+	QVector<Node*> _children;
 
 	QString path;
 	uint64_t secondsTaken = 0;
@@ -41,9 +41,9 @@ class ProgressModel : public QAbstractItemModel
 public:
 	ProgressModel(QObject* parent) :
 		QAbstractItemModel(parent),
-		m_root(new Node(nullptr))
+		_root(new Node(nullptr))
 	{
-		auto alpha = new Node(m_root);
+		auto alpha = new Node(_root);
 		alpha->path = "D:\\TEST DATA\\foo.txt";
 
 		auto progressA1 = new Node(alpha);
@@ -69,24 +69,24 @@ public:
 		alpha->bytesPerSecond = progressA1->bytesPerSecond + progressA2->bytesPerSecond / 2;
 		alpha->progressPercent = (progressA1->progressPercent + progressA2->progressPercent) / 2;
 
-		alpha->m_children.append(progressA1);
-		alpha->m_children.append(progressA2);
+		alpha->_children.append(progressA1);
+		alpha->_children.append(progressA2);
 
-		auto bravo = new Node(m_root);
+		auto bravo = new Node(_root);
 		bravo->path = "D:\\TEST DATA\\bar.txt";
 		auto progressB1 = new Node(bravo);
 		auto progressB2 = new Node(bravo);
 
-		bravo->m_children.append(progressB1);
-		bravo->m_children.append(progressB2);
+		bravo->_children.append(progressB1);
+		bravo->_children.append(progressB2);
 
-		m_root->m_children.append(alpha);
-		m_root->m_children.append(bravo);
+		_root->_children.append(alpha);
+		_root->_children.append(bravo);
 	}
 
 	~ProgressModel()
 	{
-		delete m_root;
+		delete _root;
 	}
 
 	QModelIndex index(int row, int column, const QModelIndex& parentIndex = QModelIndex()) const override
@@ -98,9 +98,9 @@ public:
 
 		Node* parentNode = parentIndex.isValid() ?
 			static_cast<Node*>(parentIndex.internalPointer()) :
-			m_root;
+			_root;
 
-		Node* childNode = parentNode->m_children.at(row);
+		Node* childNode = parentNode->_children.at(row);
 
 		return childNode ?
 			createIndex(row, column, childNode) :
@@ -114,9 +114,9 @@ public:
 			return QModelIndex();
 		}
 
-		Node* parentNode = static_cast<Node*>(childIndex.internalPointer())->m_parent;
+		Node* parentNode = static_cast<Node*>(childIndex.internalPointer())->_parent;
 
-		return parentNode != m_root ?
+		return parentNode != _root ?
 			createIndex(parentNode->parentRow(), 0, parentNode) :
 			QModelIndex();
 	}
@@ -124,8 +124,8 @@ public:
 	int rowCount(const QModelIndex& parentIndex = QModelIndex()) const override
 	{
 		return parentIndex.isValid() ?
-			static_cast<Node*>(parentIndex.internalPointer())->m_children.size() :
-			m_root->m_children.size();
+			static_cast<Node*>(parentIndex.internalPointer())->_children.size() :
+			_root->_children.size();
 	}
 
 	int columnCount(const QModelIndex&) const override
@@ -141,7 +141,7 @@ public:
 		}
 
 		Node* node = static_cast<Node*>(index.internalPointer());
-		bool topLevel = node->m_parent == m_root;
+		bool topLevel = node->_parent == _root;
 
 		if (role == Qt::DisplayRole)
 		{
@@ -204,7 +204,7 @@ public:
 	}
 
 private:
-	Node* m_root;
+	Node* _root;
 };
 
 ProgressTab::ProgressTab(QWidget *parent) :

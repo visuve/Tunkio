@@ -31,12 +31,12 @@ namespace Kuura
 		void OnOverwriteCompleted(uint16_t passes, uint64_t bytesWritten);
 
 	private:
-		std::atomic<bool> m_keepRunning = true;
-		KuuraHandle* m_handle = nullptr;
-		Time::Timer m_totalTimer;
-		Time::Timer m_currentTimer;
-		uint32_t m_error = ErrorCode::Success;
-		uint64_t m_bytesToWrite = 0;
-		uint64_t m_bytesWrittenLastTime = 0;
+		std::atomic<bool> _keepRunning = true;
+		KuuraHandle* _handle = nullptr;
+		Time::Timer _totalTimer;
+		Time::Timer _currentTimer;
+		uint32_t _error = ErrorCode::Success;
+		uint64_t _bytesToWrite = 0;
+		uint64_t _bytesWrittenLastTime = 0;
 	};
 }

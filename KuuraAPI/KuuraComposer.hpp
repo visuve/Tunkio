@@ -23,7 +23,7 @@ namespace Kuura
 		const std::vector<std::shared_ptr<IFillProvider>>& Fillers() const;
 
 	private:
-		std::vector<std::shared_ptr<IWorkload>> m_workloads;
-		std::vector<std::shared_ptr<IFillProvider>> m_fillers;
+		std::vector<std::shared_ptr<IWorkload>> _workloads;
+		std::vector<std::shared_ptr<IFillProvider>> _fillers;
 	};
 }

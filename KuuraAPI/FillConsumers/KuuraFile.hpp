@@ -27,14 +27,14 @@ namespace Kuura
 		bool Delete();
 
 	private:
-		std::optional<uint64_t> m_allocationSize;
-		std::optional<uint64_t> m_alignmentSize;
-		std::optional<uint64_t> m_optimalWriteSize;
+		std::optional<uint64_t> _allocationSize;
+		std::optional<uint64_t> _alignmentSize;
+		std::optional<uint64_t> _optimalWriteSize;
 
 #if defined(_WIN32)
-		void* m_handle = reinterpret_cast<void*>(-1);
+		void* _handle = reinterpret_cast<void*>(-1);
 #else
-		int m_descriptor = -1;
+		int _descriptor = -1;
 #endif
 	};
 }

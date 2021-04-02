@@ -14,70 +14,70 @@ namespace Kuura::DataUnit
 		constexpr DataUnitBase() = default;
 
 		constexpr DataUnitBase(uint64_t value) :
-			m_bytes(value* Ratio)
+			_bytes(value* Ratio)
 		{
 		}
 
 		template<uint64_t R>
 		constexpr DataUnitBase(const DataUnitBase<R>& other) :
-			m_bytes(other.Bytes())
+			_bytes(other.Bytes())
 		{
 		}
 
 		template<uint64_t R>
 		DataUnitBase<Ratio>& operator = (const DataUnitBase<R>& other)
 		{
-			m_bytes = other.Bytes();
+			_bytes = other.Bytes();
 			return *this;
 		}
 
 		constexpr uint64_t Bytes() const
 		{
-			return m_bytes;
+			return _bytes;
 		}
 
 		double Value() const
 		{
-			if (!m_bytes)
+			if (!_bytes)
 			{
 				return 0;
 			}
 
-			return double(m_bytes) / double(Ratio);
+			return double(_bytes) / double(Ratio);
 		}
 
 		constexpr bool operator < (uint64_t bytes) const
 		{
-			return m_bytes < bytes;
+			return _bytes < bytes;
 		}
 
 		constexpr bool operator > (uint64_t bytes) const
 		{
-			return m_bytes > bytes;
+			return _bytes > bytes;
 		}
 
 		template<uint64_t R>
 		constexpr bool operator == (const DataUnitBase<R>& unit) const
 		{
-			return m_bytes == unit.Bytes();
+			return _bytes == unit.Bytes();
 		}
 
 		template<uint64_t R>
 		DataUnitBase& operator + (const DataUnitBase<R>& other)
 		{
-			m_bytes += other.Bytes();
+			_bytes += other.Bytes();
 			return *this;
 		}
 
 		template<uint64_t R>
 		DataUnitBase& operator - (const DataUnitBase<R>& other)
 		{
-			m_bytes -= other.Bytes();
+			_bytes -= other.Bytes();
 			return *this;
 		}
 
 	private:
-		uint64_t m_bytes = 0;
+		uint64_t _bytes = 0;
 	};
 
 	using Bytes = DataUnitBase<1>;

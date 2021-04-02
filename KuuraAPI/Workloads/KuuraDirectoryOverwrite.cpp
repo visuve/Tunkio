@@ -15,13 +15,13 @@ namespace Kuura
 
 	bool DirectoryOverwrite::Run()
 	{
-		Directory directory(m_path);
+		Directory directory(_path);
 
 		std::optional<std::vector<std::shared_ptr<File>>>& files = directory.Files();
 
 		if (!files)
 		{
-			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+			_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
@@ -29,19 +29,19 @@ namespace Kuura
 
 		if (!directorySize)
 		{
-			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+			_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		auto fillers  = m_parent->Fillers();
-		m_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), directorySize.value());
+		auto fillers  = _parent->Fillers();
+		_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), directorySize.value());
 
 		for (auto& filler : fillers)
 		{
-			m_parent->Callbacks.OnPassStarted(m_path.c_str(), ++passes);
+			_parent->Callbacks.OnPassStarted(_path.c_str(), ++passes);
 
 			for (auto& file : files.value())
 			{
@@ -55,22 +55,22 @@ namespace Kuura
 
 				if (!file->Flush())
 				{
-					m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+					_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 				}
 
 				totalBytesWritten += bytesWritten;
 			}
 
-			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
+			_parent->Callbacks.OnPassCompleted(_path.c_str(), passes);
 		}
 
-		if (m_removeAfterOverwrite && !directory.RemoveAll())
+		if (_removeAfterOverwrite && !directory.RemoveAll())
 		{
-			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 
-		m_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
+		_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
 		return true;
 	}
 }

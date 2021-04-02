@@ -12,12 +12,12 @@
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow()),
-	m_targetSelectTab(new TargetSelectTab(ui->tabWidget)),
-	m_pathSelectTab(new PathSelectTab(ui->tabWidget)),
-	m_driveSelectTab(new DriveSelectTab(ui->tabWidget)),
-	m_algorithmTab(new AlgorithmTab(ui->tabWidget)),
-	m_progressTab(new ProgressTab(ui->tabWidget)),
-	m_resultsTab(new ResultsTab(ui->tabWidget))
+	_targetSelectTab(new TargetSelectTab(ui->tabWidget)),
+	_pathSelectTab(new PathSelectTab(ui->tabWidget)),
+	_driveSelectTab(new DriveSelectTab(ui->tabWidget)),
+	_algorithmTab(new AlgorithmTab(ui->tabWidget)),
+	_progressTab(new ProgressTab(ui->tabWidget)),
+	_resultsTab(new ResultsTab(ui->tabWidget))
 {
 	ui->setupUi(this);
 
@@ -35,27 +35,27 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	connect(ui->pushButtonNext, &QPushButton::clicked, this, &MainWindow::onNextRequested);
 
-	connect(m_targetSelectTab, &TargetSelectTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_targetSelectTab, &TargetSelectTab::targetTypeSelected, this, &MainWindow::onTargetTypeSelected);
-	connect(m_targetSelectTab, &TargetSelectTab::nextRequested, this, &MainWindow::onNextRequested);
+	connect(_targetSelectTab, &TargetSelectTab::backRequested, this, &MainWindow::onBackRequested);
+	connect(_targetSelectTab, &TargetSelectTab::targetTypeSelected, this, &MainWindow::onTargetTypeSelected);
+	connect(_targetSelectTab, &TargetSelectTab::nextRequested, this, &MainWindow::onNextRequested);
 
-	connect(m_pathSelectTab, &PathSelectTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_pathSelectTab, &PathSelectTab::nextRequested, this, &MainWindow::onNextRequested);
+	connect(_pathSelectTab, &PathSelectTab::backRequested, this, &MainWindow::onBackRequested);
+	connect(_pathSelectTab, &PathSelectTab::nextRequested, this, &MainWindow::onNextRequested);
 
-	connect(m_driveSelectTab, &DriveSelectTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_driveSelectTab, &DriveSelectTab::nextRequested, this, &MainWindow::onNextRequested);
+	connect(_driveSelectTab, &DriveSelectTab::backRequested, this, &MainWindow::onBackRequested);
+	connect(_driveSelectTab, &DriveSelectTab::nextRequested, this, &MainWindow::onNextRequested);
 
-	connect(m_algorithmTab, &AlgorithmTab::backRequested, this, &MainWindow::onBackRequested);
-	connect(m_algorithmTab, &AlgorithmTab::nextRequested, this, &MainWindow::onNextRequested);
+	connect(_algorithmTab, &AlgorithmTab::backRequested, this, &MainWindow::onBackRequested);
+	connect(_algorithmTab, &AlgorithmTab::nextRequested, this, &MainWindow::onNextRequested);
 
-	connect(m_progressTab, &ProgressTab::nextRequested, this, &MainWindow::onNextRequested);
+	connect(_progressTab, &ProgressTab::nextRequested, this, &MainWindow::onNextRequested);
 
-	ui->tabWidget->insertTab(1, m_targetSelectTab, "Target");
-	ui->tabWidget->insertTab(2, m_pathSelectTab, "Path");
-	ui->tabWidget->insertTab(3, m_driveSelectTab, "Path");
-	ui->tabWidget->insertTab(4, m_algorithmTab, "Algorithm");
-	ui->tabWidget->insertTab(5, m_progressTab, "Progress");
-	ui->tabWidget->insertTab(6, m_resultsTab, "Results");
+	ui->tabWidget->insertTab(1, _targetSelectTab, "Target");
+	ui->tabWidget->insertTab(2, _pathSelectTab, "Path");
+	ui->tabWidget->insertTab(3, _driveSelectTab, "Path");
+	ui->tabWidget->insertTab(4, _algorithmTab, "Algorithm");
+	ui->tabWidget->insertTab(5, _progressTab, "Progress");
+	ui->tabWidget->insertTab(6, _resultsTab, "Results");
 	ui->tabWidget->setTabVisible(3, false);
 
 	setAcceptDrops(true);
@@ -103,7 +103,7 @@ void MainWindow::onBackRequested()
 		}
 		case 4:
 		{
-			switch (m_targetSelectTab->selectedTargetType())
+			switch (_targetSelectTab->selectedTargetType())
 			{
 				case KuuraTargetType::FileOverwrite:
 				case KuuraTargetType::DirectoryOverwrite:
@@ -129,7 +129,7 @@ void MainWindow::onNextRequested()
 		}
 		case 1:
 		{
-			switch (m_targetSelectTab->selectedTargetType())
+			switch (_targetSelectTab->selectedTargetType())
 			{
 				case KuuraTargetType::FileOverwrite:
 				case KuuraTargetType::DirectoryOverwrite:
@@ -196,5 +196,5 @@ void MainWindow::dropEvent(QDropEvent* e)
 	#endif
 	}
 
-	m_pathSelectTab->addPaths(std::move(paths));
+	_pathSelectTab->addPaths(std::move(paths));
 }

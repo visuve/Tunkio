@@ -13,6 +13,6 @@ namespace Kuura
 		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
 
 	protected:
-		std::byte m_byte;
+		std::byte _byte;
 	};
 }

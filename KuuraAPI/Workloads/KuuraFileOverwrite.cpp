@@ -15,30 +15,30 @@ namespace Kuura
 
 	bool FileOverwrite::Run()
 	{
-		auto file = std::make_shared<File>(m_path);
+		auto file = std::make_shared<File>(_path);
 
 		if (!file->IsValid())
 		{
-			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+			_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
 			return false;
 		}
 
 		if (!file->Size())
 		{
-			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+			_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
 
-		auto fillers = m_parent->Fillers();
+		auto fillers = _parent->Fillers();
 
-		m_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), file->Size().value());
+		_parent->Callbacks.OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), file->Size().value());
 
 		for (auto filler : fillers)
 		{
-			m_parent->Callbacks.OnPassStarted(m_path.c_str(), ++passes);
+			_parent->Callbacks.OnPassStarted(_path.c_str(), ++passes);
 
 			uint64_t bytesLeft = file->Size().value();
 			uint64_t bytesWritten = 0;
@@ -50,18 +50,18 @@ namespace Kuura
 
 			if (!file->Flush())
 			{
-				m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+				_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 			}
 
 			totalBytesWritten += bytesWritten;
-			m_parent->Callbacks.OnPassCompleted(m_path.c_str(), passes);
+			_parent->Callbacks.OnPassCompleted(_path.c_str(), passes);
 		}
 
-		m_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
+		_parent->Callbacks.OnOverwriteCompleted(passes, totalBytesWritten);
 
-		if (m_removeAfterOverwrite && !file->Delete())
+		if (_removeAfterOverwrite && !file->Delete())
 		{
-			m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return false;
 		}
 

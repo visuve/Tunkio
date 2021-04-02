@@ -6,23 +6,23 @@ namespace Kuura
 {
 	File::File(const std::filesystem::path& path) :
 		IFillConsumer(path),
-		m_handle(Open(path))
+		_handle(Open(path))
 	{
 		if (!IsValid())
 		{
 			return;
 		}
 
-		m_allocationSize = AllocationSizeByHandle(m_handle);
-		m_optimalWriteSize = OptimalWriteSizeByHandle(m_handle);
-		m_alignmentSize = PageSize();
+		_allocationSize = AllocationSizeByHandle(_handle);
+		_optimalWriteSize = OptimalWriteSizeByHandle(_handle);
+		_alignmentSize = PageSize();
 
-		if (!m_allocationSize || m_allocationSize.value() % 512 != 0)
+		if (!_allocationSize || _allocationSize.value() % 512 != 0)
 		{
 			// Something is horribly wrong
-			m_allocationSize = std::nullopt;
-			m_alignmentSize = std::nullopt;
-			m_optimalWriteSize = std::nullopt;
+			_allocationSize = std::nullopt;
+			_alignmentSize = std::nullopt;
+			_optimalWriteSize = std::nullopt;
 		}
 	}
 
@@ -37,10 +37,10 @@ namespace Kuura
 		if (this != &other)
 		{
 			std::swap(Path, other.Path);
-			std::swap(m_handle, other.m_handle);
-			std::swap(m_allocationSize, other.m_allocationSize);
-			std::swap(m_alignmentSize, other.m_alignmentSize);
-			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+			std::swap(_handle, other._handle);
+			std::swap(_allocationSize, other._allocationSize);
+			std::swap(_alignmentSize, other._alignmentSize);
+			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
 		return *this;
@@ -50,29 +50,29 @@ namespace Kuura
 	{
 		if (IsValid())
 		{
-			CloseHandle(m_handle);
-			m_handle = nullptr;
+			CloseHandle(_handle);
+			_handle = nullptr;
 		}
 	}
 
 	bool File::IsValid() const
 	{
-		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
+		return _handle != nullptr && _handle != INVALID_HANDLE_VALUE;
 	}
 
 	std::optional<uint64_t> File::Size() const
 	{
-		return m_allocationSize;
+		return _allocationSize;
 	}
 
 	std::optional<uint64_t> File::AlignmentSize() const
 	{
-		return m_alignmentSize;
+		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const
 	{
-		return m_optimalWriteSize;
+		return _optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)
@@ -80,7 +80,7 @@ namespace Kuura
 		DWORD bytesWritten = 0;
 		DWORD bytesToWrite = static_cast<DWORD>(data.size_bytes());
 
-		if (!WriteFile(m_handle, data.data(), bytesToWrite, &bytesWritten, nullptr))
+		if (!WriteFile(_handle, data.data(), bytesToWrite, &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
@@ -94,7 +94,7 @@ namespace Kuura
 		DWORD bytesRead = 0;
 		OVERLAPPED overlapped = Offset(offset);
 
-		if (!ReadFile(m_handle, buffer.data(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
+		if (!ReadFile(_handle, buffer.data(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
 		{
 			return { false, {} };
 		}
@@ -104,14 +104,14 @@ namespace Kuura
 
 	bool File::Flush()
 	{
-		return FlushFileBuffers(m_handle);
+		return FlushFileBuffers(_handle);
 	}
 
 	bool File::Delete()
 	{
-		if (IsValid() && CloseHandle(m_handle))
+		if (IsValid() && CloseHandle(_handle))
 		{
-			m_handle = nullptr;
+			_handle = nullptr;
 			return DeleteFileW(Path.c_str());
 		}
 

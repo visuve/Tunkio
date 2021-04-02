@@ -25,6 +25,6 @@ signals:
 
 private:
 	Ui::TargetSelectTab *ui;
-	KuuraTargetType m_selectedTargetType = KuuraTargetType::FileOverwrite;
+	KuuraTargetType _selectedTargetType = KuuraTargetType::FileOverwrite;
 };
 

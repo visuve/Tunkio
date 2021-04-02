@@ -12,13 +12,13 @@ namespace Kuura
 
 		if (Type == typeid(std::filesystem::path))
 		{
-			m_value = std::filesystem::path(value);
+			_value = std::filesystem::path(value);
 			return true;
 		}
 
 		if (Type == typeid(std::string))
 		{
-			m_value = std::string(value);
+			_value = std::string(value);
 			return true;
 		}
 
@@ -30,7 +30,7 @@ namespace Kuura
 				return false;
 			}
 
-			return TargetFromChar(value.front(), m_value);
+			return TargetFromChar(value.front(), _value);
 		}
 
 		if (Type == typeid(KuuraFillType))
@@ -41,7 +41,7 @@ namespace Kuura
 				return false;
 			}
 
-			return ModeFromChar(value.front(), m_value);
+			return ModeFromChar(value.front(), _value);
 		}
 
 		if (Type == typeid(bool))
@@ -52,7 +52,7 @@ namespace Kuura
 				return false;
 			}
 
-			return BoolFromChar(value.front(), m_value);
+			return BoolFromChar(value.front(), _value);
 		}
 
 		// Uknown type

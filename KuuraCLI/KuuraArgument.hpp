@@ -21,7 +21,7 @@ namespace Kuura
 		Argument(bool required, T&& value) :
 			Required(required),
 			Type(typeid(value)),
-			m_value(value)
+			_value(value)
 		{
 		}
 
@@ -30,14 +30,14 @@ namespace Kuura
 		template <class T>
 		const T& Value() const
 		{
-			return std::get<T>(m_value);
+			return std::get<T>(_value);
 		}
 
 		const bool Required;
 		const std::type_index Type;
 
 	private:
-		Variant m_value;
+		Variant _value;
 	};
 
 	bool TargetFromChar(char c, Argument::Variant& result);

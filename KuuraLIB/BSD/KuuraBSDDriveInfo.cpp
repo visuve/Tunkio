@@ -10,7 +10,7 @@ namespace Kuura
 	public:
 		GeomTree()
 		{
-			m_mesh = std::make_unique<gmesh>();
+			_mesh = std::make_unique<gmesh>();
 
 			if (geom_gettree(m_mesh.get()) != 0)
 			{
@@ -20,18 +20,18 @@ namespace Kuura
 
 		~GeomTree()
 		{
-			geom_deletetree(m_mesh.get());
-			m_mesh.reset();
+			geo_deletetree(_mesh.get());
+			_mesh.reset();
 		}
 
 		gclass* find_geom_class(const std::string& name)
 		{
-			if (!m_mesh)
+			if (!_mesh)
 			{
 				return nullptr;
 			}
 
-			for (gclass* iter = m_mesh->lg_class.lh_first;
+			for (gclass* iter = _mesh->lg_class.lh_first;
 				iter;
 				iter = iter->lg_class.le_next)
 			{
@@ -46,7 +46,7 @@ namespace Kuura
 		}
 
 	private:
-		std::unique_ptr<gmesh> m_mesh;
+		std::unique_ptr<gmesh> _mesh;
 	};
 
 	void FillDriveInfo(ggeom* diskObject, Drive& drive)

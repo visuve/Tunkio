@@ -9,6 +9,6 @@ namespace Kuura
 		void OnTestEnd(const testing::TestInfo& testInfo) override;
 
 	private:
-		std::chrono::high_resolution_clock::time_point m_testStart;
+		std::chrono::high_resolution_clock::time_point _testStart;
 	};
 }

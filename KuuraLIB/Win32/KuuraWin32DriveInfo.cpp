@@ -14,26 +14,26 @@ namespace Kuura
 	public:
 		ComVariant()
 		{
-			VariantInit(&m_value);
+			VariantInit(&_value);
 		}
 
 		~ComVariant()
 		{
-			VariantClear(&m_value);
+			VariantClear(&_value);
 		}
 
 		operator VARIANT* ()
 		{
-			return &m_value;
+			return &_value;
 		}
 
 		VARIANT* operator -> ()
 		{
-			return &m_value;
+			return &_value;
 		}
 
 	private:
-		VARIANT m_value;
+		VARIANT _value;
 	};
 
 	std::string ToUtf8(const std::wstring& unicode)
@@ -76,17 +76,17 @@ namespace Kuura
 		DiskDriveInfo()
 		{
 			// https://docs.microsoft.com/en-us/windows/win32/wmisdk/creating-a-wmi-application-using-c-
-			m_result = CoInitializeEx(nullptr, COINIT_SPEED_OVER_MEMORY | COINIT_MULTITHREADED);
-			m_uninitializeRequired = SUCCEEDED(m_result);
+			_result = CoInitializeEx(nullptr, COINIT_SPEED_OVER_MEMORY | COINIT_MULTITHREADED);
+			_uninitializeRequired = SUCCEEDED(_result);
 
-			if (FAILED(m_result) && m_result != RPC_E_CHANGED_MODE)
+			if (FAILED(_result) && _result != RPC_E_CHANGED_MODE)
 			{
 				std::cerr << "CoInitializeEx failed: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 				return;
 			}
 
-			m_result = CoInitializeSecurity(
+			_result = CoInitializeSecurity(
 				nullptr,
 				-1,
 				nullptr,
@@ -97,27 +97,27 @@ namespace Kuura
 				EOAC_NONE,
 				0);
 
-			if (FAILED(m_result) && m_result != RPC_E_TOO_LATE)
+			if (FAILED(_result) && _result != RPC_E_TOO_LATE)
 			{
 				std::cerr << "CoInitializeSecurity failed: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 				return;
 			}
 
-			m_result = CoCreateInstance(
+			_result = CoCreateInstance(
 				CLSID_WbemLocator,
 				nullptr,
 				CLSCTX_INPROC_SERVER,
-				IID_PPV_ARGS(&m_locator));
+				IID_PPV_ARGS(&_locator));
 
-			if (FAILED(m_result))
+			if (FAILED(_result))
 			{
 				std::cerr << "CoCreateInstance failed: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 				return;
 			}
 
-			m_result = m_locator->ConnectServer(
+			_result = _locator->ConnectServer(
 				BSTR(L"root\\CIMV2"),
 				nullptr,
 				nullptr,
@@ -125,17 +125,17 @@ namespace Kuura
 				WBEM_FLAG_CONNECT_USE_MAX_WAIT,
 				nullptr,
 				nullptr,
-				&m_service);
+				&_service);
 
-			if (FAILED(m_result))
+			if (FAILED(_result))
 			{
 				std::cerr << "IWbemLocator::ConnectServer failed: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 				return;
 			}
 
-			m_result = CoSetProxyBlanket(
-				m_service.Get(),
+			_result = CoSetProxyBlanket(
+				_service.Get(),
 				RPC_C_AUTHN_WINNT,
 				RPC_C_AUTHZ_NONE,
 				nullptr,
@@ -145,19 +145,19 @@ namespace Kuura
 				EOAC_NONE
 			);
 
-			if (FAILED(m_result))
+			if (FAILED(_result))
 			{
 				std::cerr << "CoSetProxyBlanket failed: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 			}
 		}
 
 		~DiskDriveInfo()
 		{
-			m_service.Reset();
-			m_locator.Reset();
+			_service.Reset();
+			_locator.Reset();
 
-			if (m_uninitializeRequired)
+			if (_uninitializeRequired)
 			{
 				CoUninitialize();
 			}
@@ -166,43 +166,43 @@ namespace Kuura
 		// https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskdrive
 		std::vector<Drive> DiskDrives()
 		{
-			if (FAILED(m_result))
+			if (FAILED(_result))
 			{
 				return {};
 			}
 
 			ComPtr<IEnumWbemClassObject> enumerator;
 
-			m_result = m_service->ExecQuery(
+			_result = _service->ExecQuery(
 				BSTR(L"WQL"),
 				BSTR(L"SELECT Caption, DeviceID, Partitions, Size FROM Win32_DiskDrive"),
 				WBEM_FLAG_FORWARD_ONLY,
 				nullptr,
 				&enumerator);
 
-			if (FAILED(m_result))
+			if (FAILED(_result))
 			{
 				std::cerr << "IWbemServices::ExecQuery failed: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 				return {};
 			}
 
 			std::vector<Drive> drives;
 
-			while (SUCCEEDED(m_result))
+			while (SUCCEEDED(_result))
 			{
 				ComPtr<IWbemClassObject> classObject;
 				ULONG numElems;
-				m_result = enumerator->Next(WBEM_INFINITE, 1, &classObject, &numElems);
+				_result = enumerator->Next(WBEM_INFINITE, 1, &classObject, &numElems);
 
-				if (FAILED(m_result))
+				if (FAILED(_result))
 				{
 					std::cerr << "IEnumWbemClassObject::Next failed: 0x"
-						<< std::hex << m_result << std::endl;
+						<< std::hex << _result << std::endl;
 					return drives;
 				}
 
-				if (m_result == WBEM_S_FALSE)
+				if (_result == WBEM_S_FALSE)
 				{
 					return drives;
 				}
@@ -230,12 +230,12 @@ namespace Kuura
 			std::any result;
 			ComVariant comVariant;
 
-			m_result = classObject->Get(name, 0, comVariant, nullptr, nullptr);
+			_result = classObject->Get(name, 0, comVariant, nullptr, nullptr);
 
-			if (FAILED(m_result) || comVariant->vt == VT_NULL)
+			if (FAILED(_result) || comVariant->vt == VT_NULL)
 			{
 				std::wcerr << L"Fecthing " << name << L" failed. HRESULT: 0x"
-					<< std::hex << m_result << std::endl;
+					<< std::hex << _result << std::endl;
 
 				return T();
 			}
@@ -270,10 +270,10 @@ namespace Kuura
 			return std::any_cast<T>(result);
 		}
 
-		bool m_uninitializeRequired = false;
-		HRESULT m_result;
-		ComPtr<IWbemLocator> m_locator;
-		ComPtr<IWbemServices> m_service;
+		bool _uninitializeRequired = false;
+		HRESULT _result;
+		ComPtr<IWbemLocator> _locator;
+		ComPtr<IWbemServices> _service;
 	};
 
 	std::vector<Drive> DriveInfo()

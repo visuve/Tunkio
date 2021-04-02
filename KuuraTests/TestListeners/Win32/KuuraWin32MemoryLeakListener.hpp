@@ -12,6 +12,6 @@ namespace Kuura
 		void OnTestEnd(const testing::TestInfo& testInfo) override;
 
 	private:
-		_CrtMemState m_testStart = {};
+		_CrtMemState _testStart = {};
 	};
 }

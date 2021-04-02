@@ -4,7 +4,7 @@
 
 namespace Kuura
 {
-	CLI g_cli;
+	CLI _cli;
 
 	std::map<std::string, Argument> Arguments =
 	{
@@ -20,7 +20,7 @@ namespace Kuura
 	void SignalHandler(int signal)
 	{
 		std::cout << "Got signal: " << signal << std::endl;
-		g_cli.Stop();
+		_cli.Stop();
 	}
 
 	void PrintUsage(const std::filesystem::path& exe)
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if (!g_cli.Initialize(
+	if (!_cli.Initialize(
 		Arguments.at("path").Value<std::filesystem::path>(),
 		Arguments.at("target").Value<KuuraTargetType>(),
 		Arguments.at("mode").Value<KuuraFillType>(),
@@ -227,10 +227,10 @@ int main(int argc, char* argv[])
 		return ErrorCode::Generic;
 	}
 
-	if (!g_cli.Run())
+	if (!_cli.Run())
 	{
 		std::cerr << "Kuura failed." << std::endl;
-		return g_cli.Error();
+		return _cli.Error();
 	}
 
 	return ErrorCode::Success;

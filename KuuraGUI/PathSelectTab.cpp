@@ -17,25 +17,25 @@ public:
 
 	int rowCount(const QModelIndex&) const override
 	{
-		return m_files.size();
+		return _files.size();
 	}
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
 	{
-		if (index.row() > m_files.size())
+		if (index.row() > _files.size())
 		{
 			return QVariant();
 		}
 
 		if (role == Qt::DisplayRole)
 		{
-			const QFileInfo& file = m_files[index.row()];
+			const QFileInfo& file = _files[index.row()];
 			return QDir::toNativeSeparators(file.absoluteFilePath());
 		}
 
 		if (role == Qt::DecorationRole)
 		{
-			const QFileInfo& file = m_files[index.row()];
+			const QFileInfo& file = _files[index.row()];
 			return QApplication::style()->standardIcon(file.isDir() ? QStyle::SP_DirIcon : QStyle::SP_FileIcon);
 		}
 
@@ -44,14 +44,14 @@ public:
 
 	void addPaths(QVector<QFileInfo>&& paths)
 	{
-		beginInsertRows(QModelIndex(), m_files.size(), m_files.size() + paths.size());
+		beginInsertRows(QModelIndex(), _files.size(), _files.size() + paths.size());
 
 		for (const QFileInfo& file : paths)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-			m_files.emplaceBack(file);
+			_files.emplaceBack(file);
 #else
-			m_files.append(file);
+			_files.append(file);
 #endif
 		}
 
@@ -60,11 +60,11 @@ public:
 
 	const QVector<QFileInfo>& selectedPaths() const
 	{
-		return m_files;
+		return _files;
 	}
 
 private:
-	QVector<QFileInfo> m_files;
+	QVector<QFileInfo> _files;
 };
 
 PathSelectTab::PathSelectTab(QWidget *parent) :

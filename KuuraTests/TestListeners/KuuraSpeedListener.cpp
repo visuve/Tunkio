@@ -13,7 +13,7 @@ namespace Kuura
 
 	void SpeedListener::OnTestStart(const testing::TestInfo&)
 	{
-		m_testStart = std::chrono::high_resolution_clock::now();
+		_testStart = std::chrono::high_resolution_clock::now();
 	}
 
 	void SpeedListener::OnTestEnd(const testing::TestInfo& testInfo)
@@ -30,7 +30,7 @@ namespace Kuura
 		}
 #endif
 
-		const auto elapsed = std::chrono::high_resolution_clock::now() - m_testStart;
+		const auto elapsed = std::chrono::high_resolution_clock::now() - _testStart;
 
 		if (elapsed > Limit)
 		{

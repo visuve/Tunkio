@@ -19,9 +19,9 @@ namespace Kuura
 
 	void Win32MemoryLeakListener::OnTestStart(const testing::TestInfo&)
 	{
-		memset(&m_testStart, 0, sizeof(_CrtMemState));
+		memset(&_testStart, 0, sizeof(_CrtMemState));
 
-		_CrtMemCheckpoint(&m_testStart);
+		_CrtMemCheckpoint(&_testStart);
 	}
 
 	void Win32MemoryLeakListener::OnTestEnd(const testing::TestInfo& testInfo)
@@ -35,7 +35,7 @@ namespace Kuura
 		_CrtMemState diff = {};
 		_CrtMemCheckpoint(&testEnd);
 
-		if (!_CrtMemDifference(&diff, &m_testStart, &testEnd))
+		if (!_CrtMemDifference(&diff, &_testStart, &testEnd))
 		{
 			return;
 		}

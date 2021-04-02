@@ -5,9 +5,9 @@ namespace Kuura
 {
 	File::File(const std::filesystem::path& path) :
 		IFillConsumer(path),
-		m_allocationSize(2048),
-		m_alignmentSize(512),
-		m_optimalWriteSize(1024)
+		_allocationSize(2048),
+		_alignmentSize(512),
+		_optimalWriteSize(1024)
 	{
 	}
 
@@ -22,13 +22,13 @@ namespace Kuura
 		if (this != &other)
 		{
 #if defined(_WIN32)
-			std::swap(m_handle, other.m_handle);
+			std::swap(_handle, other._handle);
 #else
-			std::swap(m_descriptor, other.m_descriptor);
+			std::swap(_descriptor, other._descriptor);
 #endif
-			std::swap(m_allocationSize, other.m_allocationSize);
-			std::swap(m_alignmentSize, other.m_alignmentSize);
-			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+			std::swap(_allocationSize, other._allocationSize);
+			std::swap(_alignmentSize, other._alignmentSize);
+			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
 		return *this;
@@ -45,17 +45,17 @@ namespace Kuura
 
 	std::optional<uint64_t> File::Size() const
 	{
-		return m_allocationSize;
+		return _allocationSize;
 	}
 
 	std::optional<uint64_t> File::AlignmentSize() const
 	{
-		return m_alignmentSize;
+		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const
 	{
-		return m_optimalWriteSize;
+		return _optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> File::Write(const std::span<std::byte> data)

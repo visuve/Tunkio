@@ -32,10 +32,10 @@ public:
 
 private:
 	Ui::MainWindow* ui = nullptr;
-	TargetSelectTab* m_targetSelectTab = nullptr;
-	PathSelectTab* m_pathSelectTab = nullptr;
-	DriveSelectTab* m_driveSelectTab = nullptr;
-	AlgorithmTab* m_algorithmTab = nullptr;
-	ProgressTab* m_progressTab = nullptr;
-	ResultsTab* m_resultsTab = nullptr;
+	TargetSelectTab* _targetSelectTab = nullptr;
+	PathSelectTab* _pathSelectTab = nullptr;
+	DriveSelectTab* _driveSelectTab = nullptr;
+	AlgorithmTab* _algorithmTab = nullptr;
+	ProgressTab* _progressTab = nullptr;
+	ResultsTab* _resultsTab = nullptr;
 };

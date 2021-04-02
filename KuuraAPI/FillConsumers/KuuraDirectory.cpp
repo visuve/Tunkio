@@ -25,18 +25,18 @@ namespace Kuura
 				return;
 			}
 
-			if (!m_files.has_value())
+			if (!_files.has_value())
 			{
-				m_files.emplace();
+				_files.emplace();
 			}
 
-			if (!m_size.has_value())
+			if (!_size.has_value())
 			{
-				m_size = 0;
+				_size = 0;
 			}
 
-			m_files.value().emplace_back(file);
-			m_size.value() += file->Size().value();
+			_files.value().emplace_back(file);
+			_size.value() += file->Size().value();
 		}
 	}
 
@@ -46,22 +46,22 @@ namespace Kuura
 
 	std::optional<std::vector<std::shared_ptr<File>>>& Directory::Files()
 	{
-		return m_files;
+		return _files;
 	}
 
 	std::optional<uint64_t> Directory::Size() const
 	{
-		return m_size;
+		return _size;
 	}
 
 	bool Directory::RemoveAll()
 	{
-		if (!m_files.has_value())
+		if (!_files.has_value())
 		{
 			return false;
 		}
 
-		for (auto& file : m_files.value())
+		for (auto& file : _files.value())
 		{
 			if (!file->Delete())
 			{

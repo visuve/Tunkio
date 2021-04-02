@@ -4,9 +4,9 @@
 namespace Kuura
 {
 	IWorkload::IWorkload(const Composer* parent, const std::filesystem::path& path, bool remove) :
-		m_parent(parent),
-		m_path(path),
-		m_removeAfterOverwrite(remove)
+		_parent(parent),
+		_path(path),
+		_removeAfterOverwrite(remove)
 	{
 	}
 
@@ -34,7 +34,7 @@ namespace Kuura
 
 			if (!result.first)
 			{
-				m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
+				_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
 				return false;
 			}
 
@@ -44,18 +44,18 @@ namespace Kuura
 
 				if (!actualData.first)
 				{
-					m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 
 				if (!std::equal(writtenData.begin(), writtenData.end(), actualData.second.begin()))
 				{
-					m_parent->Callbacks.OnError(m_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 			}
 
-			if (!m_parent->Callbacks.OnProgress(m_path.c_str(), pass, bytesWritten))
+			if (!_parent->Callbacks.OnProgress(_path.c_str(), pass, bytesWritten))
 			{
 				return true;
 			}

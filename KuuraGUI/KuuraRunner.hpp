@@ -25,8 +25,8 @@ signals:
 	void errorOccurred(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:
-	std::atomic<bool> m_keepRunning;
+	std::atomic<bool> _keepRunning;
 	void attachCallbacks();
 	void run() override;
-	KuuraHandle* m_kuura = nullptr;
+	KuuraHandle* _kuura = nullptr;
 };

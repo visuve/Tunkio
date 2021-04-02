@@ -13,9 +13,9 @@ namespace Kuura
 		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
 
 	protected:
-		const std::string m_fillString;
+		const std::string _fillString;
 
 	private:
-		size_t m_offset = 0;
+		size_t _offset = 0;
 	};
 }

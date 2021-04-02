@@ -51,17 +51,17 @@ namespace Kuura::Time
 		template <typename T>
 		T Elapsed() const
 		{
-			const auto diff = std::chrono::high_resolution_clock::now() - m_start;
+			const auto diff = std::chrono::high_resolution_clock::now() - _start;
 			return std::chrono::duration_cast<T>(diff);
 		}
 
 		void Reset()
 		{
-			m_start = std::chrono::high_resolution_clock::now();
+			_start = std::chrono::high_resolution_clock::now();
 		}
 
 		Duration Elapsed() const;
 	private:
-		std::chrono::high_resolution_clock::time_point m_start = std::chrono::high_resolution_clock::now();
+		std::chrono::high_resolution_clock::time_point _start = std::chrono::high_resolution_clock::now();
 	};
 }

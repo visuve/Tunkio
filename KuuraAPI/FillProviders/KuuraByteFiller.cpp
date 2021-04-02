@@ -5,18 +5,18 @@ namespace Kuura
 {
 	ByteFiller::ByteFiller(std::byte byte, bool verify) :
 		IFillProvider(verify),
-		m_byte(byte)
+		_byte(byte)
 	{
 	}
 
 	std::span<std::byte> ByteFiller::Data(uint64_t bytes, uint64_t alignment)
 	{
-		if (m_fillData.size() != bytes)
+		if (_fillData.size() != bytes)
 		{
-			m_fillData.resize(bytes, m_byte);
+			_fillData.resize(bytes, _byte);
 			AlignData(alignment);
 		}
 
-		return m_fillData;
+		return _fillData;
 	}
 }

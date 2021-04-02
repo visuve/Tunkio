@@ -10,13 +10,13 @@ TargetSelectTab::TargetSelectTab(QWidget* parent) :
 
 	connect(ui->radioButtonPath, &QRadioButton::clicked, [this]()
 	{
-		m_selectedTargetType = KuuraTargetType::FileOverwrite;
+		_selectedTargetType = KuuraTargetType::FileOverwrite;
 		emit targetTypeSelected(KuuraTargetType::FileOverwrite);
 	});
 
 	connect(ui->radioButtonDrive, &QRadioButton::clicked, [this]()
 	{
-		m_selectedTargetType = KuuraTargetType::DriveOverwrite;
+		_selectedTargetType = KuuraTargetType::DriveOverwrite;
 		emit targetTypeSelected(KuuraTargetType::DriveOverwrite);
 	});
 
@@ -39,5 +39,5 @@ TargetSelectTab::~TargetSelectTab()
 
 KuuraTargetType TargetSelectTab::selectedTargetType() const
 {
-	return m_selectedTargetType;
+	return _selectedTargetType;
 }

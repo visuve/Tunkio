@@ -44,23 +44,23 @@ namespace Kuura
 
 	Drive::Drive(const std::filesystem::path& path) :
 		IFillConsumer(path),
-		m_handle(Open(path))
+		_handle(Open(path))
 	{
 		if (!IsValid())
 		{
 			return;
 		}
 
-		m_actualSize = DiskSizeByHandle(m_handle);
-		m_alignmentSize = PageSize();
-		m_optimalWriteSize = OptimalWriteSizeByHandle(m_handle);
+		_actualSize = DiskSizeByHandle(_handle);
+		_alignmentSize = PageSize();
+		_optimalWriteSize = OptimalWriteSizeByHandle(_handle);
 
-		if (!m_alignmentSize || m_alignmentSize.value() % 512 != 0)
+		if (!_alignmentSize || _alignmentSize.value() % 512 != 0)
 		{
 			// Something is horribly wrong
-			m_actualSize = std::nullopt;
-			m_alignmentSize = std::nullopt;
-			m_optimalWriteSize = std::nullopt;
+			_actualSize = std::nullopt;
+			_alignmentSize = std::nullopt;
+			_optimalWriteSize = std::nullopt;
 		}
 	}
 
@@ -75,10 +75,10 @@ namespace Kuura
 		if (this != &other)
 		{
 			std::swap(Path, other.Path);
-			std::swap(m_handle, other.m_handle);
-			std::swap(m_actualSize, other.m_actualSize);
-			std::swap(m_alignmentSize, other.m_alignmentSize);
-			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+			std::swap(_handle, other._handle);
+			std::swap(_actualSize, other._actualSize);
+			std::swap(_alignmentSize, other._alignmentSize);
+			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
 		return *this;
@@ -88,20 +88,20 @@ namespace Kuura
 	{
 		if (IsValid())
 		{
-			CloseHandle(m_handle);
-			m_handle = nullptr;
+			CloseHandle(_handle);
+			_handle = nullptr;
 		}
 	}
 
 	bool Drive::IsValid() const
 	{
-		return m_handle != nullptr && m_handle != INVALID_HANDLE_VALUE;
+		return _handle != nullptr && _handle != INVALID_HANDLE_VALUE;
 	}
 
 	bool Drive::Unmount() const
 	{
 		if (!DeviceIoControl(
-			m_handle,
+			_handle,
 			IOCTL_DISK_DELETE_DRIVE_LAYOUT,
 			nullptr,
 			0,
@@ -118,17 +118,17 @@ namespace Kuura
 
 	std::optional<uint64_t> Drive::Size() const
 	{
-		return m_actualSize;
+		return _actualSize;
 	}
 
 	std::optional<uint64_t> Drive::AlignmentSize() const
 	{
-		return m_alignmentSize;
+		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> Drive::OptimalWriteSize() const
 	{
-		return m_optimalWriteSize;
+		return _optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> Drive::Write(const std::span<std::byte> data)
@@ -136,7 +136,7 @@ namespace Kuura
 		DWORD bytesWritten = 0;
 		DWORD bytesToWrite = static_cast<DWORD>(data.size_bytes());
 
-		if (!WriteFile(m_handle, data.data(), bytesToWrite, &bytesWritten, nullptr))
+		if (!WriteFile(_handle, data.data(), bytesToWrite, &bytesWritten, nullptr))
 		{
 			return { false, bytesWritten };
 		}
@@ -150,7 +150,7 @@ namespace Kuura
 		DWORD bytesRead = 0;
 		OVERLAPPED overlapped = Offset(offset);
 
-		if (!ReadFile(m_handle, buffer.data(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
+		if (!ReadFile(_handle, buffer.data(), static_cast<DWORD>(bytes), &bytesRead, &overlapped))
 		{
 			return { false, {} };
 		}

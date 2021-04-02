@@ -67,7 +67,7 @@ public:
 
 	int rowCount(const QModelIndex&) const override
 	{
-		return m_request.size();
+		return _request.size();
 	}
 
 	int columnCount(const QModelIndex&) const override
@@ -77,12 +77,12 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
 	{
-		if (role != Qt::DisplayRole || index.row() > m_request.size())
+		if (role != Qt::DisplayRole || index.row() > _request.size())
 		{
 			return {};
 		}
 
-		const OverWriteRequest& requ = m_request[index.row()];
+		const OverWriteRequest& requ = _request[index.row()];
 
 		switch (index.column())
 		{
@@ -122,7 +122,7 @@ public:
 
 	void addOverwritePass(KuuraFillType fillType, bool verify, const QByteArray& fillValue = QByteArray())
 	{
-		int row = m_request.size();
+		int row = _request.size();
 		beginInsertRows(QModelIndex(), row, row);
 
 		OverWriteRequest req = {};
@@ -162,22 +162,22 @@ public:
 		}
 
 		req.verify = verify;
-		m_request.append(req);
+		_request.append(req);
 		endInsertRows();
 	}
 
 	void clearRequests()
 	{
-		if (!m_request.isEmpty())
+		if (!_request.isEmpty())
 		{
 			beginResetModel();
-			m_request.clear();
+			_request.clear();
 			endResetModel();
 		}
 	}
 
 private:
-	QVector<OverWriteRequest> m_request;
+	QVector<OverWriteRequest> _request;
 };
 
 AlgorithmTab::AlgorithmTab(QWidget* parent) :

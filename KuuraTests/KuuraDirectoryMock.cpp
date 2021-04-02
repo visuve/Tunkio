@@ -6,8 +6,8 @@ namespace Kuura
 	Directory::Directory(const std::filesystem::path& path) :
 		Path(path)
 	{
-		m_files.emplace().emplace_back(std::make_shared<File>("foobar"));
-		m_size = 4000;
+		_files.emplace().emplace_back(std::make_shared<File>("foobar"));
+		_size = 4000;
 	}
 
 	Directory::~Directory()
@@ -16,12 +16,12 @@ namespace Kuura
 
 	std::optional<std::vector<std::shared_ptr<File>>>& Directory::Files()
 	{
-		return m_files;
+		return _files;
 	}
 
 	std::optional<uint64_t> Directory::Size() const
 	{
-		return m_size;
+		return _size;
 	}
 
 	bool Directory::RemoveAll()

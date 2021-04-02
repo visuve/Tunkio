@@ -17,7 +17,7 @@ namespace Kuura
 
 	FileFiller::FileFiller(const std::vector<std::byte>& content, bool verify) :
 		IFillProvider(verify),
-		m_fileContent(content)
+		_fileContent(content)
 	{
 	}
 
@@ -28,29 +28,29 @@ namespace Kuura
 
 	bool FileFiller::HasContent()
 	{
-		return !m_fileContent.empty();
+		return !_fileContent.empty();
 	}
 
 	std::span<std::byte> FileFiller::Data(uint64_t bytes, uint64_t alignment)
 	{
 		assert(HasContent());
 
-		if (m_fillData.size() != bytes)
+		if (_fillData.size() != bytes)
 		{
-			m_fillData.resize(bytes);
+			_fillData.resize(bytes);
 			AlignData(alignment);
 		}
 
 		for (size_t i = 0; i < bytes; ++i)
 		{
-			m_fillData[i]  = m_fileContent[m_offset];
+			_fillData[i]  = _fileContent[_offset];
 
-			if (++m_offset >= m_fileContent.size())
+			if (++_offset >= _fileContent.size())
 			{
-				m_offset = 0;
+				_offset = 0;
 			}
 		}
 
-		return m_fillData;
+		return _fillData;
 	}
 }

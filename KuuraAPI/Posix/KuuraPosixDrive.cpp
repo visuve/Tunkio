@@ -27,7 +27,7 @@ namespace Kuura
 
 	Drive::Drive(const std::filesystem::path& path) :
 		IFillConsumer(path),
-		m_descriptor(open(path.c_str(), OpenFlags))
+		_descriptor(open(path.c_str(), OpenFlags))
 	{
 		if (!IsValid())
 		{
@@ -35,27 +35,27 @@ namespace Kuura
 		}
 
 		std::optional<FileInfo> fileInfo =
-			FileInfoFromDescriptor(m_descriptor);
+			FileInfoFromDescriptor(_descriptor);
 
 		if (!fileInfo)
 		{
 			return;
 		}
 
-		m_actualSize = DiskSizeByDescriptor(m_descriptor);
+		_actualSize = DiskSizeByDescriptor(_descriptor);
 
 		// See notes in KuuraWin32File.cpp
 
-		m_alignmentSize = fileInfo->st_blksize;
-		m_optimalWriteSize = fileInfo->st_blksize / 512 * 0x10000;
+		_alignmentSize = fileInfo->st_blksize;
+		_optimalWriteSize = fileInfo->st_blksize / 512 * 0x10000;
 
-		if (m_alignmentSize.value() % 512 != 0)
+		if (_alignmentSize.value() % 512 != 0)
 		{
 			// Something is horribly wrong
 
-			m_actualSize = std::nullopt;
-			m_alignmentSize = std::nullopt;
-			m_optimalWriteSize = std::nullopt;
+			_actualSize = std::nullopt;
+			_alignmentSize = std::nullopt;
+			_optimalWriteSize = std::nullopt;
 		}
 	}
 
@@ -70,10 +70,10 @@ namespace Kuura
 		if (this != &other)
 		{
 			std::swap(Path, other.Path);
-			std::swap(m_descriptor, other.m_descriptor);
-			std::swap(m_actualSize, other.m_actualSize);
-			std::swap(m_alignmentSize, other.m_alignmentSize);
-			std::swap(m_optimalWriteSize, other.m_optimalWriteSize);
+			std::swap(_descriptor, other._descriptor);
+			std::swap(_actualSize, other._actualSize);
+			std::swap(_alignmentSize, other._alignmentSize);
+			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
 		return *this;
@@ -81,16 +81,16 @@ namespace Kuura
 
 	Drive::~Drive()
 	{
-		if (m_descriptor)
+		if (_descriptor)
 		{
-			close(m_descriptor);
-			m_descriptor = -1;
+			close(_descriptor);
+			_descriptor = -1;
 		}
 	}
 
 	bool Drive::IsValid() const
 	{
-		return m_descriptor > 0;
+		return _descriptor > 0;
 	}
 
 	bool Drive::Unmount() const
@@ -102,26 +102,26 @@ namespace Kuura
 
 	std::optional<uint64_t> Drive::Size() const
 	{
-		return m_actualSize;
+		return _actualSize;
 	}
 
 	std::optional<uint64_t> Drive::AlignmentSize() const
 	{
-		return m_alignmentSize;
+		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> Drive::OptimalWriteSize() const
 	{
-		return m_optimalWriteSize;
+		return _optimalWriteSize;
 	}
 
 	std::pair<bool, uint64_t> Drive::Write(const std::span<std::byte> data)
 	{
-		return WriteTo(m_descriptor, data);
+		return WriteTo(_descriptor, data);
 	}
 
 	std::pair<bool, std::vector<std::byte>> Drive::Read(uint64_t bytes, uint64_t offset)
 	{
-		return ReadFrom(m_descriptor, bytes, offset);
+		return ReadFrom(_descriptor, bytes, offset);
 	}
 }

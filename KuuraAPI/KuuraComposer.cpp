@@ -40,12 +40,12 @@ namespace Kuura
 		{
 			case KuuraTargetType::FileOverwrite:
 			{
-				m_workloads.emplace_back(new Kuura::FileOverwrite(this, path, removeAfterOverwrite));
+				_workloads.emplace_back(new Kuura::FileOverwrite(this, path, removeAfterOverwrite));
 				return true;
 			}
 			case KuuraTargetType::DirectoryOverwrite:
 			{
-				m_workloads.emplace_back(new Kuura::DirectoryOverwrite(this, path, removeAfterOverwrite));
+				_workloads.emplace_back(new Kuura::DirectoryOverwrite(this, path, removeAfterOverwrite));
 				return true;
 			}
 			case KuuraTargetType::DriveOverwrite:
@@ -55,7 +55,7 @@ namespace Kuura
 					return false;
 				}
 
-				m_workloads.emplace_back(new Kuura::DriveOverwrite(this, path));
+				_workloads.emplace_back(new Kuura::DriveOverwrite(this, path));
 				return true;
 			}
 		}
@@ -69,12 +69,12 @@ namespace Kuura
 		{
 			case KuuraFillType::ZeroFill:
 			{
-				m_fillers.emplace_back(new Kuura::ByteFiller(std::byte(0x00), verify));
+				_fillers.emplace_back(new Kuura::ByteFiller(std::byte(0x00), verify));
 				return true;
 			}
 			case KuuraFillType::OneFill:
 			{
-				m_fillers.emplace_back(new Kuura::ByteFiller(std::byte(0xFF), verify));
+				_fillers.emplace_back(new Kuura::ByteFiller(std::byte(0xFF), verify));
 				return true;
 			}
 			case KuuraFillType::ByteFill:
@@ -84,7 +84,7 @@ namespace Kuura
 					return false;
 				}
 
-				m_fillers.emplace_back(new Kuura::ByteFiller(std::byte(optional[0]), verify));
+				_fillers.emplace_back(new Kuura::ByteFiller(std::byte(optional[0]), verify));
 				return true;
 			}
 			case KuuraFillType::SequenceFill:
@@ -94,7 +94,7 @@ namespace Kuura
 					return false;
 				}
 
-				m_fillers.emplace_back(new Kuura::SequenceFiller(optional, verify));
+				_fillers.emplace_back(new Kuura::SequenceFiller(optional, verify));
 				return true;
 			}
 			case KuuraFillType::FileFill:
@@ -111,12 +111,12 @@ namespace Kuura
 					return false;
 				}
 
-				m_fillers.emplace_back(fileFiller);
+				_fillers.emplace_back(fileFiller);
 				return true;
 			}
 			case KuuraFillType::RandomFill:
 			{
-				m_fillers.emplace_back(new Kuura::RandomFiller(verify));
+				_fillers.emplace_back(new Kuura::RandomFiller(verify));
 				return true;
 			}
 		}
@@ -126,7 +126,7 @@ namespace Kuura
 
 	bool Composer::Run()
 	{
-		for (auto& workload : m_workloads)
+		for (auto& workload : _workloads)
 		{
 			if (!workload->Run())
 			{
@@ -134,16 +134,16 @@ namespace Kuura
 			}
 		}
 
-		return !m_workloads.empty();
+		return !_workloads.empty();
 	}
 
 	const std::vector<std::shared_ptr<IWorkload>>& Composer::Workloads() const
 	{
-		return m_workloads;
+		return _workloads;
 	}
 
 	const std::vector<std::shared_ptr<IFillProvider>>& Composer::Fillers() const
 	{
-		return m_fillers;
+		return _fillers;
 	}
 }

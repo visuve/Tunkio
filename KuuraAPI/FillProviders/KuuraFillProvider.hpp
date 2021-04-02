@@ -20,7 +20,7 @@ namespace Kuura
 
 		virtual ~IFillProvider()
 		{
-			m_fillData.clear();
+			_fillData.clear();
 		}
 
 		virtual std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) = 0;
@@ -29,8 +29,8 @@ namespace Kuura
 		{
 			if (alignment)
 			{
-				size_t space = m_fillData.size();
-				void* data = m_fillData.data();
+				size_t space = _fillData.size();
+				void* data = _fillData.data();
 
 				assert(space && space % 512 == 0);
 				assert(space >= alignment);
@@ -48,6 +48,6 @@ namespace Kuura
 		const bool Verify;
 
 	protected:
-		std::vector<std::byte> m_fillData;
+		std::vector<std::byte> _fillData;
 	};
 }

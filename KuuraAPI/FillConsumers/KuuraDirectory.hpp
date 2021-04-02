@@ -19,7 +19,7 @@ namespace Kuura
 		bool RemoveAll();
 
 	private:
-		std::optional<std::vector<std::shared_ptr<File>>> m_files;
-		std::optional<uint64_t> m_size;
+		std::optional<std::vector<std::shared_ptr<File>>> _files;
+		std::optional<uint64_t> _size;
 	};
 }

@@ -15,7 +15,7 @@ namespace Kuura
 		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
 
 	private:
-		const std::vector<std::byte> m_fileContent;
-		size_t m_offset = 0;
+		const std::vector<std::byte> _fileContent;
+		size_t _offset = 0;
 	};
 }

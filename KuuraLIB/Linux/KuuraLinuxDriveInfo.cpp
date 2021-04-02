@@ -10,7 +10,7 @@ namespace Kuura
 	public:
 		UDeviceContext()
 		{
-			if (!m_context)
+			if (!_context)
 			{
 				std::cerr << "Could not create udev context!" << std::endl;
 				return;
@@ -19,29 +19,29 @@ namespace Kuura
 
 		~UDeviceContext()
 		{
-			for (udev_enumerate* enumerator : m_enumerators)
+			for (udev_enumerate* enumerator : _enumerators)
 			{
 				udev_enumerate_unref(enumerator);
 			}
 
-			if (m_context)
+			if (_context)
 			{
-				udev_unref(m_context);
+				udev_unref(_context);
 			}
 		}
 
 		operator udev* () const
 		{
-			return m_context;
+			return _context;
 		}
 
 		udev_enumerate* CreateEnumerator()
 		{
-			udev_enumerate* enumerator = udev_enumerate_new(m_context);
+			udev_enumerate* enumerator = udev_enumerate_new(_context);
 
 			if (enumerator)
 			{
-				return m_enumerators.emplace_back(enumerator);
+				return _enumerators.emplace_back(enumerator);
 			}
 
 			std::cerr << "Could not create enumerator!" << std::endl;
@@ -49,15 +49,15 @@ namespace Kuura
 		}
 
 	private:
-		udev* m_context = udev_new();
-		std::vector<udev_enumerate*> m_enumerators;
+		udev* _context = udev_new();
+		std::vector<udev_enumerate*> _enumerators;
 	};
 
 	class UDevice
 	{
 	public:
 		UDevice(UDeviceContext& context, udev_list_entry* device_list_entry) :
-			m_context(context)
+			_context(context)
 		{
 			const char* path = udev_list_entry_get_name(device_list_entry);
 
@@ -67,43 +67,43 @@ namespace Kuura
 				return;
 			}
 
-			m_devicePath = path;
+			_devicePath = path;
 			m_device = udev_device_new_from_syspath(context, path);
 
-			if (!m_device)
+			if (!_device)
 			{
 				std::cerr << "Failed to get device from path: '"
-					<< m_devicePath << "'!" << std::endl;
+					<< _devicePath << "'!" << std::endl;
 				return;
 			}
 		}
 
 		~UDevice()
 		{
-			if (m_device)
+			if (_device)
 			{
-				udev_device_unref(m_device);
+				udev_device_unref(_device);
 			}
 		}
 
 		operator udev_device* () const
 		{
-			return m_device;
+			return _device;
 		}
 
 		std::string DevicePath() const
 		{
-			return m_devicePath;
+			return _devicePath;
 		}
 
 		std::string DeviceType() const
 		{
-			const char* type = udev_device_get_devtype(m_device);
+			const char* type = udev_device_get_devtype(_device);
 
 			if (!type)
 			{
 				std::cerr << "Failed to get device type from path: '"
-					<< m_devicePath << "'!" << std::endl;
+					<< _devicePath << "'!" << std::endl;
 				return {};
 			}
 
@@ -112,22 +112,22 @@ namespace Kuura
 
 		std::string SystemName() const
 		{
-			const char* system_name = udev_device_get_sysname(m_device);
+			const char* systemName = udev_device_get_sysname(m_device);
 
-			if (!system_name)
+			if (!systeName)
 			{
 				std::cerr << "Failed to get system name from path: '"
-					<< m_devicePath << "'!" << std::endl;
+					<< _devicePath << "'!" << std::endl;
 				return {};
 			}
 
-			return system_name;
+			return systeName;
 		}
 
 		udev_list_entry* Partitions()
 		{
-			udev_enumerate* enumerator = m_context.CreateEnumerator();
-			udev_enumerate_add_match_parent(enumerator, m_device);
+			udev_enumerate* enumerator = _context.CreateEnumerator();
+			udev_enumerate_add_match_parent(enumerator, _device);
 			udev_enumerate_add_match_property(enumerator, "DEVTYPE", "partition");
 			udev_enumerate_scan_devices(enumerator);
 			return udev_enumerate_get_list_entry(enumerator);
@@ -139,9 +139,9 @@ namespace Kuura
 		}
 
 	private:
-		UDeviceContext& m_context;
-		udev_device* m_device = nullptr;
-		std::string m_devicePath;
+		UDeviceContext& _context;
+		udev_device* _device = nullptr;
+		std::string _devicePath;
 	};
 
 

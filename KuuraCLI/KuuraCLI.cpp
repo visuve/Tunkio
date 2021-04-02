@@ -5,11 +5,11 @@ namespace Kuura
 {
 	CLI::~CLI()
 	{
-		m_keepRunning = false;
+		_keepRunning = false;
 
-		if (m_handle)
+		if (_handle)
 		{
-			KuuraFree(m_handle);
+			KuuraFree(_handle);
 		}
 	}
 
@@ -21,21 +21,21 @@ namespace Kuura
 		bool verify,
 		bool remove)
 	{
-		m_handle = KuuraInitialize(this);
+		_handle = KuuraInitialize(this);
 
-		if (!KuuraAddTarget(m_handle, path.c_str(), targetType, remove))
+		if (!KuuraAddTarget(_handle, path.c_str(), targetType, remove))
 		{
 			std::cerr << "KuuraAddTarget failed!" << std::endl;
 			return false;
 		}
 
-		if (!KuuraAddOverwriteRound(m_handle, fillType, verify, filler.c_str()))
+		if (!KuuraAddOverwriteRound(_handle, fillType, verify, filler.c_str()))
 		{
 			std::cerr << "KuuraAddOverwriteRound failed!" << std::endl;
 			return false;
 		}
 
-		KuuraSetOverwriteStartedCallback(m_handle, [](
+		KuuraSetOverwriteStartedCallback(_handle, [](
 			void* context,
 			uint16_t passes,
 			uint64_t bytesToWritePerPass)
@@ -44,7 +44,7 @@ namespace Kuura
 			self->OnOverwriteStarted(passes, bytesToWritePerPass);
 		});
 
-		KuuraSetPassStartedCallback(m_handle, [](
+		KuuraSetPassStartedCallback(_handle, [](
 			void* context,
 			const KuuraChar* path,
 			uint16_t pass)
@@ -53,7 +53,7 @@ namespace Kuura
 			self->OnPassStarted(path, pass);
 		});
 
-		KuuraSetProgressCallback(m_handle, [](
+		KuuraSetProgressCallback(_handle, [](
 			void* context,
 			const KuuraChar* path,
 			uint16_t pass,
@@ -63,7 +63,7 @@ namespace Kuura
 			return self->OnProgress(path, pass, bytesWritten);
 		});
 
-		KuuraSetPassCompletedCallback(m_handle, [](
+		KuuraSetPassCompletedCallback(_handle, [](
 			void* context,
 			const KuuraChar* path,
 			uint16_t pass)
@@ -72,7 +72,7 @@ namespace Kuura
 			self->OnPassCompleted(path, pass);
 		});
 
-		KuuraSetOverwriteCompletedCallback(m_handle, [](
+		KuuraSetOverwriteCompletedCallback(_handle, [](
 			void* context,
 			uint16_t passes,
 			uint64_t totalBytesWritten)
@@ -81,7 +81,7 @@ namespace Kuura
 			self->OnOverwriteCompleted(passes, totalBytesWritten);
 		});
 
-		KuuraSetErrorCallback(m_handle, [](
+		KuuraSetErrorCallback(_handle, [](
 			void* context,
 			const KuuraChar* path,
 			KuuraStage stage,
@@ -98,61 +98,61 @@ namespace Kuura
 
 	bool CLI::Run()
 	{
-		return KuuraRun(m_handle);
+		return KuuraRun(_handle);
 	}
 
 	void CLI::Stop()
 	{
-		m_keepRunning = false;
+		_keepRunning = false;
 	}
 
 	int32_t CLI::Error() const
 	{
-		return m_error;
+		return _error;
 	}
 
 	void CLI::OnOverwriteStarted(uint16_t passes, uint64_t bytesLeft)
 	{
-		m_bytesToWrite = bytesLeft;
-		m_bytesWrittenLastTime = 0;
+		_bytesToWrite = bytesLeft;
+		_bytesWrittenLastTime = 0;
 
 		std::cout << Time::Timestamp() << " Overwrite Started! Passes " << passes << '.' << std::endl;
 	}
 
 	void CLI::OnPassStarted(const std::filesystem::path&, uint16_t pass)
 	{
-		m_totalTimer.Reset();
-		m_currentTimer.Reset();
+		_totalTimer.Reset();
+		_currentTimer.Reset();
 
 		std::cout << Time::Timestamp() << " Pass " << pass << " started!" << std::endl;
 	}
 
 	bool CLI::OnProgress(const std::filesystem::path&, uint16_t, uint64_t bytesWritten)
 	{
-		if (!m_keepRunning)
+		if (!_keepRunning)
 		{
 			return false;
 		}
 
 		// TODO: current speed sometimes shows incorrectly
-		const auto elapsedSince = m_currentTimer.Elapsed<Time::MilliSeconds>();
-		const auto elapsedTotal = m_totalTimer.Elapsed<Time::MilliSeconds>();
-		const DataUnit::Bytes bytesWrittenSince(bytesWritten - m_bytesWrittenLastTime);
+		const auto elapsedSince = _currentTimer.Elapsed<Time::MilliSeconds>();
+		const auto elapsedTotal = _totalTimer.Elapsed<Time::MilliSeconds>();
+		const DataUnit::Bytes bytesWrittenSince(bytesWritten - _bytesWrittenLastTime);
 		const DataUnit::Bytes bytesWrittenTotal(bytesWritten);
 
 		if (bytesWrittenTotal.Bytes() && elapsedSince.count())
 		{
-			const DataUnit::Bytes bytesLeft = m_bytesToWrite - bytesWritten;
+			const DataUnit::Bytes bytesLeft = _bytesToWrite - bytesWritten;
 			std::cout << DataUnit::HumanReadable(bytesWrittenTotal) << " written."
 				<< " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
 				<< ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
-				<< ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, m_totalTimer))
+				<< ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, _totalTimer))
 				<< std::endl;
 		}
 
-		m_currentTimer.Reset();
-		m_bytesWrittenLastTime = bytesWritten;
-		return m_keepRunning;
+		_currentTimer.Reset();
+		_bytesWrittenLastTime = bytesWritten;
+		return _keepRunning;
 	}
 
 	void CLI::OnPassCompleted(const std::filesystem::path&, uint16_t pass)
@@ -188,7 +188,7 @@ namespace Kuura
 
 		std::cerr << ' ' << path << "! Bytes written: " << bytesWritten << '.' << std::endl;
 		std::cerr << "Detailed description: " << SystemErrorCodeToString(error) << std::endl;
-		m_error = error;
+		_error = error;
 	}
 
 	void CLI::OnOverwriteCompleted(uint16_t passes, uint64_t bytesWritten)
@@ -197,7 +197,7 @@ namespace Kuura
 			"Passes "  << passes <<  ". Bytes written: " << bytesWritten << std::endl;
 
 		const DataUnit::Bytes bytes(bytesWritten);
-		const auto elapsed = m_totalTimer.Elapsed<Time::MilliSeconds>();
+		const auto elapsed = _totalTimer.Elapsed<Time::MilliSeconds>();
 
 		if (bytes.Value() && elapsed.count())
 		{

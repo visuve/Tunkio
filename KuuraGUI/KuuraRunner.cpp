@@ -3,7 +3,7 @@
 
 KuuraRunner::KuuraRunner(QObject* parent) :
 	QThread(parent),
-	m_kuura(KuuraInitialize(this))
+	_kuura(KuuraInitialize(this))
 {
 }
 
@@ -11,12 +11,12 @@ KuuraRunner::~KuuraRunner()
 {
 	qDebug() << "Destroying...";
 
-	m_keepRunning = false;
+	_keepRunning = false;
 	wait();
 
-	if (m_kuura)
+	if (_kuura)
 	{
-		KuuraFree(m_kuura);
+		KuuraFree(_kuura);
 	}
 
 	qDebug() << "Destroyed.";
@@ -24,12 +24,12 @@ KuuraRunner::~KuuraRunner()
 
 bool KuuraRunner::addTarget(const std::filesystem::path& path, KuuraTargetType type, bool remove)
 {
-	return KuuraAddTarget(m_kuura, path.c_str(), type, remove);
+	return KuuraAddTarget(_kuura, path.c_str(), type, remove);
 }
 
 bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify)
 {
-	Q_ASSERT(m_kuura);
+	Q_ASSERT(_kuura);
 
 	const std::string sequence = fillValue.toStdString();
 
@@ -38,15 +38,15 @@ bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, b
 		case KuuraFillType::ZeroFill:
 		case KuuraFillType::OneFill:
 		case KuuraFillType::RandomFill:
-			return KuuraAddOverwriteRound(m_kuura, fillType, verify, nullptr);
+			return KuuraAddOverwriteRound(_kuura, fillType, verify, nullptr);
 		case KuuraFillType::ByteFill:
 		{
 			char character[] = { sequence[0], '\0' };
-			return KuuraAddOverwriteRound(m_kuura, fillType, verify, character);
+			return KuuraAddOverwriteRound(_kuura, fillType, verify, character);
 		}
 		case KuuraFillType::SequenceFill:
 		case KuuraFillType::FileFill:
-			return KuuraAddOverwriteRound(m_kuura, fillType, verify, sequence.c_str());
+			return KuuraAddOverwriteRound(_kuura, fillType, verify, sequence.c_str());
 	}
 
 	return false;
@@ -54,18 +54,18 @@ bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, b
 
 void KuuraRunner::stop()
 {
-	m_keepRunning = false;
+	_keepRunning = false;
 }
 
 void KuuraRunner::attachCallbacks()
 {
-	if (!m_kuura)
+	if (!_kuura)
 	{
 		qCritical() << "Kuura not initialized properly!";
 		return;
 	}
 
-	KuuraSetOverwriteStartedCallback(m_kuura, [](
+	KuuraSetOverwriteStartedCallback(_kuura, [](
 		void* context,
 		uint16_t passes,
 		uint64_t bytesToWritePerPass)
@@ -75,7 +75,7 @@ void KuuraRunner::attachCallbacks()
 		emit self->wipeStarted(passes, bytesToWritePerPass);
 	});
 
-	KuuraSetPassStartedCallback(m_kuura, [](
+	KuuraSetPassStartedCallback(_kuura, [](
 		void* context,
 		const KuuraChar* path,
 		uint16_t pass)
@@ -85,7 +85,7 @@ void KuuraRunner::attachCallbacks()
 		emit self->passStarted(path, pass);
 	});
 
-	KuuraSetProgressCallback(m_kuura, [](
+	KuuraSetProgressCallback(_kuura, [](
 		void* context,
 		const KuuraChar* path,
 		uint16_t pass,
@@ -94,10 +94,10 @@ void KuuraRunner::attachCallbacks()
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passProgressed(path, pass, bytesWritten);
-		return self->m_keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
+		return self->_keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
 	});
 
-	KuuraSetPassCompletedCallback(m_kuura, [](
+	KuuraSetPassCompletedCallback(_kuura, [](
 		void* context,
 		const KuuraChar* path,
 		uint16_t pass)
@@ -107,7 +107,7 @@ void KuuraRunner::attachCallbacks()
 		emit self->passFinished(path, pass);
 	});
 
-	KuuraSetOverwriteCompletedCallback(m_kuura, [](
+	KuuraSetOverwriteCompletedCallback(_kuura, [](
 		void* context,
 		uint16_t passes,
 		uint64_t totalBytesWritten)
@@ -117,7 +117,7 @@ void KuuraRunner::attachCallbacks()
 		emit self->wipeCompleted(passes, totalBytesWritten);
 	});
 
-	KuuraSetErrorCallback(m_kuura, [](
+	KuuraSetErrorCallback(_kuura, [](
 		void* context,
 		const KuuraChar* path,
 		KuuraStage stage,
@@ -134,17 +134,17 @@ void KuuraRunner::attachCallbacks()
 void KuuraRunner::run()
 {
 	qDebug() << "Started!";
-	Q_ASSERT(m_kuura);
+	Q_ASSERT(_kuura);
 
-	m_keepRunning = true;
+	_keepRunning = true;
 
 	attachCallbacks();
 
-	if (!KuuraRun(m_kuura))
+	if (!KuuraRun(_kuura))
 	{
 		qDebug() << "Failed!";
 		return;
 	}
 
-	qDebug() << (m_keepRunning ? "Finished!" : "Canceled.");
+	qDebug() << (_keepRunning ? "Finished!" : "Canceled.");
 }

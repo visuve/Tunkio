@@ -18,7 +18,7 @@ public:
 
 	int rowCount(const QModelIndex& /*parent*/) const
 	{
-		return static_cast<int>(m_drives.size());
+		return static_cast<int>(_drives.size());
 	}
 
 	int columnCount(const QModelIndex&) const
@@ -36,8 +36,8 @@ public:
 		if (role == Qt::DisplayRole)
 		{
 			const size_t row = static_cast<size_t>(index.row());
-			Q_ASSERT(row <= m_drives.size());
-			const Kuura::Drive& drive = m_drives[row];
+			Q_ASSERT(row <= _drives.size());
+			const Kuura::Drive& drive = _drives[row];
 
 			switch (index.column())
 			{
@@ -94,7 +94,7 @@ public:
 	void refresh()
 	{
 		beginResetModel();
-		m_drives = Kuura::DriveInfo();
+		_drives = Kuura::DriveInfo();
 		endResetModel();
 	}
 
@@ -104,7 +104,7 @@ public:
 	}
 
 private:
-	std::vector<Kuura::Drive> m_drives = Kuura::DriveInfo();
+	std::vector<Kuura::Drive> _drives = Kuura::DriveInfo();
 };
 
 DriveSelectTab::DriveSelectTab(QWidget *parent) :
