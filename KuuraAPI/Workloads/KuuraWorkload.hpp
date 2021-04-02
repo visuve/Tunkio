@@ -22,6 +22,7 @@ namespace Kuura
 		bool VerifyPass = false;
 
 	protected:
+		const Composer* _parent;
 		const std::filesystem::path _path;
 		const bool _removeAfterOverwrite = false;
 
@@ -31,8 +32,6 @@ namespace Kuura
 			uint64_t& bytesWritten,
 			std::shared_ptr<IFillProvider> filler,
 			std::shared_ptr<IFillConsumer> fillable);
-
-		const Composer* _parent;
 
 	private:
 		std::queue<std::shared_ptr<IFillProvider>> _fillers;

@@ -30,7 +30,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		add_executable("kuura-gui" ${KuuraGUISources})
 	endif()
 	target_precompile_headers("kuura-gui" PRIVATE "KuuraGUI-PCH.hpp")
-	target_link_libraries("kuura-gui" LINK_PRIVATE Qt${QT_VERSION_MAJOR}::Widgets kuura-api kuura-dev)
+	target_link_libraries("kuura-gui" LINK_PRIVATE Qt${QT_VERSION_MAJOR}::Widgets kuura-api kuura-dev stdc++fs)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")

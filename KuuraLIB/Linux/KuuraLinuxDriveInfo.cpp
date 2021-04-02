@@ -68,7 +68,7 @@ namespace Kuura
 			}
 
 			_devicePath = path;
-			m_device = udev_device_new_from_syspath(context, path);
+			_device = udev_device_new_from_syspath(context, path);
 
 			if (!_device)
 			{
@@ -112,16 +112,16 @@ namespace Kuura
 
 		std::string SystemName() const
 		{
-			const char* systemName = udev_device_get_sysname(m_device);
+			const char* systemName = udev_device_get_sysname(_device);
 
-			if (!systeName)
+			if (!systemName)
 			{
 				std::cerr << "Failed to get system name from path: '"
 					<< _devicePath << "'!" << std::endl;
 				return {};
 			}
 
-			return systeName;
+			return systemName;
 		}
 
 		udev_list_entry* Partitions()
