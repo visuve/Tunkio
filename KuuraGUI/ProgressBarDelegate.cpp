@@ -1,9 +1,17 @@
 #include "KuuraGUI-PCH.hpp"
 #include "ProgressBarDelegate.hpp"
 
+constexpr QColor PowderBlue(176, 224, 230);
+constexpr QColor Crystalsong(79, 179, 179);
+
 ProgressBarDelegate::ProgressBarDelegate(QObject* parent) :
 	QStyledItemDelegate(parent)
 {
+}
+
+ProgressBarDelegate::~ProgressBarDelegate()
+{
+	qDebug();
 }
 
 void ProgressBarDelegate::paint(
@@ -11,27 +19,27 @@ void ProgressBarDelegate::paint(
 	const QStyleOptionViewItem& option,
 	const QModelIndex& index) const
 {
-	float progress = index.model()->data(index, Qt::DisplayRole).toFloat();
-
-	QStyleOptionProgressBar progressBar;
-	progressBar.rect = option.rect;
-	progressBar.minimum = 0;
-	progressBar.maximum = 100;
-	progressBar.progress = static_cast<int>(progress);
-	progressBar.textVisible = true;
-
-	if (progress <= 0.00f)
+	if (!index.isValid())
 	{
-		progressBar.text = "0%";
-	}
-	else if (progress >= 99.99f)
-	{
-		progressBar.text = "100%";
-	}
-	else
-	{
-		progressBar.text = QLocale::system().toString(progress, 'f', 2) + '%';
+		return;
 	}
 
-	QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBar, painter);
+	const QVariant data = index.model()->data(index, Qt::DisplayRole);
+
+	if (!data.isValid())
+	{
+		return;
+	}
+
+	const float percent = std::clamp(data.toFloat(), 0.00f, 100.00f);
+
+	QRect progressRect = option.rect;
+	progressRect.setWidth(progressRect.width() * (percent / 100.0f ));
+
+	painter->setPen(Qt::NoPen);
+	painter->fillRect(progressRect, PowderBlue);
+
+	QBrush verBrush(Crystalsong, index.parent().isValid() ? Qt::BDiagPattern : Qt::FDiagPattern);
+	painter->setBrush(verBrush);
+	painter->drawRect(progressRect);
 }

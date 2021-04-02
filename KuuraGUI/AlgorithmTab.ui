@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AlgorithmTab</class>
+ <widget class="QWidget" name="AlgorithmTab">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pushButtonBack">
+     <property name="text">
+      <string>Back</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="pushButtonNext">
+     <property name="text">
+      <string>Next</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="3">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Overwrite algorithms</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="3" column="0" colspan="5">
+       <widget class="QTableView" name="tableViewWipePasses">
+        <property name="frameShape">
+         <enum>QFrame::WinPanel</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>180</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="0" colspan="5">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Please select either a preset algorithm, or customize your own:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="5">
+       <widget class="QGroupBox" name="groupBoxAddPass">
+        <property name="title">
+         <string>Overwrite pass</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayoutAddPass">
+         <item>
+          <widget class="QLabel" name="labelFillType">
+           <property name="text">
+            <string>Fill Type:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxFillType">
+           <item>
+            <property name="text">
+             <string>Zeroes</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ones</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Byte</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Sequence</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>File</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Random</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelFillValue">
+           <property name="text">
+            <string>Fill Value:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditFillValue">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>0x00</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBoxVerify">
+           <property name="text">
+            <string>Verify?</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonRemovePass">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Remove</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonClearPasses">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonAddPass">
+           <property name="text">
+            <string>Add</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QRadioButton" name="radioButtonPresets">
+        <property name="text">
+         <string>Use presets:</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="comboBoxPresets">
+        <item>
+         <property name="text">
+          <string>NIST SP-800-88 Rev. 1 [Recommended]</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>British HMG Infosec Standard 5, Baseline Standard</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>British HMG Infosec Standard 5, Enhanced Standard</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Communications Security Establishment Canada ITSG-06</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>German Federal Office for Information Security</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>U.S. DoD Unclassified Computer Hard Drive Disposition</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bruce Schneier's Algorithm</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Peter Gutmann's Algorithm</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>U.S. Air Force System Security Instruction 5020</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>U.S. Navy Staff Office Publication NAVSO P-5239-26</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QRadioButton" name="radioButtonCustomize">
+        <property name="text">
+         <string>Customize:</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

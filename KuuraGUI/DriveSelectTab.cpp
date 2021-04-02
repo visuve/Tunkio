@@ -1,6 +1,6 @@
 #include "KuuraGUI-PCH.hpp"
-#include "DriveSelectDialog.hpp"
-#include "ui_DriveSelectDialog.h"
+#include "DriveSelectTab.hpp"
+#include "ui_DriveSelectTab.h"
 #include "../KuuraLIB/KuuraDriveInfo.hpp"
 
 class DriveSelectModel : public QAbstractTableModel
@@ -13,7 +13,7 @@ public:
 
 	~DriveSelectModel()
 	{
-		m_drives.clear();
+		qDebug();
 	}
 
 	int rowCount(const QModelIndex& /*parent*/) const
@@ -23,11 +23,16 @@ public:
 
 	int columnCount(const QModelIndex&) const
 	{
-		return 4;
+		return 5;
 	}
 
 	QVariant data(const QModelIndex& index, int role) const
 	{
+		if (role == Qt::CheckStateRole && index.column() == 4)
+		{
+			return Qt::CheckState::Unchecked;
+		}
+
 		if (role == Qt::DisplayRole)
 		{
 			const size_t row = static_cast<size_t>(index.row());
@@ -44,6 +49,8 @@ public:
 					return drive.Partitions;
 				case 3:
 					return QLocale().formattedDataSize(drive.Capacity);
+				case 4:
+					return "No";
 			}
 
 			qCritical() << index << " is out of bounds";
@@ -68,6 +75,8 @@ public:
 						return "Partitions";
 					case 3:
 						return "Size";
+					case 4:
+						return "Selected";
 				}
 
 				qCritical() << section << " is out of bounds";
@@ -82,53 +91,53 @@ public:
 		return QVariant();
 	}
 
+	void refresh()
+	{
+		beginResetModel();
+		m_drives = Kuura::DriveInfo();
+		endResetModel();
+	}
+
+	QStringList selectedDrives() const
+	{
+		return {}; // TODO:
+	}
+
 private:
 	std::vector<Kuura::Drive> m_drives = Kuura::DriveInfo();
 };
 
-DriveSelectDialog::DriveSelectDialog(QWidget* parent) :
-	QDialog(parent),
-	ui(new Ui::DriveSelectDialog())
+DriveSelectTab::DriveSelectTab(QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::DriveSelectTab)
 {
 	ui->setupUi(this);
 
-	auto openButton = ui->buttonBoxDriveSelect->button(QDialogButtonBox::Open);
-	auto cancelButton = ui->buttonBoxDriveSelect->button(QDialogButtonBox::Cancel);
+	auto model = new DriveSelectModel(this);
+	ui->tableViewDrives->setModel(model);
 
-	connect(openButton, &QPushButton::clicked, this, [this]
+	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
 	{
-		QItemSelectionModel* selectionModel = ui->tableViewDrives->selectionModel();
-
-		if (!selectionModel->hasSelection())
-		{
-			QMessageBox::information(
-				this,
-				"Kuura - Please select a drive",
-				"No drive has been selected.\nPlease select one, or click Cancel to return.");
-			return;
-		}
-
-		return QDialog::accept();
+		emit backRequested();
 	});
-	connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-	ui->tableViewDrives->setModel(new DriveSelectModel(this));
+	connect(ui->pushButtonNext, &QPushButton::clicked, [this]()
+	{
+		emit nextRequested();
+	});
+
+	connect(ui->pushButtonRefresh, &QPushButton::clicked, model, &DriveSelectModel::refresh);
 }
 
-DriveSelectDialog::~DriveSelectDialog()
+DriveSelectTab::~DriveSelectTab()
 {
 	delete ui;
+	qDebug();
 }
 
-QString DriveSelectDialog::selectedDrive()
+QStringList DriveSelectTab::selectedDrives() const
 {
-	const QItemSelectionModel* selectionModel = ui->tableViewDrives->selectionModel();
-
-	if (!selectionModel->hasSelection())
-	{
-		return {};
-	}
-
-	const QModelIndex selected = selectionModel->selectedRows(0).first();
-	return ui->tableViewDrives->model()->data(selected).toString();
+	auto model = reinterpret_cast<DriveSelectModel*>(ui->tableViewDrives->model());
+	Q_ASSERT(model);
+	return model->selectedDrives();
 }
