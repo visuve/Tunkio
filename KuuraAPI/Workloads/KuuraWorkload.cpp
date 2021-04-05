@@ -14,20 +14,20 @@ namespace Kuura
 	{
 	}
 
-	bool IWorkload::Fill(
+	bool IWorkload::Overwrite(
 		uint16_t pass,
 		uint64_t bytesLeft,
 		uint64_t& bytesWritten,
-		std::shared_ptr<IFillProvider> filler,
-		std::shared_ptr<IFillConsumer> fillable)
+		std::shared_ptr<IFillProvider> provider,
+		std::shared_ptr<IFillConsumer> consumer)
 	{
 		while (bytesLeft)
 		{
-			const uint64_t size = std::min(bytesLeft, fillable->OptimalWriteSize().value());
+			const uint64_t size = std::min(bytesLeft, consumer->OptimalWriteSize().value());
 			const uint64_t offset = bytesWritten;
 
-			const std::span<std::byte> writtenData = filler->Data(size, fillable->AlignmentSize().value());
-			const auto result = fillable->Write(writtenData);
+			const std::span<std::byte> writtenData = provider->Data(size, consumer->AlignmentSize().value());
+			const auto result = consumer->Write(writtenData);
 
 			bytesWritten += result.second;
 			bytesLeft -= std::min(bytesLeft, result.second);
@@ -38,9 +38,9 @@ namespace Kuura
 				return false;
 			}
 
-			if (filler->Verify)
+			if (provider->Verify)
 			{
-				const auto actualData = fillable->Read(size, offset);
+				const auto actualData = consumer->Read(size, offset);
 
 				if (!actualData.first)
 				{

@@ -6,7 +6,7 @@
 #include "FillProviders/KuuraRandomFiller.hpp"
 #include "FillProviders/KuuraFileFiller.hpp"
 
-namespace Kuura::Fill
+namespace Kuura
 {
 	bool operator == (std::span<std::byte> lhs, std::string_view rhs)
 	{

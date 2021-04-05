@@ -19,7 +19,6 @@ namespace Kuura
 
 		CallbackContainer Callbacks;
 		
-		const std::vector<std::shared_ptr<IWorkload>>& Workloads() const;
 		const std::vector<std::shared_ptr<IFillProvider>>& Fillers() const;
 
 	private:

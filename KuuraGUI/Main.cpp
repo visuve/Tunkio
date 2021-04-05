@@ -98,6 +98,7 @@ int main(int argc, char* argv[])
 	qRegisterMetaType<KuuraTargetType>("KuuraTargetType");
 	qRegisterMetaType<KuuraFillType>("KuuraFillType");
 	qRegisterMetaType<KuuraStage>("KuuraStage");
+	qRegisterMetaType<std::filesystem::path>("std::filesystem::path");
 
 	QApplication application(argc, argv);
 	MainWindow window;

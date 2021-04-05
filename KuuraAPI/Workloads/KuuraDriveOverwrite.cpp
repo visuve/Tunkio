@@ -6,7 +6,7 @@
 namespace Kuura
 {
 	DriveOverwrite::DriveOverwrite(const Composer* parent, const std::filesystem::path& path) :
-		FileOverwrite(parent, path, false)
+		IWorkload(parent, path, false)
 	{
 	}
 
@@ -46,7 +46,7 @@ namespace Kuura
 			uint64_t bytesLeft = drive->Size().value();
 			uint64_t bytesWritten = 0;
 
-			if (!Fill(passes, bytesLeft, bytesWritten, filler, drive))
+			if (!Overwrite(passes, bytesLeft, bytesWritten, filler, drive))
 			{
 				return false;
 			}

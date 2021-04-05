@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../KuuraAPI.h"
-#include "KuuraFileOverwrite.hpp"
+#include "KuuraWorkload.hpp"
 
 namespace Kuura
 {
-	class DriveOverwrite : public FileOverwrite
+	class DriveOverwrite : public IWorkload
 	{
 	public:
 		DriveOverwrite(const Composer* parent, const std::filesystem::path& path);

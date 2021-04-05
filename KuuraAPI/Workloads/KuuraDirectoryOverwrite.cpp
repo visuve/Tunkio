@@ -48,7 +48,7 @@ namespace Kuura
 				uint64_t bytesLeft = file->Size().value();
 				uint64_t bytesWritten = 0;
 
-				if (!Fill(passes, bytesLeft, bytesWritten, filler, file))
+				if (!Overwrite(passes, bytesLeft, bytesWritten, filler, file))
 				{
 					return false;
 				}

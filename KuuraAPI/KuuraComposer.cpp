@@ -137,11 +137,6 @@ namespace Kuura
 		return !_workloads.empty();
 	}
 
-	const std::vector<std::shared_ptr<IWorkload>>& Composer::Workloads() const
-	{
-		return _workloads;
-	}
-
 	const std::vector<std::shared_ptr<IFillProvider>>& Composer::Fillers() const
 	{
 		return _fillers;

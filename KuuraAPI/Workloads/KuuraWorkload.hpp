@@ -26,14 +26,11 @@ namespace Kuura
 		const std::filesystem::path _path;
 		const bool _removeAfterOverwrite = false;
 
-		bool Fill(
+		bool Overwrite(
 			uint16_t pass,
 			uint64_t bytesLeft,
 			uint64_t& bytesWritten,
-			std::shared_ptr<IFillProvider> filler,
-			std::shared_ptr<IFillConsumer> fillable);
-
-	private:
-		std::queue<std::shared_ptr<IFillProvider>> _fillers;
+			std::shared_ptr<IFillProvider> provider,
+			std::shared_ptr<IFillConsumer> consumer);
 	};
 }
