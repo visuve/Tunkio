@@ -2,8 +2,6 @@
 
 #include "../KuuraAPI/KuuraAPI.h"
 
-#include <filesystem>
-
 #include <QThread>
 
 class KuuraRunner : public QThread

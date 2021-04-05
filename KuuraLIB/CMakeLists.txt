@@ -3,7 +3,7 @@
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	file(GLOB KuuraLIBSource "*.cpp" "Win32/*.cpp")
 	add_library("KuuraDEV" STATIC ${KuuraLIBSource}) # -> KuuraDEV.lib
-	# target_precompile_headers("KuuraDEV" PRIVATE "KuuraLIB-PCH.hpp")
+	target_precompile_headers("KuuraDEV" PRIVATE "KuuraLIB-PCH.hpp")
 	target_link_libraries("KuuraDEV" wbemuuid)
 endif()
 

@@ -21,12 +21,14 @@
 #include <QPushButton>
 #include <QScreen>
 #include <QStyledItemDelegate>
+#include <QTabWidget>
 #include <QTreeWidgetItem>
 #include <QThread>
 #include <QTime>
 
 #include <array>
 #include <atomic>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <random>
