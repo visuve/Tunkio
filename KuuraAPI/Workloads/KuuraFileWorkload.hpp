@@ -9,10 +9,10 @@ namespace Kuura
 	{
 	public:
 		FileWorkload(
-			const Composer* parent,
+			const CallbackContainer* callbacks,
 			const std::filesystem::path& path,
 			bool removeAfterOverwrite);
 
-		bool Run() override;
+		bool Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers) override;
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "KuuraAPI.h"
 
 namespace Kuura
@@ -28,7 +29,6 @@ namespace Kuura
 
 		inline bool OnProgress(const KuuraChar* path, uint16_t pass, uint64_t bytesWritten) const
 		{
-			
 			return ProgressCallback ? ProgressCallback(Context, path, pass, bytesWritten) : true;
 		}
 

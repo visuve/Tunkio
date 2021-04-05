@@ -16,7 +16,7 @@ void Set(KuuraHandle* handle, T(Kuura::CallbackContainer::* field), T value)
 		return;
 	}
 
-	instance->Callbacks.*field = value;
+	instance->Set(field, value);
 }
 
 KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(void* context)

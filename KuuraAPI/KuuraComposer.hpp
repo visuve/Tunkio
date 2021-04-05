@@ -17,11 +17,14 @@ namespace Kuura
 		bool AddPass(KuuraFillType type, bool verify, const char* optional);
 		bool Run();
 
-		CallbackContainer Callbacks;
-		
-		const std::vector<std::shared_ptr<IFillProvider>>& Fillers() const;
+		template <typename T>
+		void Set(T(Kuura::CallbackContainer::* field), T value)
+		{
+			this->_callbacks.*field = value;
+		}
 
 	private:
+		CallbackContainer _callbacks;
 		std::vector<std::shared_ptr<IWorkload>> _workloads;
 		std::vector<std::shared_ptr<IFillProvider>> _fillers;
 	};

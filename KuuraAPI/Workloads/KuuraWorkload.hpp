@@ -1,28 +1,28 @@
 #pragma once
 
-#include "../KuuraAPI.h"
-#include "../KuuraComposer.hpp"
-#include "../FillProviders/KuuraFillProvider.hpp"
-#include "../FillConsumers/KuuraFillConsumer.hpp"
+#include "../KuuraCallbackContainer.hpp"
 
 namespace Kuura
 {
+	class IFillProvider;
+	class IFillConsumer;
+
 	class IWorkload
 	{
 	public:
 		IWorkload(
-			const Composer* parent,
+			const CallbackContainer* callbacks,
 			const std::filesystem::path& path,
 			bool removeAfterOverwrite);
 
 		virtual ~IWorkload();
 
-		virtual bool Run() = 0;
+		virtual bool Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers) = 0;
 
 		bool VerifyPass = false;
 
 	protected:
-		const Composer* _parent;
+		const CallbackContainer* _callbacks;
 		const std::filesystem::path _path;
 		const bool _removeAfterOverwrite = false;
 

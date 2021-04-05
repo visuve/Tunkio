@@ -1,10 +1,13 @@
 #include "../KuuraAPI-PCH.hpp"
 #include "KuuraWorkload.hpp"
+#include "../KuuraCallbackContainer.hpp"
+#include "../FillProviders/KuuraFillProvider.hpp"
+#include "../FillConsumers/KuuraFillConsumer.hpp"
 
 namespace Kuura
 {
-	IWorkload::IWorkload(const Composer* parent, const std::filesystem::path& path, bool remove) :
-		_parent(parent),
+	IWorkload::IWorkload(const CallbackContainer* callbacks, const std::filesystem::path& path, bool remove) :
+		_callbacks(callbacks),
 		_path(path),
 		_removeAfterOverwrite(remove)
 	{
@@ -34,7 +37,7 @@ namespace Kuura
 
 			if (!result.first)
 			{
-				_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
+				_callbacks->OnError(_path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
 				return false;
 			}
 
@@ -44,18 +47,18 @@ namespace Kuura
 
 				if (!actualData.first)
 				{
-					_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					_callbacks->OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 
 				if (!std::equal(writtenData.begin(), writtenData.end(), actualData.second.begin()))
 				{
-					_parent->Callbacks.OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					_callbacks->OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 			}
 
-			if (!_parent->Callbacks.OnProgress(_path.c_str(), pass, bytesWritten))
+			if (!_callbacks->OnProgress(_path.c_str(), pass, bytesWritten))
 			{
 				return true;
 			}

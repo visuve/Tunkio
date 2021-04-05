@@ -30,7 +30,7 @@ namespace Kuura
 	}
 
 	Composer::Composer(void* context) :
-		Callbacks(context)
+		_callbacks(context)
 	{
 	}
 
@@ -40,12 +40,12 @@ namespace Kuura
 		{
 			case KuuraTargetType::FileOverwrite:
 			{
-				_workloads.emplace_back(new Kuura::FileWorkload(this, path, removeAfterOverwrite));
+				_workloads.emplace_back(new Kuura::FileWorkload(&_callbacks, path, removeAfterOverwrite));
 				return true;
 			}
 			case KuuraTargetType::DirectoryOverwrite:
 			{
-				_workloads.emplace_back(new Kuura::DirectoryWorkload(this, path, removeAfterOverwrite));
+				_workloads.emplace_back(new Kuura::DirectoryWorkload(&_callbacks, path, removeAfterOverwrite));
 				return true;
 			}
 			case KuuraTargetType::DriveOverwrite:
@@ -55,7 +55,7 @@ namespace Kuura
 					return false;
 				}
 
-				_workloads.emplace_back(new Kuura::DriveWorkload(this, path));
+				_workloads.emplace_back(new Kuura::DriveWorkload(&_callbacks, path));
 				return true;
 			}
 		}
@@ -128,17 +128,12 @@ namespace Kuura
 	{
 		for (auto& workload : _workloads)
 		{
-			if (!workload->Run())
+			if (!workload->Run(_fillers))
 			{
 				return false;
 			}
 		}
 
 		return !_workloads.empty();
-	}
-
-	const std::vector<std::shared_ptr<IFillProvider>>& Composer::Fillers() const
-	{
-		return _fillers;
 	}
 }
