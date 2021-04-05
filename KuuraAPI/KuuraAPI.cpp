@@ -26,8 +26,8 @@ KuuraHandle* KUURA_CALLING_CONVENTION KuuraInitialize(void* context)
 
 bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 	struct KuuraHandle* handle,
-	const KuuraChar* path,
 	enum KuuraTargetType type,
+	const KuuraChar* path,
 	bool removeAfterOverwrite)
 {
 	if (!path)
@@ -42,10 +42,10 @@ bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 		return false;
 	}
 
-	return instance->AddWorkload(path, type, removeAfterOverwrite);
+	return instance->AddTarget(type, path, removeAfterOverwrite);
 }
 
-bool KUURA_CALLING_CONVENTION KuuraAddOverwriteRound(
+bool KUURA_CALLING_CONVENTION KuuraAddPass(
 	struct KuuraHandle* handle,
 	KuuraFillType type,
 	bool verify,
@@ -58,7 +58,7 @@ bool KUURA_CALLING_CONVENTION KuuraAddOverwriteRound(
 		return false;
 	}
 
-	return instance->AddFiller(type, verify, optional);
+	return instance->AddPass(type, verify, optional);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetOverwriteStartedCallback(

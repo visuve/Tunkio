@@ -49,11 +49,11 @@ namespace Kuura
 		KuuraHandle* handle = KuuraInitialize(&counters);
 		EXPECT_NE(handle, nullptr);
 
-		EXPECT_FALSE(KuuraAddTarget(nullptr, nullptr, KuuraTargetType::FileOverwrite, false));
-		EXPECT_FALSE(KuuraAddTarget(handle, nullptr, KuuraTargetType::FileOverwrite, false));
+		EXPECT_FALSE(KuuraAddTarget(nullptr, KuuraTargetType::FileOverwrite, nullptr, false));
+		EXPECT_FALSE(KuuraAddTarget(handle, KuuraTargetType::FileOverwrite, nullptr, false));
 
-		EXPECT_FALSE(KuuraAddOverwriteRound(handle, KuuraFillType::ByteFill, false, "xxx"));
-		EXPECT_FALSE(KuuraAddOverwriteRound(handle, KuuraFillType::SequenceFill, false, nullptr));
+		EXPECT_FALSE(KuuraAddPass(handle, KuuraFillType::ByteFill, false, "xxx"));
+		EXPECT_FALSE(KuuraAddPass(handle, KuuraFillType::SequenceFill, false, nullptr));
 
 		KuuraFree(handle);
 
@@ -70,7 +70,7 @@ namespace Kuura
 		Counters counters;
 		KuuraHandle* handle = KuuraInitialize(&counters);
 		EXPECT_NE(handle, nullptr);
-		EXPECT_TRUE(KuuraAddOverwriteRound(handle, KuuraFillType::ByteFill, false, "x"));
+		EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::ByteFill, false, "x"));
 
 		EXPECT_FALSE(KuuraRun(handle));
 		KuuraFree(handle);
@@ -89,7 +89,7 @@ namespace Kuura
 		KuuraHandle* handle = KuuraInitialize(&counters);
 		EXPECT_NE(handle, nullptr);
 
-		EXPECT_TRUE(KuuraAddTarget(handle, std::filesystem::path("foobar").c_str(), KuuraTargetType::FileOverwrite, false));
+		EXPECT_TRUE(KuuraAddTarget(handle, KuuraTargetType::FileOverwrite, std::filesystem::path("foobar").c_str(), false));
 		EXPECT_EQ(counters.OnOverwriteStartedCount, 0);
 		EXPECT_EQ(counters.OnPassStartedCount, 0);
 		EXPECT_EQ(counters.OnProgressCount, 0);
@@ -113,7 +113,7 @@ namespace Kuura
 		{
 			Counters counters;
 			KuuraHandle* handle = KuuraInitialize(&counters);
-			EXPECT_TRUE(KuuraAddTarget(handle, std::filesystem::path("foobar").c_str(), type, false));
+			EXPECT_TRUE(KuuraAddTarget(handle, type, std::filesystem::path("foobar").c_str(), false));
 			EXPECT_NE(handle, nullptr);
 
 			EXPECT_EQ(counters.OnOverwriteStartedCount, 0);
@@ -130,10 +130,10 @@ namespace Kuura
 			KuuraSetOverwriteCompletedCallback(handle, OnOverwriteCompleted);
 			KuuraSetErrorCallback(handle, OnError);
 
-			EXPECT_TRUE(KuuraAddOverwriteRound(handle, KuuraFillType::OneFill, false, nullptr));
-			EXPECT_TRUE(KuuraAddOverwriteRound(handle, KuuraFillType::ZeroFill, false, nullptr));
-			EXPECT_TRUE(KuuraAddOverwriteRound(handle, KuuraFillType::ByteFill, false, "x"));
-			EXPECT_TRUE(KuuraAddOverwriteRound(handle, KuuraFillType::SequenceFill, false, "xyz"));
+			EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::OneFill, false, nullptr));
+			EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::ZeroFill, false, nullptr));
+			EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::ByteFill, false, "x"));
+			EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::SequenceFill, false, "xyz"));
 
 			EXPECT_TRUE(KuuraRun(handle));
 			KuuraFree(handle);

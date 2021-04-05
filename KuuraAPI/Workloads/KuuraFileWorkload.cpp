@@ -1,11 +1,11 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "KuuraFileOverwrite.hpp"
+#include "KuuraFileWorkload.hpp"
 #include "../FillConsumers/KuuraFile.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
 {
-	FileOverwrite::FileOverwrite(
+	FileWorkload::FileWorkload(
 		const Composer* parent,
 		const std::filesystem::path& path,
 		bool removeAfterOverwrite) :
@@ -13,7 +13,7 @@ namespace Kuura
 	{
 	}
 
-	bool FileOverwrite::Run()
+	bool FileWorkload::Run()
 	{
 		auto file = std::make_shared<File>(_path);
 

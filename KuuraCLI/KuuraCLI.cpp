@@ -14,22 +14,22 @@ namespace Kuura
 	}
 
 	bool CLI::Initialize(
-		const std::filesystem::path& path,
 		KuuraTargetType targetType,
+		const std::filesystem::path& targetPath,
 		KuuraFillType fillType,
-		const std::string& filler,
+		const std::string& fillValue,
 		bool verify,
 		bool remove)
 	{
 		_handle = KuuraInitialize(this);
 
-		if (!KuuraAddTarget(_handle, path.c_str(), targetType, remove))
+		if (!KuuraAddTarget(_handle, targetType, targetPath.c_str(), remove))
 		{
 			std::cerr << "KuuraAddTarget failed!" << std::endl;
 			return false;
 		}
 
-		if (!KuuraAddOverwriteRound(_handle, fillType, verify, filler.c_str()))
+		if (!KuuraAddPass(_handle, fillType, verify, fillValue.c_str()))
 		{
 			std::cerr << "KuuraAddOverwriteRound failed!" << std::endl;
 			return false;

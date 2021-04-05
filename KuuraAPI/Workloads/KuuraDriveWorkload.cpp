@@ -1,16 +1,16 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "KuuraDriveOverwrite.hpp"
+#include "KuuraDriveWorkload.hpp"
 #include "../FillConsumers/KuuraDrive.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
 {
-	DriveOverwrite::DriveOverwrite(const Composer* parent, const std::filesystem::path& path) :
+	DriveWorkload::DriveWorkload(const Composer* parent, const std::filesystem::path& path) :
 		IWorkload(parent, path, false)
 	{
 	}
 
-	bool DriveOverwrite::Run()
+	bool DriveWorkload::Run()
 	{
 		auto drive = std::make_shared<Drive>(_path);
 

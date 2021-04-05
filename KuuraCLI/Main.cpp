@@ -8,8 +8,8 @@ namespace Kuura
 
 	std::map<std::string, Argument> Arguments =
 	{
-		{ "path", Argument(true, std::filesystem::path()) },
 		{ "target", Argument(false, KuuraTargetType::FileOverwrite) },
+		{ "path", Argument(true, std::filesystem::path()) },
 		{ "mode", Argument(false, KuuraFillType::ZeroFill) },
 		{ "filler", Argument(false, std::string()) },
 		{ "verify", Argument(false, false) },
@@ -216,8 +216,8 @@ int main(int argc, char* argv[])
 	}
 
 	if (!_cli.Initialize(
-		Arguments.at("path").Value<std::filesystem::path>(),
 		Arguments.at("target").Value<KuuraTargetType>(),
+		Arguments.at("path").Value<std::filesystem::path>(),
 		Arguments.at("mode").Value<KuuraFillType>(),
 		Arguments.at("filler").Value<std::string>(),
 		Arguments.at("verify").Value<bool>(),

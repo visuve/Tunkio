@@ -5,10 +5,10 @@
 
 namespace Kuura
 {
-	class DirectoryOverwrite : public IWorkload
+	class DirectoryWorkload : public IWorkload
 	{
 	public:
-		DirectoryOverwrite(
+		DirectoryWorkload(
 			const Composer* parent,
 			const std::filesystem::path& path,
 			bool removeAfterOverwrite);

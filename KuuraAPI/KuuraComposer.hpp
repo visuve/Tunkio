@@ -13,8 +13,8 @@ namespace Kuura
 		Composer(void* context);
 		~Composer() = default;
 
-		bool AddWorkload(const std::filesystem::path& path, KuuraTargetType type, bool removeAfterOverwrite);
-		bool AddFiller(KuuraFillType type, bool verify, const char* optional);
+		bool AddTarget(KuuraTargetType type, const std::filesystem::path& path, bool removeAfterOverwrite);
+		bool AddPass(KuuraFillType type, bool verify, const char* optional);
 		bool Run();
 
 		CallbackContainer Callbacks;

@@ -22,9 +22,9 @@ KuuraRunner::~KuuraRunner()
 	qDebug() << "Destroyed.";
 }
 
-bool KuuraRunner::addTarget(const std::filesystem::path& path, KuuraTargetType type, bool remove)
+bool KuuraRunner::addTarget(KuuraTargetType type, const std::filesystem::path& path, bool remove)
 {
-	return KuuraAddTarget(_kuura, path.c_str(), type, remove);
+	return KuuraAddTarget(_kuura, type, path.c_str(), remove);
 }
 
 bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify)
@@ -38,15 +38,15 @@ bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, b
 		case KuuraFillType::ZeroFill:
 		case KuuraFillType::OneFill:
 		case KuuraFillType::RandomFill:
-			return KuuraAddOverwriteRound(_kuura, fillType, verify, nullptr);
+			return KuuraAddPass(_kuura, fillType, verify, nullptr);
 		case KuuraFillType::ByteFill:
 		{
 			char character[] = { sequence[0], '\0' };
-			return KuuraAddOverwriteRound(_kuura, fillType, verify, character);
+			return KuuraAddPass(_kuura, fillType, verify, character);
 		}
 		case KuuraFillType::SequenceFill:
 		case KuuraFillType::FileFill:
-			return KuuraAddOverwriteRound(_kuura, fillType, verify, sequence.c_str());
+			return KuuraAddPass(_kuura, fillType, verify, sequence.c_str());
 	}
 
 	return false;

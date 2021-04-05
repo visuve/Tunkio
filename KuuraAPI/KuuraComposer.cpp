@@ -8,9 +8,9 @@
 #include "FillProviders/KuuraRandomFiller.hpp"
 
 #include "Workloads/KuuraWorkload.hpp"
-#include "Workloads/KuuraFileOverwrite.hpp"
-#include "Workloads/KuuraDirectoryOverwrite.hpp"
-#include "Workloads/KuuraDriveOverwrite.hpp"
+#include "Workloads/KuuraFileWorkload.hpp"
+#include "Workloads/KuuraDirectoryWorkload.hpp"
+#include "Workloads/KuuraDriveWorkload.hpp"
 
 namespace Kuura
 {
@@ -34,18 +34,18 @@ namespace Kuura
 	{
 	}
 
-	bool Composer::AddWorkload(const std::filesystem::path& path, KuuraTargetType type, bool removeAfterOverwrite)
+	bool Composer::AddTarget(KuuraTargetType type, const std::filesystem::path& path, bool removeAfterOverwrite)
 	{
 		switch (type)
 		{
 			case KuuraTargetType::FileOverwrite:
 			{
-				_workloads.emplace_back(new Kuura::FileOverwrite(this, path, removeAfterOverwrite));
+				_workloads.emplace_back(new Kuura::FileWorkload(this, path, removeAfterOverwrite));
 				return true;
 			}
 			case KuuraTargetType::DirectoryOverwrite:
 			{
-				_workloads.emplace_back(new Kuura::DirectoryOverwrite(this, path, removeAfterOverwrite));
+				_workloads.emplace_back(new Kuura::DirectoryWorkload(this, path, removeAfterOverwrite));
 				return true;
 			}
 			case KuuraTargetType::DriveOverwrite:
@@ -55,7 +55,7 @@ namespace Kuura
 					return false;
 				}
 
-				_workloads.emplace_back(new Kuura::DriveOverwrite(this, path));
+				_workloads.emplace_back(new Kuura::DriveWorkload(this, path));
 				return true;
 			}
 		}
@@ -63,7 +63,7 @@ namespace Kuura
 		return false;
 	}
 
-	bool Composer::AddFiller(KuuraFillType type, bool verify, const char* optional)
+	bool Composer::AddPass(KuuraFillType type, bool verify, const char* optional)
 	{
 		switch (type)
 		{

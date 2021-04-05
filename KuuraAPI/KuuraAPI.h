@@ -89,11 +89,11 @@ extern "C"
 
 	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddTarget(
 		struct KuuraHandle*,
-		const KuuraChar* path,
 		enum KuuraTargetType type,
+		const KuuraChar* path,
 		bool removeAfterOverwrite);
 
-	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddOverwriteRound(
+	KUURA_EXPORT bool KUURA_CALLING_CONVENTION KuuraAddPass(
 		struct KuuraHandle*,
 		enum KuuraFillType,
 		bool verify,

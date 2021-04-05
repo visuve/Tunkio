@@ -5,10 +5,10 @@
 
 namespace Kuura
 {
-	class DriveOverwrite : public IWorkload
+	class DriveWorkload : public IWorkload
 	{
 	public:
-		DriveOverwrite(const Composer* parent, const std::filesystem::path& path);
+		DriveWorkload(const Composer* parent, const std::filesystem::path& path);
 		bool Run() override;
 	};
 }

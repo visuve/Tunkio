@@ -12,10 +12,10 @@ namespace Kuura
 		~CLI();
 
 		bool Initialize(
-			const std::filesystem::path& path,
 			KuuraTargetType targetType,
+			const std::filesystem::path& targetPath,
 			KuuraFillType fillType,
-			const std::string& filler,
+			const std::string& fillValue,
 			bool verify,
 			bool remove);
 

@@ -1,11 +1,11 @@
 #include "../KuuraAPI-PCH.hpp"
-#include "KuuraDirectoryOverwrite.hpp"
+#include "KuuraDirectoryWorkload.hpp"
 #include "../FillConsumers/KuuraDirectory.hpp"
 #include "../FillProviders/KuuraFillProvider.hpp"
 
 namespace Kuura
 {
-	DirectoryOverwrite::DirectoryOverwrite(
+	DirectoryWorkload::DirectoryWorkload(
 		const Composer* parent,
 		const std::filesystem::path& path,
 		bool removeAfterOverwrite) :
@@ -13,7 +13,7 @@ namespace Kuura
 	{
 	}
 
-	bool DirectoryOverwrite::Run()
+	bool DirectoryWorkload::Run()
 	{
 		Directory directory(_path);
 
