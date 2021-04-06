@@ -25,6 +25,7 @@ public:
 	void onAbout();
 	void onBackRequested();
 	void onNextRequested();
+	void onTabChanged(int index);
 	void onTargetTypeSelected(KuuraTargetType);
 
 	void dragEnterEvent(QDragEnterEvent* e);

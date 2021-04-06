@@ -58,6 +58,8 @@ MainWindow::MainWindow(QWidget* parent) :
 	ui->tabWidget->insertTab(6, _resultsTab, "Results");
 	ui->tabWidget->setTabVisible(3, false);
 
+	connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChanged);
+
 	setAcceptDrops(true);
 }
 
@@ -122,12 +124,12 @@ void MainWindow::onNextRequested()
 {
 	switch (ui->tabWidget->currentIndex())
 	{
-		case 0:
+		case 0: // Welcome
 		{
 			ui->tabWidget->setCurrentIndex(1);
 			return;
 		}
-		case 1:
+		case 1: // Target
 		{
 			switch (_targetSelectTab->selectedTargetType())
 			{
@@ -141,22 +143,34 @@ void MainWindow::onNextRequested()
 			}
 			return;
 		}
-		case 2:
-		case 3:
+		case 2: // Path
+		case 3: // Drive
 		{
 			ui->tabWidget->setCurrentIndex(4);
 			return;
 		}
-		case 4:
+		case 4: // Algorithm
 		{
 			ui->tabWidget->setCurrentIndex(5);
 			return;
 		}
-		case 5:
+		case 5: // Progress
 		{
 			ui->tabWidget->setCurrentIndex(6);
 			return;
 		}
+	}
+}
+
+void MainWindow::onTabChanged(int index)
+{
+	qDebug() << "Changed to: " << index;
+
+	switch (index)
+	{
+		case 3: // Drive
+			_driveSelectTab->refreshDrives();
+			return;
 	}
 }
 
