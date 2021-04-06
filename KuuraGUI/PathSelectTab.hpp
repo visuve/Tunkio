@@ -19,7 +19,7 @@ public:
 	~PathSelectTab();
 
 	void addPaths(QVector<QFileInfo>&& paths);
-	const QVector<QFileInfo>& selectedPaths() const;
+	const QVector<QPair<QFileInfo, bool>>& selectedPaths() const;
 
 signals:
 	void backRequested();

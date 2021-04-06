@@ -2,11 +2,11 @@
 #include "PathSelectTab.hpp"
 #include "ui_PathSelectTab.h"
 
-class PathSelectModel : public QAbstractListModel
+class PathSelectModel : public QAbstractTableModel
 {
 public:
 	PathSelectModel(QObject* parent) :
-		QAbstractListModel(parent)
+		QAbstractTableModel(parent)
 	{
 	}
 
@@ -20,23 +20,62 @@ public:
 		return _files.size();
 	}
 
+	int columnCount(const QModelIndex&) const
+	{
+		return 2;
+	}
+
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
 	{
-		if (index.row() > _files.size())
+		const int row = index.row();
+		Q_ASSERT(row <= _files.size());
+		const auto& file = _files[row];
+
+		if (index.column() == 0)
 		{
-			return QVariant();
+			switch (role)
+			{
+				case Qt::CheckStateRole:
+					return file.second ? Qt::Checked : Qt::Unchecked;
+				case Qt::DisplayRole:
+					return file.second ? "Yes" : "No";
+			}
 		}
 
+		if (index.column() == 1)
+		{
+			switch (role)
+			{
+				case Qt::DisplayRole:
+					return QDir::toNativeSeparators(file.first.absoluteFilePath());
+				case Qt::DecorationRole:
+					return QApplication::style()->standardIcon(file.first.isDir() ? QStyle::SP_DirIcon : QStyle::SP_FileIcon);
+			}
+		}
+
+		return QVariant();
+	}
+
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const
+	{
 		if (role == Qt::DisplayRole)
 		{
-			const QFileInfo& file = _files[index.row()];
-			return QDir::toNativeSeparators(file.absoluteFilePath());
-		}
+			if (orientation == Qt::Orientation::Horizontal)
+			{
+				switch (section)
+				{
+					case 0:
+						return "Delete after overwrite?";
+					case 1:
+						return "Path";
+				}
 
-		if (role == Qt::DecorationRole)
-		{
-			const QFileInfo& file = _files[index.row()];
-			return QApplication::style()->standardIcon(file.isDir() ? QStyle::SP_DirIcon : QStyle::SP_FileIcon);
+				qCritical() << section << " is out of bounds";
+			}
+			else
+			{
+				return ++section;
+			}
 		}
 
 		return QVariant();
@@ -44,27 +83,32 @@ public:
 
 	void addPaths(QVector<QFileInfo>&& paths)
 	{
-		beginInsertRows(QModelIndex(), _files.size(), _files.size() + paths.size());
+		int before = _files.size();
+		int after = before + paths.size() - 1;
+
+		beginInsertRows(QModelIndex(), before, after);
 
 		for (const QFileInfo& file : paths)
 		{
+			QPair<QFileInfo, bool> pair(file, false);
+
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-			_files.emplaceBack(file);
+			_files.emplaceBack(pair);
 #else
-			_files.append(file);
+			_files.append(pair);
 #endif
 		}
 
 		endInsertRows();
 	}
 
-	const QVector<QFileInfo>& selectedPaths() const
+	const QVector<QPair<QFileInfo, bool>>& selectedPaths() const
 	{
 		return _files;
 	}
 
 private:
-	QVector<QFileInfo> _files;
+	QVector<QPair<QFileInfo, bool>> _files;
 };
 
 PathSelectTab::PathSelectTab(QWidget *parent) :
@@ -73,7 +117,7 @@ PathSelectTab::PathSelectTab(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	ui->listViewPaths->setModel(new PathSelectModel(this));
+	ui->tableViewPaths->setModel(new PathSelectModel(this));
 
 	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
 	{
@@ -104,14 +148,14 @@ PathSelectTab::~PathSelectTab()
 
 void PathSelectTab::addPaths(QVector<QFileInfo>&& paths)
 {
-	auto model = reinterpret_cast<PathSelectModel*>(ui->listViewPaths->model());
+	auto model = reinterpret_cast<PathSelectModel*>(ui->tableViewPaths->model());
 	Q_ASSERT(model);
 	model->addPaths(std::move(paths));
 }
 
-const QVector<QFileInfo>& PathSelectTab::selectedPaths() const
+const QVector<QPair<QFileInfo, bool>>& PathSelectTab::selectedPaths() const
 {
-	auto model = reinterpret_cast<PathSelectModel*>(ui->listViewPaths->model());
+	auto model = reinterpret_cast<PathSelectModel*>(ui->tableViewPaths->model());
 	Q_ASSERT(model);
 	return model->selectedPaths();
 }
@@ -135,7 +179,7 @@ void PathSelectTab::onAddPaths(QFileDialog::FileMode mode)
 		std::inserter(fileInfos, fileInfos.end()),
 		[](const QString& path){ return QFileInfo(path); });
 
-	auto model = reinterpret_cast<PathSelectModel*>(ui->listViewPaths->model());
+	auto model = reinterpret_cast<PathSelectModel*>(ui->tableViewPaths->model());
 	Q_ASSERT(model);
 	model->addPaths(std::move(fileInfos));
 }

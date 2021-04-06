@@ -15,6 +15,8 @@ public:
 	explicit DriveSelectTab(QWidget *parent = nullptr);
 	~DriveSelectTab();
 
+	void refreshDrives();
+
 	QStringList selectedDrives() const;
 
 signals:

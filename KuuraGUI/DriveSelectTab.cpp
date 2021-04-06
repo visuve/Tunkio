@@ -18,7 +18,7 @@ public:
 
 	int rowCount(const QModelIndex& /*parent*/) const
 	{
-		return static_cast<int>(_drives.size());
+		return _drives.size();
 	}
 
 	int columnCount(const QModelIndex&) const
@@ -28,29 +28,29 @@ public:
 
 	QVariant data(const QModelIndex& index, int role) const
 	{
-		if (role == Qt::CheckStateRole && index.column() == 4)
+		const int row = index.row();
+		Q_ASSERT(row <= _drives.size());
+		const auto& drive = _drives[row];
+
+		if (role == Qt::CheckStateRole && index.column() == 0)
 		{
-			return Qt::CheckState::Unchecked;
+			return drive.second ? Qt::Checked : Qt::Unchecked;
 		}
 
 		if (role == Qt::DisplayRole)
 		{
-			const size_t row = static_cast<size_t>(index.row());
-			Q_ASSERT(row <= _drives.size());
-			const Kuura::Drive& drive = _drives[row];
-
 			switch (index.column())
 			{
 				case 0:
-					return QString::fromStdString(drive.Path);
+					return drive.second ? "Yes" : "No";
 				case 1:
-					return QString::fromStdString(drive.Description);
+					return QString::fromStdString(drive.first.Path);
 				case 2:
-					return drive.Partitions;
+					return QString::fromStdString(drive.first.Description);
 				case 3:
-					return QLocale().formattedDataSize(drive.Capacity);
+					return drive.first.Partitions;
 				case 4:
-					return "No";
+					return QLocale().formattedDataSize(drive.first.Capacity);
 			}
 
 			qCritical() << index << " is out of bounds";
@@ -68,15 +68,15 @@ public:
 				switch (section)
 				{
 					case 0:
-						return "Path";
-					case 1:
-						return "Description";
-					case 2:
-						return "Partitions";
-					case 3:
-						return "Size";
-					case 4:
 						return "Selected";
+					case 1:
+						return "Path";
+					case 2:
+						return "Description";
+					case 3:
+						return "Partitions";
+					case 4:
+						return "Size";
 				}
 
 				qCritical() << section << " is out of bounds";
@@ -94,17 +94,46 @@ public:
 	void refresh()
 	{
 		beginResetModel();
-		_drives = Kuura::DriveInfo();
+
+		_drives.clear();
+
+		for (auto& drive : Kuura::DriveInfo())
+		{
+			QPair<Kuura::Drive, bool> pair(drive, false);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+			_drives.emplaceBack(pair);
+#else
+			_drives.append(pair);
+#endif
+		}
+
 		endResetModel();
 	}
 
 	QStringList selectedDrives() const
 	{
-		return {}; // TODO:
+		QStringList selected;
+
+		for (const auto& drive : _drives)
+		{
+			if (!drive.second)
+			{
+				continue;
+			}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+			selected.emplaceBack(QString::fromStdString(drive.first.Path));
+#else
+			selected.append(QString::fromStdString(drive.first.Path));
+#endif
+		}
+
+		return selected;
 	}
 
 private:
-	std::vector<Kuura::Drive> _drives = Kuura::DriveInfo();
+	QVector<QPair<Kuura::Drive, bool>> _drives;
 };
 
 DriveSelectTab::DriveSelectTab(QWidget *parent) :
@@ -113,8 +142,7 @@ DriveSelectTab::DriveSelectTab(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	auto model = new DriveSelectModel(this);
-	ui->tableViewDrives->setModel(model);
+	ui->tableViewDrives->setModel(new DriveSelectModel(this));
 
 	connect(ui->pushButtonBack, &QPushButton::clicked, [this]()
 	{
@@ -126,13 +154,20 @@ DriveSelectTab::DriveSelectTab(QWidget *parent) :
 		emit nextRequested();
 	});
 
-	connect(ui->pushButtonRefresh, &QPushButton::clicked, model, &DriveSelectModel::refresh);
+	connect(ui->pushButtonRefresh, &QPushButton::clicked, this, &DriveSelectTab::refreshDrives);
 }
 
 DriveSelectTab::~DriveSelectTab()
 {
 	delete ui;
 	qDebug();
+}
+
+void DriveSelectTab::refreshDrives()
+{
+	auto model = reinterpret_cast<DriveSelectModel*>(ui->tableViewDrives->model());
+	Q_ASSERT(model);
+	model->refresh();
 }
 
 QStringList DriveSelectTab::selectedDrives() const
