@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QDir>
 #include <QFileDialog>
+#include <QDateTime>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QInputDialog>

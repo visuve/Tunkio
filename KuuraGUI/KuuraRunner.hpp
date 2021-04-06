@@ -17,11 +17,11 @@ public slots:
 	void stop();
 
 signals:
-	void wipeStarted(uint16_t passes, uint64_t bytesToWritePerPass);
+	void overwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass);
 	void passStarted(const std::filesystem::path& path, uint16_t pass);
 	void passProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten);
 	void passFinished(const std::filesystem::path& path, uint16_t pass);
-	void wipeCompleted(uint16_t passes, uint64_t totalBytesWritten);
+	void overwriteCompleted(uint16_t passes, uint64_t totalBytesWritten);
 	void errorOccurred(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 private:

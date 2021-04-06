@@ -5,6 +5,22 @@
 
 #include <QStandardItemModel>
 
+namespace
+{
+	QString toQString(const std::filesystem::path& path)
+	{
+		return QString::fromStdString(path.string());
+	}
+
+	const QTime ZeroTime(0, 0, 0, 0);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	const QLocale SystemLocale = QLocale::system();
+#else
+	QLocale SystemLocale = QLocale::system();
+#endif
+}
+
 struct Node
 {
 	Node(Node* parent) :
@@ -227,4 +243,68 @@ ProgressTab::~ProgressTab()
 {
 	delete ui;
 	qDebug();
+}
+
+void ProgressTab::onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass)
+{
+	_bytesToProcess = bytesToWritePerPass * passes;
+	_overwriteStartTime = QDateTime::currentDateTime();
+	ui->progressBar->setValue(0);
+
+	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+}
+
+void ProgressTab::onPassStarted(const std::filesystem::path& path, uint16_t pass)
+{
+	_bytesProcessed[pass] = 0;
+
+	qDebug() << "Pass started:" << toQString(path) << '/' << pass;
+}
+
+void ProgressTab::onPassProgressed(const std::filesystem::path&, uint16_t pass, uint64_t bytesWritten)
+{
+	_bytesProcessed[pass] = bytesWritten;
+	updateTotalProgress();
+}
+
+void ProgressTab::onPassFinished(const std::filesystem::path& path, uint16_t pass)
+{
+	qDebug() << "Pass finished:" << toQString(path) << '/' << pass;
+}
+
+void ProgressTab::onOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritten)
+{
+	qDebug() << "Wipe completed:" << passes << '/' << totalBytesWritten;
+
+	ui->progressBar->setValue(100);
+}
+
+void ProgressTab::updateTotalProgress()
+{
+	const QDateTime now = QDateTime::currentDateTime();
+	double bytesWrittenTotal = 0;
+
+	for (const auto& [pass, bytesWritten] : _bytesProcessed)
+	{
+		bytesWrittenTotal += bytesWritten;
+	}
+
+	{
+		const double percentage = (bytesWrittenTotal / _bytesToProcess) * 100.0f;
+		ui->progressBar->setValue(static_cast<int>(percentage));
+	}
+
+	const double milliSecondsTaken = _overwriteStartTime.msecsTo(now);
+
+	if (bytesWrittenTotal >= 0.00f && milliSecondsTaken >= 0.00f)
+	{
+		double bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
+		QString speed = SystemLocale.formattedDataSize(static_cast<qint64>(bytesPerMilliSecond * 1000.0f)).append("/s");
+		ui->labelSpeed->setText(speed);
+
+		double bytesLeft = _bytesToProcess - bytesWrittenTotal;
+		double milliSecondsLeft = bytesLeft / bytesPerMilliSecond;
+		QString timeLeft = SystemLocale.toString(ZeroTime.addMSecs(milliSecondsLeft), QLocale::LongFormat);
+		ui->labelTime->setText(timeLeft);
+	}
 }

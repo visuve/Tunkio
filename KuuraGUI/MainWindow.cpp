@@ -2,12 +2,35 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+#include "KuuraRunner.hpp"
 #include "TargetSelectTab.hpp"
 #include "PathSelectTab.hpp"
 #include "DriveSelectTab.hpp"
 #include "AlgorithmTab.hpp"
 #include "ProgressTab.hpp"
 #include "ResultsTab.hpp"
+
+QString toString(KuuraStage type)
+{
+	switch (type)
+	{
+		case KuuraStage::Open:
+			return "opening";
+		case KuuraStage::Unmount:
+			return "unmounting";
+		case KuuraStage::Size:
+			return "querying size";
+		case KuuraStage::Write:
+			return "writing";
+		case KuuraStage::Verify:
+			return "verifying";
+		case KuuraStage::Delete:
+			return "deleting file";
+	}
+
+	qCritical() << int(type) << " is out of bounds";
+	return "Unknown?";
+}
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
@@ -164,13 +187,69 @@ void MainWindow::onNextRequested()
 
 void MainWindow::onTabChanged(int index)
 {
-	qDebug() << "Changed to: " << index;
+	qDebug() << "Changed to:" << index;
 
 	switch (index)
 	{
 		case 3: // Drive
 			_driveSelectTab->refreshDrives();
 			return;
+		case 5:
+		{
+			auto kuura = new KuuraRunner();
+
+			for (const QPair<QFileInfo, bool>& selectedPath : _pathSelectTab->selectedPaths())
+			{
+				if (selectedPath.first.isFile())
+				{
+					kuura->addTarget(
+						KuuraTargetType::FileOverwrite,
+						QDir::toNativeSeparators(selectedPath.first.absoluteFilePath()).toStdString(),
+						selectedPath.second);
+
+					continue;
+				}
+
+				if (selectedPath.first.isDir())
+				{
+					kuura->addTarget(
+						KuuraTargetType::DirectoryOverwrite,
+						QDir::toNativeSeparators(selectedPath.first.absolutePath()).toStdString(),
+						selectedPath.second);
+
+					continue;
+				}
+
+				qCritical() << "Should never reach here!";
+			}
+
+			for (const QString& selectedDrive : _driveSelectTab->selectedDrives())
+			{
+				kuura->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive.toStdString(), false);
+			}
+
+			for (const AlgorithmTab::OverwritePass& pass : _algorithmTab->selectedPasses())
+			{
+				kuura->addPass(pass.fillType, pass.fillValue, pass.verify);
+			}
+
+			connect(kuura, &KuuraRunner::errorOccurred, this, &MainWindow::onError);
+
+			connect(kuura, &KuuraRunner::overwriteStarted, _progressTab, &ProgressTab::onOverwriteStarted);
+			connect(kuura, &KuuraRunner::passStarted, _progressTab, &ProgressTab::onPassStarted);
+			connect(kuura, &KuuraRunner::passProgressed, _progressTab, &ProgressTab::onPassProgressed);
+			connect(kuura, &KuuraRunner::passFinished, _progressTab, &ProgressTab::onPassFinished);
+			connect(kuura, &KuuraRunner::overwriteCompleted, _progressTab, &ProgressTab::onOverwriteCompleted);
+
+			connect(kuura, &KuuraRunner::overwriteCompleted, this, []()
+			{
+				qDebug() << "DONE!";
+			});
+
+			connect(kuura, &QThread::finished, kuura, &QObject::deleteLater);
+
+			kuura->start();
+		}
 	}
 }
 
@@ -211,4 +290,22 @@ void MainWindow::dropEvent(QDropEvent* e)
 	}
 
 	_pathSelectTab->addPaths(std::move(paths));
+}
+
+void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
+{
+	QStringList message =
+	{
+		QString("An error occurred while %1 %2!\n")
+		.arg(toString(stage))
+		.arg(QString::fromStdString(path.string()))
+	};
+
+	message << QString("Pass: %1").arg(pass);
+	message << QString("Bytes written: %1").arg(bytesWritten);
+	message << QString("Operating system error code: %1").arg(errorCode);
+	/*message << "Detailed description: " <<
+		QString::fromStdString(Kuura::SystemErrorCodeToString(errorCode));*/
+
+	QMessageBox::critical(this, "Kuura - An error occurred", message.join('\n'));
 }

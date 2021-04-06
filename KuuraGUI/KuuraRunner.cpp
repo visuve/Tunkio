@@ -72,7 +72,7 @@ void KuuraRunner::attachCallbacks()
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->wipeStarted(passes, bytesToWritePerPass);
+		emit self->overwriteStarted(passes, bytesToWritePerPass);
 	});
 
 	KuuraSetPassStartedCallback(_kuura, [](
@@ -114,7 +114,7 @@ void KuuraRunner::attachCallbacks()
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->wipeCompleted(passes, totalBytesWritten);
+		emit self->overwriteCompleted(passes, totalBytesWritten);
 	});
 
 	KuuraSetErrorCallback(_kuura, [](
