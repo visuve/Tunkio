@@ -41,6 +41,8 @@
 - Clarify the usage of words wipe, overwrite and pass within the code
 - Complement fill option
 	Complements the disk contents
+- Allow continuing on errors
+	- I.e. maybe have a boolean return value in OnError callback
 
 ## Further reading notes:
 

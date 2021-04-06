@@ -13,43 +13,46 @@ namespace Kuura
 	{
 	}
 
-	bool DirectoryWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)
+	uint64_t DirectoryWorkload::Size()
 	{
-		Directory directory(_path);
+		_directory = std::make_shared<Directory>(_path);
 
-		std::optional<std::vector<std::shared_ptr<File>>>& files = directory.Files();
+		std::optional<std::vector<std::shared_ptr<File>>>& files = _directory->Files();
 
 		if (!files)
 		{
 			_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
-			return false;
+			return 0;
 		}
 
-		std::optional<uint64_t> directorySize = directory.Size();
+		std::optional<uint64_t> directorySize = _directory->Size();
 
 		if (!directorySize)
 		{
 			_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
-			return false;
+			return 0;
 		}
 
+		return directorySize.value();
+	}
+
+	std::pair<bool, uint64_t> DirectoryWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)
+	{
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
-
-		_callbacks->OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), directorySize.value());
 
 		for (auto& filler : fillers)
 		{
 			_callbacks->OnPassStarted(_path.c_str(), ++passes);
 
-			for (auto& file : files.value())
+			for (auto& file : _directory->Files().value())
 			{
 				uint64_t bytesLeft = file->Size().value();
 				uint64_t bytesWritten = 0;
 
 				if (!Overwrite(passes, bytesLeft, bytesWritten, filler, file))
 				{
-					return false;
+					return { false, totalBytesWritten };
 				}
 
 				if (!file->Flush())
@@ -63,13 +66,12 @@ namespace Kuura
 			_callbacks->OnPassCompleted(_path.c_str(), passes);
 		}
 
-		if (_removeAfterOverwrite && !directory.RemoveAll())
+		if (_removeAfterOverwrite && !_directory->RemoveAll())
 		{
 			_callbacks->OnError(_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
-			return false;
+			return { false, totalBytesWritten };
 		}
 
-		_callbacks->OnOverwriteCompleted(passes, totalBytesWritten);
-		return true;
+		return { true, totalBytesWritten };
 	}
 }

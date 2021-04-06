@@ -10,52 +10,52 @@ namespace Kuura
 	{
 	}
 
-	bool DriveWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)
+	uint64_t DriveWorkload::Size()
 	{
-		auto drive = std::make_shared<Drive>(_path);
+		_drive = std::make_shared<Drive>(_path);
 
-		if (!drive->IsValid())
+		if (!_drive->IsValid())
 		{
 			_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
-			return false;
+			return 0;
 		}
 
-		if (!drive->Unmount())
+		if (!_drive->Unmount())
 		{
-			// TODO: maybe add a stage "unmount" which is only used for drives
 			_callbacks->OnError(_path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
-			return false;
+			return 0;
 		}
 
-		if (!drive->Size())
+		if (!_drive->Size())
 		{
 			_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
 			return false;
 		}
 
+		return _drive->Size().value();
+	}
+
+	std::pair<bool, uint64_t> DriveWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)
+	{
 		uint16_t passes = 0;
 		uint64_t totalBytesWritten = 0;
-
-		_callbacks->OnOverwriteStarted(static_cast<uint16_t>(fillers.size()), drive->Size().value());
 
 		for (auto& filler : fillers)
 		{
 			_callbacks->OnPassStarted(_path.c_str(), ++passes);
 
-			uint64_t bytesLeft = drive->Size().value();
+			uint64_t bytesLeft = _drive->Size().value();
 			uint64_t bytesWritten = 0;
 
-			if (!Overwrite(passes, bytesLeft, bytesWritten, filler, drive))
+			if (!Overwrite(passes, bytesLeft, bytesWritten, filler, _drive))
 			{
-				return false;
+				return { false, totalBytesWritten };
 			}
 
 			totalBytesWritten += bytesWritten;
 			_callbacks->OnPassCompleted(_path.c_str(), passes);
 		}
 
-		_callbacks->OnOverwriteCompleted(passes, totalBytesWritten);
-
-		return true;
+		return { true, totalBytesWritten };
 	}
 }

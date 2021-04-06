@@ -126,14 +126,42 @@ namespace Kuura
 
 	bool Composer::Run()
 	{
+		if (_workloads.empty())
+		{
+			return false;
+		}
+
+		uint64_t totalBytesToWrite = 0;
+		uint64_t totalBytesWritten = 0;
+
 		for (auto& workload : _workloads)
 		{
-			if (!workload->Run(_fillers))
+			uint64_t workloadSize = workload->Size();
+
+			if (!workloadSize)
 			{
 				return false;
 			}
+
+			totalBytesToWrite += workloadSize;
 		}
 
-		return !_workloads.empty();
+		_callbacks.OnOverwriteStarted(static_cast<uint16_t>(_fillers.size()), totalBytesToWrite);
+
+		for (auto& workload : _workloads)
+		{
+			std::pair<bool, uint64_t> bytesWritten = workload->Run(_fillers);
+
+			if (!bytesWritten.first)
+			{
+				return false;
+			}
+
+			totalBytesWritten += bytesWritten.second;
+		}
+
+		_callbacks.OnOverwriteCompleted(static_cast<uint16_t>(_fillers.size()), totalBytesWritten);
+
+		return true;
 	}
 }

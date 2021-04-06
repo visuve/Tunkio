@@ -17,7 +17,8 @@ namespace Kuura
 
 		virtual ~IWorkload();
 
-		virtual bool Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers) = 0;
+		virtual uint64_t Size() = 0;
+		virtual std::pair<bool, uint64_t> Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers) = 0;
 
 		bool VerifyPass = false;
 
