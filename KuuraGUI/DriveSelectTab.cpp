@@ -59,6 +59,20 @@ public:
 		return QVariant();
 	}
 
+	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
+	{
+		if (role == Qt::CheckStateRole && index.column() == 0)
+		{
+			const int row = index.row();
+			Q_ASSERT(row <= _drives.size());
+			_drives[row].second = value.toBool();
+			emit dataChanged(index, index);
+			return true;
+		}
+
+		return false;
+	}
+
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const
 	{
 		if (role == Qt::DisplayRole)
@@ -89,6 +103,18 @@ public:
 		}
 
 		return QVariant();
+	}
+
+	Qt::ItemFlags flags(const QModelIndex& index) const override
+	{
+		Qt::ItemFlags existing = QAbstractTableModel::flags(index);
+
+		if (index.column() == 0)
+		{
+			return existing | Qt::ItemIsUserCheckable;
+		}
+
+		return existing;
 	}
 
 	void refresh()

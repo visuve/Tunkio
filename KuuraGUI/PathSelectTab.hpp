@@ -27,6 +27,7 @@ signals:
 
 private:
 	void onAddPaths(QFileDialog::FileMode mode);
+	void onRemoveSelected();
 
 	Ui::PathSelectTab* ui;
 };
