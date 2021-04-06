@@ -13,10 +13,17 @@ class AlgorithmTab : public QWidget
 	Q_OBJECT
 
 public:
+	struct OverwritePass
+	{
+		KuuraFillType fillType;
+		QByteArray fillValue;
+		bool verify;
+	};
+
 	explicit AlgorithmTab(QWidget *parent = nullptr);
 	~AlgorithmTab();
 
-	QVector<QPair<KuuraFillType, QByteArray>> selectedAlgorithms();
+	const QVector<OverwritePass>& selectedPasses() const;
 
 signals:
 	void backRequested();

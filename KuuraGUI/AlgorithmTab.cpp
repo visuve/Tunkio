@@ -2,20 +2,8 @@
 #include "AlgorithmTab.hpp"
 #include "ui_AlgorithmTab.h"
 
-struct OverWriteRequest
+namespace
 {
-	bool verify;
-	KuuraFillType fillType;
-	QByteArray fillValue;
-};
-
-namespace Ui
-{
-	QVariant booleanToYesNo(bool value)
-	{
-		return value ? "Yes" : "No";
-	}
-
 	QString fillTypeToString(KuuraFillType type)
 	{
 		switch (type)
@@ -38,7 +26,7 @@ namespace Ui
 		return "Unknown?";
 	}
 
-	QVariant fillValueToString(const OverWriteRequest& pass)
+	QVariant fillValueToString(const AlgorithmTab::OverwritePass& pass)
 	{
 		switch (pass.fillType)
 		{
@@ -67,7 +55,7 @@ public:
 
 	int rowCount(const QModelIndex&) const override
 	{
-		return _request.size();
+		return _passes.size();
 	}
 
 	int columnCount(const QModelIndex&) const override
@@ -77,75 +65,73 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
 	{
-		if (role != Qt::DisplayRole || index.row() > _request.size())
+		if (role == Qt::DisplayRole)
 		{
-			return {};
+			const AlgorithmTab::OverwritePass& pass = _passes[index.row()];
+
+			switch (index.column())
+			{
+				case 0:
+					return pass.verify ? "Yes" : "No";
+				case 1:
+					return fillTypeToString(pass.fillType);
+				case 2:
+					return fillValueToString(pass);
+			}
 		}
 
-		const OverWriteRequest& requ = _request[index.row()];
-
-		switch (index.column())
-		{
-			case 0:
-				return Ui::booleanToYesNo(requ.verify);
-			case 1:
-				return Ui::fillTypeToString(requ.fillType);
-			case 2:
-				return Ui::fillValueToString(requ);
-		}
-
-		return {};
+		return QVariant();
 	}
 
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const override
 	{
-		if (role != Qt::DisplayRole)
+		if (role == Qt::DisplayRole)
 		{
-			return {};
-		}
-
-		if (orientation == Qt::Orientation::Horizontal)
-		{
-			switch (section)
+			if (orientation == Qt::Orientation::Horizontal)
 			{
-				case 0:
-					return "Verify?";
-				case 1:
-					return "Fill type";
-				case 2:
-					return "Fill value";
+				switch (section)
+				{
+					case 0:
+						return "Verify?";
+					case 1:
+						return "Fill type";
+					case 2:
+						return "Fill value";
+				}
 			}
+
+			return section + 1;
 		}
 
-		return section + 1;
+		return QVariant();
 	}
 
 	void addOverwritePass(KuuraFillType fillType, bool verify, const QByteArray& fillValue = QByteArray())
 	{
-		int row = _request.size();
+		int row = _passes.size();
 		beginInsertRows(QModelIndex(), row, row);
 
-		OverWriteRequest req = {};
-		req.fillType = fillType;
+		AlgorithmTab::OverwritePass pass = {};
+		pass.fillType = fillType;
 
 		switch (fillType)
 		{
 			case ZeroFill:
 			{
 				Q_ASSERT(fillValue.isEmpty());
-				req.fillValue = QByteArray("\x00", 1);
+				pass.fillValue = QByteArray("\x00", 1);
 				break;
 			}
 			case OneFill:
 			{
 				Q_ASSERT(fillValue.isEmpty());
-				req.fillValue = QByteArray("\xFF", 1);
+				pass.fillValue = QByteArray("\xFF", 1);
 				break;
 			}
 			case ByteFill:
 			{
 				Q_ASSERT(fillValue.size() == 1);
-				req.fillValue = fillValue;
+				pass.fillValue = fillValue;
 				break;
 			}
 			case RandomFill:
@@ -156,28 +142,33 @@ public:
 			default:
 			{
 				Q_ASSERT(!fillValue.isEmpty());
-				req.fillValue = fillValue;
+				pass.fillValue = fillValue;
 				break;
 			}
 		}
 
-		req.verify = verify;
-		_request.append(req);
+		pass.verify = verify;
+		_passes.append(pass);
 		endInsertRows();
+	}
+
+	const QVector<AlgorithmTab::OverwritePass>& selectedPasses() const
+	{
+		return _passes;
 	}
 
 	void clearRequests()
 	{
-		if (!_request.isEmpty())
+		if (!_passes.isEmpty())
 		{
 			beginResetModel();
-			_request.clear();
+			_passes.clear();
 			endResetModel();
 		}
 	}
 
 private:
-	QVector<OverWriteRequest> _request;
+	QVector<AlgorithmTab::OverwritePass> _passes;
 };
 
 AlgorithmTab::AlgorithmTab(QWidget* parent) :
@@ -227,9 +218,11 @@ AlgorithmTab::~AlgorithmTab()
 	qDebug();
 }
 
-QVector<QPair<KuuraFillType, QByteArray> > AlgorithmTab::selectedAlgorithms()
+const QVector<AlgorithmTab::OverwritePass>& AlgorithmTab::selectedPasses() const
 {
-	return {}; // TODO!
+	auto model = reinterpret_cast<AlgorithmModel*>(ui->tableViewWipePasses->model());
+	Q_ASSERT(model);
+	return model->selectedPasses();
 }
 
 void AlgorithmTab::presetChanged(int index)
