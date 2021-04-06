@@ -52,10 +52,12 @@
             <string notr="true">QProgressBar {
 	border: 1px solid grey;
 	text-align: center;
+	padding: 1px;
 }
-
 QProgressBar::chunk {
 	background-color: #b0e0e6;
+	width: 4px;
+	border-right: 1px solid #4fb3b3;
 }</string>
            </property>
            <property name="value">
