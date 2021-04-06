@@ -15,6 +15,9 @@ else()
 	add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
+set(EXECUTABLE_OUTPUT_PATH "..")
+set(LIBRARY_OUTPUT_PATH "..")
+
 if(EXISTS "${PROJECT_SOURCE_DIR}/googletest")
 	add_subdirectory("KuuraTests")
 endif()
