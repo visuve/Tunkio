@@ -21,6 +21,7 @@ namespace Kuura
 	{
 		if (this != &other)
 		{
+			std::swap(Path, other.Path);
 #if defined(_WIN32)
 			std::swap(_handle, other._handle);
 #else

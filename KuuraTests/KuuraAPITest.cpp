@@ -100,6 +100,37 @@ namespace Kuura
 		KuuraFree(handle);
 	}
 
+	TEST(KuuraAPITest, MultitargetSuccess)
+	{
+		Counters counters;
+		KuuraHandle* handle = KuuraInitialize(&counters);
+		EXPECT_NE(handle, nullptr);
+
+		EXPECT_TRUE(KuuraAddTarget(handle, KuuraTargetType::FileOverwrite, std::filesystem::path("foo").c_str(), false));
+		EXPECT_TRUE(KuuraAddTarget(handle, KuuraTargetType::FileOverwrite, std::filesystem::path("bar").c_str(), false));
+		EXPECT_TRUE(KuuraAddTarget(handle, KuuraTargetType::FileOverwrite, std::filesystem::path("foobar").c_str(), false));
+		EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::OneFill, false, nullptr));
+		EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::OneFill, false, nullptr));
+		EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::OneFill, false, nullptr));
+
+		KuuraSetOverwriteStartedCallback(handle, OnOverwriteStarted);
+		KuuraSetPassStartedCallback(handle, OnPassStarted);
+		KuuraSetProgressCallback(handle, OnProgress);
+		KuuraSetPassCompletedCallback(handle, OnPassCompleted);
+		KuuraSetOverwriteCompletedCallback(handle, OnOverwriteCompleted);
+		KuuraSetErrorCallback(handle, OnError);
+
+		EXPECT_TRUE(KuuraRun(handle));
+		KuuraFree(handle);
+
+		EXPECT_EQ(counters.OnOverwriteStartedCount, 1);
+		EXPECT_EQ(counters.OnPassStartedCount, 9);
+		EXPECT_EQ(counters.OnProgressCount, 18); // The mock file is overwritten in two slices
+		EXPECT_EQ(counters.OnPassCompletedCount, 9);
+		EXPECT_EQ(counters.OnOverwriteCompletedCount, 1);
+		EXPECT_EQ(counters.OnErrorCount, 0);
+	}
+
 	TEST(KuuraAPITest, OverwriteSuccess)
 	{
 		constexpr KuuraTargetType Types[] =
