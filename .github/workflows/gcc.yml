@@ -29,5 +29,5 @@ jobs:
 
     - name: Run unit tests
       run: |
-        cd out/KuuraTests
+        cd out
         valgrind --leak-check=yes ./kuura-tests
