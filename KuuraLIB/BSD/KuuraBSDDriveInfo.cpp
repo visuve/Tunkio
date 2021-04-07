@@ -12,7 +12,7 @@ namespace Kuura
 		{
 			_mesh = std::make_unique<gmesh>();
 
-			if (geom_gettree(m_mesh.get()) != 0)
+			if (geom_gettree(_mesh.get()) != 0)
 			{
 				std::cerr << "Cannot get GEOM tree" << std::endl;
 			}
@@ -20,7 +20,7 @@ namespace Kuura
 
 		~GeomTree()
 		{
-			geo_deletetree(_mesh.get());
+			geom_deletetree(_mesh.get());
 			_mesh.reset();
 		}
 
