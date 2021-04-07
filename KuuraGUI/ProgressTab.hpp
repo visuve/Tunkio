@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QWidget>
+#include <QDateTime>
+
+#include <filesystem>
 
 namespace Ui
 {
@@ -14,6 +17,9 @@ class ProgressTab : public QWidget
 public:
 	explicit ProgressTab(QWidget *parent = nullptr);
 	~ProgressTab();
+
+	void addTarget(const std::filesystem::path& path);
+	void setPassCount(uint16_t);
 
 	void onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass);
 	void onPassStarted(const std::filesystem::path& path, uint16_t pass);

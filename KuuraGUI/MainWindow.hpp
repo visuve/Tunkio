@@ -27,6 +27,7 @@ public:
 	void onNextRequested();
 	void onTabChanged(int index);
 	void onTargetTypeSelected(KuuraTargetType);
+	void runKuura();
 	void onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode);
 
 	void dragEnterEvent(QDragEnterEvent* e);

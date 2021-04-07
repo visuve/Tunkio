@@ -4,6 +4,8 @@
 
 #include <QThread>
 
+#include <filesystem>
+
 class KuuraRunner : public QThread
 {
 	Q_OBJECT

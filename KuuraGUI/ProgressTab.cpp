@@ -43,13 +43,15 @@ struct Node
 	Node* _parent;
 	QVector<Node*> _children;
 
-	QString path;
-	uint64_t secondsTaken = 0;
-	uint64_t secondsLeft = 0;
+	std::filesystem::path path;
 	uint64_t bytesWritten = 0;
-	uint64_t bytesToWrite = 0;
-	uint64_t bytesPerSecond = 0;
+	uint64_t bytesLeft = 0;
+	int secondsTaken = 0;
+	int secondsLeft = 0;
+	float bytesPerSecond = 0;
 	float progressPercent = 0;
+
+	QTime startTime;
 };
 
 class ProgressModel : public QAbstractItemModel
@@ -59,45 +61,6 @@ public:
 		QAbstractItemModel(parent),
 		_root(new Node(nullptr))
 	{
-		auto alpha = new Node(_root);
-		alpha->path = "D:\\TEST DATA\\foo.txt";
-
-		auto progressA1 = new Node(alpha);
-		progressA1->secondsTaken = 444;
-		progressA1->secondsLeft = 0;
-		progressA1->bytesWritten = 444;
-		progressA1->bytesToWrite = 0;
-		progressA1->bytesPerSecond = 1;
-		progressA1->progressPercent = 100.0f;
-
-		auto progressA2 = new Node(alpha);
-		progressA2->secondsTaken = 321;
-		progressA2->secondsLeft = 123;
-		progressA2->bytesWritten = 321;
-		progressA2->bytesToWrite = 123;
-		progressA2->bytesPerSecond = 1;
-		 progressA2->progressPercent = 38.32f;
-
-		alpha->secondsTaken = progressA1->secondsTaken + progressA2->secondsTaken;
-		alpha->secondsLeft = progressA1->secondsLeft + progressA2->secondsLeft;
-		alpha->bytesWritten = progressA1->bytesWritten + progressA2->bytesWritten;
-		alpha->bytesToWrite = progressA1->secondsTaken + progressA2->secondsTaken;
-		alpha->bytesPerSecond = progressA1->bytesPerSecond + progressA2->bytesPerSecond / 2;
-		alpha->progressPercent = (progressA1->progressPercent + progressA2->progressPercent) / 2;
-
-		alpha->_children.append(progressA1);
-		alpha->_children.append(progressA2);
-
-		auto bravo = new Node(_root);
-		bravo->path = "D:\\TEST DATA\\bar.txt";
-		auto progressB1 = new Node(bravo);
-		auto progressB2 = new Node(bravo);
-
-		bravo->_children.append(progressB1);
-		bravo->_children.append(progressB2);
-
-		_root->_children.append(alpha);
-		_root->_children.append(bravo);
 	}
 
 	~ProgressModel()
@@ -125,6 +88,8 @@ public:
 
 	QModelIndex parent(const QModelIndex& childIndex) const override
 	{
+		Q_ASSERT(childIndex.isValid());
+
 		if (!childIndex.isValid())
 		{
 			return QModelIndex();
@@ -151,6 +116,8 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
 	{
+		Q_ASSERT(index.isValid());
+
 		if (!index.isValid())
 		{
 			return QVariant();
@@ -166,22 +133,24 @@ public:
 				case 0:
 				{
 					if (topLevel)
-						return node->path;
+					{
+						return toQString(node->path);
+					}
 
 					return QString("Pass %1").arg(index.row() + 1);
 				}
 				case 1:
-					return QVariant::fromValue(node->secondsTaken);
+					return SystemLocale.formattedDataSize(node->bytesWritten);
 				case 2:
-					return QVariant::fromValue(node->secondsLeft);
+					return SystemLocale.formattedDataSize(node->bytesLeft);
 				case 3:
-					return QVariant::fromValue(node->bytesWritten);
+					return SystemLocale.toString(ZeroTime.addSecs(node->secondsTaken), QLocale::LongFormat);
 				case 4:
-					return QVariant::fromValue(node->bytesWritten);
+					return SystemLocale.toString(ZeroTime.addSecs(node->secondsLeft), QLocale::LongFormat);
 				case 5:
-					return QVariant::fromValue(node->bytesPerSecond);
+					return SystemLocale.formattedDataSize(node->bytesPerSecond).append("/s");
 				case 6:
-					return node->progressPercent;
+					return std::clamp(node->progressPercent, 0.00f, 100.00f);
 			}
 		}
 
@@ -202,13 +171,13 @@ public:
 				case 0:
 					return "Path";
 				case 1:
-					return "Time taken";
-				case 2:
-					return "Time left";
-				case 3:
 					return "Bytes written";
-				case 4:
+				case 2:
 					return "Bytes left";
+				case 3:
+					return "Time taken";
+				case 4:
+					return "Time left";
 				case 5:
 					return "Speed";
 				case 6:
@@ -217,6 +186,104 @@ public:
 		}
 
 		return QVariant();
+	}
+
+	void addNode(const std::filesystem::path& path)
+	{
+		auto node = new Node(_root);
+		node->path = path;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		_root->_children.emplaceBack(node);
+#else
+		_root->_children.append(node);
+#endif
+	}
+
+	void setPassCount(uint16_t passes)
+	{
+		for (Node* iter : _root->_children)
+		{
+			for (uint16_t i = 0; i < passes; ++i)
+			{
+				auto node = new Node(iter);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+				iter->_children.emplaceBack(node);
+#else
+				iter->_children.append(node);
+#endif
+			}
+		}
+
+		emit dataChanged(index(0, 0), index(passes, 1), { Qt::DisplayRole });
+	}
+
+	std::pair<int, Node*> findProgressNode(const std::filesystem::path& path, uint16_t pass)
+	{
+		Node* topLevelNode = nullptr;
+		int parentRow = 0;
+
+		for (Node* iter : _root->_children)
+		{
+			++parentRow;
+
+			if (iter->path != path)
+			{
+				continue;
+			}
+
+			topLevelNode = iter;
+			break;
+		}
+
+		if (!topLevelNode)
+		{
+			return { -1, nullptr };
+		}
+
+		int subRow = pass - 1;
+		Q_ASSERT(subRow >= 0);
+
+		return { parentRow, topLevelNode->_children[subRow] };
+	}
+
+	void beginPass(const std::filesystem::path& path, uint16_t pass, uint64_t bytesToWrite)
+	{
+		auto node = findProgressNode(path, pass);
+
+		if (!node.second)
+		{
+			return;
+		}
+
+		node.second->startTime = QTime::currentTime();
+		node.second->bytesLeft = bytesToWrite;
+	}
+
+	void updateNode(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten)
+	{
+		auto iter = findProgressNode(path, pass);
+		int parentRow = iter.first;
+		Node* node = iter.second;
+
+		if (parentRow < 0 || !node)
+		{
+			return;
+		}
+
+		node->bytesWritten = bytesWritten;
+		
+		if (node->bytesWritten > 0 && node->bytesLeft > 0)
+		{
+			node->bytesLeft -= bytesWritten;
+			node->progressPercent = float(node->bytesWritten) / float(node->bytesLeft) * 100.0f;
+			node->secondsTaken = node->startTime.secsTo(QTime::currentTime());
+			node->bytesPerSecond = node->secondsTaken ? node->bytesWritten / node->secondsTaken : 0;
+			node->secondsLeft = node->bytesLeft / node->bytesPerSecond;
+		}
+
+		int row = pass - 1;
+		Q_ASSERT(row >= 0);
+		emit dataChanged(index(parentRow, 1), index(row, 1), { Qt::DisplayRole });
 	}
 
 private:
@@ -229,13 +296,12 @@ ProgressTab::ProgressTab(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	auto model = new ProgressModel(this);
-	ui->treeViewProgress->setModel(model);
+	ui->treeViewProgress->setModel(new ProgressModel(this));
 	ui->treeViewProgress->setItemDelegateForColumn(6, new ProgressBarDelegate(this));
 
 	connect(ui->pushButtonNext, &QPushButton::clicked, [this]
 	{
-		emit nextRequested(); // TODO: remove
+		emit nextRequested();
 	});
 }
 
@@ -245,26 +311,50 @@ ProgressTab::~ProgressTab()
 	qDebug();
 }
 
+void ProgressTab::addTarget(const std::filesystem::path& path)
+{
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	model->addNode(path);
+}
+
+void ProgressTab::setPassCount(uint16_t passes)
+{
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	model->setPassCount(passes);
+}
+
 void ProgressTab::onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
 	_bytesToProcess = bytesToWritePerPass * passes;
 	_overwriteStartTime = QDateTime::currentDateTime();
 	ui->progressBar->setValue(0);
+	ui->pushButtonNext->setEnabled(false);
 
 	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+
+	setPassCount(passes);
 }
 
 void ProgressTab::onPassStarted(const std::filesystem::path& path, uint16_t pass)
 {
 	_bytesProcessed[pass] = 0;
-
 	qDebug() << "Pass started:" << toQString(path) << '/' << pass;
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	model->beginPass(path, pass, 6666);
+
 }
 
-void ProgressTab::onPassProgressed(const std::filesystem::path&, uint16_t pass, uint64_t bytesWritten)
+void ProgressTab::onPassProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten)
 {
 	_bytesProcessed[pass] = bytesWritten;
 	updateTotalProgress();
+
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	model->updateNode(path, pass, bytesWritten);
 }
 
 void ProgressTab::onPassFinished(const std::filesystem::path& path, uint16_t pass)
@@ -277,12 +367,13 @@ void ProgressTab::onOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritt
 	qDebug() << "Wipe completed:" << passes << '/' << totalBytesWritten;
 
 	ui->progressBar->setValue(100);
+	ui->pushButtonNext->setEnabled(true);
 }
 
 void ProgressTab::updateTotalProgress()
 {
 	const QDateTime now = QDateTime::currentDateTime();
-	double bytesWrittenTotal = 0;
+	float bytesWrittenTotal = 0;
 
 	for (const auto& [pass, bytesWritten] : _bytesProcessed)
 	{
@@ -290,21 +381,22 @@ void ProgressTab::updateTotalProgress()
 	}
 
 	{
-		const double percentage = (bytesWrittenTotal / _bytesToProcess) * 100.0f;
+		const float percentage = (bytesWrittenTotal / _bytesToProcess) * 100.0f;
 		ui->progressBar->setValue(static_cast<int>(percentage));
 	}
 
-	const double milliSecondsTaken = _overwriteStartTime.msecsTo(now);
+	const float milliSecondsTaken = _overwriteStartTime.msecsTo(now);
 
 	if (bytesWrittenTotal >= 0.00f && milliSecondsTaken >= 0.00f)
 	{
-		double bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
-		QString speed = SystemLocale.formattedDataSize(static_cast<qint64>(bytesPerMilliSecond * 1000.0f)).append("/s");
+		const float bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
+		const qint64 bytesPerSecond = static_cast<qint64>(bytesPerMilliSecond * 1000.0f);
+		const QString speed = SystemLocale.formattedDataSize(bytesPerSecond).append("/s");
 		ui->labelSpeed->setText(speed);
 
-		double bytesLeft = _bytesToProcess - bytesWrittenTotal;
-		double milliSecondsLeft = bytesLeft / bytesPerMilliSecond;
-		QString timeLeft = SystemLocale.toString(ZeroTime.addMSecs(milliSecondsLeft), QLocale::LongFormat);
+		const float bytesLeft = _bytesToProcess - bytesWrittenTotal;
+		const float milliSecondsLeft = bytesLeft / bytesPerMilliSecond;
+		const QString timeLeft = SystemLocale.toString(ZeroTime.addMSecs(milliSecondsLeft), QLocale::LongFormat);
 		ui->labelTime->setText(timeLeft);
 	}
 }

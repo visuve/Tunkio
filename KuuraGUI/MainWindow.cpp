@@ -195,61 +195,8 @@ void MainWindow::onTabChanged(int index)
 			_driveSelectTab->refreshDrives();
 			return;
 		case 5:
-		{
-			auto kuura = new KuuraRunner();
-
-			for (const QPair<QFileInfo, bool>& selectedPath : _pathSelectTab->selectedPaths())
-			{
-				if (selectedPath.first.isFile())
-				{
-					kuura->addTarget(
-						KuuraTargetType::FileOverwrite,
-						QDir::toNativeSeparators(selectedPath.first.absoluteFilePath()).toStdString(),
-						selectedPath.second);
-
-					continue;
-				}
-
-				if (selectedPath.first.isDir())
-				{
-					kuura->addTarget(
-						KuuraTargetType::DirectoryOverwrite,
-						QDir::toNativeSeparators(selectedPath.first.absolutePath()).toStdString(),
-						selectedPath.second);
-
-					continue;
-				}
-
-				qCritical() << "Should never reach here!";
-			}
-
-			for (const QString& selectedDrive : _driveSelectTab->selectedDrives())
-			{
-				kuura->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive.toStdString(), false);
-			}
-
-			for (const AlgorithmTab::OverwritePass& pass : _algorithmTab->selectedPasses())
-			{
-				kuura->addPass(pass.fillType, pass.fillValue, pass.verify);
-			}
-
-			connect(kuura, &KuuraRunner::errorOccurred, this, &MainWindow::onError);
-
-			connect(kuura, &KuuraRunner::overwriteStarted, _progressTab, &ProgressTab::onOverwriteStarted);
-			connect(kuura, &KuuraRunner::passStarted, _progressTab, &ProgressTab::onPassStarted);
-			connect(kuura, &KuuraRunner::passProgressed, _progressTab, &ProgressTab::onPassProgressed);
-			connect(kuura, &KuuraRunner::passFinished, _progressTab, &ProgressTab::onPassFinished);
-			connect(kuura, &KuuraRunner::overwriteCompleted, _progressTab, &ProgressTab::onOverwriteCompleted);
-
-			connect(kuura, &KuuraRunner::overwriteCompleted, this, []()
-			{
-				qDebug() << "DONE!";
-			});
-
-			connect(kuura, &QThread::finished, kuura, &QObject::deleteLater);
-
-			kuura->start();
-		}
+			runKuura();
+			return;
 	}
 }
 
@@ -291,6 +238,84 @@ void MainWindow::dropEvent(QDropEvent* e)
 
 	_pathSelectTab->addPaths(std::move(paths));
 }
+
+
+void MainWindow::runKuura()
+{
+	auto kuura = new KuuraRunner();
+
+	for (const QPair<QFileInfo, bool>& selectedPath : _pathSelectTab->selectedPaths())
+	{
+		if (selectedPath.first.isFile())
+		{
+			const std::filesystem::path path = QDir::toNativeSeparators(selectedPath.first.absoluteFilePath()).toStdString();
+
+			if (kuura->addTarget(
+				KuuraTargetType::FileOverwrite,
+				path,
+				selectedPath.second))
+			{
+				_progressTab->addTarget(path);
+				continue;
+			}
+		}
+
+		if (selectedPath.first.isDir())
+		{
+			const std::filesystem::path path = QDir::toNativeSeparators(selectedPath.first.absolutePath()).toStdString();
+
+			if (kuura->addTarget(
+				KuuraTargetType::DirectoryOverwrite,
+				path,
+				selectedPath.second))
+			{
+				_progressTab->addTarget(path);
+				continue;
+			}
+		}
+
+		qCritical() << "Should never reach here!";
+	}
+
+	for (const QString& selectedDrive : _driveSelectTab->selectedDrives())
+	{
+		if (kuura->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive.toStdString(), false))
+		{
+			_progressTab->addTarget(selectedDrive.toStdString());
+			continue;
+		}
+
+		qCritical() << "Should never reach here!";
+	}
+
+	for (const AlgorithmTab::OverwritePass& pass : _algorithmTab->selectedPasses())
+	{
+		if (kuura->addPass(pass.fillType, pass.fillValue, pass.verify))
+		{
+			continue;
+		}
+
+		qCritical() << "Should never reach here!";
+	}
+
+	connect(kuura, &KuuraRunner::errorOccurred, this, &MainWindow::onError);
+
+	connect(kuura, &KuuraRunner::overwriteStarted, _progressTab, &ProgressTab::onOverwriteStarted);
+	connect(kuura, &KuuraRunner::passStarted, _progressTab, &ProgressTab::onPassStarted);
+	connect(kuura, &KuuraRunner::passProgressed, _progressTab, &ProgressTab::onPassProgressed);
+	connect(kuura, &KuuraRunner::passFinished, _progressTab, &ProgressTab::onPassFinished);
+	connect(kuura, &KuuraRunner::overwriteCompleted, _progressTab, &ProgressTab::onOverwriteCompleted);
+
+	connect(kuura, &KuuraRunner::overwriteCompleted, this, []()
+	{
+		qDebug() << "DONE!";
+	});
+
+	connect(kuura, &QThread::finished, kuura, &QObject::deleteLater);
+
+	kuura->start();
+}
+
 
 void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 {
