@@ -73,9 +73,10 @@ public:
 	bool removeRows(int row, int count, const QModelIndex& parent) override
 	{
 		const int lastIndex = row + count - 1;
+		Q_ASSERT(lastIndex >= 0);
 		beginRemoveRows(parent, row, lastIndex);
 
-		for (int index = row; index < lastIndex; ++index)
+		for (int index = row; index <= lastIndex; ++index)
 		{
 			_files.removeAt(index);
 		}
