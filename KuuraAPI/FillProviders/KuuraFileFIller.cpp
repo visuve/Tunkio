@@ -1,6 +1,5 @@
 #include "../KuuraAPI-PCH.hpp"
 #include "KuuraFileFiller.hpp"
-#include <fstream>
 
 namespace Kuura
 {

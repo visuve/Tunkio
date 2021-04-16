@@ -35,7 +35,7 @@ private:
 
 	Ui::ProgressTab *ui;
 	double _bytesToProcess = 0;
-	QDateTime _overwriteStartTime;
+	std::chrono::steady_clock::time_point _overwriteStartTime;
 	std::map<uint16_t, uint64_t> _bytesProcessed;
 };
 

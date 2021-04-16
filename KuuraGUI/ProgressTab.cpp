@@ -5,6 +5,8 @@
 
 #include <QStandardItemModel>
 
+using MilliSeconds = std::chrono::duration<float, std::ratio<1, 1000>>;
+
 namespace
 {
 	QString toQString(const std::filesystem::path& path)
@@ -44,14 +46,14 @@ struct Node
 	QVector<Node*> _children;
 
 	std::filesystem::path path;
-	uint64_t bytesWritten = 0;
-	uint64_t bytesLeft = 0;
-	int secondsTaken = 0;
-	int secondsLeft = 0;
-	float bytesPerSecond = 0;
+	float bytesWritten = 0;
+	float bytesLeft = 0;
+	MilliSeconds millisecondsTaken;
+	MilliSeconds millisecondsLeft;
+	float bytesPerMilliSecond = 0;
 	float progressPercent = 0;
 
-	QTime startTime;
+	std::chrono::steady_clock::time_point startTime;
 };
 
 class ProgressModel : public QAbstractItemModel
@@ -144,11 +146,11 @@ public:
 				case 2:
 					return SystemLocale.formattedDataSize(node->bytesLeft);
 				case 3:
-					return SystemLocale.toString(ZeroTime.addSecs(node->secondsTaken), QLocale::LongFormat);
+					return SystemLocale.toString(ZeroTime.addMSecs(node->millisecondsTaken.count()), QLocale::LongFormat);
 				case 4:
-					return SystemLocale.toString(ZeroTime.addSecs(node->secondsLeft), QLocale::LongFormat);
+					return SystemLocale.toString(ZeroTime.addMSecs(node->millisecondsLeft.count()), QLocale::LongFormat);
 				case 5:
-					return SystemLocale.formattedDataSize(node->bytesPerSecond).append("/s");
+					return SystemLocale.formattedDataSize(node->bytesPerMilliSecond / 1000.0f).append("/s");
 				case 6:
 					return std::clamp(node->progressPercent, 0.00f, 100.00f);
 			}
@@ -255,7 +257,7 @@ public:
 			return;
 		}
 
-		node.second->startTime = QTime::currentTime();
+		node.second->startTime = std::chrono::steady_clock::now();
 		node.second->bytesLeft = bytesToWrite;
 	}
 
@@ -275,10 +277,10 @@ public:
 		if (node->bytesWritten > 0 && node->bytesLeft > 0)
 		{
 			node->bytesLeft -= bytesWritten;
-			node->progressPercent = float(node->bytesWritten) / float(node->bytesLeft) * 100.0f;
-			node->secondsTaken = node->startTime.secsTo(QTime::currentTime());
-			node->bytesPerSecond = node->secondsTaken ? node->bytesWritten / node->secondsTaken : 0;
-			node->secondsLeft = node->bytesLeft / node->bytesPerSecond;
+			node->progressPercent = node->bytesWritten / node->bytesLeft * 100.0f;
+			node->millisecondsTaken =  std::chrono::duration_cast<MilliSeconds>(std::chrono::steady_clock::now() - node->startTime);
+			node->bytesPerMilliSecond = node->millisecondsTaken.count() ? node->bytesWritten / node->millisecondsTaken.count() : 0;
+			node->millisecondsLeft = MilliSeconds(node->bytesLeft / node->bytesPerMilliSecond);
 		}
 
 		int row = pass - 1;
@@ -328,7 +330,7 @@ void ProgressTab::setPassCount(uint16_t passes)
 void ProgressTab::onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
 	_bytesToProcess = bytesToWritePerPass * passes;
-	_overwriteStartTime = QDateTime::currentDateTime();
+	_overwriteStartTime = std::chrono::steady_clock::now();
 	ui->progressBar->setValue(0);
 	ui->pushButtonNext->setEnabled(false);
 
@@ -372,7 +374,7 @@ void ProgressTab::onOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritt
 
 void ProgressTab::updateTotalProgress()
 {
-	const QDateTime now = QDateTime::currentDateTime();
+	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 	float bytesWrittenTotal = 0;
 
 	for (const auto& [pass, bytesWritten] : _bytesProcessed)
@@ -385,12 +387,12 @@ void ProgressTab::updateTotalProgress()
 		ui->progressBar->setValue(static_cast<int>(percentage));
 	}
 
-	const float milliSecondsTaken = _overwriteStartTime.msecsTo(now);
+	const float milliSecondsTaken = std::chrono::duration_cast<MilliSeconds>(now - _overwriteStartTime).count();
 
 	if (bytesWrittenTotal >= 0.00f && milliSecondsTaken >= 0.00f)
 	{
 		const float bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
-		const qint64 bytesPerSecond = static_cast<qint64>(bytesPerMilliSecond * 1000.0f);
+		const float bytesPerSecond = bytesPerMilliSecond * 1000.0f;
 		const QString speed = SystemLocale.formattedDataSize(bytesPerSecond).append("/s");
 		ui->labelSpeed->setText(speed);
 

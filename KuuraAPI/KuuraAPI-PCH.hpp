@@ -24,7 +24,9 @@
 #include <cassert>
 #include <cstring>
 #include <cstddef>
+#include <cuchar>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <limits>
 #include <numeric>

@@ -29,6 +29,7 @@
 
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <memory>
