@@ -1,6 +1,7 @@
 #include "KuuraAPI-PCH.hpp"
 #include "KuuraAPI.h"
 #include "KuuraComposer.hpp"
+#include "../KuuraResources/KuuraVersion.h"
 
 template <typename T>
 void Set(KuuraHandle* handle, T(Kuura::CallbackContainer::* field), T value)
@@ -121,4 +122,9 @@ void KUURA_CALLING_CONVENTION KuuraFree(KuuraHandle* handle)
 	{
 		delete reinterpret_cast<Kuura::Composer*>(handle);
 	}
+}
+
+const char* KUURA_CALLING_CONVENTION KuuraVersion()
+{
+	return KuuraVersionStr;
 }

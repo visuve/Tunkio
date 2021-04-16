@@ -1,7 +1,7 @@
 # KuuraAPI
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*.cpp" "FillConsumers/*.cpp" "Win32/*.cpp")
+	file(GLOB KuuraAPISource "KuuraAPI.c" "*.cpp" "Workloads/*.cpp" "FillProviders/*.cpp" "FillConsumers/*.cpp" "Win32/*.cpp" "KuuraAPI.rc")
 	add_library("KuuraAPI" SHARED ${KuuraAPISource})
 	target_precompile_headers("KuuraAPI" PRIVATE "KuuraAPI-PCH.hpp")
 	set_source_files_properties("KuuraAPI.c" PROPERTIES SKIP_PRECOMPILE_HEADERS ON)

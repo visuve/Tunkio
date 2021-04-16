@@ -8,9 +8,8 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
-file(GLOB KuuraGUISources "*.cpp" "*.hpp" "*.ui" "*.qrc")
-
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+	file(GLOB KuuraGUISources "*.cpp" "*.hpp" "*.ui" "*.qrc" "KuuraGUI.rc")
 	set(APP_ICON_RESOURCE_WINDOWS "../KuuraResources/Kuura.rc")
 
 	if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -24,6 +23,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	file(GLOB KuuraGUISources "*.cpp" "*.hpp" "*.ui" "*.qrc")
 	if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 		qt_add_executable("kuura-gui" ${KuuraGUISources})
 	else()
@@ -34,6 +34,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	file(GLOB KuuraGUISources "*.cpp" "*.hpp" "*.ui" "*.qrc")
 	if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 		qt_add_executable("kuura-gui" ${KuuraGUISources})
 	else()

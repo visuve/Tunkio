@@ -1,7 +1,7 @@
 # KuuraCLI
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-	file(GLOB KuuraCLISource "*.cpp" "../KuuraResources/Kuura.rc")
+	file(GLOB KuuraCLISource "*.cpp" "KuuraCLI.rc" "../KuuraResources/Kuura.rc")
 	add_executable("KuuraCLI" ${KuuraCLISource})
 	target_precompile_headers("KuuraCLI" PRIVATE "KuuraCLI-PCH.hpp")
 	target_link_libraries("KuuraCLI" LINK_PRIVATE KuuraAPI KuuraDEV)

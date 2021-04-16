@@ -9,6 +9,7 @@
 #include "AlgorithmTab.hpp"
 #include "ProgressTab.hpp"
 #include "ResultsTab.hpp"
+#include "../KuuraResources/KuuraVersion.h"
 
 QString toString(KuuraStage type)
 {
@@ -95,7 +96,7 @@ MainWindow::~MainWindow()
 void MainWindow::onAbout()
 {
 	QStringList text;
-	text << "Kuura - Data Erasure Tool version 0.1.";
+	text << "Kuura - Data Erasure Tool version " << KuuraVersionStr;
 	text << "";
 	text << "Kuura is yet another data erasure tool.";
 	text << "";

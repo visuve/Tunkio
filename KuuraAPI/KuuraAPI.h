@@ -129,6 +129,8 @@ extern "C"
 	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraFree(
 		struct KuuraHandle*);
 
+	KUURA_EXPORT const char* KUURA_CALLING_CONVENTION KuuraVersion();
+
 #if defined(__cplusplus)
 }
 #endif

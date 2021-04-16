@@ -1,0 +1,30 @@
+#include "../KuuraResources/KuuraVersion.h"
+
+VS_VERSION_INFO VERSIONINFO
+	FILEVERSION KuuraMajor,KuuraMinor,KuuraBuild,0
+	PRODUCTVERSION KuuraMajor,KuuraMinor,KuuraBuild,0
+	FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+	FILEFLAGS 0x1L
+#else
+	FILEFLAGS 0x0L
+#endif
+	FILEOS 0x40004L
+	FILETYPE 0x1L
+	FILESUBTYPE 0x0L
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "200004b0"
+		BEGIN
+			VALUE "CompanyName", "visuve"
+			VALUE "FileDescription", "Kuura Command Line Interface"
+			VALUE "FileVersion", KuuraVersionStr
+			VALUE "InternalName", "KuuraCLI.exe"
+			VALUE "LegalCopyright", "Copyright (C) visuve 2021"
+			VALUE "OriginalFilename", "KuuraCLI.exe"
+			VALUE "ProductName", "Kuura CLI"
+			VALUE "ProductVersion", KuuraVersionStr
+		END
+	END
+END

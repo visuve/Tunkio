@@ -1,6 +1,7 @@
 #include "KuuraCLI-PCH.hpp"
 #include "KuuraCLI.hpp"
 #include "KuuraArgument.hpp"
+#include "../KuuraResources/KuuraVersion.h"
 
 namespace Kuura
 {
@@ -177,7 +178,7 @@ int main(int argc, char* argv[])
 	std::cout << " ##    #   #  #   #  # #    #####" << std::endl;
 	std::cout << " # #   #   #  #   #  #  #   #   #"<< std::endl;
 	std::cout << " #  #   ###    ###   #   #  #   #" << std::endl;
-	std::cout << std::endl << "Version 0.1" << std::endl << std::endl;
+	std::cout << std::endl << "Version " << KuuraVersionStr << std::endl << std::endl;
 
 	if (argc <= 1)
 	{
