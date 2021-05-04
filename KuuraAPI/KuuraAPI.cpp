@@ -126,5 +126,5 @@ void KUURA_CALLING_CONVENTION KuuraFree(KuuraHandle* handle)
 
 const char* KUURA_CALLING_CONVENTION KuuraVersion()
 {
-	return KuuraVersionStr;
+	return KuuraVersionString;
 }

@@ -1,6 +1,4 @@
 #pragma once
 
-constexpr int KuuraMajor = 0;
-constexpr int KuuraMinor = 1;
-constexpr int KuuraBuild = 0;
-constexpr char KuuraVersionStr[] = "0.1.0";
+#define KuuraVersionComma 0,1,0,0
+#define KuuraVersionString "0.1.0"

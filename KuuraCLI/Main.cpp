@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 	std::cout << " ##    #   #  #   #  # #    #####" << std::endl;
 	std::cout << " # #   #   #  #   #  #  #   #   #"<< std::endl;
 	std::cout << " #  #   ###    ###   #   #  #   #" << std::endl;
-	std::cout << std::endl << "Version " << KuuraVersionStr << std::endl << std::endl;
+	std::cout << std::endl << "Version " << KuuraVersionString << std::endl << std::endl;
 
 	if (argc <= 1)
 	{

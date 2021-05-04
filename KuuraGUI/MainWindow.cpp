@@ -96,7 +96,7 @@ MainWindow::~MainWindow()
 void MainWindow::onAbout()
 {
 	QStringList text;
-	text << "Kuura - Data Erasure Tool version " << KuuraVersionStr;
+	text << "Kuura - Data Erasure Tool version " << KuuraVersionString;
 	text << "";
 	text << "Kuura is yet another data erasure tool.";
 	text << "";

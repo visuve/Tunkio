@@ -10,7 +10,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	file(GLOB KuuraGUISources "*.cpp" "*.hpp" "*.ui" "*.qrc" "KuuraGUI.rc")
-	set(APP_ICON_RESOURCE_WINDOWS "../KuuraResources/Kuura.rc")
+	# set(APP_ICON_RESOURCE_WINDOWS "../KuuraResources/Kuura.rc")
 
 	if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 		qt_add_executable("KuuraGUI" ${KuuraGUISources} ${APP_ICON_RESOURCE_WINDOWS})
