@@ -15,25 +15,26 @@ namespace Kuura
 
 	uint64_t DirectoryWorkload::Size()
 	{
-		_directory = std::make_shared<Directory>(_path);
-
-		std::optional<std::vector<std::shared_ptr<File>>>& files = _directory->Files();
-
-		if (!files)
+		if (!_directory)
 		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
-			return 0;
+			_directory = std::make_shared<Directory>(_path);
+
+			std::optional<std::vector<std::shared_ptr<File>>>& files = _directory->Files();
+
+			if (!files)
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+				return 0;
+			}
+
+			if (!_directory->Size())
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+				return 0;
+			}
 		}
 
-		std::optional<uint64_t> directorySize = _directory->Size();
-
-		if (!directorySize)
-		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
-			return 0;
-		}
-
-		return directorySize.value();
+		return _directory->Size().has_value() ? _directory->Size().value() : 0;
 	}
 
 	std::pair<bool, uint64_t> DirectoryWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)

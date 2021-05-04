@@ -12,27 +12,30 @@ namespace Kuura
 
 	uint64_t DriveWorkload::Size()
 	{
-		_drive = std::make_shared<Drive>(_path);
-
-		if (!_drive->IsValid())
+		if (!_drive)
 		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
-			return 0;
+			_drive = std::make_shared<Drive>(_path);
+
+			if (!_drive->IsValid())
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+				return 0;
+			}
+
+			if (!_drive->Unmount())
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
+				return 0;
+			}
+
+			if (!_drive->Size())
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+				return false;
+			}
 		}
 
-		if (!_drive->Unmount())
-		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
-			return 0;
-		}
-
-		if (!_drive->Size())
-		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
-			return false;
-		}
-
-		return _drive->Size().value();
+		return _drive->Size().has_value() ? _drive->Size().value() : 0;
 	}
 
 	std::pair<bool, uint64_t> DriveWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)

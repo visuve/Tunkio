@@ -15,21 +15,24 @@ namespace Kuura
 
 	uint64_t FileWorkload::Size()
 	{
-		_file = std::make_shared<File>(_path);
-
-		if (!_file->IsValid())
+		if (!_file)
 		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
-			return 0;
+			_file = std::make_shared<File>(_path);
+
+			if (!_file->IsValid())
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+				return 0;
+			}
+
+			if (!_file->Size())
+			{
+				_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+				return 0;
+			}
 		}
 
-		if (!_file->Size())
-		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
-			return 0;
-		}
-
-		return _file->Size().value();
+		return _file->Size().has_value() ? _file->Size().value() : 0;
 	}
 
 	std::pair<bool, uint64_t> FileWorkload::Run(const std::vector<std::shared_ptr<IFillProvider>>& fillers)
