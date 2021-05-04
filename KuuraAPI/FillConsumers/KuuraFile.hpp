@@ -28,7 +28,6 @@ namespace Kuura
 
 	private:
 		std::optional<uint64_t> _allocationSize;
-		std::optional<uint64_t> _alignmentSize;
 		std::optional<uint64_t> _optimalWriteSize;
 
 #if defined(_WIN32)

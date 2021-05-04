@@ -39,6 +39,8 @@
 ## Developer TODO
 
 - Known bug: if file has no allocation size e.g. lies within MFT, the overwrite will fail
+	- This raises a question, why do I even care about the allocation size, caching or alignment with regular files as it's insecure to wipe them anyways?
+		- Maybe just use std::fstream for files?
 - Clarify the usage of words wipe, overwrite and pass within the code
 - Complement fill option
 	Complements the disk contents

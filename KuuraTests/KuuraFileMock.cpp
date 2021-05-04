@@ -6,7 +6,6 @@ namespace Kuura
 	File::File(const std::filesystem::path& path) :
 		IFillConsumer(path),
 		_allocationSize(2048),
-		_alignmentSize(512),
 		_optimalWriteSize(1024)
 	{
 	}
@@ -28,7 +27,6 @@ namespace Kuura
 			std::swap(_descriptor, other._descriptor);
 #endif
 			std::swap(_allocationSize, other._allocationSize);
-			std::swap(_alignmentSize, other._alignmentSize);
 			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
@@ -51,7 +49,7 @@ namespace Kuura
 
 	std::optional<uint64_t> File::AlignmentSize() const
 	{
-		return _alignmentSize;
+		return 0;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const

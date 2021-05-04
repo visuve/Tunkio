@@ -15,13 +15,11 @@ namespace Kuura
 
 		_allocationSize = AllocationSizeByHandle(_handle);
 		_optimalWriteSize = OptimalWriteSizeByHandle(_handle);
-		_alignmentSize = PageSize();
 
-		if (!_allocationSize || _allocationSize.value() % 512 != 0)
+		if (!_optimalWriteSize || _optimalWriteSize.value() % 512 != 0)
 		{
 			// Something is horribly wrong
 			_allocationSize = std::nullopt;
-			_alignmentSize = std::nullopt;
 			_optimalWriteSize = std::nullopt;
 		}
 	}
@@ -39,7 +37,6 @@ namespace Kuura
 			std::swap(Path, other.Path);
 			std::swap(_handle, other._handle);
 			std::swap(_allocationSize, other._allocationSize);
-			std::swap(_alignmentSize, other._alignmentSize);
 			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
@@ -67,7 +64,7 @@ namespace Kuura
 
 	std::optional<uint64_t> File::AlignmentSize() const
 	{
-		return _alignmentSize;
+		return 0;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const

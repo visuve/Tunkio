@@ -5,7 +5,7 @@
 namespace Kuura
 {
 	// https://linux.die.net/man/2/open
-	constexpr uint32_t OpenFlags = O_RDWR | O_DIRECT | O_SYNC;
+	constexpr uint32_t OpenFlags = O_RDWR | O_SYNC;
 
 	File::File(const std::filesystem::path& path) :
 		IFillConsumer(path),
@@ -28,14 +28,12 @@ namespace Kuura
 
 		// See notes in KuuraWin32File.cpp
 
-		_alignmentSize = fileInfo->st_blksize;
 		_optimalWriteSize = fileInfo->st_blksize / 512 * 0x10000;
 
-		if (_alignmentSize.value() % 512 != 0)
+		if (fileInfo->st_blksize % 512 != 0)
 		{
 			// Something is horribly wrong
 			_allocationSize = std::nullopt;
-			_alignmentSize = std::nullopt;
 			_optimalWriteSize = std::nullopt;
 		}
 	}
@@ -53,7 +51,6 @@ namespace Kuura
 			std::swap(Path, other.Path);
 			std::swap(_descriptor, other._descriptor);
 			std::swap(_allocationSize, other._allocationSize);
-			std::swap(_alignmentSize, other._alignmentSize);
 			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
@@ -62,7 +59,7 @@ namespace Kuura
 
 	File::~File()
 	{
-		if (_descriptor)
+		if (_descriptor != -1)
 		{
 			close(_descriptor);
 			_descriptor = -1;
@@ -81,7 +78,7 @@ namespace Kuura
 
 	std::optional<uint64_t> File::AlignmentSize() const
 	{
-		return _alignmentSize;
+		return 0;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const
