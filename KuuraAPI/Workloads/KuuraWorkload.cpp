@@ -8,7 +8,7 @@ namespace Kuura
 {
 	IWorkload::IWorkload(const CallbackContainer* callbacks, const std::filesystem::path& path, bool remove) :
 		_callbacks(callbacks),
-		_path(path),
+		Path(path),
 		_removeAfterOverwrite(remove)
 	{
 	}
@@ -37,7 +37,7 @@ namespace Kuura
 
 			if (!result.first)
 			{
-				_callbacks->OnError(_path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
+				_callbacks->OnError(Path.c_str(), KuuraStage::Write, pass, bytesWritten, LastError);
 				return false;
 			}
 
@@ -47,18 +47,18 @@ namespace Kuura
 
 				if (!actualData.first)
 				{
-					_callbacks->OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					_callbacks->OnError(Path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 
 				if (!std::equal(writtenData.begin(), writtenData.end(), actualData.second.begin()))
 				{
-					_callbacks->OnError(_path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
+					_callbacks->OnError(Path.c_str(), KuuraStage::Verify, pass, bytesWritten, LastError);
 					return false;
 				}
 			}
 
-			if (!_callbacks->OnProgress(_path.c_str(), pass, bytesWritten))
+			if (!_callbacks->OnProgress(Path.c_str(), pass, bytesWritten))
 			{
 				return true;
 			}

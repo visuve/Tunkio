@@ -5,9 +5,11 @@ namespace Kuura
 	struct Counters
 	{
 		int OnOverwriteStartedCount = 0;
+		int OnTargetStartedCount = 0;
 		int OnPassStartedCount = 0;
 		int OnProgressCount = 0;
 		int OnPassCompletedCount = 0;
+		int OnTargetCompletedCount = 0;
 		int OnOverwriteCompletedCount = 0;
 		int OnErrorCount = 0;
 	};
@@ -15,6 +17,11 @@ namespace Kuura
 	void OnOverwriteStarted(void* context, uint16_t, uint64_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnOverwriteStartedCount++;
+	}
+
+	void OnTargetStarted(void* context, const KuuraChar*, uint64_t)
+	{
+		reinterpret_cast<Counters*>(context)->OnTargetStartedCount++;
 	}
 
 	void OnPassStarted(void* context, const KuuraChar*, uint16_t)
@@ -31,6 +38,11 @@ namespace Kuura
 	void OnPassCompleted(void* context, const KuuraChar*, uint16_t)
 	{
 		reinterpret_cast<Counters*>(context)->OnPassCompletedCount++;
+	}
+
+	void OnTargetCompleted(void* context, const KuuraChar*, uint64_t)
+	{
+		reinterpret_cast<Counters*>(context)->OnTargetCompletedCount++;
 	}
 
 	void OnOverwriteCompleted(void* context, uint16_t, uint64_t)
@@ -58,9 +70,11 @@ namespace Kuura
 		KuuraFree(handle);
 
 		EXPECT_EQ(counters.OnOverwriteStartedCount, 0);
+		EXPECT_EQ(counters.OnTargetCompletedCount, 0);
 		EXPECT_EQ(counters.OnPassStartedCount, 0);
 		EXPECT_EQ(counters.OnProgressCount, 0);
 		EXPECT_EQ(counters.OnPassCompletedCount, 0);
+		EXPECT_EQ(counters.OnTargetCompletedCount, 0);
 		EXPECT_EQ(counters.OnOverwriteCompletedCount, 0);
 		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
@@ -76,9 +90,11 @@ namespace Kuura
 		KuuraFree(handle);
 
 		EXPECT_EQ(counters.OnOverwriteStartedCount, 0);
+		EXPECT_EQ(counters.OnTargetStartedCount, 0);
 		EXPECT_EQ(counters.OnPassStartedCount, 0);
 		EXPECT_EQ(counters.OnProgressCount, 0);
 		EXPECT_EQ(counters.OnPassCompletedCount, 0);
+		EXPECT_EQ(counters.OnTargetCompletedCount, 0);
 		EXPECT_EQ(counters.OnOverwriteCompletedCount, 0);
 		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
@@ -91,9 +107,11 @@ namespace Kuura
 
 		EXPECT_TRUE(KuuraAddTarget(handle, KuuraTargetType::FileOverwrite, std::filesystem::path("foobar").c_str(), false));
 		EXPECT_EQ(counters.OnOverwriteStartedCount, 0);
+		EXPECT_EQ(counters.OnTargetStartedCount, 0);
 		EXPECT_EQ(counters.OnPassStartedCount, 0);
 		EXPECT_EQ(counters.OnProgressCount, 0);
 		EXPECT_EQ(counters.OnPassCompletedCount, 0);
+		EXPECT_EQ(counters.OnTargetCompletedCount, 0);
 		EXPECT_EQ(counters.OnOverwriteCompletedCount, 0);
 		EXPECT_EQ(counters.OnErrorCount, 0);
 
@@ -114,9 +132,11 @@ namespace Kuura
 		EXPECT_TRUE(KuuraAddPass(handle, KuuraFillType::OneFill, false, nullptr));
 
 		KuuraSetOverwriteStartedCallback(handle, OnOverwriteStarted);
+		KuuraSetTargetStartedCallback(handle, OnTargetStarted);
 		KuuraSetPassStartedCallback(handle, OnPassStarted);
 		KuuraSetProgressCallback(handle, OnProgress);
 		KuuraSetPassCompletedCallback(handle, OnPassCompleted);
+		KuuraSetTargetCompletedCallback(handle, OnTargetCompleted);
 		KuuraSetOverwriteCompletedCallback(handle, OnOverwriteCompleted);
 		KuuraSetErrorCallback(handle, OnError);
 
@@ -124,9 +144,11 @@ namespace Kuura
 		KuuraFree(handle);
 
 		EXPECT_EQ(counters.OnOverwriteStartedCount, 1);
+		EXPECT_EQ(counters.OnTargetStartedCount, 3);
 		EXPECT_EQ(counters.OnPassStartedCount, 9);
 		EXPECT_EQ(counters.OnProgressCount, 18); // The mock file is overwritten in two slices
 		EXPECT_EQ(counters.OnPassCompletedCount, 9);
+		EXPECT_EQ(counters.OnTargetCompletedCount, 3);
 		EXPECT_EQ(counters.OnOverwriteCompletedCount, 1);
 		EXPECT_EQ(counters.OnErrorCount, 0);
 	}
@@ -148,16 +170,20 @@ namespace Kuura
 			EXPECT_NE(handle, nullptr);
 
 			EXPECT_EQ(counters.OnOverwriteStartedCount, 0);
+			EXPECT_EQ(counters.OnTargetStartedCount, 0);
 			EXPECT_EQ(counters.OnPassStartedCount, 0);
 			EXPECT_EQ(counters.OnProgressCount, 0);
 			EXPECT_EQ(counters.OnPassCompletedCount, 0);
+			EXPECT_EQ(counters.OnTargetCompletedCount, 0);
 			EXPECT_EQ(counters.OnOverwriteCompletedCount, 0);
 			EXPECT_EQ(counters.OnErrorCount, 0);
 
 			KuuraSetOverwriteStartedCallback(handle, OnOverwriteStarted);
+			KuuraSetTargetStartedCallback(handle, OnTargetStarted);
 			KuuraSetPassStartedCallback(handle, OnPassStarted);
 			KuuraSetProgressCallback(handle, OnProgress);
 			KuuraSetPassCompletedCallback(handle, OnPassCompleted);
+			KuuraSetTargetCompletedCallback(handle, OnTargetCompleted);
 			KuuraSetOverwriteCompletedCallback(handle, OnOverwriteCompleted);
 			KuuraSetErrorCallback(handle, OnError);
 
@@ -170,9 +196,11 @@ namespace Kuura
 			KuuraFree(handle);
 
 			EXPECT_EQ(counters.OnOverwriteStartedCount, 1);
+			EXPECT_EQ(counters.OnTargetStartedCount, 1);
 			EXPECT_EQ(counters.OnPassStartedCount, 4);
 			EXPECT_EQ(counters.OnProgressCount, 8);
 			EXPECT_EQ(counters.OnPassCompletedCount, 4);
+			EXPECT_EQ(counters.OnTargetCompletedCount, 1);
 			EXPECT_EQ(counters.OnOverwriteCompletedCount, 1);
 			EXPECT_EQ(counters.OnErrorCount, 0);
 		}

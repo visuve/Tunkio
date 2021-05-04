@@ -46,12 +46,12 @@ struct Node
 	QVector<Node*> _children;
 
 	std::filesystem::path path;
-	float bytesWritten = 0;
-	float bytesLeft = 0;
+	float bytesWritten = 0.0f;
+	float bytesLeft = 0.0f;
 	MilliSeconds millisecondsTaken;
 	MilliSeconds millisecondsLeft;
-	float bytesPerMilliSecond = 0;
-	float progressPercent = 0;
+	float bytesPerMilliSecond = 0.0f;
+	float progressPercent = 0.0f;
 
 	std::chrono::steady_clock::time_point startTime;
 };
@@ -142,16 +142,46 @@ public:
 					return QString("Pass %1").arg(index.row() + 1);
 				}
 				case 1:
+					if (topLevel)
+					{
+						break;
+					}
+
 					return SystemLocale.formattedDataSize(node->bytesWritten);
 				case 2:
+					if (topLevel)
+					{
+						break;
+					}
+
 					return SystemLocale.formattedDataSize(node->bytesLeft);
 				case 3:
+					if (topLevel)
+					{
+						break;
+					}
+
 					return SystemLocale.toString(ZeroTime.addMSecs(node->millisecondsTaken.count()), QLocale::LongFormat);
 				case 4:
+					if (topLevel)
+					{
+						break;
+					}
+
 					return SystemLocale.toString(ZeroTime.addMSecs(node->millisecondsLeft.count()), QLocale::LongFormat);
 				case 5:
-					return SystemLocale.formattedDataSize(node->bytesPerMilliSecond / 1000.0f).append("/s");
+					if (topLevel)
+					{
+						break;
+					}
+
+					return SystemLocale.formattedDataSize(node->bytesPerMilliSecond * 1000.0f).append("/s");
 				case 6:
+					if (topLevel)
+					{
+						break;
+					}
+
 					return std::clamp(node->progressPercent, 0.00f, 100.00f);
 			}
 		}
@@ -219,7 +249,7 @@ public:
 		emit dataChanged(index(0, 0), index(passes, 1), { Qt::DisplayRole });
 	}
 
-	std::pair<int, Node*> findProgressNode(const std::filesystem::path& path, uint16_t pass)
+	std::pair<int, Node*> findTopLevelNode(const std::filesystem::path& path)
 	{
 		Node* topLevelNode = nullptr;
 		int parentRow = 0;
@@ -242,23 +272,41 @@ public:
 			return { -1, nullptr };
 		}
 
+		return { parentRow, topLevelNode };
+	}
+		
+	std::pair<int, Node*> findProgressNode(const std::filesystem::path& path, uint16_t pass)
+	{
+		auto node = findTopLevelNode(path);
+
+		if (node.first < 0 || !node.second)
+		{
+			return { -1, nullptr };
+		}
+
 		int subRow = pass - 1;
 		Q_ASSERT(subRow >= 0);
 
-		return { parentRow, topLevelNode->_children[subRow] };
+		return { node.first, node.second->_children[subRow] };
 	}
 
-	void beginPass(const std::filesystem::path& path, uint16_t pass, uint64_t bytesToWrite)
+	void beginTarget(const std::filesystem::path& path, uint64_t bytesToWrite)
 	{
-		auto node = findProgressNode(path, pass);
+		auto node = findTopLevelNode(path);
 
 		if (!node.second)
 		{
 			return;
 		}
 
-		node.second->startTime = std::chrono::steady_clock::now();
-		node.second->bytesLeft = bytesToWrite;
+		for (Node* progressNode : node.second->_children)
+		{
+			progressNode->bytesLeft = bytesToWrite;
+		}
+
+		const auto now = std::chrono::steady_clock::now();
+		node.second->startTime = now;
+		node.second->_children.first()->startTime = now;
 	}
 
 	void updateNode(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten)
@@ -276,16 +324,32 @@ public:
 		
 		if (node->bytesWritten > 0 && node->bytesLeft > 0)
 		{
+			const auto now = std::chrono::steady_clock::now();
 			node->bytesLeft -= bytesWritten;
 			node->progressPercent = node->bytesWritten / node->bytesLeft * 100.0f;
-			node->millisecondsTaken =  std::chrono::duration_cast<MilliSeconds>(std::chrono::steady_clock::now() - node->startTime);
+			node->millisecondsTaken =  std::chrono::duration_cast<MilliSeconds>(now - node->startTime);
 			node->bytesPerMilliSecond = node->millisecondsTaken.count() ? node->bytesWritten / node->millisecondsTaken.count() : 0;
 			node->millisecondsLeft = MilliSeconds(node->bytesLeft / node->bytesPerMilliSecond);
 		}
 
 		int row = pass - 1;
 		Q_ASSERT(row >= 0);
-		emit dataChanged(index(parentRow, 1), index(row, 1), { Qt::DisplayRole });
+		emit dataChanged(index(parentRow, 1), index(row, 6), { Qt::DisplayRole });
+	}
+
+	float bytesWrittenTotal()
+	{
+		float result = 0;
+
+		for (Node* topLevel : _root->_children)
+		{
+			for (Node* iter : topLevel->_children)
+			{
+				result += iter->bytesWritten;
+			}
+		}
+
+		return result;
 	}
 
 private:
@@ -320,38 +384,35 @@ void ProgressTab::addTarget(const std::filesystem::path& path)
 	model->addNode(path);
 }
 
-void ProgressTab::setPassCount(uint16_t passes)
-{
-	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
-	Q_ASSERT(model);
-	model->setPassCount(passes);
-}
-
 void ProgressTab::onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
-	_bytesToProcess = bytesToWritePerPass * passes;
+	_bytesToProcess = float(bytesToWritePerPass) * float(passes);
 	_overwriteStartTime = std::chrono::steady_clock::now();
 	ui->progressBar->setValue(0);
 	ui->pushButtonNext->setEnabled(false);
 
-	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	model->setPassCount(passes);
 
-	setPassCount(passes);
+	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+}
+
+void ProgressTab::onTargetStarted(const std::filesystem::path& path, uint64_t bytesToWrite)
+{
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	model->beginTarget(path, bytesToWrite);
 }
 
 void ProgressTab::onPassStarted(const std::filesystem::path& path, uint16_t pass)
 {
-	_bytesProcessed[pass] = 0;
-	qDebug() << "Pass started:" << toQString(path) << '/' << pass;
-	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
-	Q_ASSERT(model);
-	model->beginPass(path, pass, 6666);
 
+	qDebug() << "Pass started:" << toQString(path) << '/' << pass;
 }
 
 void ProgressTab::onPassProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten)
 {
-	_bytesProcessed[pass] = bytesWritten;
 	updateTotalProgress();
 
 	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
@@ -359,46 +420,58 @@ void ProgressTab::onPassProgressed(const std::filesystem::path& path, uint16_t p
 	model->updateNode(path, pass, bytesWritten);
 }
 
-void ProgressTab::onPassFinished(const std::filesystem::path& path, uint16_t pass)
+void ProgressTab::onPassCompleted(const std::filesystem::path& path, uint16_t pass)
 {
-	qDebug() << "Pass finished:" << toQString(path) << '/' << pass;
+	qDebug() << "Pass completed:" << toQString(path) << '/' << pass;
+}
+
+void ProgressTab::onTargetCompleted(const std::filesystem::path& path, uint64_t bytesWritten)
+{
+	qDebug() << "Target completed:" << toQString(path) << '/' << bytesWritten;
 }
 
 void ProgressTab::onOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritten)
 {
 	qDebug() << "Wipe completed:" << passes << '/' << totalBytesWritten;
 
+	updateTotalProgress();
 	ui->progressBar->setValue(100);
 	ui->pushButtonNext->setEnabled(true);
 }
 
 void ProgressTab::updateTotalProgress()
 {
-	const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-	float bytesWrittenTotal = 0;
+	auto model = reinterpret_cast<ProgressModel*>(ui->treeViewProgress->model());
+	Q_ASSERT(model);
+	const float bytesWrittenTotal = model->bytesWrittenTotal();
 
-	for (const auto& [pass, bytesWritten] : _bytesProcessed)
+	const std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+	const float milliSecondsTaken = std::chrono::duration_cast<MilliSeconds>(time - _overwriteStartTime).count();
+
+	if (bytesWrittenTotal <= 0.00f || milliSecondsTaken <= 0.00f)
 	{
-		bytesWrittenTotal += bytesWritten;
+		return;
 	}
 
+	const float bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
+
 	{
-		const float percentage = (bytesWrittenTotal / _bytesToProcess) * 100.0f;
-		ui->progressBar->setValue(static_cast<int>(percentage));
+		const QString timeTaken = SystemLocale.toString(ZeroTime.addMSecs(milliSecondsTaken), QLocale::LongFormat);
+		ui->labelTimeTaken->setText(timeTaken);
 	}
-
-	const float milliSecondsTaken = std::chrono::duration_cast<MilliSeconds>(now - _overwriteStartTime).count();
-
-	if (bytesWrittenTotal >= 0.00f && milliSecondsTaken >= 0.00f)
 	{
-		const float bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
 		const float bytesPerSecond = bytesPerMilliSecond * 1000.0f;
 		const QString speed = SystemLocale.formattedDataSize(bytesPerSecond).append("/s");
 		ui->labelSpeed->setText(speed);
-
+	}
+	{
 		const float bytesLeft = _bytesToProcess - bytesWrittenTotal;
 		const float milliSecondsLeft = bytesLeft / bytesPerMilliSecond;
 		const QString timeLeft = SystemLocale.toString(ZeroTime.addMSecs(milliSecondsLeft), QLocale::LongFormat);
-		ui->labelTime->setText(timeLeft);
+		ui->labelTimeLeft->setText(timeLeft);
+	}
+	{
+		const float percentage = (bytesWrittenTotal / _bytesToProcess) * 100.0f;
+		ui->progressBar->setValue(static_cast<int>(percentage));
 	}
 }

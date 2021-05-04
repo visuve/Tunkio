@@ -55,6 +55,11 @@ extern "C"
 		uint16_t passes,
 		uint64_t bytesToWritePerPass);
 
+	typedef void(KuuraTargetStartedCallback)(
+		void* context,
+		const KuuraChar* path,
+		uint64_t bytesToWritePerPass);
+
 	typedef void(KuuraPassStartedCallback)(
 		void* context,
 		const KuuraChar* path,
@@ -70,6 +75,11 @@ extern "C"
 		void* context,
 		const KuuraChar* path,
 		uint16_t pass);
+
+	typedef void(KuuraTargetCompletedCallback)(
+		void* context,
+		const KuuraChar* path,
+		uint64_t bytesWritten);
 
 	typedef void(KuuraOverwriteCompletedCallback)(
 		void* context,
@@ -103,6 +113,10 @@ extern "C"
 		struct KuuraHandle*,
 		KuuraOverwriteStartedCallback*);
 
+	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetTargetStartedCallback(
+		struct KuuraHandle*,
+		KuuraTargetStartedCallback*);
+
 	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetPassStartedCallback(
 		struct KuuraHandle*,
 		KuuraPassStartedCallback*);
@@ -114,6 +128,10 @@ extern "C"
 	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetPassCompletedCallback(
 		struct KuuraHandle*,
 		KuuraPassCompletedCallback*);
+
+	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetTargetCompletedCallback(
+		struct KuuraHandle*,
+		KuuraTargetCompletedCallback*);
 
 	KUURA_EXPORT void KUURA_CALLING_CONVENTION KuuraSetOverwriteCompletedCallback(
 		struct KuuraHandle*,

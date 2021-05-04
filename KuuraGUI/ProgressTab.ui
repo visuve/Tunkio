@@ -48,8 +48,50 @@
         <property name="title">
          <string>Overall:</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0" colspan="5">
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelTimeTakenDesc">
+           <property name="text">
+            <string>Time taken:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="labelTimeTaken">
+           <property name="text">
+            <string>20min</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="labelTimeLeftDesc">
+           <property name="text">
+            <string>Time left:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="labelTimeLeft">
+           <property name="text">
+            <string>1h 20min</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelSpeedDesc">
+           <property name="text">
+            <string>Speed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="labelSpeed">
+           <property name="text">
+            <string>123 MiB/s</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
           <widget class="QProgressBar" name="progressBar">
            <property name="styleSheet">
             <string notr="true">QProgressBar {
@@ -65,47 +107,6 @@ QProgressBar::chunk {
            </property>
            <property name="value">
             <number>24</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="labelSpeedDesc">
-           <property name="text">
-            <string>Speed:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="labelSpeed">
-           <property name="text">
-            <string>123 MiB/s</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>332</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="labelTimeDesc">
-           <property name="text">
-            <string>Time left:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
-          <widget class="QLabel" name="labelTime">
-           <property name="text">
-            <string>1h 20min</string>
            </property>
           </widget>
          </item>

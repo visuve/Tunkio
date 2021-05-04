@@ -136,7 +136,7 @@ namespace Kuura
 
 		for (auto& workload : _workloads)
 		{
-			uint64_t workloadSize = workload->Size();
+			const uint64_t workloadSize = workload->Size();
 
 			if (!workloadSize)
 			{
@@ -150,6 +150,7 @@ namespace Kuura
 
 		for (auto& workload : _workloads)
 		{
+			_callbacks.OnTargetStarted(workload->Path.c_str(), workload->Size());
 			std::pair<bool, uint64_t> bytesWritten = workload->Run(_fillers);
 
 			if (!bytesWritten.first)
@@ -158,6 +159,7 @@ namespace Kuura
 			}
 
 			totalBytesWritten += bytesWritten.second;
+			_callbacks.OnTargetCompleted(workload->Path.c_str(), bytesWritten.second);
 		}
 
 		_callbacks.OnOverwriteCompleted(static_cast<uint16_t>(_fillers.size()), totalBytesWritten);

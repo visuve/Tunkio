@@ -44,6 +44,15 @@ namespace Kuura
 			self->OnOverwriteStarted(passes, bytesToWritePerPass);
 		});
 
+		KuuraSetTargetStartedCallback(_handle, [](
+			void* context,
+			const KuuraChar* path,
+			uint64_t bytesToWritePerPass)
+		{
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnTargetStarted(path, bytesToWritePerPass);
+		});
+
 		KuuraSetPassStartedCallback(_handle, [](
 			void* context,
 			const KuuraChar* path,
@@ -70,6 +79,15 @@ namespace Kuura
 		{
 			auto self = reinterpret_cast<CLI*>(context);
 			self->OnPassCompleted(path, pass);
+		});
+
+		KuuraSetTargetCompletedCallback(_handle, [](
+			void* context,
+			const KuuraChar* path,
+			uint64_t bytesWritten)
+		{
+			auto self = reinterpret_cast<CLI*>(context);
+			self->OnTargetCompleted(path, bytesWritten);
 		});
 
 		KuuraSetOverwriteCompletedCallback(_handle, [](
@@ -119,6 +137,11 @@ namespace Kuura
 		std::cout << Time::Timestamp() << " Overwrite Started! Passes " << passes << '.' << std::endl;
 	}
 
+	void CLI::OnTargetStarted(const std::filesystem::path& path, uint64_t)
+	{
+		std::cout << Time::Timestamp() << " Starting to overwrite: " << path << '.' << std::endl;
+	}
+
 	void CLI::OnPassStarted(const std::filesystem::path&, uint16_t pass)
 	{
 		_totalTimer.Reset();
@@ -158,6 +181,11 @@ namespace Kuura
 	void CLI::OnPassCompleted(const std::filesystem::path&, uint16_t pass)
 	{
 		std::cout << Time::Timestamp() << " Pass " << pass << " completed!" << std::endl;
+	}
+
+	void CLI::OnTargetCompleted(const std::filesystem::path& path, uint64_t)
+	{
+		std::cout << Time::Timestamp() << ' ' << path << " processed." << std::endl;
 	}
 
 	void CLI::OnError(const std::filesystem::path& path, KuuraStage stage, uint16_t, uint64_t bytesWritten, uint32_t error)

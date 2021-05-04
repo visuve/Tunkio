@@ -302,9 +302,11 @@ void MainWindow::runKuura()
 	connect(kuura, &KuuraRunner::errorOccurred, this, &MainWindow::onError);
 
 	connect(kuura, &KuuraRunner::overwriteStarted, _progressTab, &ProgressTab::onOverwriteStarted);
+	connect(kuura, &KuuraRunner::targetStarted, _progressTab, &ProgressTab::onTargetStarted);
 	connect(kuura, &KuuraRunner::passStarted, _progressTab, &ProgressTab::onPassStarted);
 	connect(kuura, &KuuraRunner::passProgressed, _progressTab, &ProgressTab::onPassProgressed);
-	connect(kuura, &KuuraRunner::passFinished, _progressTab, &ProgressTab::onPassFinished);
+	connect(kuura, &KuuraRunner::passCompleted, _progressTab, &ProgressTab::onPassCompleted);
+	connect(kuura, &KuuraRunner::targetCompleted, _progressTab, &ProgressTab::onTargetCompleted);
 	connect(kuura, &KuuraRunner::overwriteCompleted, _progressTab, &ProgressTab::onOverwriteCompleted);
 
 	connect(kuura, &KuuraRunner::overwriteCompleted, this, []()

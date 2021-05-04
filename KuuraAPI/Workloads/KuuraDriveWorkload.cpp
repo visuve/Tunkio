@@ -14,23 +14,23 @@ namespace Kuura
 	{
 		if (!_drive)
 		{
-			_drive = std::make_shared<Drive>(_path);
+			_drive = std::make_shared<Drive>(Path);
 
 			if (!_drive->IsValid())
 			{
-				_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+				_callbacks->OnError(Path.c_str(), KuuraStage::Open, 0, 0, LastError);
 				return 0;
 			}
 
 			if (!_drive->Unmount())
 			{
-				_callbacks->OnError(_path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
+				_callbacks->OnError(Path.c_str(), KuuraStage::Unmount, 0, 0, LastError);
 				return 0;
 			}
 
 			if (!_drive->Size())
 			{
-				_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+				_callbacks->OnError(Path.c_str(), KuuraStage::Size, 0, 0, LastError);
 				return false;
 			}
 		}
@@ -45,7 +45,7 @@ namespace Kuura
 
 		for (auto& filler : fillers)
 		{
-			_callbacks->OnPassStarted(_path.c_str(), ++passes);
+			_callbacks->OnPassStarted(Path.c_str(), ++passes);
 
 			uint64_t bytesLeft = _drive->Size().value();
 			uint64_t bytesWritten = 0;
@@ -56,7 +56,7 @@ namespace Kuura
 			}
 
 			totalBytesWritten += bytesWritten;
-			_callbacks->OnPassCompleted(_path.c_str(), passes);
+			_callbacks->OnPassCompleted(Path.c_str(), passes);
 		}
 
 		return { true, totalBytesWritten };

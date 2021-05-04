@@ -75,6 +75,16 @@ void KuuraRunner::attachCallbacks()
 		emit self->overwriteStarted(passes, bytesToWritePerPass);
 	});
 
+	KuuraSetTargetStartedCallback(_kuura, [](
+		void* context,
+		const KuuraChar* path,
+		uint64_t bytesToWritePerPass)
+	{
+		auto self = static_cast<KuuraRunner*>(context);
+		Q_ASSERT(self);
+		self->targetStarted(path, bytesToWritePerPass);
+	});
+
 	KuuraSetPassStartedCallback(_kuura, [](
 		void* context,
 		const KuuraChar* path,
@@ -104,7 +114,17 @@ void KuuraRunner::attachCallbacks()
 	{
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
-		emit self->passFinished(path, pass);
+		emit self->passCompleted(path, pass);
+	});
+
+	KuuraSetTargetCompletedCallback(_kuura, [](
+		void* context,
+		const KuuraChar* path,
+		uint64_t bytesWritten)
+	{
+		auto self = static_cast<KuuraRunner*>(context);
+		Q_ASSERT(self);
+		emit self->targetCompleted(path, bytesWritten);
 	});
 
 	KuuraSetOverwriteCompletedCallback(_kuura, [](

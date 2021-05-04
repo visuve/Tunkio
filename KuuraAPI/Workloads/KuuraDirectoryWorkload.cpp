@@ -17,19 +17,19 @@ namespace Kuura
 	{
 		if (!_directory)
 		{
-			_directory = std::make_shared<Directory>(_path);
+			_directory = std::make_shared<Directory>(Path);
 
 			std::optional<std::vector<std::shared_ptr<File>>>& files = _directory->Files();
 
 			if (!files)
 			{
-				_callbacks->OnError(_path.c_str(), KuuraStage::Open, 0, 0, LastError);
+				_callbacks->OnError(Path.c_str(), KuuraStage::Open, 0, 0, LastError);
 				return 0;
 			}
 
 			if (!_directory->Size())
 			{
-				_callbacks->OnError(_path.c_str(), KuuraStage::Size, 0, 0, LastError);
+				_callbacks->OnError(Path.c_str(), KuuraStage::Size, 0, 0, LastError);
 				return 0;
 			}
 		}
@@ -44,7 +44,7 @@ namespace Kuura
 
 		for (auto& filler : fillers)
 		{
-			_callbacks->OnPassStarted(_path.c_str(), ++passes);
+			_callbacks->OnPassStarted(Path.c_str(), ++passes);
 
 			for (auto& file : _directory->Files().value())
 			{
@@ -58,18 +58,18 @@ namespace Kuura
 
 				if (!file->Flush())
 				{
-					_callbacks->OnError(_path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+					_callbacks->OnError(Path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
 				}
 
 				totalBytesWritten += bytesWritten;
 			}
 
-			_callbacks->OnPassCompleted(_path.c_str(), passes);
+			_callbacks->OnPassCompleted(Path.c_str(), passes);
 		}
 
 		if (_removeAfterOverwrite && !_directory->RemoveAll())
 		{
-			_callbacks->OnError(_path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
+			_callbacks->OnError(Path.c_str(), KuuraStage::Delete, passes, totalBytesWritten, LastError);
 			return { false, totalBytesWritten };
 		}
 

@@ -19,6 +19,14 @@ namespace Kuura
 			}
 		}
 
+		inline void OnTargetStarted(const KuuraChar* path, uint64_t bytesToWritePerPass) const
+		{
+			if (TargetStartedCallback)
+			{
+				TargetStartedCallback(Context, path, bytesToWritePerPass);
+			}
+		}
+
 		inline void OnPassStarted(const KuuraChar* path, uint16_t pass) const
 		{
 			if (PassStartedCallback)
@@ -37,6 +45,14 @@ namespace Kuura
 			if (PassCompletedCallback)
 			{
 				PassCompletedCallback(Context, path, pass);
+			}
+		}
+
+		inline void OnTargetCompleted(const KuuraChar* path, uint64_t bytesWritten)
+		{
+			if (TargetCompletedCallback)
+			{
+				TargetCompletedCallback(Context, path, bytesWritten);
 			}
 		}
 
@@ -63,9 +79,11 @@ namespace Kuura
 
 		void* Context = nullptr;
 		KuuraOverwriteStartedCallback* OverwriteStartedCallback = nullptr;
+		KuuraTargetStartedCallback* TargetStartedCallback = nullptr;
 		KuuraPassStartedCallback* PassStartedCallback = nullptr;
 		KuuraProgressCallback* ProgressCallback = nullptr;
 		KuuraPassCompletedCallback* PassCompletedCallback = nullptr;
+		KuuraTargetCompletedCallback* TargetCompletedCallback = nullptr;
 		KuuraOverwriteCompletedCallback* OverwriteCompletedCallback = nullptr;
 		KuuraErrorCallback* ErrorCallback = nullptr;
 	};

@@ -69,6 +69,11 @@ void KUURA_CALLING_CONVENTION KuuraSetOverwriteStartedCallback(
 	Set(handle, &Kuura::CallbackContainer::OverwriteStartedCallback, callback);
 }
 
+void KUURA_CALLING_CONVENTION KuuraSetTargetStartedCallback(KuuraHandle* handle, KuuraTargetStartedCallback* callback)
+{
+	Set(handle, &Kuura::CallbackContainer::TargetStartedCallback, callback);
+}
+
 void KUURA_CALLING_CONVENTION KuuraSetPassStartedCallback(
 	KuuraHandle* handle,
 	KuuraPassStartedCallback* callback)
@@ -88,6 +93,11 @@ void KUURA_CALLING_CONVENTION KuuraSetPassCompletedCallback(
 	KuuraPassCompletedCallback* callback)
 {
 	Set(handle, &Kuura::CallbackContainer::PassCompletedCallback, callback);
+}
+
+void KUURA_CALLING_CONVENTION KuuraSetTargetCompletedCallback(KuuraHandle* handle, KuuraTargetCompletedCallback* callback)
+{
+	Set(handle, &Kuura::CallbackContainer::TargetCompletedCallback, callback);
 }
 
 void KUURA_CALLING_CONVENTION KuuraSetOverwriteCompletedCallback(
