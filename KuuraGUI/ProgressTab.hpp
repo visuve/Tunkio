@@ -5,6 +5,8 @@
 
 #include <filesystem>
 
+class ProgressModel;
+
 namespace Ui
 {
 	class ProgressTab;
@@ -35,6 +37,8 @@ private:
 	void updateTotalProgress();
 
 	Ui::ProgressTab *ui;
+	ProgressModel* _model;
+
 	float _bytesToProcess = 0.0f;
 	std::chrono::steady_clock::time_point _overwriteStartTime;
 };
