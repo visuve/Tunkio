@@ -7,8 +7,8 @@
 namespace Kuura
 {
 	IWorkload::IWorkload(const CallbackContainer* callbacks, const std::filesystem::path& path, bool remove) :
-		_callbacks(callbacks),
 		Path(path),
+		_callbacks(callbacks),
 		_removeAfterOverwrite(remove)
 	{
 	}
