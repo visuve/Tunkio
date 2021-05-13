@@ -16,17 +16,17 @@ public:
 		qDebug();
 	}
 
-	int rowCount(const QModelIndex& /*parent*/) const
+	int rowCount(const QModelIndex& /*parent*/) const override
 	{
 		return _drives.size();
 	}
 
-	int columnCount(const QModelIndex&) const
+	int columnCount(const QModelIndex&) const override
 	{
 		return 5;
 	}
 
-	QVariant data(const QModelIndex& index, int role) const
+	QVariant data(const QModelIndex& index, int role) const override
 	{
 		const int row = index.row();
 		Q_ASSERT(row <= _drives.size());
@@ -73,7 +73,7 @@ public:
 		return false;
 	}
 
-	QVariant headerData(int section, Qt::Orientation orientation, int role) const
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const override
 	{
 		if (role == Qt::DisplayRole)
 		{
@@ -126,12 +126,7 @@ public:
 		for (auto& drive : Kuura::DriveInfo())
 		{
 			QPair<Kuura::Drive, bool> pair(drive, false);
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 			_drives.emplaceBack(pair);
-#else
-			_drives.append(pair);
-#endif
 		}
 
 		endResetModel();
@@ -148,11 +143,7 @@ public:
 				continue;
 			}
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 			selected.emplaceBack(QString::fromStdString(drive.first.Path));
-#else
-			selected.append(QString::fromStdString(drive.first.Path));
-#endif
 		}
 
 		return selected;

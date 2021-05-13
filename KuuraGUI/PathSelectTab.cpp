@@ -20,7 +20,7 @@ public:
 		return _files.size();
 	}
 
-	int columnCount(const QModelIndex&) const
+	int columnCount(const QModelIndex&) const override
 	{
 		return 2;
 	}
@@ -85,7 +85,7 @@ public:
 		return true;
 	}
 
-	QVariant headerData(int section, Qt::Orientation orientation, int role) const
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const override
 	{
 		if (role == Qt::DisplayRole)
 		{
@@ -132,12 +132,7 @@ public:
 		for (const QFileInfo& file : paths)
 		{
 			QPair<QFileInfo, bool> pair(file, true);
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 			_files.emplaceBack(pair);
-#else
-			_files.append(pair);
-#endif
 		}
 
 		endInsertRows();

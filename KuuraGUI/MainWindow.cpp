@@ -230,11 +230,7 @@ void MainWindow::dropEvent(QDropEvent* e)
 
 	for (const QUrl& url : e->mimeData()->urls())
 	{
-	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 		paths.emplace_back(QDir::toNativeSeparators(url.toLocalFile()));
-	#else
-		paths.append(QDir::toNativeSeparators(url.toLocalFile()));
-	#endif
 	}
 
 	_pathSelectTab->addPaths(std::move(paths));

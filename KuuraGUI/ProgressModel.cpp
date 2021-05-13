@@ -216,11 +216,7 @@ void ProgressModel::addNode(const std::filesystem::path& path)
 {
 	auto node = new ProgressNode(_root);
 	node->path = path;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	_root->_children.emplaceBack(node);
-#else
-	_root->_children.append(node);
-#endif
 }
 
 void ProgressModel::setPassCount(uint16_t passes)
@@ -230,11 +226,7 @@ void ProgressModel::setPassCount(uint16_t passes)
 		for (uint16_t i = 0; i < passes; ++i)
 		{
 			auto node = new ProgressNode(iter);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 			iter->_children.emplaceBack(node);
-#else
-			iter->_children.append(node);
-#endif
 		}
 	}
 
