@@ -170,7 +170,8 @@ namespace Kuura
 				<< " Speed: " << DataUnit::SpeedPerSecond(bytesWrittenSince, elapsedSince)
 				<< ". Avg. speed: " << DataUnit::SpeedPerSecond(bytesWrittenTotal, elapsedTotal)
 				<< ". Time left: " << Time::HumanReadable(DataUnit::TimeLeft(bytesLeft, bytesWrittenTotal, _totalTimer))
-				<< '\n';
+				<< ". " << std::setprecision(3) << std::fixed << (float(bytesWritten) / float(_bytesToWrite)) * 100.0f
+				<< "% complete.\n";
 		}
 
 		_currentTimer.Reset();
