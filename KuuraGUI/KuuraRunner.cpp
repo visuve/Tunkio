@@ -22,9 +22,17 @@ KuuraRunner::~KuuraRunner()
 	qDebug() << "Destroyed.";
 }
 
-bool KuuraRunner::addTarget(KuuraTargetType type, const std::filesystem::path& path, bool remove)
+bool KuuraRunner::addTarget(KuuraTargetType type, const QString& path, bool remove)
 {
-	return KuuraAddTarget(_kuura, type, path.c_str(), remove);
+	const std::filesystem::path native =
+		QDir::toNativeSeparators(path).toStdString();
+
+	return KuuraAddTarget(_kuura, type, native.c_str(), remove);
+}
+
+bool KuuraRunner::addTarget(KuuraTargetType type, const QFileInfo& path, bool remove)
+{
+	return addTarget(type, path.absoluteFilePath(), remove);
 }
 
 bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify)

@@ -6,8 +6,9 @@ using MilliSeconds = std::chrono::duration<float, std::ratio<1, 1000>>;
 class ProgressNode
 {
 public:
-	ProgressNode(ProgressNode* parent) :
-		_parent(parent)
+	explicit ProgressNode(ProgressNode* parent, const QVector<QVariant>& data) :
+		_parent(parent),
+		_data(data)
 	{
 	}
 
@@ -16,50 +17,112 @@ public:
 		qDeleteAll(_children);
 	}
 
-	int row() const
+	ProgressNode* addChild(const QVector<QVariant>& data)
 	{
-		return _parent ?
-			_parent->_children.indexOf(const_cast<ProgressNode*>(this)) :
-			0;
+		return _children.emplaceBack(new ProgressNode(this, data));
 	}
 
-	const ProgressNode* _parent;
+	ProgressNode* childAt(int row)
+	{
+		if (row < 0 || row >= _children.size())
+		{
+			return nullptr;
+		}
+
+		return _children.at(row);
+	}
+
+	QVector<ProgressNode*> findChildren(const std::function<bool(ProgressNode*)>& lambda) const
+	{
+		QVector<ProgressNode*> results;
+
+		for (ProgressNode* child : _children)
+		{
+			if (lambda(child))
+			{
+				results.emplaceBack(child);
+			}
+		}
+
+		return results;
+	}
+
+	int childCount() const
+	{
+		return _children.size();
+	}
+
+	int columnCount() const
+	{
+		return _data.size();
+	}
+
+	QVariant data(int column) const
+	{
+		if (column < 0 || column >= _data.size())
+		{
+			return QVariant();
+		}
+
+		return _data.at(column);
+	}
+
+	QVariantList data() const
+	{
+		return _data;
+	}
+
+	QVariant& operator[] (int index)
+	{
+		return _data[index];
+	}
+
+	int row() const
+	{
+		return _parent ? _parent->_children.indexOf(this) : 0;
+	}
+
+	ProgressNode* parent()
+	{
+		return _parent;
+	}
+
+	const QVector<ProgressNode*>& children() const
+	{
+		return _children;
+	}
+
+private:
+	ProgressNode* _parent;
 	QVector<ProgressNode*> _children;
-
-	std::filesystem::path path;
-	float bytesWritten = 0.0f;
-	float bytesLeft = 0.0f;
-	MilliSeconds millisecondsTaken;
-	MilliSeconds millisecondsLeft;
-	float bytesPerMilliSecond = 0.0f;
-	float progressPercent = 0.0f;
-
-	std::chrono::steady_clock::time_point startTime;
+	QVariantList _data;
 };
 
-ProgressModel::ProgressModel(QObject* parent) :
-	QAbstractItemModel(parent),
-	_root(new ProgressNode(nullptr))
+inline ProgressNode* indexToNode(const QModelIndex& index)
 {
-	/*auto alpha = new ProgressNode(_root);
-	alpha->path = "D:\\TEST DATA\\foo.txt";
+	return static_cast<ProgressNode*>(index.internalPointer());
+}
 
-	auto progressA1 = new ProgressNode(alpha);
-	progressA1->millisecondsTaken = MilliSeconds(1000);
-	progressA1->millisecondsLeft = MilliSeconds(0);
-	progressA1->bytesWritten = 10000;
-	progressA1->bytesLeft = 0;
-	progressA1->bytesPerMilliSecond = 10;
-	progressA1->progressPercent = 100.0f;
-
-	alpha->_children.append(progressA1);
-
-	_root->_children.append(alpha);*/
+ProgressModel::ProgressModel(const QVariantList& headerData, QObject* parent) :
+	QAbstractItemModel(parent),
+	_root(new ProgressNode(nullptr, headerData))
+{
+	// _root->addChild({ "/dev/sdc" })->addChild({ "Pass 1", "7.454", "14.907GB", "24m 01s", "23m 57s", "5.682MB/s", 50.000f });
 }
 
 ProgressModel::~ProgressModel()
 {
 	delete _root;
+}
+
+QVariant ProgressModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (role == Qt::DisplayRole && orientation == Qt::Horizontal)
+	{
+		return _root->data(section);
+	}
+
+	return QVariant();
 }
 
 QModelIndex ProgressModel::index(int row, int column, const QModelIndex& parentIndex) const
@@ -69,269 +132,100 @@ QModelIndex ProgressModel::index(int row, int column, const QModelIndex& parentI
 		return QModelIndex();
 	}
 
-	ProgressNode* parentNode = parentIndex.isValid() ?
-		static_cast<ProgressNode*>(parentIndex.internalPointer()) :
-		_root;
+	ProgressNode* parent = parentIndex.isValid() ? indexToNode(parentIndex) : _root;
+	ProgressNode* child = parent->childAt(row);
 
-	ProgressNode* childNode = parentNode->_children.at(row);
-
-	return childNode ?
-		createIndex(row, column, childNode) :
-		QModelIndex();
+	return child ? createIndex(row, column, child) : QModelIndex();
 }
 
 QModelIndex ProgressModel::parent(const QModelIndex& childIndex) const
 {
-	Q_ASSERT(childIndex.isValid());
-
 	if (!childIndex.isValid())
 	{
 		return QModelIndex();
 	}
 
-	const ProgressNode* parentNode = static_cast<ProgressNode*>(childIndex.internalPointer())->_parent;
+	ProgressNode* child = indexToNode(childIndex);
+	ProgressNode* parent = child->parent();
 
-	return parentNode != _root ?
-		createIndex(parentNode->row(), 0, parentNode) :
-		QModelIndex();
+	return parent == _root ?
+		QModelIndex() :
+		createIndex(parent->row(), 0, parent);
 }
 
 int ProgressModel::rowCount(const QModelIndex& parentIndex) const
 {
-	return parentIndex.isValid() ?
-		static_cast<ProgressNode*>(parentIndex.internalPointer())->_children.size() :
-		_root->_children.size();
+	if (parentIndex.column() > 0)
+	{
+		return 0;
+	}
+
+	return parentIndex.isValid() ? indexToNode(parentIndex)->childCount() : _root->childCount();
 }
 
 int ProgressModel::columnCount(const QModelIndex&) const
 {
-	return 7;
+	return _root->columnCount();
 }
 
 QVariant ProgressModel::data(const QModelIndex& index, int role) const
 {
-	Q_ASSERT(index.isValid());
-
 	if (!index.isValid())
 	{
 		return QVariant();
 	}
 
-	ProgressNode* node = static_cast<ProgressNode*>(index.internalPointer());
-	bool topLevel = node->_parent == _root;
-
-	if (role == Qt::DisplayRole)
-	{
-		switch (index.column())
-		{
-			case 0:
-			{
-				if (topLevel)
-				{
-					return Ui::toQString(node->path);
-				}
-
-				return QString("Pass %1").arg(index.row() + 1);
-			}
-			case 1:
-				if (topLevel)
-				{
-					break;
-				}
-
-				return Ui::bytesToString(node->bytesWritten);
-			case 2:
-				if (topLevel)
-				{
-					break;
-				}
-
-				return Ui::bytesToString(node->bytesLeft);
-			case 3:
-				if (topLevel)
-				{
-					break;
-				}
-
-				return Ui::millisecondsToString(node->millisecondsTaken);
-			case 4:
-				if (topLevel)
-				{
-					break;
-				}
-
-				return Ui::millisecondsToString(node->millisecondsLeft);
-			case 5:
-				if (topLevel)
-				{
-					break;
-				}
-
-				return Ui::bytesToString(node->bytesPerMilliSecond * 1000.0f).append("/s");
-			case 6:
-				if (topLevel)
-				{
-					break;
-				}
-
-				return std::clamp(node->progressPercent, 0.00f, 100.00f);
-		}
-	}
-
-	return QVariant();
-}
-
-QVariant ProgressModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
 	if (role != Qt::DisplayRole)
 	{
 		return QVariant();
 	}
 
-	if (orientation == Qt::Horizontal)
+	return indexToNode(index)->data(index.column());
+}
+
+void ProgressModel::addTarget(const QVariant& path)
+{
+	_root->addChild({ path });
+}
+
+void ProgressModel::addPass(const QVariantList& pass)
+{
+	for (ProgressNode* node : _root->children())
 	{
-		switch (section)
+		node->addChild(pass);
+	}
+}
+
+bool ProgressModel::setData(const QString& path, int row, int column, const QVariant& value)
+{
+	QVector<ProgressNode*> nodes = _root->findChildren([&](ProgressNode* node)->bool
+	{
+		if (row == -1)
 		{
-			case 0:
-				return "Path";
-			case 1:
-				return "Bytes written";
-			case 2:
-				return "Bytes left";
-			case 3:
-				return "Time taken";
-			case 4:
-				return "Time left";
-			case 5:
-				return "Speed";
-			case 6:
-				return "Progress";
+			return node->data(0) == path;
+		}
+
+		return node->row() == row && node->data(0) == path;
+	});
+
+	for (ProgressNode* node : nodes)
+	{
+		(*node)[column] = value;
+	}
+
+	return !nodes.isEmpty();
+}
+
+/*QVariantList* ProgressModel::data(const QString& path, int row, int column)
+{
+	for (ProgressNode* node : _root->children())
+	{
+		if (node->row() == row && node->data(0) == path)
+		{
+			return &node->data();
 		}
 	}
 
-	return QVariant();
-}
+	return nullptr;
+}*/
 
-void ProgressModel::addNode(const std::filesystem::path& path)
-{
-	auto node = new ProgressNode(_root);
-	node->path = path;
-	_root->_children.emplaceBack(node);
-}
-
-void ProgressModel::setPassCount(uint16_t passes)
-{
-	for (ProgressNode* iter : _root->_children)
-	{
-		for (uint16_t i = 0; i < passes; ++i)
-		{
-			auto node = new ProgressNode(iter);
-			iter->_children.emplaceBack(node);
-		}
-	}
-
-	emit dataChanged(index(0, 0), index(passes, 1), { Qt::DisplayRole });
-}
-
-std::pair<int, ProgressNode*> ProgressModel::findTopLevelNode(const std::filesystem::path& path)
-{
-	ProgressNode* topLevelNode = nullptr;
-	int parentRow = 0;
-
-	for (ProgressNode* iter : _root->_children)
-	{
-		++parentRow;
-
-		if (iter->path != path)
-		{
-			continue;
-		}
-
-		topLevelNode = iter;
-		break;
-	}
-
-	if (!topLevelNode)
-	{
-		return { -1, nullptr };
-	}
-
-	return { parentRow, topLevelNode };
-}
-
-std::pair<int, ProgressNode*> ProgressModel::findProgressNode(const std::filesystem::path& path, uint16_t pass)
-{
-	auto node = findTopLevelNode(path);
-
-	if (node.first < 0 || !node.second)
-	{
-		return { -1, nullptr };
-	}
-
-	int subRow = pass - 1;
-	Q_ASSERT(subRow >= 0);
-
-	return { node.first, node.second->_children[subRow] };
-}
-
-void ProgressModel::beginTarget(const std::filesystem::path& path, uint64_t bytesToWrite)
-{
-	auto node = findTopLevelNode(path);
-
-	if (!node.second)
-	{
-		return;
-	}
-
-	for (ProgressNode* progressNode : node.second->_children)
-	{
-		progressNode->bytesLeft = bytesToWrite;
-	}
-
-	const auto now = std::chrono::steady_clock::now();
-	node.second->startTime = now;
-	node.second->_children.first()->startTime = now;
-}
-
-void ProgressModel::updateNode(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten)
-{
-	auto iter = findProgressNode(path, pass);
-	int parentRow = iter.first;
-	ProgressNode* node = iter.second;
-
-	if (parentRow < 0 || !node)
-	{
-		return;
-	}
-
-	node->bytesWritten = bytesWritten;
-
-	if (node->bytesWritten > 0 && node->bytesLeft > 0)
-	{
-		const auto now = std::chrono::steady_clock::now();
-		node->bytesLeft -= bytesWritten;
-		node->progressPercent = node->bytesWritten / node->bytesLeft * 100.0f;
-		node->millisecondsTaken = std::chrono::duration_cast<MilliSeconds>(now - node->startTime);
-		node->bytesPerMilliSecond = node->millisecondsTaken.count() ? node->bytesWritten / node->millisecondsTaken.count() : 0;
-		node->millisecondsLeft = MilliSeconds(node->bytesLeft / node->bytesPerMilliSecond);
-	}
-
-	int row = pass - 1;
-	Q_ASSERT(row >= 0);
-	emit dataChanged(index(parentRow, 1), index(row, 6), { Qt::DisplayRole });
-}
-
-float ProgressModel::bytesWrittenTotal() const
-{
-	float result = 0;
-
-	for (ProgressNode* topLevel : _root->_children)
-	{
-		for (ProgressNode* iter : topLevel->_children)
-		{
-			result += iter->bytesWritten;
-		}
-	}
-
-	return result;
-}

@@ -14,7 +14,8 @@ public:
 	~KuuraRunner();
 
 public slots:
-	bool addTarget(KuuraTargetType type, const std::filesystem::path& path, bool remove);
+	bool addTarget(KuuraTargetType type, const QString& path, bool remove);
+	bool addTarget(KuuraTargetType type, const QFileInfo& path, bool remove);
 	bool addPass(KuuraFillType fillType, const QByteArray& fillValue, bool verify);
 	void stop();
 

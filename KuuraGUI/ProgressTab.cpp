@@ -7,7 +7,16 @@
 ProgressTab::ProgressTab(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::ProgressTab),
-	_model(new ProgressModel(this))
+	_model(new ProgressModel(
+		{
+			"Path",				// 0
+			"Bytes Written",	// 1
+			"Bytes Left",		// 2
+			"Time Taken",		// 3
+			"Time Left",		// 4
+			"Speed",			// 5
+			"Progress"			// 6
+		}, this))
 {
 	ui->setupUi(this);
 
@@ -18,6 +27,15 @@ ProgressTab::ProgressTab(QWidget *parent) :
 	{
 		emit nextRequested();
 	});
+
+	connect(&_totalProgressUpdater, &QTimer::timeout, [this]()
+	{
+		updateTotalProgress();
+	});
+
+	_totalProgressUpdater.setInterval(100);
+	ui->progressBar->setMinimum(0);
+	ui->progressBar->setMaximum(100);
 }
 
 ProgressTab::~ProgressTab()
@@ -26,26 +44,36 @@ ProgressTab::~ProgressTab()
 	qDebug();
 }
 
-void ProgressTab::addTarget(const std::filesystem::path& path)
+void ProgressTab::addTarget(const QString& path)
 {
-	_model->addNode(path);
+	_model->addTarget(path);
+}
+
+void ProgressTab::addTarget(const QFileInfo& path)
+{
+	addTarget(QDir::toNativeSeparators(path.absoluteFilePath()));
+}
+
+void ProgressTab::addPass(const QVariantList& pass)
+{
+	_model->addPass(pass);
 }
 
 void ProgressTab::onOverwriteStarted(uint16_t passes, uint64_t bytesToWritePerPass)
 {
-	_bytesToProcess = float(bytesToWritePerPass) * float(passes);
-	_overwriteStartTime = std::chrono::steady_clock::now();
+	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+
+	_totalProgress.reset(bytesToWritePerPass * passes);
 	ui->progressBar->setValue(0);
 	ui->pushButtonNext->setEnabled(false);
-
-	_model->setPassCount(passes);
-
-	qDebug() << "Wipe started:" << passes << '/' << bytesToWritePerPass;
+	_totalProgressUpdater.start();
 }
 
 void ProgressTab::onTargetStarted(const std::filesystem::path& path, uint64_t bytesToWrite)
 {
-	_model->beginTarget(path, bytesToWrite);
+	qDebug() << "Target started:" << Ui::toQString(path) << '/' << bytesToWrite;
+
+	//_model->setData(QString::fromStdWString(path), -1, 2, bytesToWrite);
 }
 
 void ProgressTab::onPassStarted(const std::filesystem::path& path, uint16_t pass)
@@ -53,11 +81,11 @@ void ProgressTab::onPassStarted(const std::filesystem::path& path, uint16_t pass
 	qDebug() << "Pass started:" << Ui::toQString(path) << '/' << pass;
 }
 
-void ProgressTab::onPassProgressed(const std::filesystem::path& path, uint16_t pass, uint64_t bytesWritten)
+void ProgressTab::onPassProgressed(const std::filesystem::path&, uint16_t, uint64_t bytesWritten)
 {
-	updateTotalProgress();
+	// qDebug() << "Pass progressed:" << Ui::toQString(path) << '/' << pass << '/' << bytesWritten;
 
-	_model->updateNode(path, pass, bytesWritten);
+	_totalProgress.update(bytesWritten);
 }
 
 void ProgressTab::onPassCompleted(const std::filesystem::path& path, uint16_t pass)
@@ -68,48 +96,52 @@ void ProgressTab::onPassCompleted(const std::filesystem::path& path, uint16_t pa
 void ProgressTab::onTargetCompleted(const std::filesystem::path& path, uint64_t bytesWritten)
 {
 	qDebug() << "Target completed:" << Ui::toQString(path) << '/' << bytesWritten;
+
+	//_model->setData(QString::fromStdWString(path), -1, 1, float(bytesWritten));
 }
 
 void ProgressTab::onOverwriteCompleted(uint16_t passes, uint64_t totalBytesWritten)
 {
 	qDebug() << "Wipe completed:" << passes << '/' << totalBytesWritten;
 
+	_totalProgressUpdater.stop();
+	_totalProgress.complete();
 	updateTotalProgress();
 	ui->progressBar->setValue(100);
 	ui->pushButtonNext->setEnabled(true);
 }
 
+void ProgressTab::onError()
+{
+	_totalProgressUpdater.stop();
+}
+
+void ProgressTab::updatePassProgress()
+{
+	// TODO: implement
+}
+
 void ProgressTab::updateTotalProgress()
 {
-	const float bytesWrittenTotal = _model->bytesWrittenTotal();
-
-	const std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
-	const float milliSecondsTaken = std::chrono::duration_cast<Ui::MilliSeconds>(time - _overwriteStartTime).count();
-
-	if (bytesWrittenTotal <= 0.00f || milliSecondsTaken <= 0.00f)
-	{
-		return;
-	}
-
-	const float bytesPerMilliSecond = bytesWrittenTotal / milliSecondsTaken;
+	qDebug();
 
 	{
+		const float milliSecondsTaken = _totalProgress.milliSecondsTaken();
 		const QString timeTaken = Ui::millisecondsToString(milliSecondsTaken);
 		ui->labelTimeTaken->setText(timeTaken);
 	}
 	{
-		const float bytesPerSecond = bytesPerMilliSecond * 1000.0f;
+		const float bytesPerSecond = _totalProgress.bytesPerMillisecond() * 1000.0f;
 		const QString speed = Ui::bytesToString(bytesPerSecond).append("/s");
 		ui->labelSpeed->setText(speed);
 	}
 	{
-		const float bytesLeft = _bytesToProcess - bytesWrittenTotal;
-		const float milliSecondsLeft = bytesLeft / bytesPerMilliSecond;
+		const float milliSecondsLeft = _totalProgress.millisecondsLeft();
 		const QString timeLeft = Ui::millisecondsToString(milliSecondsLeft);
 		ui->labelTimeLeft->setText(timeLeft);
 	}
 	{
-		const float percentage = (bytesWrittenTotal / _bytesToProcess) * 100.0f;
-		ui->progressBar->setValue(static_cast<int>(percentage));
+		const int percentage = static_cast<int>(_totalProgress.percentageDone());
+		ui->progressBar->setValue(percentage);
 	}
 }

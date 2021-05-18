@@ -245,28 +245,24 @@ void MainWindow::runKuura()
 	{
 		if (selectedPath.first.isFile())
 		{
-			const std::filesystem::path path = QDir::toNativeSeparators(selectedPath.first.absoluteFilePath()).toStdString();
-
 			if (kuura->addTarget(
 				KuuraTargetType::FileOverwrite,
-				path,
+				selectedPath.first,
 				selectedPath.second))
 			{
-				_progressTab->addTarget(path);
+				_progressTab->addTarget(selectedPath.first);
 				continue;
 			}
 		}
 
 		if (selectedPath.first.isDir())
 		{
-			const std::filesystem::path path = QDir::toNativeSeparators(selectedPath.first.absolutePath()).toStdString();
-
 			if (kuura->addTarget(
 				KuuraTargetType::DirectoryOverwrite,
-				path,
+				selectedPath.first,
 				selectedPath.second))
 			{
-				_progressTab->addTarget(path);
+				_progressTab->addTarget(selectedPath.first);
 				continue;
 			}
 		}
@@ -276,9 +272,9 @@ void MainWindow::runKuura()
 
 	for (const QString& selectedDrive : _driveSelectTab->selectedDrives())
 	{
-		if (kuura->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive.toStdString(), false))
+		if (kuura->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive, false))
 		{
-			_progressTab->addTarget(selectedDrive.toStdString());
+			_progressTab->addTarget(selectedDrive);
 			continue;
 		}
 
@@ -289,6 +285,7 @@ void MainWindow::runKuura()
 	{
 		if (kuura->addPass(pass.fillType, pass.fillValue, pass.verify))
 		{
+			_progressTab->addPass({ pass.fillType, pass.verify });
 			continue;
 		}
 
@@ -318,6 +315,8 @@ void MainWindow::runKuura()
 
 void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 {
+	_progressTab->onError();
+
 	QStringList message =
 	{
 		QString("An error occurred while %1 %2!\n")

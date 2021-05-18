@@ -7,6 +7,7 @@
 #include <QDesktopServices>
 #include <QDialog>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFileDialog>
 #include <QDateTime>
 #include <QDragEnterEvent>
@@ -14,18 +15,19 @@
 #include <QInputDialog>
 #include <QLocale>
 #include <QMainWindow>
-#include <QMapIterator>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QObject>
 #include <QPainter>
 #include <QPushButton>
+#include <QQueue>
 #include <QScreen>
 #include <QStyledItemDelegate>
 #include <QTabWidget>
 #include <QTreeWidgetItem>
 #include <QThread>
 #include <QTime>
+#include <QTimer>
 
 #include <array>
 #include <atomic>
