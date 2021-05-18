@@ -113,6 +113,20 @@ namespace Kuura
 			return false;
 		}
 
+		// TODO: Investigate why the drive layout is not deleted
+		if (!DeviceIoControl(
+			_handle,
+			IOCTL_DISK_UPDATE_PROPERTIES,
+			nullptr,
+			0,
+			nullptr,
+			0,
+			nullptr,
+			nullptr))
+		{
+			return false;
+		}
+
 		return true;
 	}
 
