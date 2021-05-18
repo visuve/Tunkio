@@ -59,7 +59,7 @@
          <item row="0" column="1">
           <widget class="QLabel" name="labelTimeTaken">
            <property name="text">
-            <string>20min</string>
+            <string>24min 1s</string>
            </property>
           </widget>
          </item>
@@ -73,7 +73,7 @@
          <item row="1" column="1">
           <widget class="QLabel" name="labelTimeLeft">
            <property name="text">
-            <string>1h 20min</string>
+            <string>23min 57s</string>
            </property>
           </widget>
          </item>
@@ -87,7 +87,7 @@
          <item row="2" column="1">
           <widget class="QLabel" name="labelSpeed">
            <property name="text">
-            <string>123 MiB/s</string>
+            <string>5.68 MiB/s</string>
            </property>
           </widget>
          </item>
@@ -106,7 +106,7 @@ QProgressBar::chunk {
 }</string>
            </property>
            <property name="value">
-            <number>24</number>
+            <number>50</number>
            </property>
           </widget>
          </item>

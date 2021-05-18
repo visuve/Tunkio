@@ -1,8 +1,12 @@
 #include "KuuraGUI-PCH.hpp"
 #include "ProgressBarDelegate.hpp"
 
-constexpr QColor PowderBlue(176, 224, 230);
-constexpr QColor Crystalsong(79, 179, 179);
+namespace
+{
+	constexpr QColor PowderBlue(176, 224, 230);
+	constexpr QColor Crystalsong(79, 179, 179);
+	const QBrush Light = QApplication::palette().light();
+}
 
 ProgressBarDelegate::ProgressBarDelegate(QObject* parent) :
 	QStyledItemDelegate(parent)
@@ -30,6 +34,8 @@ void ProgressBarDelegate::paint(
 	{
 		return;
 	}
+
+	painter->fillRect(option.rect, Light);
 
 	const float percent = std::clamp(data.toFloat(), 0.00f, 100.00f);
 
