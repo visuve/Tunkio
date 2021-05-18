@@ -9,7 +9,7 @@ namespace Kuura
 
 	std::map<std::string, Argument> Arguments =
 	{
-		{ "target", Argument(false, KuuraTargetType::FileOverwrite) },
+		{ "target", Argument(true, KuuraTargetType::FileOverwrite) },
 		{ "path", Argument(true, std::filesystem::path()) },
 		{ "mode", Argument(false, KuuraFillType::ZeroFill) },
 		{ "filler", Argument(false, std::string()) },
@@ -54,18 +54,18 @@ namespace Kuura
 		std::cout << " Usage examples:" << std::endl << std::endl;
 #if defined(_WIN32)
 		std::cout << "  " << exe.filename().string()
-			<< R"( --path="C:\\Users\\You\\SecretFile.txt" --target=f --mode=r)" << std::endl;
+			<< R"( --path="C:\\Users\\You\\SecretFile.txt" --target=f)" << std::endl;
 		std::cout << "  " << exe.filename().string()
-			<< R"( --path="C:\\Users\\You\\SecretDirectory" --target=d --mode=r)" << std::endl;
+			<< R"( --path="C:\\Users\\You\\SecretDirectory" --target=d)" << std::endl;
 		std::cout << "  " << exe.filename().string()
-			<< R"( --path=\\.\PHYSICALDRIVE9 --target=D --mode=r)" << std::endl;
+			<< R"( --path=\\.\PHYSICALDRIVE9 --target=D)" << std::endl;
 #else
 		std::cout << "  ./" << exe.filename().string()
-			<< " --path=/home/you/secret_file.txt --target=f --mode=r" << std::endl;
+			<< " --path=/home/you/secret_file.txt --target=f" << std::endl;
 		std::cout << "  ./" << exe.filename().string()
-			<< " --path=/home/you/secret_directory --target=d --mode=r" << std::endl;
+			<< " --path=/home/you/secret_directory --target=d" << std::endl;
 		std::cout << "  ./" << exe.filename().string()
-			<< " --path=/dev/sdx --target=D --mode=r" << std::endl;
+			<< " --path=/dev/sdx --target=D" << std::endl;
 #endif
 		std::cout << std::endl;
 
