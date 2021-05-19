@@ -24,12 +24,14 @@ namespace Kuura
 		std::shared_ptr<IFillProvider> provider,
 		std::shared_ptr<IFillConsumer> consumer)
 	{
+		const uint64_t size = std::min(bytesLeft, consumer->OptimalWriteSize().value());
+		const uint64_t alignment = consumer->AlignmentSize().value();
+
 		while (bytesLeft)
 		{
-			const uint64_t size = std::min(bytesLeft, consumer->OptimalWriteSize().value());
 			const uint64_t offset = bytesWritten;
 
-			const std::span<std::byte> writtenData = provider->Data(size, consumer->AlignmentSize().value());
+			const std::span<std::byte> writtenData = provider->Data(size, alignment);
 			const auto result = consumer->Write(writtenData);
 
 			bytesWritten += result.second;
@@ -60,7 +62,7 @@ namespace Kuura
 
 			if (!_callbacks->OnProgress(Path.c_str(), pass, bytesWritten))
 			{
-				return true;
+				return false;
 			}
 		}
 
