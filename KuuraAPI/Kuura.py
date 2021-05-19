@@ -5,6 +5,7 @@ import math
 import os
 import signal
 import sys
+import threading
 import time
 
 KUURA_STRING = ctypes.c_char_p if sys.platform != "win32" else ctypes.c_wchar_p
@@ -18,9 +19,35 @@ def human_readable(num, suffix='B'):
     return '{:3.2f} {}{}'.format(val, ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi'][magnitude], suffix)
 
 
+def update_progress():
+    while (Kuura.keep_running):
+        time.sleep(0.1)
+
+        start_time = Kuura.start_time
+        bytes_written = Kuura.bytes_written
+        bytes_beginning = Kuura.bytes_beginning
+
+        if start_time <= 0.0 or bytes_beginning <= 0.0 or bytes_written <= 0.0:
+            continue
+
+        seconds_taken = time.perf_counter() - start_time
+        bytes_per_second = float(bytes_written) / seconds_taken
+        bytes_left = bytes_beginning - bytes_written
+        seconds_left = bytes_left / bytes_per_second
+
+        sys.stdout.write(human_readable(bytes_written) + " written. ")
+        sys.stdout.write(human_readable(bytes_left) + " left")
+        sys.stdout.write(". Speed: " + human_readable(bytes_per_second, 'B/s'))
+        sys.stdout.write(". Taken: " + str(datetime.timedelta(seconds=int(seconds_taken))))
+        sys.stdout.write(". ETA: " + str(datetime.timedelta(seconds=int(seconds_left))))
+        sys.stdout.write(".\n")
+
 class Kuura:
-    _keep_running = False
-    _time_start = None
+    keep_running = False
+    start_time = 0.0
+    bytes_beginning = 0.0
+    bytes_written = 0.0
+    _update_thread = threading.Thread(target=update_progress)
 
     class Handle(ctypes.Structure):
         _fields_ = [
@@ -102,13 +129,15 @@ class Kuura:
     @staticmethod
     def signal_handler(signalled_number, frame):
         print("Canceled")
-        Kuura._keep_running = False
+        Kuura.keep_running = False
 
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint16, ctypes.c_uint64)
     def _on_overwrite_started(context, passes, bytes_left):
-        Kuura._time_start = time.perf_counter()
         print("Overwrite started")
+        Kuura.start_time = time.perf_counter()
+        Kuura.bytes_beginning = float(bytes_left)
+        Kuura._update_thread.start()
 
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, KUURA_STRING, ctypes.c_uint64)
@@ -123,22 +152,14 @@ class Kuura:
     @staticmethod
     @ctypes.CFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, KUURA_STRING, ctypes.c_uint16, ctypes.c_uint64)
     def _on_progress(context, path, pass_num, bytes_written):
-        now = time.perf_counter()
-        diff = now - Kuura._time_start
-        bytes_per_second = float(bytes_written) / diff
-
-        sys.stdout.write(human_readable(bytes_written) + " written")
-        sys.stdout.write(". Speed: " + human_readable(bytes_per_second, 'B/s'))
-        sys.stdout.write(". Taken: " + str(datetime.timedelta(seconds=int(diff))))
-        sys.stdout.write(".\n")
-
-        return Kuura._keep_running
+        Kuura.bytes_written = float(bytes_written)
+        return Kuura.keep_running
 
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, KUURA_STRING, ctypes.c_char, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint32)
     def _on_error(context, path, phase, pass_num, bytes_written, error_code):
-        Kuura._keep_running = False
         print(f"ERROR: {os.strerror(error_code)}!")
+        Kuura.keep_running = False
 
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, KUURA_STRING, ctypes.c_uint16)
@@ -154,10 +175,17 @@ class Kuura:
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint16, ctypes.c_uint64)
     def _on_overwrite_completed(context, passes, bytes_written):
         print("Overwrite completed")
+        Kuura.keep_running = False
 
     def __del__(self):
+        Kuura.keep_running = False
+
+        if Kuura._update_thread:
+            Kuura._update_thread.join()
+
         if self.kuura_handle:
             self.kuura_free_fn(self.kuura_handle)
+
         self.kuura_api = None
 
     def add_target(self, target_type, target_path, delete_after):
@@ -174,7 +202,7 @@ class Kuura:
 
     def run(self):
         assert(self.kuura_handle)
-        Kuura._keep_running = True
+        Kuura.keep_running = True
         self.kuura_run_fn(self.kuura_handle)
 
     def version(self)->str:
