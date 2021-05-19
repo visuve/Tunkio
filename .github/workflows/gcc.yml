@@ -15,8 +15,9 @@ jobs:
       run: |
         sudo apt update
         sudo apt --yes install g++-10 cmake ninja-build
-        sudo apt --yes install libudev-dev qtbase5-dev
+        sudo apt --yes install libudev-dev
         sudo apt --yes install valgrind
+        # sudo apt --yes install qtbase6-dev not yet available...
 
     - name: Build
       run: |
@@ -24,8 +25,8 @@ jobs:
         cd out
         export CC=/usr/bin/gcc-10
         export CXX=/usr/bin/g++-10
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
-        make
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DKUURA_SKIP_GUI_BUILD=True ..
+        ninja
 
     - name: Run unit tests
       run: |

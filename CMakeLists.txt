@@ -27,7 +27,6 @@ add_subdirectory("KuuraLIB")
 add_subdirectory("KuuraAPI")
 add_subdirectory("KuuraCLI")
 
-# TEMPORARILY DISABLED FOR OTHER PLATFORMS. UBUNTU 20.04 (GITHUB CI VM) CANNOT INSTALL QT 5.15 WHICH IS A REQUIREMENT
-if(CMAKE_SYSTEM_NAME MATCHES "Windows|FreeBSD")
+if(NOT KUURA_SKIP_GUI_BUILD)
 	add_subdirectory("KuuraGUI")
 endif()
