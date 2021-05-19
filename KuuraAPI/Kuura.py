@@ -35,12 +35,13 @@ def update_progress():
         bytes_left = bytes_beginning - bytes_written
         seconds_left = bytes_left / bytes_per_second
 
-        sys.stdout.write(human_readable(bytes_written) + " written. ")
-        sys.stdout.write(human_readable(bytes_left) + " left")
-        sys.stdout.write(". Speed: " + human_readable(bytes_per_second, 'B/s'))
-        sys.stdout.write(". Taken: " + str(datetime.timedelta(seconds=int(seconds_taken))))
-        sys.stdout.write(". ETA: " + str(datetime.timedelta(seconds=int(seconds_left))))
-        sys.stdout.write(".\n")
+        sys.stdout.write("{} written.".format(human_readable(bytes_written)))
+        sys.stdout.write(" {} left.".format(human_readable(bytes_left)))
+        sys.stdout.write(" {:.2%} Complete.".format(bytes_written / bytes_beginning))
+        sys.stdout.write(" Taken: {}.".format(datetime.timedelta(seconds=int(seconds_taken))))
+        sys.stdout.write(" ETA: {}.".format(datetime.timedelta(seconds=int(seconds_left))))
+        sys.stdout.write(" Speed: {}.".format(human_readable(bytes_per_second, 'B/s')))
+        sys.stdout.write('\n')
 
 class Kuura:
     keep_running = False
