@@ -133,6 +133,7 @@ namespace Kuura
 	{
 		_bytesToWrite = bytesLeft;
 		_bytesWrittenLastTime = 0;
+		_totalTimer.Reset();
 
 		std::cout << Time::Timestamp() << " Overwrite Started! Passes " << passes << '.' << std::endl;
 	}
@@ -144,7 +145,6 @@ namespace Kuura
 
 	void CLI::OnPassStarted(const std::filesystem::path&, uint16_t pass)
 	{
-		_totalTimer.Reset();
 		_currentTimer.Reset();
 
 		std::cout << Time::Timestamp() << " Pass " << pass << " started!" << std::endl;
