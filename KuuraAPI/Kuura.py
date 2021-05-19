@@ -1,13 +1,26 @@
 import ctypes
+import datetime
 import enum
+import math
 import os
 import signal
 import sys
+import time
 
 KUURA_STRING = ctypes.c_char_p if sys.platform != "win32" else ctypes.c_wchar_p
 
+
+def human_readable(num, suffix='B'):
+    magnitude = int(math.floor(math.log(num, 1024)))
+    val = num / math.pow(1024, magnitude)
+    if magnitude > 7:
+        return '{:.1f} {}{}'.format(val, 'Yi', suffix)
+    return '{:3.2f} {}{}'.format(val, ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi'][magnitude], suffix)
+
+
 class Kuura:
     _keep_running = False
+    _time_start = None
 
     class Handle(ctypes.Structure):
         _fields_ = [
@@ -94,6 +107,7 @@ class Kuura:
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_uint16, ctypes.c_uint64)
     def _on_overwrite_started(context, passes, bytes_left):
+        Kuura._time_start = time.perf_counter()
         print("Overwrite started")
 
     @staticmethod
@@ -109,14 +123,22 @@ class Kuura:
     @staticmethod
     @ctypes.CFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, KUURA_STRING, ctypes.c_uint16, ctypes.c_uint64)
     def _on_progress(context, path, pass_num, bytes_written):
-        print(bytes_written)
+        now = time.perf_counter()
+        diff = now - Kuura._time_start
+        bytes_per_second = float(bytes_written) / diff
+
+        sys.stdout.write(human_readable(bytes_written) + " written")
+        sys.stdout.write(". Speed: " + human_readable(bytes_per_second, 'B/s'))
+        sys.stdout.write(". Taken: " + str(datetime.timedelta(seconds=int(diff))))
+        sys.stdout.write(".\n")
+
         return Kuura._keep_running
 
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, KUURA_STRING, ctypes.c_char, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint32)
     def _on_error(context, path, phase, pass_num, bytes_written, error_code):
         Kuura._keep_running = False
-        print("ERROR")
+        print(f"ERROR: {os.strerror(error_code)}!")
 
     @staticmethod
     @ctypes.CFUNCTYPE(None, ctypes.c_void_p, KUURA_STRING, ctypes.c_uint16)
@@ -172,6 +194,6 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, Kuura.signal_handler)
 
-    # kuura.add_target(target_type=Kuura.TargetType.DriveOverwrite, target_path="/dev/da0", delete_after=False)
-    # kuura.add_pass(pass_type=Kuura.FillType.ZeroFill, verify_pass=False)
-    # kuura.run()
+    kuura.add_target(target_type=Kuura.TargetType.DriveOverwrite, target_path="/dev/da0", delete_after=False)
+    kuura.add_pass(pass_type=Kuura.FillType.ZeroFill, verify_pass=False)
+    kuura.run()
