@@ -55,6 +55,7 @@ namespace Kuura
 			if (!_file->Flush())
 			{
 				_callbacks->OnError(Path.c_str(), KuuraStage::Write, passes, bytesWritten, LastError);
+				return { false, totalBytesWritten };
 			}
 
 			totalBytesWritten += bytesWritten;
