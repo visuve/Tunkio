@@ -38,7 +38,8 @@
 - Qt >= 5.15
 
 ## TODO:
-
+- There is now regression in the GUI progress tab after refactoring
+	- Functionality missing
 - Known bug: if file has no allocation size e.g. lies within MFT, the overwrite will fail
 	- This raises a question, why do I even care about the allocation size, caching or alignment with regular files as it's insecure to wipe them anyways?
 		- Maybe just use std::fstream for files?
