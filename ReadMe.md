@@ -2,7 +2,7 @@
 
 - Overwrites files, folders or drives
 - Originally written during the small hours of a boring night
-	- Since then it has bloated a bit...
+	- Since then has bloated a bit...
 
 ## Folders
 
@@ -24,11 +24,12 @@
 - Google Test
 	- https://github.com/google/googletest
 		- Used for unit tests
-	- ``git submodule update --init``
-
 ## Getting started
 
-- ``apt install qt5-default``
+1. git clone --recursive https://github.com/visuve/kuura.git
+2. Install Qt
+3. Run cmake
+4. Build
 
 ## Tools
 
@@ -36,7 +37,7 @@
 - CMake >= 3.16
 - Qt >= 5.15
 
-## Developer TODO
+## TODO:
 
 - Known bug: if file has no allocation size e.g. lies within MFT, the overwrite will fail
 	- This raises a question, why do I even care about the allocation size, caching or alignment with regular files as it's insecure to wipe them anyways?
@@ -46,11 +47,3 @@
 	Complements the disk contents
 - Allow continuing on errors
 	- I.e. maybe have a boolean return value in OnError callback
-
-## Further reading notes:
-
-- https://linux.die.net/man/2/open
-- https://www.ibm.com/support/knowledgecenter/STXKQY_5.0.5/com.ibm.spectrum.scale.v5r05.doc/bl1adm_considerations_direct_io.htm
-- https://github.com/ronomon/direct-io
-- https://lwn.net/Articles/457667/
-- https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-160
