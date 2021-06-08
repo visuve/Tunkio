@@ -19,11 +19,6 @@
 	- Kuura Graphical User Interface, a simple dialog to show progress
 	- Depends on ``KuuraAPI`` & ``KuuraLIB``
 
-## Submodules
-
-- Google Test
-	- https://github.com/google/googletest
-		- Used for unit tests
 ## Getting started
 
 1. git clone --recursive https://github.com/visuve/kuura.git
@@ -33,9 +28,15 @@
 
 ## Tools
 
-- Visual Studio >= 2019 or GCC >= 10.0 or Clang >= 10.0
+- Visual Studio >= 2019 or GCC >= 10.0 or Clang >= 11.0
 - CMake >= 3.16
-- Qt >= 5.15
+- Qt >= 6.1
+
+## Submodules
+
+- Google Test
+	- https://github.com/google/googletest
+		- Used for unit tests
 
 ## TODO:
 - There is now regression in the GUI progress tab after refactoring
