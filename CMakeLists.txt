@@ -27,6 +27,10 @@ add_subdirectory("KuuraLIB")
 add_subdirectory("KuuraAPI")
 add_subdirectory("KuuraCLI")
 
-if(NOT KUURA_SKIP_GUI_BUILD)
+find_package(Qt6)
+
+if(Qt6_FOUND)
 	add_subdirectory("KuuraGUI")
+else()
+	message(WARNING "QT 6 not found. KuuraGUI not included.")
 endif()
