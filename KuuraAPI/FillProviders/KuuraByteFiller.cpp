@@ -9,12 +9,11 @@ namespace Kuura
 	{
 	}
 
-	std::span<std::byte> ByteFiller::Data(uint64_t bytes, uint64_t alignment)
+	std::span<std::byte> ByteFiller::Data(uint64_t bytes)
 	{
 		if (_fillData.size() != bytes)
 		{
 			_fillData.resize(bytes, _byte);
-			AlignData(alignment);
 		}
 
 		return _fillData;

@@ -19,7 +19,6 @@ namespace Kuura
 		virtual ~IFillConsumer() = default;
 
 		virtual std::optional<uint64_t> Size() const = 0;
-		virtual std::optional<uint64_t> AlignmentSize() const = 0;
 		virtual std::optional<uint64_t> OptimalWriteSize() const = 0;
 
 		virtual std::pair<bool, uint64_t> Write(const std::span<std::byte> data) = 0;

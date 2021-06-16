@@ -6,7 +6,6 @@ namespace Kuura
 	Drive::Drive(const std::filesystem::path& path) :
 		IFillConsumer(path),
 		_actualSize(2048),
-		_alignmentSize(512),
 		_optimalWriteSize(1024)
 	{
 	}
@@ -28,7 +27,6 @@ namespace Kuura
 			std::swap(_descriptor, other._descriptor);
 #endif
 			std::swap(_actualSize, other._actualSize);
-			std::swap(_alignmentSize, other._alignmentSize);
 			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
@@ -47,11 +45,6 @@ namespace Kuura
 	std::optional<uint64_t> Drive::Size() const
 	{
 		return _actualSize;
-	}
-
-	std::optional<uint64_t> Drive::AlignmentSize() const
-	{
-		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> Drive::OptimalWriteSize() const

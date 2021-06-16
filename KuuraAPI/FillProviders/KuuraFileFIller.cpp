@@ -30,14 +30,13 @@ namespace Kuura
 		return !_fileContent.empty();
 	}
 
-	std::span<std::byte> FileFiller::Data(uint64_t bytes, uint64_t alignment)
+	std::span<std::byte> FileFiller::Data(uint64_t bytes)
 	{
 		assert(HasContent());
 
 		if (_fillData.size() != bytes)
 		{
 			_fillData.resize(bytes);
-			AlignData(alignment);
 		}
 
 		for (size_t i = 0; i < bytes; ++i)

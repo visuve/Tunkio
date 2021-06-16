@@ -11,12 +11,11 @@ namespace Kuura
 	{
 	}
 
-	std::span<std::byte> SequenceFiller::Data(uint64_t bytes, uint64_t alignment)
+	std::span<std::byte> SequenceFiller::Data(uint64_t bytes)
 	{
 		if (_fillData.size() != bytes)
 		{
 			_fillData.resize(bytes);
-			AlignData(alignment);
 		}
 
 		for (size_t i = 0; i < bytes; ++i)

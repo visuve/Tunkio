@@ -11,7 +11,7 @@ namespace Kuura
 #endif
 
 	// https://linux.die.net/man/2/open
-	constexpr uint32_t OpenFlags = O_RDWR | O_DIRECT | O_SYNC;
+	constexpr uint32_t OpenFlags = O_RDWR | O_SYNC;
 
 	std::optional<uint64_t> DiskSizeByDescriptor(const int descriptor)
 	{
@@ -43,20 +43,7 @@ namespace Kuura
 		}
 
 		_actualSize = DiskSizeByDescriptor(_descriptor);
-
-		// See notes in KuuraWin32File.cpp
-
-		_alignmentSize = fileInfo->st_blksize;
 		_optimalWriteSize = fileInfo->st_blksize / 512 * 0x10000;
-
-		if (_alignmentSize.value() % 512 != 0)
-		{
-			// Something is horribly wrong
-
-			_actualSize = std::nullopt;
-			_alignmentSize = std::nullopt;
-			_optimalWriteSize = std::nullopt;
-		}
 	}
 
 	Drive::Drive(Drive&& other) noexcept :
@@ -72,7 +59,6 @@ namespace Kuura
 			std::swap(Path, other.Path);
 			std::swap(_descriptor, other._descriptor);
 			std::swap(_actualSize, other._actualSize);
-			std::swap(_alignmentSize, other._alignmentSize);
 			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
@@ -103,11 +89,6 @@ namespace Kuura
 	std::optional<uint64_t> Drive::Size() const
 	{
 		return _actualSize;
-	}
-
-	std::optional<uint64_t> Drive::AlignmentSize() const
-	{
-		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> Drive::OptimalWriteSize() const

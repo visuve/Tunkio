@@ -47,11 +47,6 @@ namespace Kuura
 		return _allocationSize;
 	}
 
-	std::optional<uint64_t> File::AlignmentSize() const
-	{
-		return 0;
-	}
-
 	std::optional<uint64_t> File::OptimalWriteSize() const
 	{
 		return _optimalWriteSize;

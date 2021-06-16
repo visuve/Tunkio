@@ -75,14 +75,6 @@ namespace Kuura
 		return standardInfo.AllocationSize.QuadPart;
 	}
 
-	uint64_t PageSize()
-	{
-		SYSTEM_INFO systemInfo = {};
-		GetSystemInfo(&systemInfo);
-
-		return systemInfo.dwPageSize;
-	}
-
 	std::pair<bool, uint64_t> WriteTo(HANDLE handle, const std::span<std::byte> data)
 	{
 		DWORD bytesWritten = 0;

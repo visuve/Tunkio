@@ -25,17 +25,7 @@ namespace Kuura
 		}
 
 		_allocationSize = fileInfo->st_blocks * 512;
-
-		// See notes in KuuraWin32File.cpp
-
 		_optimalWriteSize = fileInfo->st_blksize / 512 * 0x10000;
-
-		if (fileInfo->st_blksize % 512 != 0)
-		{
-			// Something is horribly wrong
-			_allocationSize = std::nullopt;
-			_optimalWriteSize = std::nullopt;
-		}
 	}
 
 	File::File(File&& other) noexcept :
@@ -74,11 +64,6 @@ namespace Kuura
 	std::optional<uint64_t> File::Size() const
 	{
 		return _allocationSize;
-	}
-
-	std::optional<uint64_t> File::AlignmentSize() const
-	{
-		return 0;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const

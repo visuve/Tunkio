@@ -15,13 +15,6 @@ namespace Kuura
 
 		_allocationSize = AllocationSizeByHandle(_handle);
 		_optimalWriteSize = OptimalWriteSizeByHandle(_handle);
-
-		if (!_optimalWriteSize || _optimalWriteSize.value() % 512 != 0)
-		{
-			// Something is horribly wrong
-			_allocationSize = std::nullopt;
-			_optimalWriteSize = std::nullopt;
-		}
 	}
 
 	File::File(File&& other) noexcept :
@@ -60,11 +53,6 @@ namespace Kuura
 	std::optional<uint64_t> File::Size() const
 	{
 		return _allocationSize;
-	}
-
-	std::optional<uint64_t> File::AlignmentSize() const
-	{
-		return 0;
 	}
 
 	std::optional<uint64_t> File::OptimalWriteSize() const

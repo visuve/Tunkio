@@ -21,7 +21,7 @@ namespace Kuura
 	TEST(KuuraFillTest, ByteFiller)
 	{
 		ByteFiller filler(std::byte(0x58), false);
-		auto data = filler.Data(3, 0);
+		auto data = filler.Data(3);
 		EXPECT_TRUE(data == "XXX");
 	}
 
@@ -29,46 +29,46 @@ namespace Kuura
 	{
 		{
 			SequenceFiller filler("foobar\n", false);
-			const auto data = filler.Data(3, 0);
+			const auto data = filler.Data(3);
 			EXPECT_TRUE(data == "foo");
 		}
 		{
 			SequenceFiller filler("foobar\n", false);
-			const auto data = filler.Data(14, 0);
+			const auto data = filler.Data(14);
 			EXPECT_TRUE(data == "foobar\nfoobar\n");
 		}
 		{
 			SequenceFiller filler("foobar\n", false);
-			const auto data = filler.Data(15, 0);
+			const auto data = filler.Data(15);
 			EXPECT_TRUE(data == "foobar\nfoobar\nf");
 		}
 		{
 			SequenceFiller filler("foobar", false);
 			{
-				const auto data = filler.Data(3, 0);
+				const auto data = filler.Data(3);
 				EXPECT_TRUE(data == "foo");
 			}
 			{
-				const auto data = filler.Data(3, 0);
+				const auto data = filler.Data(3);
 				EXPECT_TRUE(data == "bar");
 			}
 			{
-				const auto data = filler.Data(3, 0);
+				const auto data = filler.Data(3);
 				EXPECT_TRUE(data == "foo");
 			}
 		}
 		{
 			SequenceFiller filler("foobar", false);
 			{
-				const auto data = filler.Data(3, 0);
+				const auto data = filler.Data(3);
 				EXPECT_TRUE(data == "foo");
 			}
 			{
-				const auto data = filler.Data(4, 0);
+				const auto data = filler.Data(4);
 				EXPECT_TRUE(data == "barf");
 			}
 			{
-				const auto data = filler.Data(2, 0);
+				const auto data = filler.Data(2);
 				EXPECT_TRUE(data == "oo");
 			}
 		}
@@ -82,17 +82,17 @@ namespace Kuura
 
 		{
 			FileFiller filler(fileContent, false);
-			const auto data = filler.Data(3, 0);
+			const auto data = filler.Data(3);
 			EXPECT_TRUE(data == "foo");
 		}
 		{
 			FileFiller filler(fileContent, false);
-			const auto data = filler.Data(14, 0);
+			const auto data = filler.Data(14);
 			EXPECT_TRUE(data == "foobar\nfoobar\n");
 		}
 		{
 			FileFiller filler(fileContent, false);
-			const auto data = filler.Data(15, 0);
+			const auto data = filler.Data(15);
 			EXPECT_TRUE(data == "foobar\nfoobar\nf");
 		}
 	}
@@ -103,7 +103,7 @@ namespace Kuura
 
 		for (uint64_t i = 0; i < 10; ++i)
 		{
-			EXPECT_NO_THROW(filler.Data(i, 0));
+			EXPECT_NO_THROW(filler.Data(i));
 		}
 	}
 
@@ -114,11 +114,11 @@ namespace Kuura
 		std::vector<std::byte> after;
 
 		{
-			auto data = filler.Data(8, 0);
+			auto data = filler.Data(8);
 			before.insert(before.begin(), data.begin(), data.end());
 		}
 		{
-			auto data = filler.Data(8, 0);
+			auto data = filler.Data(8);
 			after.insert(after.begin(), data.begin(), data.end());
 		}
 
@@ -134,11 +134,11 @@ namespace Kuura
 		std::vector<std::byte> fillB;
 
 		{
-			auto data = fillerA.Data(8, 0);
+			auto data = fillerA.Data(8);
 			fillA.insert(fillA.begin(), data.begin(), data.end());
 		}
 		{
-			auto data = fillerB.Data(8, 0);
+			auto data = fillerB.Data(8);
 			fillB.insert(fillB.begin(), data.begin(), data.end());
 		}
 

@@ -10,7 +10,7 @@ namespace Kuura
 		explicit SequenceFiller(const std::string& fillString, bool verify);
 		~SequenceFiller() = default;
 
-		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
+		std::span<std::byte> Data(uint64_t bytes) override;
 
 	protected:
 		const std::string _fillString;

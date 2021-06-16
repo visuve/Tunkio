@@ -12,7 +12,7 @@ namespace Kuura
 		~FileFiller() = default;
 
 		bool HasContent();
-		std::span<std::byte> Data(uint64_t bytes, uint64_t alignment) override;
+		std::span<std::byte> Data(uint64_t bytes) override;
 
 	private:
 		const std::vector<std::byte> _fileContent;

@@ -15,7 +15,7 @@ namespace Kuura
 	{
 	}
 
-	std::span<std::byte> RandomFiller::Data(uint64_t bytes, uint64_t alignment)
+	std::span<std::byte> RandomFiller::Data(uint64_t bytes)
 	{
 		thread_local std::random_device device;
 		thread_local std::mt19937_64 engine(device());
@@ -24,7 +24,6 @@ namespace Kuura
 		if (_fillData.size() != bytes)
 		{
 			_fillData.resize(bytes);
-			AlignData(alignment);
 
 			UInt64Union randomNumber;
 

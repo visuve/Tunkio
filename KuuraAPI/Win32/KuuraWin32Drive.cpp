@@ -52,16 +52,7 @@ namespace Kuura
 		}
 
 		_actualSize = DiskSizeByHandle(_handle);
-		_alignmentSize = PageSize();
 		_optimalWriteSize = OptimalWriteSizeByHandle(_handle);
-
-		if (!_alignmentSize || _alignmentSize.value() % 512 != 0)
-		{
-			// Something is horribly wrong
-			_actualSize = std::nullopt;
-			_alignmentSize = std::nullopt;
-			_optimalWriteSize = std::nullopt;
-		}
 	}
 
 	Drive::Drive(Drive&& other) noexcept :
@@ -77,7 +68,6 @@ namespace Kuura
 			std::swap(Path, other.Path);
 			std::swap(_handle, other._handle);
 			std::swap(_actualSize, other._actualSize);
-			std::swap(_alignmentSize, other._alignmentSize);
 			std::swap(_optimalWriteSize, other._optimalWriteSize);
 		}
 
@@ -133,11 +123,6 @@ namespace Kuura
 	std::optional<uint64_t> Drive::Size() const
 	{
 		return _actualSize;
-	}
-
-	std::optional<uint64_t> Drive::AlignmentSize() const
-	{
-		return _alignmentSize;
 	}
 
 	std::optional<uint64_t> Drive::OptimalWriteSize() const
