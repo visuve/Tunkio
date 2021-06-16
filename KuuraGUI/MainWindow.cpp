@@ -239,13 +239,13 @@ void MainWindow::dropEvent(QDropEvent* e)
 
 void MainWindow::runKuura()
 {
-	auto kuura = new KuuraRunner();
+	auto kuuraRunner = new KuuraRunner(this);
 
 	for (const QPair<QFileInfo, bool>& selectedPath : _pathSelectTab->selectedPaths())
 	{
 		if (selectedPath.first.isFile())
 		{
-			if (kuura->addTarget(
+			if (kuuraRunner->addTarget(
 				KuuraTargetType::FileOverwrite,
 				selectedPath.first,
 				selectedPath.second))
@@ -257,7 +257,7 @@ void MainWindow::runKuura()
 
 		if (selectedPath.first.isDir())
 		{
-			if (kuura->addTarget(
+			if (kuuraRunner->addTarget(
 				KuuraTargetType::DirectoryOverwrite,
 				selectedPath.first,
 				selectedPath.second))
@@ -272,7 +272,7 @@ void MainWindow::runKuura()
 
 	for (const QString& selectedDrive : _driveSelectTab->selectedDrives())
 	{
-		if (kuura->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive, false))
+		if (kuuraRunner->addTarget(KuuraTargetType::DriveOverwrite, selectedDrive, false))
 		{
 			_progressTab->addTarget(selectedDrive);
 			continue;
@@ -283,7 +283,7 @@ void MainWindow::runKuura()
 
 	for (const AlgorithmTab::OverwritePass& pass : _algorithmTab->selectedPasses())
 	{
-		if (kuura->addPass(pass.fillType, pass.fillValue, pass.verify))
+		if (kuuraRunner->addPass(pass.fillType, pass.fillValue, pass.verify))
 		{
 			_progressTab->addPass({ pass.fillType, pass.verify });
 			continue;
@@ -292,29 +292,29 @@ void MainWindow::runKuura()
 		qCritical() << "Should never reach here!";
 	}
 
-	connect(kuura, &KuuraRunner::errorOccurred, this, &MainWindow::onError);
+	connect(kuuraRunner, &KuuraRunner::overwriteStarted, _progressTab, &ProgressTab::onOverwriteStarted);
+	connect(kuuraRunner, &KuuraRunner::targetStarted, _progressTab, &ProgressTab::onTargetStarted);
+	connect(kuuraRunner, &KuuraRunner::passStarted, _progressTab, &ProgressTab::onPassStarted);
+	connect(kuuraRunner, &KuuraRunner::passProgressed, _progressTab, &ProgressTab::onPassProgressed);
+	connect(kuuraRunner, &KuuraRunner::passCompleted, _progressTab, &ProgressTab::onPassCompleted);
+	connect(kuuraRunner, &KuuraRunner::targetCompleted, _progressTab, &ProgressTab::onTargetCompleted);
+	connect(kuuraRunner, &KuuraRunner::overwriteCompleted, _progressTab, &ProgressTab::onOverwriteCompleted);
 
-	connect(kuura, &KuuraRunner::overwriteStarted, _progressTab, &ProgressTab::onOverwriteStarted);
-	connect(kuura, &KuuraRunner::targetStarted, _progressTab, &ProgressTab::onTargetStarted);
-	connect(kuura, &KuuraRunner::passStarted, _progressTab, &ProgressTab::onPassStarted);
-	connect(kuura, &KuuraRunner::passProgressed, _progressTab, &ProgressTab::onPassProgressed);
-	connect(kuura, &KuuraRunner::passCompleted, _progressTab, &ProgressTab::onPassCompleted);
-	connect(kuura, &KuuraRunner::targetCompleted, _progressTab, &ProgressTab::onTargetCompleted);
-	connect(kuura, &KuuraRunner::overwriteCompleted, _progressTab, &ProgressTab::onOverwriteCompleted);
-
-	connect(kuura, &KuuraRunner::overwriteCompleted, this, []()
+	connect(kuuraRunner, &KuuraRunner::overwriteCompleted, this, []()
 	{
-		qDebug() << "DONE!";
+		qDebug() << "Completed";
 	});
 
-	connect(kuura, &QThread::finished, kuura, &QObject::deleteLater);
+	connect(kuuraRunner, &QThread::finished, kuuraRunner, &QObject::deleteLater); // TODO: causes crash
 
-	kuura->start();
+	kuuraRunner->start();
 }
 
 
 void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, uint16_t pass, uint64_t bytesWritten, uint32_t errorCode)
 {
+	qWarning() << path << stage << pass << bytesWritten << errorCode;
+
 	_progressTab->onError();
 
 	QStringList message =
@@ -327,6 +327,7 @@ void MainWindow::onError(const std::filesystem::path& path, KuuraStage stage, ui
 	message << QString("Pass: %1").arg(pass);
 	message << QString("Bytes written: %1").arg(bytesWritten);
 	message << QString("Operating system error code: %1").arg(errorCode);
+
 	/*message << "Detailed description: " <<
 		QString::fromStdString(Kuura::SystemErrorCodeToString(errorCode));*/
 
