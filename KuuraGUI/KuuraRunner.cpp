@@ -11,12 +11,12 @@ KuuraRunner::~KuuraRunner()
 {
 	qDebug() << "Destroying...";
 
-	_keepRunning = false;
 	wait();
 
 	if (_kuura)
 	{
 		KuuraFree(_kuura);
+		_kuura = nullptr;
 	}
 
 	qDebug() << "Destroyed.";
@@ -60,9 +60,9 @@ bool KuuraRunner::addPass(KuuraFillType fillType, const QByteArray& fillValue, b
 	return false;
 }
 
-void KuuraRunner::stop()
+bool KuuraRunner::keepRunning() const
 {
-	_keepRunning = false;
+	return QThread::currentThread()->isInterruptionRequested() == false;
 }
 
 void KuuraRunner::attachCallbacks()
@@ -112,7 +112,7 @@ void KuuraRunner::attachCallbacks()
 		auto self = static_cast<KuuraRunner*>(context);
 		Q_ASSERT(self);
 		emit self->passProgressed(path, pass, bytesWritten);
-		return self->_keepRunning.load(); // TODO: investigate why isInterruptionRequested() does not work
+		return self->keepRunning();
 	});
 
 	KuuraSetPassCompletedCallback(_kuura, [](
@@ -164,8 +164,6 @@ void KuuraRunner::run()
 	qDebug() << "Started!";
 	Q_ASSERT(_kuura);
 
-	_keepRunning = true;
-
 	attachCallbacks();
 
 	if (!KuuraRun(_kuura))
@@ -174,5 +172,5 @@ void KuuraRunner::run()
 		return;
 	}
 
-	qDebug() << (_keepRunning ? "Finished!" : "Canceled.");
+	qDebug() << "Finished!";
 }
