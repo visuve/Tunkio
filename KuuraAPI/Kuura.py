@@ -1,3 +1,4 @@
+import argparse
 import ctypes
 import datetime
 import enum
@@ -20,7 +21,7 @@ def human_readable(num, suffix='B'):
 
 
 def update_progress():
-    while (Kuura.keep_running):
+    while Kuura.keep_running:
         time.sleep(0.1)
 
         start_time = Kuura.start_time
@@ -34,6 +35,9 @@ def update_progress():
         bytes_per_second = float(bytes_written) / seconds_taken
         bytes_left = bytes_beginning - bytes_written
         seconds_left = bytes_left / bytes_per_second
+
+        if Kuura.keep_running == False:
+            return
 
         sys.stdout.write("{} written.".format(human_readable(bytes_written)))
         sys.stdout.write(" {} left.".format(human_readable(bytes_left)))
@@ -210,6 +214,11 @@ class Kuura:
         return self.kuura_version_fn().decode('ascii')
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Kuura Python wrapper")
+    parser.add_argument('--target', type=ord, required=True)
+    parser.add_argument('--path', type=str, required=True)
+    args = parser.parse_args()
+
     this_directory =  os.path.dirname(os.path.abspath(__file__))
     kuura_api_path = None
 
@@ -223,6 +232,6 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, Kuura.signal_handler)
 
-    kuura.add_target(target_type=Kuura.TargetType.DriveOverwrite, target_path="/dev/da0", delete_after=False)
+    kuura.add_target(target_type=args.target, target_path=args.path, delete_after=False)
     kuura.add_pass(pass_type=Kuura.FillType.ZeroFill, verify_pass=False)
     kuura.run()
